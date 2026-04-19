@@ -273,6 +273,18 @@ namespace Emby.YouTubePlugin
             return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
         }
 
+        // ── Channel Live Streams ──
+
+        public static async Task<JsonDocument?> GetChannelLiveAsync(
+            string apiKey, string channelId, string? pageToken, CancellationToken ct)
+        {
+            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
+                      $"&type=video&eventType=live&order=date&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+            if (!string.IsNullOrEmpty(pageToken))
+                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+        }
+
         // ── Playlist Videos ──
 
         public static async Task<JsonDocument?> GetPlaylistVideosAsync(

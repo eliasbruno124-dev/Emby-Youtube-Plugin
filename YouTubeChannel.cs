@@ -202,6 +202,34 @@ namespace Emby.YouTubePlugin
                     string type = query.FolderId.Substring(0, sepIdx);
                     string term = query.FolderId.Substring(sepIdx + FolderSeparator.Length);
 
+                    // ── Channel → show subcategories ──
+                    if (type == "channel")
+                    {
+                        items.Add(new ChannelItemInfo
+                        {
+                            Name = "📺 Videos",
+                            Id = $"channelvideos{FolderSeparator}{term}",
+                            Type = ChannelItemType.Folder
+                        });
+                        items.Add(new ChannelItemInfo
+                        {
+                            Name = "⚡ Shorts",
+                            Id = $"channelshorts{FolderSeparator}{term}",
+                            Type = ChannelItemType.Folder
+                        });
+                        items.Add(new ChannelItemInfo
+                        {
+                            Name = "🔴 Live",
+                            Id = $"channellive{FolderSeparator}{term}",
+                            Type = ChannelItemType.Folder
+                        });
+                        return new ChannelItemResult
+                        {
+                            Items = items,
+                            TotalRecordCount = items.Count
+                        };
+                    }
+
                     if (type == "trending")
                     {
                         var trendingResult = await LoadTrending(apiKey, cancellationToken,
@@ -228,8 +256,14 @@ namespace Emby.YouTubePlugin
                         if (type == "search")
                             doc = await YouTubeApi.SearchVideosAsync(apiKey, term, pageToken, cancellationToken)
                                 .ConfigureAwait(false);
-                        else if (type == "channel")
+                        else if (type == "channelvideos")
                             doc = await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, cancellationToken, config.ChannelSortBy)
+                                .ConfigureAwait(false);
+                        else if (type == "channelshorts")
+                            doc = await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, cancellationToken, config.ChannelSortBy)
+                                .ConfigureAwait(false);
+                        else if (type == "channellive")
+                            doc = await YouTubeApi.GetChannelLiveAsync(apiKey, term, pageToken, cancellationToken)
                                 .ConfigureAwait(false);
                         else if (type == "playlist")
                             doc = await YouTubeApi.GetPlaylistVideosAsync(apiKey, term, pageToken, cancellationToken)
@@ -294,6 +328,16 @@ namespace Emby.YouTubePlugin
                         }
 
                         ApplyCachedMeta(batch);
+
+                        // Filter: channelvideos = only regular videos, channelshorts = only shorts
+                        if (type == "channelvideos")
+                            batch.RemoveAll(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)
+                                                 || item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+                        else if (type == "channelshorts")
+                            batch.RemoveAll(item => !item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
+                        else if (type == "channellive")
+                            batch.RemoveAll(item => !item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+
                         foreach (var item in batch)
                             items.Add(item);
 
