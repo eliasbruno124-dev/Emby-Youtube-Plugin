@@ -272,7 +272,8 @@ namespace Emby.YouTubePlugin
                         if (doc == null) break;
 
                         // Extract videos
-                        var tempItems = ExtractVideos(doc, type == "playlist");
+                        bool isPlaylistFormat = type == "playlist" || type == "channelvideos" || type == "channelshorts";
+                        var tempItems = ExtractVideos(doc, isPlaylistFormat);
 
                         // Get next page token
                         pageToken = null;
@@ -405,16 +406,34 @@ namespace Emby.YouTubePlugin
                             if (ts.HasValue && ts.Value.TotalSeconds > 0)
                             {
                                 batchItem.RunTimeTicks = ts.Value.Ticks;
+                            }
 
-                                // Detect Shorts by duration
-                                bool isCurrentlyReel = batchItem.Id.StartsWith(ReelPrefix);
-                                if (!isCurrentlyReel && ts.Value.TotalSeconds <= ReelMaxSeconds
-                                    && !batchItem.Id.StartsWith(LivePrefix))
+                            // Detect Shorts via snippet.tags containing "shorts" or "#shorts"
+                            bool isShort = false;
+                            if (detail.TryGetProperty("snippet", out var snipEl)
+                                && snipEl.TryGetProperty("tags", out var tagsEl)
+                                && tagsEl.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var tag in tagsEl.EnumerateArray())
                                 {
-                                    // Check dimension hints from contentDetails
-                                    var def = YouTubeApi.GetNestedString(detail, "contentDetails", "definition");
-                                    // We'll do dimension check at playback time
+                                    var t = tag.GetString();
+                                    if (t != null && t.IndexOf("shorts", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    {
+                                        isShort = true;
+                                        break;
+                                    }
                                 }
+                            }
+                            // Fallback: duration ≤60s is very likely a Short
+                            if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60)
+                                isShort = true;
+
+                            if (isShort
+                                && !batchItem.Id.StartsWith(ReelPrefix)
+                                && !batchItem.Id.StartsWith(LivePrefix))
+                            {
+                                batchItem.Id = ReelPrefix + rawId;
+                                batchItem.Name = $"▶ Short: {batchItem.Name}";
                             }
 
                             // Description + view count

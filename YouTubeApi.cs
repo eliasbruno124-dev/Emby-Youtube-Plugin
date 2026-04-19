@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -12,6 +13,13 @@ namespace Emby.YouTubePlugin
     public static class YouTubeApi
     {
         private const string ApiBase = "https://www.googleapis.com/youtube/v3";
+
+        // ── Response cache to minimize API calls ──
+        private record CachedResponse(string Json, long CachedAtMs);
+        private static readonly ConcurrentDictionary<string, CachedResponse> ResponseCache = new();
+        private const int MaxCacheEntries = 200;
+        private const long CacheTtlMs = 15 * 60 * 1000; // 15 minutes
+        private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000; // 6 hours
 
         private static readonly HttpClient Http = new HttpClient(
             new SocketsHttpHandler
@@ -147,6 +155,48 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private static async Task<JsonDocument?> TryGetCachedJsonAsync(
+            string url, CancellationToken ct, long? customTtlMs = null)
+        {
+            var ttl = customTtlMs ?? CacheTtlMs;
+            var now = Environment.TickCount64;
+
+            // Check cache
+            if (ResponseCache.TryGetValue(url, out var cached)
+                && (now - cached.CachedAtMs) < ttl)
+            {
+                try { return JsonDocument.Parse(cached.Json); }
+                catch { ResponseCache.TryRemove(url, out _); }
+            }
+
+            var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            if (doc != null)
+            {
+                // Store raw JSON in cache
+                var json = doc.RootElement.GetRawText();
+                ResponseCache[url] = new CachedResponse(json, now);
+                EvictCacheIfNeeded();
+                // Return a fresh parse (caller will dispose)
+                doc.Dispose();
+                return JsonDocument.Parse(json);
+            }
+            return null;
+        }
+
+        private static void EvictCacheIfNeeded()
+        {
+            if (ResponseCache.Count <= MaxCacheEntries) return;
+            var oldest = new List<string>();
+            var now = Environment.TickCount64;
+            foreach (var kvp in ResponseCache)
+            {
+                if ((now - kvp.Value.CachedAtMs) > CacheTtlMs)
+                    oldest.Add(kvp.Key);
+            }
+            foreach (var key in oldest)
+                ResponseCache.TryRemove(key, out _);
+        }
+
         // ── Channel Details ──
 
         public static async Task<(string? id, string? name, string? thumb, string? uploadsPlaylistId)>
@@ -160,7 +210,7 @@ namespace Emby.YouTubePlugin
                     // First search for the channel by handle
                     var handle = query.TrimStart('@');
                     url = $"{ApiBase}/search?part=snippet&q=%40{Uri.EscapeDataString(handle)}&type=channel&maxResults=1&key={Uri.EscapeDataString(apiKey)}";
-                    using var searchDoc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+                    using var searchDoc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
                     if (searchDoc == null) return (null, null, null, null);
 
                     var searchRoot = searchDoc.RootElement;
@@ -191,7 +241,7 @@ namespace Emby.YouTubePlugin
             GetChannelByIdAsync(string apiKey, string channelId, CancellationToken ct)
         {
             var url = $"{ApiBase}/channels?part=snippet,contentDetails&id={Uri.EscapeDataString(channelId)}&key={Uri.EscapeDataString(apiKey)}";
-            using var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            using var doc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
             if (doc == null) return (channelId, null, null, null);
 
             var root = doc.RootElement;
@@ -256,21 +306,19 @@ namespace Emby.YouTubePlugin
             var url = $"{ApiBase}/search?part=snippet&q={q}&type=video&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
-        // ── Channel Videos (via uploads playlist or search) ──
+        // ── Channel Videos (via uploads playlist — costs 1 unit vs 100 for search) ──
 
         public static async Task<JsonDocument?> GetChannelVideosAsync(
             string apiKey, string channelId, string? pageToken, CancellationToken ct,
             string sortBy = "date")
         {
-            var sort = NormalizeSortBy(sortBy);
-            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
-                      $"&type=video&order={sort}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-            if (!string.IsNullOrEmpty(pageToken))
-                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            // Derive uploads playlist ID: UC... → UU...
+            var uploadsPlaylistId = "UU" + channelId.Substring(2);
+            return await GetPlaylistVideosAsync(apiKey, uploadsPlaylistId, pageToken, ct)
+                .ConfigureAwait(false);
         }
 
         // ── Channel Live Streams ──
@@ -282,7 +330,7 @@ namespace Emby.YouTubePlugin
                       $"&type=video&eventType=live&order=date&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
         // ── Playlist Videos ──
@@ -294,7 +342,7 @@ namespace Emby.YouTubePlugin
                       $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
         // ── Trending ──
@@ -308,7 +356,7 @@ namespace Emby.YouTubePlugin
                 url += $"&regionCode={Uri.EscapeDataString(regionCode)}";
             if (!string.IsNullOrEmpty(categoryId) && categoryId != "0")
                 url += $"&videoCategoryId={Uri.EscapeDataString(categoryId)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
         // ── Video Details ──
@@ -329,7 +377,7 @@ namespace Emby.YouTubePlugin
             var ids = string.Join(",", videoIds);
             var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails" +
                       $"&id={Uri.EscapeDataString(ids)}&key={Uri.EscapeDataString(apiKey)}";
-            return await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
         // ── Helpers ──
