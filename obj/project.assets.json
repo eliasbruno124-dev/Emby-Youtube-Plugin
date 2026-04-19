@@ -1,0 +1,188 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "MediaBrowser.Common/4.9.1.90": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Emby.Media.Model.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/Emby.Web.GenericEdit.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Common.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Model.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Emby.Media.Model.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/Emby.Web.GenericEdit.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Common.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Model.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "MediaBrowser.Server.Core/4.9.1.90": {
+        "type": "package",
+        "dependencies": {
+          "MediaBrowser.Common": "4.9.1.90"
+        },
+        "compile": {
+          "lib/netstandard2.0/Emby.Naming.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Controller.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Emby.Naming.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/netstandard2.0/MediaBrowser.Controller.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MediaBrowser.Common/4.9.1.90": {
+      "sha512": "QzXFYh7TPskAtctdCguJxep9aMSfIrsT4F+xUrdAVh4pj2KAD3DzwkY1DDPIUUD6M+Lgwag/NesBgd1pgLffbQ==",
+      "type": "package",
+      "path": "mediabrowser.common/4.9.1.90",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/Emby.Media.Model.dll",
+        "lib/netstandard2.0/Emby.Media.Model.pdb",
+        "lib/netstandard2.0/Emby.Media.Model.xml",
+        "lib/netstandard2.0/Emby.Web.GenericEdit.dll",
+        "lib/netstandard2.0/Emby.Web.GenericEdit.pdb",
+        "lib/netstandard2.0/Emby.Web.GenericEdit.xml",
+        "lib/netstandard2.0/MediaBrowser.Common.dll",
+        "lib/netstandard2.0/MediaBrowser.Common.pdb",
+        "lib/netstandard2.0/MediaBrowser.Common.xml",
+        "lib/netstandard2.0/MediaBrowser.Model.dll",
+        "lib/netstandard2.0/MediaBrowser.Model.pdb",
+        "lib/netstandard2.0/MediaBrowser.Model.xml",
+        "mediabrowser.common.4.9.1.90.nupkg.sha512",
+        "mediabrowser.common.nuspec"
+      ]
+    },
+    "MediaBrowser.Server.Core/4.9.1.90": {
+      "sha512": "lyThQ7kXhzLNisMfqzSoxrhG/7gnK9/lJyNfV/TCo10c30oKiTR2n5nG+ognv6hCNz9jmcPpAt3561Oj7EIVwQ==",
+      "type": "package",
+      "path": "mediabrowser.server.core/4.9.1.90",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/Emby.Naming.dll",
+        "lib/netstandard2.0/Emby.Naming.pdb",
+        "lib/netstandard2.0/Emby.Naming.xml",
+        "lib/netstandard2.0/MediaBrowser.Controller.dll",
+        "lib/netstandard2.0/MediaBrowser.Controller.pdb",
+        "lib/netstandard2.0/MediaBrowser.Controller.xml",
+        "mediabrowser.server.core.4.9.1.90.nupkg.sha512",
+        "mediabrowser.server.core.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "MediaBrowser.Common >= 4.9.1.90",
+      "MediaBrowser.Server.Core >= 4.9.1.90"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\elias\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.1.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+      "projectName": "Emby.YouTubePlugin",
+      "projectPath": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+      "packagesPath": "C:\\Users\\elias\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\elias\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.200"
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "dependencies": {
+          "MediaBrowser.Common": {
+            "target": "Package",
+            "version": "[4.9.1.90, )"
+          },
+          "MediaBrowser.Server.Core": {
+            "target": "Package",
+            "version": "[4.9.1.90, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

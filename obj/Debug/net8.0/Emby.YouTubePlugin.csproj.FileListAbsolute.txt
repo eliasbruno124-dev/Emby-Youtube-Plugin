@@ -1,0 +1,14 @@
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.csproj.AssemblyReference.cache
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.AssemblyInfoInputs.cache
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.AssemblyInfo.cs
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.csproj.CoreCompileInputs.cache
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.sourcelink.json
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\bin\Debug\net8.0\thumb.png
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\bin\Debug\net8.0\Emby.YouTubePlugin.deps.json
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\bin\Debug\net8.0\Emby.YouTubePlugin.dll
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\bin\Debug\net8.0\Emby.YouTubePlugin.pdb
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.dll
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\refint\Emby.YouTubePlugin.dll
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\Emby.YouTubePlugin.pdb
+C:\Users\elias\Documents\GitHub\Emby-Youtube-Pluginnnn\obj\Debug\net8.0\ref\Emby.YouTubePlugin.dll
