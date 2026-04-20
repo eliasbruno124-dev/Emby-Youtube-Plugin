@@ -111,9 +111,10 @@ namespace Emby.YouTubePlugin
         public void Run()
         {
             YouTubeChannel.ScheduleSortNameFix();
+            var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
             _pollTimer = new Timer(PollTick, null,
                 TimeSpan.FromSeconds(30),
-                TimeSpan.FromMinutes(5));
+                TimeSpan.FromMinutes(minutes));
         }
 
         private void PollTick(object? state)
@@ -134,6 +135,7 @@ namespace Emby.YouTubePlugin
                               $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
 
                     var json = await PollHttp.GetStringAsync(url).ConfigureAwait(false);
+                    QuotaTracker.Record(1);
 
                     var ids = new List<string>();
                     using var doc = JsonDocument.Parse(json);

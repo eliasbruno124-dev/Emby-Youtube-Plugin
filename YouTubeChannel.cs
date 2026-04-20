@@ -141,7 +141,7 @@ namespace Emby.YouTubePlugin
                     {
                         var d = await YouTubeApi.GetPlaylistDetailsAsync(apiKey, watchLater, cancellationToken)
                             .ConfigureAwait(false);
-                        var thumbUrl = !string.IsNullOrEmpty(d.thumb) ? d.thumb : null;
+                        var thumbUrl = !string.IsNullOrEmpty(d.thumb) ? d.thumb : FolderIcons.WatchLater;
                         items.Add(new ChannelItemInfo
                         {
                             Name = "\u2B50 " + (d.name ?? "Watch Later"),
@@ -155,9 +155,31 @@ namespace Emby.YouTubePlugin
                     if (config.ShowTrending)
                         items.Add(new ChannelItemInfo
                         {
-                            Name = "Trending",
+                            Name = "🔥 Trending",
                             Id = "trending_x_all",
-                            Type = ChannelItemType.Folder
+                            Type = ChannelItemType.Folder,
+                            ImageUrl = FolderIcons.Trending
+                        });
+
+                    // Categories Browser
+                    if (config.ShowCategories)
+                        items.Add(new ChannelItemInfo
+                        {
+                            Name = "📂 Categories",
+                            Id = "categories_x_root",
+                            Type = ChannelItemType.Folder,
+                            ImageUrl = FolderIcons.Categories
+                        });
+
+                    // Recently Added (mix newest from all channels)
+                    if (config.ShowRecentlyAdded
+                        && !string.IsNullOrWhiteSpace(config.SavedItems))
+                        items.Add(new ChannelItemInfo
+                        {
+                            Name = "🆕 Recently Added",
+                            Id = "recent_x_all",
+                            Type = ChannelItemType.Folder,
+                            ImageUrl = FolderIcons.RecentlyAdded
                         });
 
                     // User content sources
@@ -214,7 +236,8 @@ namespace Emby.YouTubePlugin
                             {
                                 Name = $"Search: {term}",
                                 Id = $"search{FolderSeparator}{term}",
-                                Type = ChannelItemType.Folder
+                                Type = ChannelItemType.Folder,
+                                ImageUrl = FolderIcons.Search
                             });
                         }
                     }
@@ -242,21 +265,27 @@ namespace Emby.YouTubePlugin
                         {
                             Name = "📺 Videos",
                             Id = $"channelvideos{FolderSeparator}{term}",
-                            Type = ChannelItemType.Folder
+                            Type = ChannelItemType.Folder,
+                            ImageUrl = FolderIcons.Videos
                         });
                         items.Add(new ChannelItemInfo
                         {
                             Name = "⚡ Shorts",
                             Id = $"channelshorts{FolderSeparator}{term}",
-                            Type = ChannelItemType.Folder
+                            Type = ChannelItemType.Folder,
+                            ImageUrl = FolderIcons.Shorts
                         });
 
-                        items.Add(new ChannelItemInfo
+                        if (config.ShowLiveFolders)
                         {
-                            Name = "🔴 Live",
-                            Id = $"channellive{FolderSeparator}{term}",
-                            Type = ChannelItemType.Folder
-                        });
+                            items.Add(new ChannelItemInfo
+                            {
+                                Name = "🔴 Live & Upcoming",
+                                Id = $"channellive{FolderSeparator}{term}",
+                                Type = ChannelItemType.Folder,
+                                ImageUrl = FolderIcons.Live
+                            });
+                        }
 
                         return new ChannelItemResult
                         {
@@ -273,6 +302,55 @@ namespace Emby.YouTubePlugin
                             .ConfigureAwait(false);
                         ScheduleSortNameFix();
                         return trendingResult;
+                    }
+
+                    // ── Categories browser root ──
+                    if (type == "categories" && term == "root")
+                    {
+                        var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
+                        using var catDoc = await YouTubeApi.GetVideoCategoriesAsync(apiKey, region, cancellationToken)
+                            .ConfigureAwait(false);
+                        if (catDoc != null && catDoc.RootElement.TryGetProperty("items", out var catItems)
+                            && catItems.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var c in catItems.EnumerateArray())
+                            {
+                                var cid = YouTubeApi.GetString(c, "id");
+                                var cname = YouTubeApi.GetNestedString(c, "snippet", "title");
+                                if (string.IsNullOrEmpty(cid) || string.IsNullOrEmpty(cname)) continue;
+                                // Skip non-assignable categories (no trending available)
+                                if (c.TryGetProperty("snippet", out var sn)
+                                    && sn.TryGetProperty("assignable", out var ass)
+                                    && ass.ValueKind == JsonValueKind.False) continue;
+                                items.Add(new ChannelItemInfo
+                                {
+                                    Name = cname,
+                                    Id = $"category{FolderSeparator}{cid}",
+                                    Type = ChannelItemType.Folder,
+                                    ImageUrl = FolderIcons.ForCategory(cid)
+                                });
+                            }
+                        }
+                        if (items.Count == 0) return Msg(items, "No categories available.");
+                        return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
+                    }
+
+                    // ── Single category trending ──
+                    if (type == "category")
+                    {
+                        var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
+                        var catResult = await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false);
+                        ScheduleSortNameFix();
+                        return catResult;
+                    }
+
+                    // ── Recently Added: newest videos across all saved channels ──
+                    if (type == "recent" && term == "all")
+                    {
+                        var recentResult = await LoadRecentlyAdded(apiKey, config, cancellationToken)
+                            .ConfigureAwait(false);
+                        ScheduleSortNameFix();
+                        return recentResult;
                     }
 
                     int limit = type == "search"
@@ -386,6 +464,34 @@ namespace Emby.YouTubePlugin
                         if (items.Count >= limit) break;
                     }
 
+                    // ── Append upcoming streams to Live folder ──
+                    if (type == "channellive" && items.Count < limit)
+                    {
+                        try
+                        {
+                            using var upDoc = await YouTubeApi.GetChannelUpcomingAsync(apiKey, term, null, cancellationToken)
+                                .ConfigureAwait(false);
+                            if (upDoc != null)
+                            {
+                                var ups = ExtractVideos(upDoc, isPlaylist: false);
+                                foreach (var u in ups)
+                                {
+                                    var rawId = u.Id.StartsWith(LivePrefix) ? u.Id.Substring(LivePrefix.Length) : u.Id;
+                                    if (!seenIds.Add(rawId)) continue;
+                                    u.Name = u.Name.StartsWith("🔴 LIVE:")
+                                        ? u.Name.Replace("🔴 LIVE:", "📅 UPCOMING:")
+                                        : "📅 UPCOMING: " + u.Name;
+                                    items.Add(u);
+                                    if (items.Count >= limit) break;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log($"[YT] Upcoming fetch failed: {ex.Message}");
+                        }
+                    }
+
                     if (items.Count == 0)
                         return Msg(items, "No results found.");
 
@@ -471,7 +577,17 @@ namespace Emby.YouTubePlugin
                                 }
                             }
 
-                            // 2. Duration ≤ 60s → very likely a Short
+                            // 2. #shorts hashtag in title or description (very reliable)
+                            if (!isShort && hasSnippet)
+                            {
+                                var sTitle = YouTubeApi.GetString(snipEl, "title") ?? "";
+                                var sDesc = YouTubeApi.GetString(snipEl, "description") ?? "";
+                                if (sTitle.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0
+                                 || sDesc.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    isShort = true;
+                            }
+
+                            // 3. Duration ≤ 60s → very likely a Short
                             if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60)
                                 isShort = true;
 
@@ -483,20 +599,29 @@ namespace Emby.YouTubePlugin
                                 batchItem.Name = $"▶ Short: {batchItem.Name}";
                             }
 
-                            // Description + view count
+                            // Description + view count + likes + comments
                             var desc = YouTubeApi.GetNestedString(detail, "snippet", "description");
                             long? viewCount = null;
+                            long? likeCount = null;
+                            long? commentCount = null;
                             if (detail.TryGetProperty("statistics", out var stats))
                             {
-                                var vc = YouTubeApi.GetString(stats, "viewCount");
-                                if (long.TryParse(vc, out var v)) viewCount = v;
+                                if (long.TryParse(YouTubeApi.GetString(stats, "viewCount"), out var v)) viewCount = v;
+                                if (long.TryParse(YouTubeApi.GetString(stats, "likeCount"), out var l)) likeCount = l;
+                                if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                             }
+
+                            var statsParts = new List<string>();
+                            if (viewCount.HasValue) statsParts.Add($"👁 {viewCount:N0}");
+                            if (likeCount.HasValue && Plugin.Instance?.Options.ShowLikeCount == true) statsParts.Add($"👍 {likeCount:N0}");
+                            if (commentCount.HasValue && Plugin.Instance?.Options.ShowCommentCount == true) statsParts.Add($"💬 {commentCount:N0}");
+                            string statsLine = statsParts.Count > 0 ? string.Join("  ·  ", statsParts) : "";
 
                             string? overview = null;
                             if (!string.IsNullOrWhiteSpace(desc))
-                                overview = (viewCount > 0 ? $"{viewCount:N0} views\n\n" : "") + desc;
-                            else if (viewCount > 0)
-                                overview = $"{viewCount:N0} views";
+                                overview = (statsLine.Length > 0 ? statsLine + "\n\n" : "") + desc;
+                            else if (statsLine.Length > 0)
+                                overview = statsLine;
 
                             if (!string.IsNullOrEmpty(overview))
                                 batchItem.Overview = overview;
@@ -562,6 +687,86 @@ namespace Emby.YouTubePlugin
                 if (cached.RuntimeTicks.HasValue && !item.RunTimeTicks.HasValue)
                     item.RunTimeTicks = cached.RuntimeTicks;
             }
+        }
+
+        // ── Recently Added: cross-channel newest mix ──
+        private static async Task<ChannelItemResult> LoadRecentlyAdded(
+            string apiKey, PluginConfiguration config, CancellationToken ct)
+        {
+            var perChannel = Math.Clamp(config.RecentlyAddedPerChannel, 1, 25);
+            var savedItems = (config.SavedItems ?? "")
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Resolve channel IDs (uses 6h-cached channel-details endpoint, ~free after first load)
+            var channelIds = new List<string>();
+            foreach (var raw in savedItems)
+            {
+                var term = raw.Trim();
+                if (string.IsNullOrEmpty(term)) continue;
+                if (term.StartsWith(HandlePrefix))
+                {
+                    var d = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, true, ct).ConfigureAwait(false);
+                    if (!string.IsNullOrEmpty(d.id)) channelIds.Add(d.id!);
+                }
+                else if (term.StartsWith(ChannelIdPrefix) && term.Length > MinChannelIdLength)
+                {
+                    channelIds.Add(term);
+                }
+            }
+
+            var allItems = new List<ChannelItemInfo>();
+            var seen = new HashSet<string>();
+
+            foreach (var channelId in channelIds)
+            {
+                ct.ThrowIfCancellationRequested();
+                using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, channelId, null, ct, "date")
+                    .ConfigureAwait(false);
+                if (doc == null) continue;
+
+                var items = ExtractVideos(doc, isPlaylist: true);
+                int taken = 0;
+                foreach (var v in items)
+                {
+                    if (taken >= perChannel) break;
+                    var rawId = v.Id;
+                    if (rawId.StartsWith(LivePrefix)) rawId = rawId.Substring(LivePrefix.Length);
+                    else if (rawId.StartsWith(ReelPrefix)) rawId = rawId.Substring(ReelPrefix.Length);
+                    if (seen.Add(rawId))
+                    {
+                        allItems.Add(v);
+                        taken++;
+                    }
+                }
+            }
+
+            // Enrich (1u per 50 IDs, 1y cached)
+            if (allItems.Count > 0)
+            {
+                var ids = allItems.Select(i =>
+                {
+                    var r = i.Id;
+                    if (r.StartsWith(LivePrefix)) return r.Substring(LivePrefix.Length);
+                    if (r.StartsWith(ReelPrefix)) return r.Substring(ReelPrefix.Length);
+                    return r;
+                }).ToList();
+                await EnrichBatch(apiKey, allItems, ids, ct).ConfigureAwait(false);
+                ApplyCachedMeta(allItems);
+            }
+
+            // Sort newest first
+            var sorted = allItems
+                .OrderByDescending(i => i.PremiereDate ?? i.DateCreated ?? DateTimeOffset.MinValue)
+                .ToList();
+
+            if (sorted.Count == 0)
+                return Msg(new List<ChannelItemInfo>(), "No videos yet.");
+
+            return new ChannelItemResult
+            {
+                Items = sorted,
+                TotalRecordCount = sorted.Count
+            };
         }
 
         // ── Trending ──
@@ -813,56 +1018,7 @@ namespace Emby.YouTubePlugin
             };
         }
 
-        // ── SortName fix: default sort = newest first ──
-        [DllImport("sqlite3")] private static extern int sqlite3_open(string filename, out IntPtr db);
-        [DllImport("sqlite3")] private static extern int sqlite3_exec(IntPtr db, string sql, IntPtr cb, IntPtr arg, out IntPtr errmsg);
-        [DllImport("sqlite3")] private static extern int sqlite3_close(IntPtr db);
-        [DllImport("sqlite3")] private static extern void sqlite3_free(IntPtr ptr);
-
-        private static int _sortFixScheduled;
-
-        internal static void ScheduleSortNameFix()
-        {
-            if (Interlocked.CompareExchange(ref _sortFixScheduled, 1, 0) != 0) return;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(5_000).ConfigureAwait(false);
-                    FixSortNames();
-                    // Second pass to catch items loaded after first fix
-                    await Task.Delay(30_000).ConfigureAwait(false);
-                    FixSortNames();
-                }
-                catch { }
-                finally { Interlocked.Exchange(ref _sortFixScheduled, 0); }
-            });
-        }
-
-        private static void FixSortNames()
-        {
-            var dbPath = Plugin.LibraryDbPath;
-            if (string.IsNullOrEmpty(dbPath) || !File.Exists(dbPath)) return;
-
-            if (sqlite3_open(dbPath, out var db) != 0) return;
-            try
-            {
-                sqlite3_exec(db, "PRAGMA busy_timeout = 5000;", IntPtr.Zero, IntPtr.Zero, out _);
-
-                const string sql = @"
-                    UPDATE MediaItems
-                    SET SortName = printf('%010d', 9999999999 - COALESCE(PremiereDate, DateCreated, 0))
-                                   || ' ' || SortName
-                    WHERE type = 8
-                      AND PremiereDate IS NOT NULL
-                      AND ExternalId IS NOT NULL
-                      AND (length(ExternalId) = 11 OR ExternalId LIKE 'LIVE_%' OR ExternalId LIKE 'REEL_%')
-                      AND SortName NOT GLOB '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] *'";
-
-                sqlite3_exec(db, sql, IntPtr.Zero, IntPtr.Zero, out var errmsg);
-                if (errmsg != IntPtr.Zero) sqlite3_free(errmsg);
-            }
-            finally { sqlite3_close(db); }
-        }
+        // SortName fixing extracted to SortNameFixer.cs
+        internal static void ScheduleSortNameFix() => SortNameFixer.Schedule();
     }
 }

@@ -110,7 +110,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.13.0",
+    "version": "1.14.3",
     "restore": {
       "projectUniqueName": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
       "projectName": "Emby.YouTubePlugin",
