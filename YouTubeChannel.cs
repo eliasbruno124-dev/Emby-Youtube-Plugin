@@ -710,6 +710,18 @@ namespace Emby.YouTubePlugin
                     item.ProductionYear = cached.Year;
                 if (cached.RuntimeTicks.HasValue && !item.RunTimeTicks.HasValue)
                     item.RunTimeTicks = cached.RuntimeTicks;
+
+                // Rebuild MediaSources URL with original-language hl= if cache now has it
+                if (!string.IsNullOrEmpty(cached.OriginalLang))
+                {
+                    string raw = item.Id;
+                    if (raw.StartsWith(LivePrefix)) raw = raw.Substring(LivePrefix.Length);
+                    else if (raw.StartsWith(ReelPrefix)) raw = raw.Substring(ReelPrefix.Length);
+                    bool isLive = item.Id.StartsWith(LivePrefix);
+                    item.MediaSources = MakeMediaSources(raw, isLive,
+                        isLive ? null : (cached.RuntimeTicks ?? item.RunTimeTicks),
+                        cached.OriginalLang);
+                }
             }
         }
 
