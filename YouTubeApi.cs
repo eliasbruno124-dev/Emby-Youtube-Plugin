@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -297,6 +298,40 @@ namespace Emby.YouTubePlugin
             }
             foreach (var key in oldest)
                 ResponseCache.TryRemove(key, out _);
+        }
+
+        /// <summary>
+        /// Invalidate all cached entries (memory + disk) whose URL contains the given substring.
+        /// Used by the Watch Later poll: when the playlist contents change, we must drop the
+        /// 6h-cached playlistItems so the user sees the fresh list.
+        /// </summary>
+        public static void InvalidateCacheContaining(string substring)
+        {
+            if (string.IsNullOrEmpty(substring)) return;
+            try
+            {
+                foreach (var key in ResponseCache.Keys.ToList())
+                {
+                    if (key.IndexOf(substring, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        ResponseCache.TryRemove(key, out _);
+                        try
+                        {
+                            var cacheDir = Plugin.CachePath;
+                            if (!string.IsNullOrEmpty(cacheDir))
+                            {
+                                var file = Path.Combine(cacheDir, GetDiskCacheKey(key) + ".json");
+                                if (File.Exists(file)) File.Delete(file);
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[YouTubeApi] InvalidateCacheContaining failed: {ex.Message}");
+            }
         }
 
         // ── Channel Details ──
