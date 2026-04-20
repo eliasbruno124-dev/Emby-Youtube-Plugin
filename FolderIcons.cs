@@ -8,16 +8,16 @@ namespace Emby.YouTubePlugin
     /// </summary>
     internal static class FolderIcons
     {
-        private const string Cdn = "https://openmoji.org/data/color/618x618/";
+        private const string Cdn = "https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@master/color/618x618/";
 
-        public static readonly string WatchLater     = Cdn + "2B50.png";   // ⭐
-        public static readonly string Trending       = Cdn + "1F525.png";  // 🔥
-        public static readonly string Categories     = Cdn + "1F4C2.png";  // 📂
-        public static readonly string RecentlyAdded  = Cdn + "1F195.png";  // 🆕
-        public static readonly string Videos         = Cdn + "1F4FA.png";  // 📺
-        public static readonly string Shorts         = Cdn + "26A1.png";   // ⚡
-        public static readonly string Live           = Cdn + "1F534.png";  // 🔴
-        public static readonly string Search         = Cdn + "1F50D.png";  // 🔍
+        public static readonly string WatchLater = Cdn + "2B50.png";   // ⭐
+        public static readonly string Trending = Cdn + "1F525.png";  // 🔥
+        public static readonly string Categories = Cdn + "1F4C2.png";  // 📂
+        public static readonly string RecentlyAdded = Cdn + "1F195.png";  // 🆕
+        public static readonly string Videos = Cdn + "1F4FA.png";  // 📺
+        public static readonly string Shorts = Cdn + "26A1.png";   // ⚡
+        public static readonly string Live = Cdn + "1F534.png";  // 🔴
+        public static readonly string Search = Cdn + "1F50D.png";  // 🔍
 
         // Map YouTube videoCategoryId → emoji icon URL
         private static readonly Dictionary<string, string> CategoryMap = new()

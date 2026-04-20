@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ZGq72XD7+Ro=",
+  "dgSpecHash": "sQdCh2aU6dU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+  "projectFilePath": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\elias\\.nuget\\packages\\mediabrowser.common\\4.9.1.90\\mediabrowser.common.4.9.1.90.nupkg.sha512",
     "C:\\Users\\elias\\.nuget\\packages\\mediabrowser.server.core\\4.9.1.90\\mediabrowser.server.core.4.9.1.90.nupkg.sha512"

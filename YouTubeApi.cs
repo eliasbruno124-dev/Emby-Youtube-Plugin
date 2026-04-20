@@ -637,6 +637,17 @@ namespace Emby.YouTubePlugin
             return null;
         }
 
+        public static string GetStableVideoThumbnailUrl(string videoId, string? preferredUrl)
+        {
+            // Always normalize to mqdefault.jpg — it's the only thumbnail size YouTube
+            // guarantees to exist for EVERY video (including upcoming streams, brand-new
+            // uploads, and videos without maxres/hqdefault generated yet).
+            // hqdefault and maxresdefault can return 404 for many edge cases.
+            if (string.IsNullOrWhiteSpace(videoId))
+                return preferredUrl ?? string.Empty;
+            return $"https://i.ytimg.com/vi/{videoId}/mqdefault.jpg";
+        }
+
         /// <summary>
         /// Parses ISO 8601 duration (PT1H2M3S) to TimeSpan.
         /// </summary>

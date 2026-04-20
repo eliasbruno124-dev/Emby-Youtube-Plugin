@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {}
+    "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {}
   },
   "projects": {
-    "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {
-      "version": "1.16.0",
+    "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {
+      "version": "1.16.5",
       "restore": {
-        "projectUniqueName": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+        "projectUniqueName": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
         "projectName": "Emby.YouTubePlugin",
-        "projectPath": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+        "projectPath": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
         "packagesPath": "C:\\Users\\elias\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\obj\\",
+        "outputPath": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
