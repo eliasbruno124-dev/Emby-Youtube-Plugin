@@ -7,84 +7,74 @@ namespace Emby.YouTubePlugin
     public class PluginConfiguration : EditableOptionsBase
     {
         public override string EditorTitle => "YouTube Plugin Settings";
-
-        // ─────────────────────────────────────────────────────────────────────
-        // CONNECTION
-        // ─────────────────────────────────────────────────────────────────────
+        public override string EditorDescription => QuotaTracker.FormatStatus();
 
         [DisplayName("YouTube Data API Key")]
-        [Description(
-            "Your YouTube Data API v3 key.\n" +
-            "Get one at: https://console.cloud.google.com/apis/credentials\n" +
-            "Enable 'YouTube Data API v3' in the Google Cloud Console.")]
+        [Description("Your YouTube Data API v3 key. Get one at: https://console.cloud.google.com/apis/credentials. Daily quota: 10,000 units.")]
         public string ApiKey { get; set; } = "";
 
-        // ─────────────────────────────────────────────────────────────────────
-        // CONTENT SOURCES
-        // ─────────────────────────────────────────────────────────────────────
-
         [DisplayName("My YouTube Content")]
-        [Description(
-            "Comma-separated list of content sources. Three types are supported:\n" +
-            "  • @Handle  — a YouTube channel handle (e.g. @GitHub)\n" +
-            "  • UCxxxxxx — a YouTube channel ID (e.g. UCVHFbw7woebKtYXvKgG-Z6Q)\n" +
-            "  • PLxxxxxx — a playlist ID (e.g. PL0lo9MOBetEFcp4SCWinBdpml9B2U25-f)\n" +
-            "  • any text — a search query (e.g. Linux Tutorials)\n\n" +
-            "Example: @GitHub, PLxxxxxx, Linux Tutorials")]
+        [Description("Comma-separated list. Supports @Handle, UCxxxx (channel ID), PLxxxx (playlist), or any text (search).")]
         public string SavedItems { get; set; } = "";
 
         [DisplayName("Watch Later Playlist")]
-        [Description(
-            "Playlist ID for a '⭐ Watch Later' folder.\n" +
-            "Add videos to this playlist on YouTube and they appear in Emby within ~5 minutes.\n" +
-            "Only the YouTube channel is refreshed — other channels stay untouched.\n" +
-            "Example: PLxxxxxx")]
+        [Description("Playlist ID for the Watch Later folder. Polled regularly for new items.")]
         public string WatchLaterPlaylist { get; set; } = "";
 
-        // ─────────────────────────────────────────────────────────────────────
-        // DISCOVER
-        // ─────────────────────────────────────────────────────────────────────
-
         [DisplayName("Show Trending")]
-        [Description("Show a 'Trending' folder with trending and popular videos from YouTube.")]
+        [Description("Show a Trending folder.")]
         public bool ShowTrending { get; set; } = true;
 
+        [DisplayName("Show Categories Browser")]
+        [Description("Show a Categories folder for browsing trending videos by YouTube category.")]
+        public bool ShowCategories { get; set; } = true;
+
+        [DisplayName("Show Recently Added")]
+        [Description("Show a Recently Added folder mixing newest videos from all channels. NOTE: Videos in this folder also appear in their channel folder, which causes duplicates in Emby's 'Latest' view across the YouTube channel.")]
+        public bool ShowRecentlyAdded { get; set; } = false;
+
+        [DisplayName("Show Live Folders")]
+        [Description("Show Live & Upcoming subfolder per channel. Costs 100 quota units when first opened (cached 12h afterwards).")]
+        public bool ShowLiveFolders { get; set; } = false;
+
         [DisplayName("Trending Region")]
-        [Description(
-            "ISO 3166-1 country code for YouTube trending results.\n" +
-            "Examples: DE (Germany), US (USA), AT (Austria), CH (Switzerland), GB (UK), FR (France).\n" +
-            "Leave empty for default.")]
+        [Description("ISO 3166-1 country code (DE, US, GB, etc.). Empty = default.")]
         public string TrendingRegion { get; set; } = "";
 
         [DisplayName("Trending Video Category")]
-        [Description(
-            "YouTube video category ID for trending results.\n" +
-            "Common IDs: 0 (All), 10 (Music), 20 (Gaming), 24 (Entertainment), 1 (Film).\n" +
-            "Leave empty or 0 for all categories.")]
+        [Description("YouTube category ID. 0=All, 10=Music, 20=Gaming, 24=Entertainment, 1=Film.")]
         public string TrendingCategory { get; set; } = "";
 
-        // ─────────────────────────────────────────────────────────────────────
-        // SORTING
-        // ─────────────────────────────────────────────────────────────────────
+        [DisplayName("Show Like Count")]
+        [Description("Include like counts in video descriptions.")]
+        public bool ShowLikeCount { get; set; } = true;
+
+        [DisplayName("Show Comment Count")]
+        [Description("Include comment counts in video descriptions.")]
+        public bool ShowCommentCount { get; set; } = false;
 
         [DisplayName("Sort Channel Videos By")]
-        [Description(
-            "How to sort videos when browsing a channel.\n" +
-            "Options: date, viewCount, rating, relevance")]
+        [Description("Sort order: date, viewCount, rating, relevance.")]
         public string ChannelSortBy { get; set; } = "date";
 
-        // ─────────────────────────────────────────────────────────────────────
-        // LIMITS
-        // ─────────────────────────────────────────────────────────────────────
-
         [DisplayName("Max Videos per Channel or Playlist")]
-        [Description("Maximum number of videos loaded per channel or playlist. Range: 1–150.")]
+        [Description("Maximum videos loaded per channel or playlist (1-150).")]
         [Range(1, 150)]
         public int MaxChannelVideos { get; set; } = 50;
 
         [DisplayName("Max Videos per Search Query")]
-        [Description("Maximum number of videos loaded per search query. Range: 1–150.")]
+        [Description("Maximum videos loaded per search query (1-150).")]
         [Range(1, 150)]
         public int MaxSearchVideos { get; set; } = 50;
+
+        [DisplayName("Recently Added: videos per channel")]
+        [Description("How many newest videos to pull from each channel into Recently Added (1-25).")]
+        [Range(1, 25)]
+        public int RecentlyAddedPerChannel { get; set; } = 10;
+
+        [DisplayName("Watch Later Poll Interval (minutes)")]
+        [Description("How often to poll Watch Later for new videos (1-60). Each poll = 1 quota unit.")]
+        [Range(1, 60)]
+        public int WatchLaterPollMinutes { get; set; } = 3;
     }
 }
