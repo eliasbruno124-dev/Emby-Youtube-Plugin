@@ -12,11 +12,11 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Emby.YouTubePlugin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.6.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.6.0+bdd249df3446636cd7faa5f7ffdc5c5452114b6d")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.13.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.13.0+dfb9eb9f9f2229058b2492bb4a1c7eef50f5c87b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Emby.YouTubePlugin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Emby.YouTubePlugin")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.6.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.13.0.0")]
 
 // Von der MSBuild WriteCodeFragment-Klasse generiert.
 

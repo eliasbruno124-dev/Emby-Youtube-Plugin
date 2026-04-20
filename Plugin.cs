@@ -23,12 +23,13 @@ namespace Emby.YouTubePlugin
         private static readonly string PluginVersion =
             typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
-        public override string Name => $"YouTube v{PluginVersion}";
-        public override string Description => "Official YouTube integration for Emby via YouTube Data API v3.";
+        public override string Name => "YouTube";
+        public override string Description => $"Official YouTube integration for Emby via YouTube Data API v3. (v{PluginVersion})";
         public override Guid Id => Guid.Parse("B2C3D4E5-F6A7-4B5C-9D0E-1F2A3B4C5D6E");
 
         public static Plugin? Instance { get; private set; }
         public static string? LibraryDbPath { get; private set; }
+        public static string? CachePath { get; private set; }
         public static IApplicationHost? AppHost { get; private set; }
 
         public Plugin(IApplicationHost applicationHost) : base(applicationHost)
@@ -43,6 +44,10 @@ namespace Emby.YouTubePlugin
                     var candidate = Path.Combine(paths.DataPath, "library.db");
                     if (File.Exists(candidate))
                         LibraryDbPath = candidate;
+
+                    var cacheDir = Path.Combine(paths.DataPath, "youtube-cache");
+                    Directory.CreateDirectory(cacheDir);
+                    CachePath = cacheDir;
                 }
             }
             catch { }
@@ -107,8 +112,8 @@ namespace Emby.YouTubePlugin
         {
             YouTubeChannel.ScheduleSortNameFix();
             _pollTimer = new Timer(PollTick, null,
-                TimeSpan.FromSeconds(20),
-                TimeSpan.FromSeconds(10));
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromMinutes(5));
         }
 
         private void PollTick(object? state)

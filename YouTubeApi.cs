@@ -2,8 +2,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +23,8 @@ namespace Emby.YouTubePlugin
         private const int MaxCacheEntries = 200;
         private const long CacheTtlMs = 15 * 60 * 1000; // 15 minutes
         private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000; // 6 hours
+        private const long DiskCacheTtlMs = 30L * 24 * 60 * 60 * 1000; // 30 days (YouTube ToS max)
+        private static int _diskCleanupDone = 0;
 
         private static readonly HttpClient Http = new HttpClient(
             new SocketsHttpHandler
@@ -158,29 +163,115 @@ namespace Emby.YouTubePlugin
         private static async Task<JsonDocument?> TryGetCachedJsonAsync(
             string url, CancellationToken ct, long? customTtlMs = null)
         {
-            var ttl = customTtlMs ?? CacheTtlMs;
+            var memTtl = customTtlMs ?? CacheTtlMs;
             var now = Environment.TickCount64;
 
-            // Check cache
+            // 1st level: in-memory cache
             if (ResponseCache.TryGetValue(url, out var cached)
-                && (now - cached.CachedAtMs) < ttl)
+                && (now - cached.CachedAtMs) < memTtl)
             {
                 try { return JsonDocument.Parse(cached.Json); }
                 catch { ResponseCache.TryRemove(url, out _); }
             }
 
+            // 2nd level: disk cache (30 days)
+            var diskJson = TryReadDiskCache(url);
+            if (diskJson != null)
+            {
+                // Refresh in-memory cache from disk
+                ResponseCache[url] = new CachedResponse(diskJson, now);
+                EvictCacheIfNeeded();
+                return JsonDocument.Parse(diskJson);
+            }
+
+            // 3rd: actual API call
             var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
             if (doc != null)
             {
-                // Store raw JSON in cache
                 var json = doc.RootElement.GetRawText();
                 ResponseCache[url] = new CachedResponse(json, now);
                 EvictCacheIfNeeded();
-                // Return a fresh parse (caller will dispose)
+                WriteDiskCache(url, json);
                 doc.Dispose();
                 return JsonDocument.Parse(json);
             }
+
             return null;
+        }
+
+        // ── Disk cache helpers ──
+
+        private static string GetDiskCacheKey(string url)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(url));
+            return Convert.ToHexString(bytes).Substring(0, 32).ToLowerInvariant();
+        }
+
+        private static string? TryReadDiskCache(string url)
+        {
+            try
+            {
+                var cacheDir = Plugin.CachePath;
+                if (string.IsNullOrEmpty(cacheDir)) return null;
+
+                RunDiskCleanupOnce(cacheDir);
+
+                var file = Path.Combine(cacheDir, GetDiskCacheKey(url) + ".json");
+                if (!File.Exists(file)) return null;
+
+                var lastWrite = File.GetLastWriteTimeUtc(file);
+                var ageMs = (long)(DateTime.UtcNow - lastWrite).TotalMilliseconds;
+                if (ageMs > DiskCacheTtlMs)
+                {
+                    try { File.Delete(file); } catch { }
+                    return null;
+                }
+
+                return File.ReadAllText(file, Encoding.UTF8);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static void WriteDiskCache(string url, string json)
+        {
+            try
+            {
+                var cacheDir = Plugin.CachePath;
+                if (string.IsNullOrEmpty(cacheDir)) return;
+
+                var file = Path.Combine(cacheDir, GetDiskCacheKey(url) + ".json");
+                File.WriteAllText(file, json, Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[YouTubeApi] WriteDiskCache failed: {ex.Message}");
+            }
+        }
+
+        private static void RunDiskCleanupOnce(string cacheDir)
+        {
+            if (Interlocked.CompareExchange(ref _diskCleanupDone, 1, 0) != 0) return;
+            Task.Run(() =>
+            {
+                try
+                {
+                    var cutoff = DateTime.UtcNow.AddMilliseconds(-DiskCacheTtlMs);
+                    foreach (var file in Directory.EnumerateFiles(cacheDir, "*.json"))
+                    {
+                        try
+                        {
+                            if (File.GetLastWriteTimeUtc(file) < cutoff)
+                                File.Delete(file);
+                        }
+                        catch { }
+                    }
+                    Debug.WriteLine("[YouTubeApi] Disk cache cleanup done.");
+                }
+                catch { }
+            });
         }
 
         private static void EvictCacheIfNeeded()
@@ -204,26 +295,32 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                string url;
                 if (isHandle)
                 {
-                    // First search for the channel by handle
+                    // Use channels?forHandle= (1 unit) instead of search (100 units)
                     var handle = query.TrimStart('@');
-                    url = $"{ApiBase}/search?part=snippet&q=%40{Uri.EscapeDataString(handle)}&type=channel&maxResults=1&key={Uri.EscapeDataString(apiKey)}";
-                    using var searchDoc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
-                    if (searchDoc == null) return (null, null, null, null);
+                    var url = $"{ApiBase}/channels?part=snippet,contentDetails&forHandle={Uri.EscapeDataString(handle)}&key={Uri.EscapeDataString(apiKey)}";
+                    using var doc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
+                    if (doc == null) return (null, null, null, null);
 
-                    var searchRoot = searchDoc.RootElement;
-                    if (searchRoot.TryGetProperty("items", out var searchItems)
-                        && searchItems.ValueKind == JsonValueKind.Array
-                        && searchItems.GetArrayLength() > 0)
+                    var root = doc.RootElement;
+                    if (root.TryGetProperty("items", out var items2)
+                        && items2.ValueKind == JsonValueKind.Array
+                        && items2.GetArrayLength() > 0)
                     {
-                        var first = searchItems[0];
-                        var channelId = GetNestedString(first, "snippet", "channelId")
-                                        ?? GetNestedString(first, "id", "channelId");
-                        if (!string.IsNullOrEmpty(channelId))
-                            return await GetChannelByIdAsync(apiKey, channelId, ct).ConfigureAwait(false);
+                        var ch = items2[0];
+                        var channelId = GetString(ch, "id");
+                        var name = GetNestedString(ch, "snippet", "title");
+                        var thumb = GetBestThumbnail(ch);
+                        string? uploadsId = null;
+                        if (ch.TryGetProperty("contentDetails", out var cd)
+                            && cd.TryGetProperty("relatedPlaylists", out var rp))
+                        {
+                            uploadsId = GetString(rp, "uploads");
+                        }
+                        return (channelId, name, thumb, uploadsId);
                     }
+                    return (null, null, null, null);
                 }
                 else
                 {
@@ -319,6 +416,24 @@ namespace Emby.YouTubePlugin
             var uploadsPlaylistId = "UU" + channelId.Substring(2);
             return await GetPlaylistVideosAsync(apiKey, uploadsPlaylistId, pageToken, ct)
                 .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Search channel videos filtered by duration (short / medium / long).
+        /// "short" = Shorts, "medium"+"long" = regular Videos.
+        /// Uses search.list (100 quota units per call).
+        /// </summary>
+        public static async Task<JsonDocument?> SearchChannelByDurationAsync(
+            string apiKey, string channelId, string videoDuration,
+            string? pageToken, CancellationToken ct, string order = "date")
+        {
+            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
+                      $"&type=video&videoDuration={Uri.EscapeDataString(videoDuration)}" +
+                      $"&order={Uri.EscapeDataString(NormalizeSortBy(order))}" +
+                      $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+            if (!string.IsNullOrEmpty(pageToken))
+                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+            return await TryGetCachedJsonAsync(url, ct).ConfigureAwait(false);
         }
 
         // ── Channel Live Streams ──
