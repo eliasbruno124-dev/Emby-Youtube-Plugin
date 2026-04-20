@@ -17,8 +17,14 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    public class YouTubeChannel : IChannel, IRequiresMediaInfoCallback
+    public class YouTubeChannel : IChannel, IDisableMediaSourceDisplay
     {
+        private static void Log(string msg)
+        {
+            System.Diagnostics.Debug.WriteLine(msg);
+            try { File.AppendAllText("/config/data/youtube-debug.log", DateTime.UtcNow.ToString("o") + " " + msg + "\n"); } catch { }
+        }
+
         public string Name => "YouTube";
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
@@ -50,6 +56,28 @@ namespace Emby.YouTubePlugin
         private const string LivePrefix = "LIVE_";
         private const string ReelPrefix = "REEL_";
         private const int ReelMaxSeconds = 180;
+
+        private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
+        {
+            return new List<MediaSourceInfo>
+            {
+                new MediaSourceInfo
+                {
+                    Id = videoId,
+                    Path = $"https://www.youtube.com/watch?v={videoId}",
+                    Protocol = MediaProtocol.Http,
+                    IsRemote = false,
+                    SupportsTranscoding = false,
+                    SupportsDirectStream = false,
+                    SupportsDirectPlay = true,
+                    IsInfiniteStream = isLive,
+                    RequiresOpening = false,
+                    RequiresClosing = false,
+                    RequiresLooping = false,
+                    SupportsProbing = false,
+                }
+            };
+        }
 
         private static bool NeedsEnrichment(ChannelItemInfo item)
         {
@@ -97,6 +125,8 @@ namespace Emby.YouTubePlugin
             var config = plugin.Options;
             var apiKey = (config.ApiKey ?? "").Trim();
 
+            Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
+
             if (string.IsNullOrWhiteSpace(apiKey))
                 return Msg(items, "ERROR: Please configure a YouTube API Key in the plugin settings.");
 
@@ -142,8 +172,10 @@ namespace Emby.YouTubePlugin
 
                         if (term.StartsWith(HandlePrefix))
                         {
+                            Log($"[YT] Loading handle: {term}");
                             var d = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, true, cancellationToken)
                                 .ConfigureAwait(false);
+                            Log($"[YT] Handle {term} resolved to id={d.id}, name={d.name}");
                             items.Add(new ChannelItemInfo
                             {
                                 Name = d.name ?? term,
@@ -187,6 +219,7 @@ namespace Emby.YouTubePlugin
                         }
                     }
 
+                    Log($"[YT] Root level: returning {items.Count} items");
                     return new ChannelItemResult
                     {
                         Items = items,
@@ -217,12 +250,14 @@ namespace Emby.YouTubePlugin
                             Id = $"channelshorts{FolderSeparator}{term}",
                             Type = ChannelItemType.Folder
                         });
+
                         items.Add(new ChannelItemInfo
                         {
                             Name = "🔴 Live",
                             Id = $"channellive{FolderSeparator}{term}",
                             Type = ChannelItemType.Folder
                         });
+
                         return new ChannelItemResult
                         {
                             Items = items,
@@ -257,11 +292,17 @@ namespace Emby.YouTubePlugin
                             doc = await YouTubeApi.SearchVideosAsync(apiKey, term, pageToken, cancellationToken)
                                 .ConfigureAwait(false);
                         else if (type == "channelvideos")
+                        {
+                            // Use uploads playlist (cheap: 1 quota unit) — shorts filtered out after enrichment
                             doc = await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, cancellationToken, config.ChannelSortBy)
                                 .ConfigureAwait(false);
+                        }
                         else if (type == "channelshorts")
+                        {
+                            // Use uploads playlist (same as channelvideos) — shorts filtered by REEL_ prefix after enrichment
                             doc = await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, cancellationToken, config.ChannelSortBy)
                                 .ConfigureAwait(false);
+                        }
                         else if (type == "channellive")
                             doc = await YouTubeApi.GetChannelLiveAsync(apiKey, term, pageToken, cancellationToken)
                                 .ConfigureAwait(false);
@@ -330,7 +371,7 @@ namespace Emby.YouTubePlugin
 
                         ApplyCachedMeta(batch);
 
-                        // Filter: channelvideos = only regular videos, channelshorts = only shorts
+                        // Post-filter: channelvideos removes shorts/live, channellive keeps only live
                         if (type == "channelvideos")
                             batch.RemoveAll(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)
                                                  || item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
@@ -360,6 +401,7 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
+                Log($"[YT] GetChannelItems error: {ex}");
                 return Msg(items, $"ERROR: {ex.Message}");
             }
         }
@@ -408,23 +450,28 @@ namespace Emby.YouTubePlugin
                                 batchItem.RunTimeTicks = ts.Value.Ticks;
                             }
 
-                            // Detect Shorts via snippet.tags containing "shorts" or "#shorts"
+                            // Detect Shorts: only use reliable signals
                             bool isShort = false;
-                            if (detail.TryGetProperty("snippet", out var snipEl)
+                            JsonElement snipEl = default;
+                            bool hasSnippet = detail.TryGetProperty("snippet", out snipEl);
+
+                            // 1. Check tags for exact "shorts" tag (most reliable)
+                            if (hasSnippet
                                 && snipEl.TryGetProperty("tags", out var tagsEl)
                                 && tagsEl.ValueKind == JsonValueKind.Array)
                             {
                                 foreach (var tag in tagsEl.EnumerateArray())
                                 {
                                     var t = tag.GetString();
-                                    if (t != null && t.IndexOf("shorts", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    if (t != null && string.Equals(t.Trim(), "shorts", StringComparison.OrdinalIgnoreCase))
                                     {
                                         isShort = true;
                                         break;
                                     }
                                 }
                             }
-                            // Fallback: duration ≤60s is very likely a Short
+
+                            // 2. Duration ≤ 60s → very likely a Short
                             if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60)
                                 isShort = true;
 
@@ -636,7 +683,8 @@ namespace Emby.YouTubePlugin
                     Id = itemId,
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
-                    ImageUrl = thumb
+                    ImageUrl = thumb,
+                    MediaSources = MakeMediaSources(videoId, isLive)
                 };
 
                 MetaCache[itemId] = new VideoMeta(overview, premiere, premiere?.Year, ts?.Ticks, thumb, DateTime.UtcNow);
@@ -714,45 +762,13 @@ namespace Emby.YouTubePlugin
                     Id = itemId,
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
-                    ImageUrl = thumb
+                    ImageUrl = thumb,
+                    MediaSources = MakeMediaSources(videoId, isLive)
                 };
 
                 list.Add(info);
             }
             return list;
-        }
-
-        // ── Media Playback ──
-        // Returns YouTube watch URL for direct play by Emby client (same approach as Trailers plugin).
-        public Task<IEnumerable<MediaSourceInfo>> GetChannelItemMediaInfo(
-            string id, CancellationToken cancellationToken)
-        {
-            bool isLive = id.StartsWith(LivePrefix, StringComparison.Ordinal);
-            bool isReel = !isLive && id.StartsWith(ReelPrefix, StringComparison.Ordinal);
-            string videoId = isLive ? id.Substring(LivePrefix.Length)
-                : isReel ? id.Substring(ReelPrefix.Length)
-                : id;
-
-            var sources = new List<MediaSourceInfo>
-            {
-                new MediaSourceInfo
-                {
-                    Id = videoId,
-                    Path = $"https://www.youtube.com/watch?v={videoId}",
-                    Protocol = MediaProtocol.Http,
-                    IsRemote = false,
-                    SupportsTranscoding = false,
-                    SupportsDirectStream = false,
-                    SupportsDirectPlay = true,
-                    IsInfiniteStream = isLive,
-                    RequiresOpening = false,
-                    RequiresClosing = false,
-                    RequiresLooping = false,
-                    SupportsProbing = false,
-                }
-            };
-
-            return Task.FromResult<IEnumerable<MediaSourceInfo>>(sources);
         }
 
         private static int ClampVideos(int val) => Math.Clamp(val, 1, 150);
@@ -812,7 +828,10 @@ namespace Emby.YouTubePlugin
             {
                 try
                 {
-                    await Task.Delay(15_000).ConfigureAwait(false);
+                    await Task.Delay(5_000).ConfigureAwait(false);
+                    FixSortNames();
+                    // Second pass to catch items loaded after first fix
+                    await Task.Delay(30_000).ConfigureAwait(false);
                     FixSortNames();
                 }
                 catch { }
