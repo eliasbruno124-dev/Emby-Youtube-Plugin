@@ -156,7 +156,11 @@ namespace Emby.YouTubePlugin
 
                     var current = string.Join(",", ids);
                     if (_lastVideoIds.Length > 0 && current != _lastVideoIds)
+                    {
+                        // Drop the cached playlist contents so the user actually sees the new state
+                        YouTubeApi.InvalidateCacheContaining(playlist);
                         TriggerRefresh();
+                    }
 
                     _lastVideoIds = current;
                 }
