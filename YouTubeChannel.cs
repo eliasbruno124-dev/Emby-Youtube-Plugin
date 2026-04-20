@@ -60,13 +60,11 @@ namespace Emby.YouTubePlugin
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
         {
+            // Note: originalLang parameter kept for signature compat but unused.
+            // YouTube's &hl= is UI-only and does NOT influence audio-track selection.
+            // Audio language is decided by the viewer's YouTube account settings,
+            // browser Accept-Language, and YouTube's auto-dub heuristic.
             string url = $"https://www.youtube.com/watch?v={videoId}";
-            if (!string.IsNullOrEmpty(originalLang))
-            {
-                int dash = originalLang.IndexOf('-');
-                string hl = (dash > 0 ? originalLang.Substring(0, dash) : originalLang).ToLowerInvariant();
-                url += $"&hl={hl}";
-            }
             return new List<MediaSourceInfo>
             {
                 new MediaSourceInfo
@@ -288,13 +286,16 @@ namespace Emby.YouTubePlugin
                             Type = ChannelItemType.Folder,
                             ImageUrl = channelThumb ?? FolderIcons.Videos
                         });
-                        items.Add(new ChannelItemInfo
+                        if (!config.HideShorts)
                         {
-                            Name = "⚡ Shorts",
-                            Id = $"channelshorts{FolderSeparator}{term}",
-                            Type = ChannelItemType.Folder,
-                            ImageUrl = channelThumb ?? FolderIcons.Shorts
-                        });
+                            items.Add(new ChannelItemInfo
+                            {
+                                Name = "⚡ Shorts",
+                                Id = $"channelshorts{FolderSeparator}{term}",
+                                Type = ChannelItemType.Folder,
+                                ImageUrl = channelThumb ?? FolderIcons.Shorts
+                            });
+                        }
 
                         if (config.ShowLiveFolders)
                         {
@@ -477,6 +478,10 @@ namespace Emby.YouTubePlugin
                             batch.RemoveAll(item => !item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
                         else if (type == "channellive")
                             batch.RemoveAll(item => !item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+
+                        // Global: hide shorts everywhere if configured
+                        if (config.HideShorts)
+                            batch.RemoveAll(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
 
                         foreach (var item in batch)
                             items.Add(item);
@@ -790,6 +795,9 @@ namespace Emby.YouTubePlugin
                 ApplyCachedMeta(allItems);
             }
 
+            if (config.HideShorts)
+                allItems.RemoveAll(i => i.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
+
             // Sort newest first
             var sorted = allItems
                 .OrderByDescending(i => i.PremiereDate ?? i.DateCreated ?? DateTimeOffset.MinValue)
@@ -841,6 +849,9 @@ namespace Emby.YouTubePlugin
             {
                 return Msg(new List<ChannelItemInfo>(), $"ERROR: {ex.Message}");
             }
+
+            if (Plugin.Instance?.Options.HideShorts == true)
+                allVideos.RemoveAll(i => i.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
 
             if (allVideos.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No results.");

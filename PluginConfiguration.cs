@@ -37,6 +37,10 @@ namespace Emby.YouTubePlugin
         [Description("Show Live & Upcoming subfolder per channel. Costs 100 quota units when first opened (cached 12h afterwards).")]
         public bool ShowLiveFolders { get; set; } = false;
 
+        [DisplayName("Hide Shorts")]
+        [Description("Completely hide YouTube Shorts: no Shorts sub-folder per channel and Shorts are filtered out of Videos, Search, Trending and Recently Added.")]
+        public bool HideShorts { get; set; } = false;
+
         [DisplayName("Trending Region")]
         [Description("ISO 3166-1 country code (DE, US, GB, etc.). Empty = default.")]
         public string TrendingRegion { get; set; } = "";
