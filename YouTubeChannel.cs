@@ -42,7 +42,8 @@ namespace Emby.YouTubePlugin
 
         private record VideoMeta(
             string? Overview, DateTime? Premiere, int? Year,
-            long? RuntimeTicks, string? ThumbUrl, DateTime CachedAt);
+            long? RuntimeTicks, string? ThumbUrl, DateTime CachedAt,
+            string? OriginalLang = null);
 
         private static readonly ConcurrentDictionary<string, VideoMeta> MetaCache = new();
         private static readonly TimeSpan MetaCacheTtl = TimeSpan.FromDays(365);
@@ -57,14 +58,17 @@ namespace Emby.YouTubePlugin
         private const string ReelPrefix = "REEL_";
         private const int ReelMaxSeconds = 180;
 
-        private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
+        private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
         {
+            string hl = ResolveHl(originalLang);
+            string url = $"https://www.youtube.com/watch?v={videoId}";
+            if (!string.IsNullOrEmpty(hl)) url += $"&hl={hl}&persist_hl=1";
             return new List<MediaSourceInfo>
             {
                 new MediaSourceInfo
                 {
                     Id = videoId,
-                    Path = $"https://www.youtube.com/watch?v={videoId}",
+                    Path = url,
                     Protocol = MediaProtocol.Http,
                     IsRemote = false,
                     SupportsTranscoding = false,
@@ -75,8 +79,25 @@ namespace Emby.YouTubePlugin
                     RequiresClosing = false,
                     RequiresLooping = false,
                     SupportsProbing = false,
+                    RunTimeTicks = isLive ? null : runTimeTicks,
                 }
             };
+        }
+
+        // ── Resolve &hl= value based on plugin config + per-video original language ──
+        private static string ResolveHl(string? originalLang)
+        {
+            var hint = (Plugin.Instance?.Options?.PlayerLanguageHint ?? "").Trim();
+            if (string.IsNullOrEmpty(hint) || hint.Equals("off", StringComparison.OrdinalIgnoreCase))
+                return "";
+            if (hint.Equals("original", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(originalLang)) return "";
+                // Reduce to primary subtag: "de-DE" -> "de"
+                int dash = originalLang.IndexOf('-');
+                return dash > 0 ? originalLang.Substring(0, dash).ToLowerInvariant() : originalLang.ToLowerInvariant();
+            }
+            return hint.ToLowerInvariant();
         }
 
         private static bool NeedsEnrichment(ChannelItemInfo item)
@@ -261,19 +282,30 @@ namespace Emby.YouTubePlugin
                     // ── Channel → show subcategories ──
                     if (type == "channel")
                     {
+                        // Try to use the channel's avatar for prettier sub-folder thumbnails.
+                        string? channelThumb = null;
+                        try
+                        {
+                            var d = await YouTubeApi.GetChannelDetailsAsync(
+                                apiKey, term, term.StartsWith(HandlePrefix), cancellationToken)
+                                .ConfigureAwait(false);
+                            channelThumb = d.thumb;
+                        }
+                        catch { }
+
                         items.Add(new ChannelItemInfo
                         {
                             Name = "📺 Videos",
                             Id = $"channelvideos{FolderSeparator}{term}",
                             Type = ChannelItemType.Folder,
-                            ImageUrl = FolderIcons.Videos
+                            ImageUrl = channelThumb ?? FolderIcons.Videos
                         });
                         items.Add(new ChannelItemInfo
                         {
                             Name = "⚡ Shorts",
                             Id = $"channelshorts{FolderSeparator}{term}",
                             Type = ChannelItemType.Folder,
-                            ImageUrl = FolderIcons.Shorts
+                            ImageUrl = channelThumb ?? FolderIcons.Shorts
                         });
 
                         if (config.ShowLiveFolders)
@@ -283,7 +315,7 @@ namespace Emby.YouTubePlugin
                                 Name = "🔴 Live & Upcoming",
                                 Id = $"channellive{FolderSeparator}{term}",
                                 Type = ChannelItemType.Folder,
-                                ImageUrl = FolderIcons.Live
+                                ImageUrl = channelThumb ?? FolderIcons.Live
                             });
                         }
 
@@ -649,10 +681,14 @@ namespace Emby.YouTubePlugin
                                 }
                             }
 
+                            // Original audio language (for &hl= hint)
+                            var origLang = YouTubeApi.GetNestedString(detail, "snippet", "defaultAudioLanguage")
+                                        ?? YouTubeApi.GetNestedString(detail, "snippet", "defaultLanguage");
+
                             // Cache
                             MetaCache[batchItem.Id] = new VideoMeta(
                                 overview, premiere, premiere?.Year,
-                                ts?.Ticks, batchItem.ImageUrl, DateTime.UtcNow);
+                                ts?.Ticks, batchItem.ImageUrl, DateTime.UtcNow, origLang);
                         }
                     }
                 }
@@ -837,6 +873,10 @@ namespace Emby.YouTubePlugin
                 var thumb = YouTubeApi.GetBestThumbnail(el)
                             ?? $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg";
 
+                // Original language for &hl= hint
+                var origLang = YouTubeApi.GetNestedString(el, "snippet", "defaultAudioLanguage")
+                            ?? YouTubeApi.GetNestedString(el, "snippet", "defaultLanguage");
+
                 // Duration
                 var duration = YouTubeApi.GetNestedString(el, "contentDetails", "duration");
                 var ts = YouTubeApi.ParseDuration(duration);
@@ -889,10 +929,10 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
-                    MediaSources = MakeMediaSources(videoId, isLive)
+                    MediaSources = MakeMediaSources(videoId, isLive, isLive ? null : ts?.Ticks, origLang)
                 };
 
-                MetaCache[itemId] = new VideoMeta(overview, premiere, premiere?.Year, ts?.Ticks, thumb, DateTime.UtcNow);
+                MetaCache[itemId] = new VideoMeta(overview, premiere, premiere?.Year, ts?.Ticks, thumb, DateTime.UtcNow, origLang);
                 list.Add(info);
             }
             return list;
@@ -968,7 +1008,7 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
-                    MediaSources = MakeMediaSources(videoId, isLive)
+                    MediaSources = MakeMediaSources(videoId, isLive, MetaCache.TryGetValue(itemId, out var __m) ? __m.RuntimeTicks : null, MetaCache.TryGetValue(itemId, out var __m2) ? __m2.OriginalLang : null)
                 };
 
                 list.Add(info);
