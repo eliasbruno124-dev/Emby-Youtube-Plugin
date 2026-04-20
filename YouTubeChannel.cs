@@ -60,10 +60,13 @@ namespace Emby.YouTubePlugin
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
         {
-            // Note: originalLang parameter kept for signature compat but unused.
-            // YouTube's &hl= is UI-only and does NOT influence audio-track selection.
-            // Audio language is decided by the viewer's YouTube account settings,
-            // browser Accept-Language, and YouTube's auto-dub heuristic.
+            // Extra parameters (runTimeTicks, originalLang) are accepted for signature
+            // compatibility with callers but intentionally NOT applied to MediaSourceInfo:
+            //  - YouTube's &hl= is UI-only and does NOT influence audio-track selection.
+            //  - Setting RunTimeTicks on the MediaSource makes Emby Web try to direct-play
+            //    the watch URL as a raw stream, which hangs forever. Leaving it null lets
+            //    the web client recognise the watch URL and fall back to the YouTube
+            //    embed/iframe player (the behaviour that worked in v1.14.x and earlier).
             string url = $"https://www.youtube.com/watch?v={videoId}";
             return new List<MediaSourceInfo>
             {
@@ -81,7 +84,6 @@ namespace Emby.YouTubePlugin
                     RequiresClosing = false,
                     RequiresLooping = false,
                     SupportsProbing = false,
-                    RunTimeTicks = isLive ? null : runTimeTicks,
                 }
             };
         }
@@ -542,6 +544,10 @@ namespace Emby.YouTubePlugin
             string apiKey, List<ChannelItemInfo> batch, List<string> videoIds,
             CancellationToken ct)
         {
+            // Track every video ID YouTube actually returned. Anything missing after
+            // all chunks were processed is unavailable (deleted, private, region-blocked,
+            // age-restricted, copyright takedown). We remove those from the batch.
+            var foundIds = new HashSet<string>(StringComparer.Ordinal);
             try
             {
                 // YouTube API allows up to 50 IDs per request
@@ -560,7 +566,10 @@ namespace Emby.YouTubePlugin
                         {
                             var id = YouTubeApi.GetString(item, "id");
                             if (!string.IsNullOrEmpty(id))
+                            {
                                 detailsMap[id] = item.Clone();
+                                foundIds.Add(id);
+                            }
                         }
 
                         foreach (var batchItem in batch)
@@ -687,6 +696,21 @@ namespace Emby.YouTubePlugin
                 }
 
                 EvictExpiredMetaCache();
+
+                // Drop unavailable videos: anything we asked about that the API
+                // did not return is deleted, private, region-blocked, or taken down.
+                if (videoIds.Count > 0 && foundIds.Count < videoIds.Count)
+                {
+                    batch.RemoveAll(item =>
+                    {
+                        var raw = item.Id;
+                        if (raw.StartsWith(LivePrefix, StringComparison.Ordinal))
+                            raw = raw.Substring(LivePrefix.Length);
+                        else if (raw.StartsWith(ReelPrefix, StringComparison.Ordinal))
+                            raw = raw.Substring(ReelPrefix.Length);
+                        return !foundIds.Contains(raw);
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -881,8 +905,9 @@ namespace Emby.YouTubePlugin
                 var desc = YouTubeApi.GetNestedString(el, "snippet", "description");
                 var pubStr = YouTubeApi.GetNestedString(el, "snippet", "publishedAt");
                 var premiere = YouTubeApi.ParsePublishedAt(pubStr);
-                var thumb = YouTubeApi.GetBestThumbnail(el)
-                            ?? $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg";
+                var thumb = YouTubeApi.GetStableVideoThumbnailUrl(
+                    videoId,
+                    YouTubeApi.GetBestThumbnail(el));
 
                 // Original language for &hl= hint
                 var origLang = YouTubeApi.GetNestedString(el, "snippet", "defaultAudioLanguage")
@@ -993,8 +1018,9 @@ namespace Emby.YouTubePlugin
                 var desc = YouTubeApi.GetNestedString(el, "snippet", "description");
                 var pubStr = YouTubeApi.GetNestedString(el, "snippet", "publishedAt");
                 var premiere = YouTubeApi.ParsePublishedAt(pubStr);
-                var thumb = YouTubeApi.GetBestThumbnail(el)
-                            ?? $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg";
+                var thumb = YouTubeApi.GetStableVideoThumbnailUrl(
+                    videoId,
+                    YouTubeApi.GetBestThumbnail(el));
 
                 // Live badge from snippet
                 var liveBroadcastContent = YouTubeApi.GetNestedString(el, "snippet", "liveBroadcastContent");
