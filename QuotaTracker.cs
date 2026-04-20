@@ -133,7 +133,10 @@ namespace Emby.YouTubePlugin
         {
             var dir = Plugin.CachePath;
             if (string.IsNullOrEmpty(dir)) return null;
-            return Path.Combine(dir, StateFile);
+            // Store one level above the cache dir so `rm -rf cache/*` does not wipe quota.
+            var parent = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            if (string.IsNullOrEmpty(parent)) parent = dir;
+            return Path.Combine(parent, StateFile);
         }
 
         private static void EnsureLoaded()
@@ -142,7 +145,22 @@ namespace Emby.YouTubePlugin
             try
             {
                 var path = FilePath();
-                if (path == null || !File.Exists(path))
+                if (path == null)
+                {
+                    _quotaDate = CurrentQuotaDay();
+                    return;
+                }
+                // Migrate legacy file (previously stored inside the cache dir which got wiped).
+                if (!File.Exists(path))
+                {
+                    var legacy = Path.Combine(Plugin.CachePath ?? "", StateFile);
+                    if (!string.IsNullOrEmpty(legacy) && File.Exists(legacy))
+                    {
+                        try { File.Move(legacy, path); }
+                        catch { /* ignore */ }
+                    }
+                }
+                if (!File.Exists(path))
                 {
                     _quotaDate = CurrentQuotaDay();
                     return;
