@@ -76,9 +76,5 @@ namespace Emby.YouTubePlugin
         [Description("How often to poll Watch Later for new videos (1-60). Each poll = 1 quota unit.")]
         [Range(1, 60)]
         public int WatchLaterPollMinutes { get; set; } = 3;
-
-        [DisplayName("Player UI / Audio Language Hint (hl)")]
-        [Description("Strategy for the &hl= URL parameter. 'original' = use each video's original language from API (recommended). 'off' = no hint. Otherwise a fixed code like 'de', 'en', 'fr'. Officially controls UI language; may also influence audio track selection on some clients.")]
-        public string PlayerLanguageHint { get; set; } = "original";
     }
 }

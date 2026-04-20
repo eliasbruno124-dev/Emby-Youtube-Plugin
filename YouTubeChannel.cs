@@ -60,9 +60,13 @@ namespace Emby.YouTubePlugin
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
         {
-            string hl = ResolveHl(originalLang);
             string url = $"https://www.youtube.com/watch?v={videoId}";
-            if (!string.IsNullOrEmpty(hl)) url += $"&hl={hl}&persist_hl=1";
+            if (!string.IsNullOrEmpty(originalLang))
+            {
+                int dash = originalLang.IndexOf('-');
+                string hl = (dash > 0 ? originalLang.Substring(0, dash) : originalLang).ToLowerInvariant();
+                url += $"&hl={hl}";
+            }
             return new List<MediaSourceInfo>
             {
                 new MediaSourceInfo
@@ -82,22 +86,6 @@ namespace Emby.YouTubePlugin
                     RunTimeTicks = isLive ? null : runTimeTicks,
                 }
             };
-        }
-
-        // ── Resolve &hl= value based on plugin config + per-video original language ──
-        private static string ResolveHl(string? originalLang)
-        {
-            var hint = (Plugin.Instance?.Options?.PlayerLanguageHint ?? "").Trim();
-            if (string.IsNullOrEmpty(hint) || hint.Equals("off", StringComparison.OrdinalIgnoreCase))
-                return "";
-            if (hint.Equals("original", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.IsNullOrEmpty(originalLang)) return "";
-                // Reduce to primary subtag: "de-DE" -> "de"
-                int dash = originalLang.IndexOf('-');
-                return dash > 0 ? originalLang.Substring(0, dash).ToLowerInvariant() : originalLang.ToLowerInvariant();
-            }
-            return hint.ToLowerInvariant();
         }
 
         private static bool NeedsEnrichment(ChannelItemInfo item)
