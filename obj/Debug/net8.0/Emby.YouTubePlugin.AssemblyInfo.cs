@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Emby.YouTubePlugin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.16.5.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.16.5+328178ccdbf5340233e9153125d04378713b67cf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.16.5+fca76415ecbe8e23d092849380e6843edc22c6bd")]
 [assembly: System.Reflection.AssemblyProductAttribute("Emby.YouTubePlugin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Emby.YouTubePlugin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.16.5.0")]

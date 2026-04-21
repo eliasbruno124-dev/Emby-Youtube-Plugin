@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {}
+    "/home/runner/work/Emby-Youtube-Plugin/Emby-Youtube-Plugin/Emby.YouTubePlugin.csproj": {}
   },
   "projects": {
-    "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj": {
+    "/home/runner/work/Emby-Youtube-Plugin/Emby-Youtube-Plugin/Emby.YouTubePlugin.csproj": {
       "version": "1.16.5",
       "restore": {
-        "projectUniqueName": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
+        "projectUniqueName": "/home/runner/work/Emby-Youtube-Plugin/Emby-Youtube-Plugin/Emby.YouTubePlugin.csproj",
         "projectName": "Emby.YouTubePlugin",
-        "projectPath": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\Emby.YouTubePlugin.csproj",
-        "packagesPath": "C:\\Users\\elias\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\elias\\Documents\\GitHub\\Emby-Youtube-Pluginnnn\\obj\\",
+        "projectPath": "/home/runner/work/Emby-Youtube-Plugin/Emby-Youtube-Plugin/Emby.YouTubePlugin.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/Emby-Youtube-Plugin/Emby-Youtube-Plugin/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\elias\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -76,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

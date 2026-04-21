@@ -908,6 +908,7 @@ namespace Emby.YouTubePlugin
                 var thumb = YouTubeApi.GetStableVideoThumbnailUrl(
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
+                ThumbnailHealth.EnqueueValidation(videoId);
 
                 // Original language for &hl= hint
                 var origLang = YouTubeApi.GetNestedString(el, "snippet", "defaultAudioLanguage")
@@ -1021,6 +1022,7 @@ namespace Emby.YouTubePlugin
                 var thumb = YouTubeApi.GetStableVideoThumbnailUrl(
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
+                ThumbnailHealth.EnqueueValidation(videoId);
 
                 // Live badge from snippet
                 var liveBroadcastContent = YouTubeApi.GetNestedString(el, "snippet", "liveBroadcastContent");
