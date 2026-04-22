@@ -19,7 +19,8 @@ namespace Emby.YouTubePlugin
 {
     public class YouTubeChannel : IChannel, IDisableMediaSourceDisplay
     {
-        private static void Log(string msg)
+        private static void Log(string msg) => LogPublic(msg);
+        public static void LogPublic(string msg)
         {
             System.Diagnostics.Debug.WriteLine(msg);
             try { File.AppendAllText("/config/data/youtube-debug.log", DateTime.UtcNow.ToString("o") + " " + msg + "\n"); } catch { }
@@ -49,10 +50,162 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan MetaCacheTtl = TimeSpan.FromDays(365);
         private static readonly TimeSpan NegativeCacheTtl = TimeSpan.FromHours(1);
 
+        // ── Cross-folder dedup ──
+        // The same YouTube video may legitimately appear in many folders. To avoid
+        // showing it 3-5x in Emby's home-screen "Latest" view we apply asymmetric
+        // dedup:
+        //   - Channel folders (channel/playlist/watchlater/...): NEVER drop anything,
+        //     just remember which video IDs they returned. Channel folders are the
+        //     primary view, so they always show their full content.
+        //   - Trending / Recently Added: DROP videos already returned by a channel
+        //     folder this refresh cycle. They keep their own internal dedup.
+        //
+        // The seen-set is reset only when the API cache is invalidated (config change)
+        // and on a hard timeout (10 min) so a manual / scheduled refresh always sees
+        // up-to-date content.
+        private static readonly ConcurrentDictionary<string, byte> CrossFolderSeen = new(StringComparer.Ordinal);
+        private static DateTime _crossFolderSeenStartedAt = DateTime.UtcNow;
+        private static readonly TimeSpan CrossFolderSeenMaxAge = TimeSpan.FromMinutes(10);
+
+        public static void ResetCrossFolderSeen()
+        {
+            CrossFolderSeen.Clear();
+            _crossFolderSeenStartedAt = DateTime.UtcNow;
+        }
+
+        private static string StripPrefix(string id)
+        {
+            if (id.StartsWith(LivePrefix, StringComparison.Ordinal)) return id.Substring(LivePrefix.Length);
+            if (id.StartsWith(ReelPrefix, StringComparison.Ordinal)) return id.Substring(ReelPrefix.Length);
+            return id;
+        }
+
+        // Called by channel folders: remembers which video IDs this folder returned
+        // but never drops anything from the input list.
+        private static void MarkAsSeen(IEnumerable<ChannelItemInfo> items)
+        {
+            if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
+                ResetCrossFolderSeen();
+            foreach (var it in items)
+                CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
+        }
+
+        // Called by Trending / Categories / Recently Added: drops videos already
+        // returned by ANY previously-seeded folder (channel uploads or another
+        // aggregator) and then seeds the surviving items so the next aggregator
+        // can dedup against this one. This kills duplicates between
+        // trending↔categories and recent↔channelvideos in the home "Latest" view.
+        private static void DropIfSeenInChannelFolder(List<ChannelItemInfo> items)
+        {
+            if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
+                ResetCrossFolderSeen();
+            items.RemoveAll(it => CrossFolderSeen.ContainsKey(StripPrefix(it.Id)));
+            foreach (var it in items)
+                CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
+        }
+
         // ── Rate limiter for enrichment ──
         private static readonly SemaphoreSlim EnrichSemaphore = new(4, 4);
         private const int EnrichDelayMs = 200;
         private const int MaxForegroundEnrich = 0;
+
+        // Playability probe: YouTube's videos.list API does NOT expose every form
+        // of geo / partner / sports-league restriction. Items can be marked
+        // privacyStatus=public, embeddable=true, with no regionRestriction set,
+        // yet still refuse to play in our region (e.g. MLB / FS1 sports streams).
+        // The watch-page HTML contains a `playabilityStatus":"OK|UNPLAYABLE|ERROR|LOGIN_REQUIRED"`
+        // field that reflects the *actual* playability from the server's IP, so
+        // we probe it as a last line of defense after the API checks pass.
+        private static readonly System.Net.Http.HttpClient PlayabilityProbeHttp =
+            new(new System.Net.Http.HttpClientHandler { AllowAutoRedirect = true })
+            { Timeout = TimeSpan.FromSeconds(8) };
+        private static readonly ConcurrentDictionary<string, bool> PlayabilityCache = new(StringComparer.Ordinal);
+
+        static YouTubeChannel()
+        {
+            try
+            {
+                PlayabilityProbeHttp.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36");
+                PlayabilityProbeHttp.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
+            }
+            catch { }
+        }
+
+        private static async Task<bool> IsPlayableAsync(string videoId, CancellationToken ct)
+        {
+            if (PlayabilityCache.TryGetValue(videoId, out var cached)) return cached;
+            try
+            {
+                using var resp = await PlayabilityProbeHttp.GetAsync(
+                    $"https://www.youtube.com/watch?v={Uri.EscapeDataString(videoId)}",
+                    System.Net.Http.HttpCompletionOption.ResponseContentRead, ct).ConfigureAwait(false);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    // Network error — assume playable to avoid false drops
+                    return true;
+                }
+                var html = await resp.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+                int idx = html.IndexOf("\"playabilityStatus\":{", StringComparison.Ordinal);
+                if (idx < 0) return true;
+                int statusIdx = html.IndexOf("\"status\":\"", idx, StringComparison.Ordinal);
+                if (statusIdx < 0) return true;
+                statusIdx += "\"status\":\"".Length;
+                int end = html.IndexOf('"', statusIdx);
+                if (end < 0) return true;
+                var status = html.Substring(statusIdx, end - statusIdx);
+                bool playable = string.Equals(status, "OK", StringComparison.OrdinalIgnoreCase);
+                PlayabilityCache[videoId] = playable;
+                return playable;
+            }
+            catch
+            {
+                // Probe failed — assume playable to avoid false drops
+                return true;
+            }
+        }
+
+        // Runs IsPlayableAsync in parallel for every item and removes the unplayable ones.
+        private static async Task ProbeAndDropUnplayable(List<ChannelItemInfo> items, CancellationToken ct)
+        {
+            if (items.Count == 0) return;
+            var rawIds = items
+                .Select(i =>
+                {
+                    var r = i.Id;
+                    if (r.StartsWith(LivePrefix, StringComparison.Ordinal)) r = r.Substring(LivePrefix.Length);
+                    else if (r.StartsWith(ReelPrefix, StringComparison.Ordinal)) r = r.Substring(ReelPrefix.Length);
+                    return r;
+                })
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+
+            var unplayable = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
+            using var sem = new SemaphoreSlim(6, 6);
+            var tasks = rawIds.Select(async id =>
+            {
+                await sem.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    if (!await IsPlayableAsync(id, ct).ConfigureAwait(false))
+                    {
+                        unplayable.TryAdd(id, 1);
+                        Log($"[YT] Dropping unplayable video {id} (watch-page playabilityStatus != OK)");
+                    }
+                }
+                finally { sem.Release(); }
+            });
+            try { await Task.WhenAll(tasks).ConfigureAwait(false); } catch { }
+
+            if (unplayable.IsEmpty) return;
+            items.RemoveAll(i =>
+            {
+                var r = i.Id;
+                if (r.StartsWith(LivePrefix, StringComparison.Ordinal)) r = r.Substring(LivePrefix.Length);
+                else if (r.StartsWith(ReelPrefix, StringComparison.Ordinal)) r = r.Substring(ReelPrefix.Length);
+                return unplayable.ContainsKey(r);
+            });
+        }
 
         private const string LivePrefix = "LIVE_";
         private const string ReelPrefix = "REEL_";
@@ -144,20 +297,35 @@ namespace Emby.YouTubePlugin
                 // ── Root level: build folders ──
                 if (string.IsNullOrEmpty(query.FolderId))
                 {
-                    // Watch Later
-                    var watchLater = (config.WatchLaterPlaylist ?? "").Trim();
-                    if (watchLater.Length > 2)
+                    // Watch Later (comma-separated list of playlist IDs)
+                    var watchLaterRaw = (config.WatchLaterPlaylist ?? "").Trim();
+                    if (watchLaterRaw.Length > 2)
                     {
-                        var d = await YouTubeApi.GetPlaylistDetailsAsync(apiKey, watchLater, cancellationToken)
-                            .ConfigureAwait(false);
-                        var thumbUrl = !string.IsNullOrEmpty(d.thumb) ? d.thumb : FolderIcons.WatchLater;
-                        items.Add(new ChannelItemInfo
+                        var playlistIds = watchLaterRaw
+                            .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(s => s.Trim())
+                            .Where(s => s.Length > 2)
+                            .Distinct(StringComparer.Ordinal)
+                            .ToList();
+
+                        for (int wi = 0; wi < playlistIds.Count; wi++)
                         {
-                            Name = "\u2B50 " + (d.name ?? "Watch Later"),
-                            Id = $"playlist{FolderSeparator}{watchLater}",
-                            Type = ChannelItemType.Folder,
-                            ImageUrl = thumbUrl
-                        });
+                            var pid = playlistIds[wi];
+                            var d = await YouTubeApi.GetPlaylistDetailsAsync(apiKey, pid, cancellationToken)
+                                .ConfigureAwait(false);
+                            var thumbUrl = !string.IsNullOrEmpty(d.thumb) ? d.thumb : FolderIcons.WatchLater;
+                            // Keep the legacy single-playlist label so existing entries don't get renamed
+                            var displayName = playlistIds.Count == 1
+                                ? "\u2B50 " + (d.name ?? "Watch Later")
+                                : "\u2B50 " + (d.name ?? $"Watch Later {wi + 1}");
+                            items.Add(new ChannelItemInfo
+                            {
+                                Name = displayName,
+                                Id = $"playlist{FolderSeparator}{pid}",
+                                Type = ChannelItemType.Folder,
+                                ImageUrl = thumbUrl
+                            });
+                        }
                     }
 
                     // Trending
@@ -333,6 +501,7 @@ namespace Emby.YouTubePlugin
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
                         using var catDoc = await YouTubeApi.GetVideoCategoriesAsync(apiKey, region, cancellationToken)
                             .ConfigureAwait(false);
+                        var candidates = new List<(string id, string name)>();
                         if (catDoc != null && catDoc.RootElement.TryGetProperty("items", out var catItems)
                             && catItems.ValueKind == JsonValueKind.Array)
                         {
@@ -345,14 +514,48 @@ namespace Emby.YouTubePlugin
                                 if (c.TryGetProperty("snippet", out var sn)
                                     && sn.TryGetProperty("assignable", out var ass)
                                     && ass.ValueKind == JsonValueKind.False) continue;
-                                items.Add(new ChannelItemInfo
-                                {
-                                    Name = cname,
-                                    Id = $"category{FolderSeparator}{cid}",
-                                    Type = ChannelItemType.Folder,
-                                    ImageUrl = FolderIcons.ForCategory(cid)
-                                });
+                                candidates.Add((cid, cname));
                             }
+                        }
+
+                        // Probe each category in parallel: only show categories that
+                        // currently have at least 1 trending video in the user's region
+                        // (e.g. Education, Pets, Travel are usually empty in DE).
+                        // GetTrendingAsync is cached 6h so repeated refreshes are cheap.
+                        var nonEmpty = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
+                        using (var probeSem = new SemaphoreSlim(6, 6))
+                        {
+                            var probes = candidates.Select(async cand =>
+                            {
+                                await probeSem.WaitAsync(cancellationToken).ConfigureAwait(false);
+                                try
+                                {
+                                    using var td = await YouTubeApi.GetTrendingAsync(apiKey, region, cand.id, cancellationToken)
+                                        .ConfigureAwait(false);
+                                    if (td != null
+                                        && td.RootElement.TryGetProperty("items", out var ti)
+                                        && ti.ValueKind == JsonValueKind.Array
+                                        && ti.GetArrayLength() > 0)
+                                    {
+                                        nonEmpty.TryAdd(cand.id, 1);
+                                    }
+                                }
+                                catch { }
+                                finally { probeSem.Release(); }
+                            });
+                            try { await Task.WhenAll(probes).ConfigureAwait(false); } catch { }
+                        }
+
+                        foreach (var cand in candidates)
+                        {
+                            if (!nonEmpty.ContainsKey(cand.id)) continue;
+                            items.Add(new ChannelItemInfo
+                            {
+                                Name = cand.name,
+                                Id = $"category{FolderSeparator}{cand.id}",
+                                Type = ChannelItemType.Folder,
+                                ImageUrl = FolderIcons.ForCategory(cand.id)
+                            });
                         }
                         if (items.Count == 0) return Msg(items, "No categories available.");
                         return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
@@ -522,6 +725,10 @@ namespace Emby.YouTubePlugin
                     if (items.Count == 0)
                         return Msg(items, "No results found.");
 
+                    // Channel folders own their videos: just remember the IDs so
+                    // Trending / Recently Added can drop duplicates later.
+                    MarkAsSeen(items);
+
                     ScheduleSortNameFix();
                     return new ChannelItemResult
                     {
@@ -548,15 +755,31 @@ namespace Emby.YouTubePlugin
             // all chunks were processed is unavailable (deleted, private, region-blocked,
             // age-restricted, copyright takedown). We remove those from the batch.
             var foundIds = new HashSet<string>(StringComparer.Ordinal);
+            // Videos that the API returned but that are unplayable in Emby:
+            //   - status.privacyStatus = "private"
+            //   - status.uploadStatus not in ["processed", "uploaded"]
+            //     (i.e. "rejected", "deleted", "failed")
+            //   - status.embeddable = false (the YouTube iframe player refuses to load)
+            //   - duration = 0s and not a live stream (stuck transcode / unavailable)
+            // These items are removed from the batch alongside the deleted ones so
+            // Emby doesn't keep dead entries with broken thumbnails.
+            var unplayableIds = new HashSet<string>(StringComparer.Ordinal);
+            // Only IDs from chunks whose API request actually succeeded count as
+            // "definitively queried". If a chunk fails (network/5xx/rate-limit), its
+            // IDs MUST NOT be treated as missing -- otherwise we would wrongly remove
+            // them from the batch, causing Emby to delete their metadata/posters
+            // overnight whenever a single chunk transiently fails.
+            var queriedIds = new HashSet<string>(StringComparer.Ordinal);
             try
             {
                 // YouTube API allows up to 50 IDs per request
                 for (int i = 0; i < videoIds.Count; i += 50)
                 {
-                    var chunk = videoIds.Skip(i).Take(50);
-                    using var doc = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, chunk, ct)
+                    var chunkList = videoIds.Skip(i).Take(50).ToList();
+                    using var doc = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, chunkList, ct)
                         .ConfigureAwait(false);
-                    if (doc == null) continue;
+                    if (doc == null) continue; // transient failure: keep all items in this chunk
+                    foreach (var qid in chunkList) queriedIds.Add(qid);
 
                     if (doc.RootElement.TryGetProperty("items", out var items)
                         && items.ValueKind == JsonValueKind.Array)
@@ -582,12 +805,107 @@ namespace Emby.YouTubePlugin
 
                             if (!detailsMap.TryGetValue(rawId, out var detail)) continue;
 
+                            // ── Unplayable detection ──
+                            // Drop videos that YouTube returned but that won't play in
+                            // the Emby iframe player (private, rejected, non-embeddable,
+                            // stuck processing). Without this they appear in the channel
+                            // listing with broken thumbnails and "stream not available"
+                            // errors when clicked.
+                            bool isLiveStream = detail.TryGetProperty("liveStreamingDetails", out _);
+                            if (detail.TryGetProperty("status", out var statusEl)
+                                && statusEl.ValueKind == JsonValueKind.Object)
+                            {
+                                var privacy = YouTubeApi.GetString(statusEl, "privacyStatus");
+                                var upload = YouTubeApi.GetString(statusEl, "uploadStatus");
+                                bool embeddable = true;
+                                if (statusEl.TryGetProperty("embeddable", out var embEl)
+                                    && embEl.ValueKind == JsonValueKind.False)
+                                    embeddable = false;
+
+                                if (string.Equals(privacy, "private", StringComparison.OrdinalIgnoreCase)
+                                    || (!string.IsNullOrEmpty(upload)
+                                        && !string.Equals(upload, "processed", StringComparison.OrdinalIgnoreCase)
+                                        && !string.Equals(upload, "uploaded", StringComparison.OrdinalIgnoreCase))
+                                    || !embeddable)
+                                {
+                                    unplayableIds.Add(rawId);
+                                    Log($"[YT] Dropping unplayable video {rawId} (privacy={privacy}, upload={upload}, embeddable={embeddable})");
+                                    continue;
+                                }
+                            }
+
+                            // Age-restricted videos (ytAgeRestricted) won't play in the
+                            // YouTube iframe player without a logged-in YouTube account,
+                            // so they're effectively unplayable in Emby.
+                            if (detail.TryGetProperty("contentDetails", out var cdEl)
+                                && cdEl.ValueKind == JsonValueKind.Object
+                                && cdEl.TryGetProperty("contentRating", out var crEl)
+                                && crEl.ValueKind == JsonValueKind.Object
+                                && crEl.TryGetProperty("ytRating", out var ytrEl)
+                                && string.Equals(ytrEl.GetString(), "ytAgeRestricted", StringComparison.OrdinalIgnoreCase))
+                            {
+                                unplayableIds.Add(rawId);
+                                Log($"[YT] Dropping age-restricted video {rawId}");
+                                continue;
+                            }
+
+                            // Region-blocked videos: if the configured trending region
+                            // (or "DE" as default for German users) is in the blocked
+                            // list, the iframe player will refuse to play it. Also drop
+                            // if the video is allowed only in a small whitelist that
+                            // doesn't include our region.
+                            var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
+                            if (string.IsNullOrEmpty(serverRegion)) serverRegion = "DE";
+                            if (cdEl.ValueKind == JsonValueKind.Object
+                                && cdEl.TryGetProperty("regionRestriction", out var rrEl)
+                                && rrEl.ValueKind == JsonValueKind.Object)
+                            {
+                                bool blocked = false;
+                                if (rrEl.TryGetProperty("blocked", out var blockedEl)
+                                    && blockedEl.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var b in blockedEl.EnumerateArray())
+                                    {
+                                        if (string.Equals(b.GetString(), serverRegion, StringComparison.OrdinalIgnoreCase))
+                                        { blocked = true; break; }
+                                    }
+                                }
+                                if (!blocked
+                                    && rrEl.TryGetProperty("allowed", out var allowedEl)
+                                    && allowedEl.ValueKind == JsonValueKind.Array)
+                                {
+                                    bool inAllowed = false;
+                                    foreach (var a in allowedEl.EnumerateArray())
+                                    {
+                                        if (string.Equals(a.GetString(), serverRegion, StringComparison.OrdinalIgnoreCase))
+                                        { inAllowed = true; break; }
+                                    }
+                                    if (!inAllowed) blocked = true;
+                                }
+                                if (blocked)
+                                {
+                                    unplayableIds.Add(rawId);
+                                    Log($"[YT] Dropping region-blocked video {rawId} (region={serverRegion})");
+                                    continue;
+                                }
+                            }
+
                             // Duration
                             var duration = YouTubeApi.GetNestedString(detail, "contentDetails", "duration");
                             var ts = YouTubeApi.ParseDuration(duration);
                             if (ts.HasValue && ts.Value.TotalSeconds > 0)
                             {
                                 batchItem.RunTimeTicks = ts.Value.Ticks;
+                            }
+                            else if (!isLiveStream
+                                  && (duration == "P0D" || duration == "PT0S"
+                                      || (ts.HasValue && ts.Value.TotalSeconds == 0)))
+                            {
+                                // Non-live video with 0s duration = stuck processing or
+                                // unavailable. Drop it; it won't play.
+                                unplayableIds.Add(rawId);
+                                Log($"[YT] Dropping zero-duration non-live video {rawId}");
+                                continue;
                             }
 
                             // Detect Shorts: only use reliable signals
@@ -621,8 +939,13 @@ namespace Emby.YouTubePlugin
                                     isShort = true;
                             }
 
-                            // 3. Duration ≤ 60s → very likely a Short
-                            if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60)
+                            // 3. Duration ≤ ReelMaxSeconds → very likely a Short. YouTube
+                            // extended Shorts to 3 minutes in late 2024, so the old 60s
+                            // threshold missed many Shorts and created inconsistent IDs
+                            // (Trending used 180s, EnrichBatch used 60s) → same video
+                            // appeared with REEL_ prefix in one folder and without in
+                            // another, causing Emby to store two separate MediaItems.
+                            if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= ReelMaxSeconds)
                                 isShort = true;
 
                             if (isShort
@@ -697,9 +1020,52 @@ namespace Emby.YouTubePlugin
 
                 EvictExpiredMetaCache();
 
-                // Drop unavailable videos: anything we asked about that the API
-                // did not return is deleted, private, region-blocked, or taken down.
-                if (videoIds.Count > 0 && foundIds.Count < videoIds.Count)
+                // Final playability probe: catch geo / sports-league restrictions
+                // that the API doesn't expose. Runs concurrently for surviving items
+                // and is cached so repeated refreshes are cheap.
+                var probeTargets = batch
+                    .Select(b =>
+                    {
+                        var raw = b.Id;
+                        if (raw.StartsWith(LivePrefix, StringComparison.Ordinal)) raw = raw.Substring(LivePrefix.Length);
+                        else if (raw.StartsWith(ReelPrefix, StringComparison.Ordinal)) raw = raw.Substring(ReelPrefix.Length);
+                        return raw;
+                    })
+                    .Where(id => !unplayableIds.Contains(id) && foundIds.Contains(id))
+                    .Distinct(StringComparer.Ordinal)
+                    .ToList();
+
+                if (probeTargets.Count > 0)
+                {
+                    using var probeSem = new SemaphoreSlim(6, 6);
+                    var probeLock = new object();
+                    var probeTasks = probeTargets.Select(async id =>
+                    {
+                        await probeSem.WaitAsync(ct).ConfigureAwait(false);
+                        try
+                        {
+                            if (!await IsPlayableAsync(id, ct).ConfigureAwait(false))
+                            {
+                                lock (probeLock) { unplayableIds.Add(id); }
+                                Log($"[YT] Dropping unplayable video {id} (watch-page playabilityStatus != OK)");
+                            }
+                        }
+                        finally { probeSem.Release(); }
+                    });
+                    try { await Task.WhenAll(probeTasks).ConfigureAwait(false); } catch { }
+                }
+
+                // Drop unavailable videos: only items whose chunk request actually
+                // succeeded but whose ID was NOT returned by YouTube are considered
+                // unavailable (deleted, private, region-blocked, age-restricted, or
+                // copyright takedown). Items whose chunk failed are KEPT so transient
+                // API errors don't wipe them from the channel listing (and their
+                // posters in Emby's metadata cache).
+                // Additionally: items returned by YouTube but flagged as unplayable
+                // (private / rejected / non-embeddable / 0-duration non-live) are
+                // also removed so they don't leave broken posters in the listing.
+                if ((queriedIds.Count > 0 && foundIds.Count < queriedIds.Count)
+                    || unplayableIds.Count > 0)
                 {
                     batch.RemoveAll(item =>
                     {
@@ -708,7 +1074,10 @@ namespace Emby.YouTubePlugin
                             raw = raw.Substring(LivePrefix.Length);
                         else if (raw.StartsWith(ReelPrefix, StringComparison.Ordinal))
                             raw = raw.Substring(ReelPrefix.Length);
-                        return !foundIds.Contains(raw);
+                        if (unplayableIds.Contains(raw)) return true;
+                        // Only remove if the ID was definitely queried in a successful
+                        // chunk and YouTube did not return it.
+                        return queriedIds.Contains(raw) && !foundIds.Contains(raw);
                     });
                 }
             }
@@ -830,6 +1199,11 @@ namespace Emby.YouTubePlugin
             if (sorted.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No videos yet.");
 
+            // Recently Added is a convenience view across saved channels. Drop any
+            // video already shown in a channel folder so the home-screen Latest view
+            // doesn't list the same video 2-3x.
+            DropIfSeenInChannelFolder(sorted);
+
             return new ChannelItemResult
             {
                 Items = sorted,
@@ -865,6 +1239,7 @@ namespace Emby.YouTubePlugin
                     {
                         var rawId = v.Id;
                         if (rawId.StartsWith(LivePrefix)) rawId = rawId.Substring(LivePrefix.Length);
+                        else if (rawId.StartsWith(ReelPrefix)) rawId = rawId.Substring(ReelPrefix.Length);
                         if (seenIds.Add(rawId)) allVideos.Add(v);
                     }
                 }
@@ -879,6 +1254,15 @@ namespace Emby.YouTubePlugin
 
             if (allVideos.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No results.");
+
+            // Playability probe: trending feeds frequently include geo-restricted
+            // sports / news streams (FS1, Fox News, MLB, NFL …) that the
+            // videos.list endpoint reports as public+embeddable but that won't
+            // play in our region. The probe (cached) drops them.
+            await ProbeAndDropUnplayable(allVideos, ct).ConfigureAwait(false);
+
+            // Trending: drop videos already shown in a channel folder.
+            DropIfSeenInChannelFolder(allVideos);
 
             return new ChannelItemResult
             {
@@ -917,19 +1301,30 @@ namespace Emby.YouTubePlugin
                 var duration = YouTubeApi.GetNestedString(el, "contentDetails", "duration");
                 var ts = YouTubeApi.ParseDuration(duration);
 
-                // View count
+                // View / like / comment count
                 long? viewCount = null;
+                long? likeCount = null;
+                long? commentCount = null;
                 if (el.TryGetProperty("statistics", out var stats))
                 {
-                    var vc = YouTubeApi.GetString(stats, "viewCount");
-                    if (long.TryParse(vc, out var v)) viewCount = v;
+                    if (long.TryParse(YouTubeApi.GetString(stats, "viewCount"), out var v)) viewCount = v;
+                    if (long.TryParse(YouTubeApi.GetString(stats, "likeCount"), out var l)) likeCount = l;
+                    if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                 }
+
+                var statsParts = new List<string>();
+                if (viewCount.HasValue) statsParts.Add($"👁 {viewCount:N0}");
+                if (likeCount.HasValue && Plugin.Instance?.Options.ShowLikeCount == true)
+                    statsParts.Add($"👍 {likeCount:N0}");
+                if (commentCount.HasValue && Plugin.Instance?.Options.ShowCommentCount == true)
+                    statsParts.Add($"💬 {commentCount:N0}");
+                string statsLine = statsParts.Count > 0 ? string.Join("  ·  ", statsParts) : "";
 
                 string? overview = null;
                 if (!string.IsNullOrWhiteSpace(desc))
-                    overview = (viewCount > 0 ? $"{viewCount:N0} views\n\n" : "") + desc;
-                else if (viewCount > 0)
-                    overview = $"{viewCount:N0} views";
+                    overview = (statsLine.Length > 0 ? statsLine + "\n\n" : "") + desc;
+                else if (statsLine.Length > 0)
+                    overview = statsLine;
 
                 // Live detection
                 bool isLive = false;
@@ -940,8 +1335,33 @@ namespace Emby.YouTubePlugin
                         isLive = true;
                 }
 
-                // Shorts detection
+                // Shorts detection: duration ≤ ReelMaxSeconds OR explicit "shorts" tag
+                // OR #shorts hashtag in title/description (matches EnrichBatch logic)
                 bool isReel = !isLive && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= ReelMaxSeconds;
+                if (!isReel && !isLive && el.TryGetProperty("snippet", out var snipForReel))
+                {
+                    if (snipForReel.TryGetProperty("tags", out var tagsEl)
+                        && tagsEl.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var tag in tagsEl.EnumerateArray())
+                        {
+                            var t = tag.GetString();
+                            if (t != null && string.Equals(t.Trim(), "shorts", StringComparison.OrdinalIgnoreCase))
+                            {
+                                isReel = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!isReel)
+                    {
+                        var sTitle = YouTubeApi.GetString(snipForReel, "title") ?? "";
+                        var sDesc = YouTubeApi.GetString(snipForReel, "description") ?? "";
+                        if (sTitle.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0
+                         || sDesc.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0)
+                            isReel = true;
+                    }
+                }
 
                 string itemId = isLive ? LivePrefix + videoId
                     : isReel ? ReelPrefix + videoId

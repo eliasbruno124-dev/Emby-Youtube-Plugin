@@ -103,6 +103,15 @@ namespace Emby.YouTubePlugin
     {
         private Timer? _pollTimer;
         private string _lastVideoIds = "";
+        // Track config to detect first-time setup / changes and auto-trigger refresh.
+        // Many users thought the plugin was broken because the channel was not refreshed
+        // automatically after they entered their API key + saved channels for the first time.
+        // The hash of the last-seen config is persisted to disk so this also works across
+        // server restarts (e.g. user adds API key, then restarts emby).
+        private string _lastConfigHash = "";
+        private bool _firstTickDone;
+        private static string ConfigHashPath =>
+            System.IO.Path.Combine(Plugin.CachePath ?? System.IO.Path.GetTempPath(), "..", "youtube-config-hash.txt");
         private static object? _channelMgr;
         private static object? _registeredChannel;
         private static MethodInfo? _refreshContentMethod;
@@ -111,10 +120,35 @@ namespace Emby.YouTubePlugin
         public void Run()
         {
             YouTubeChannel.ScheduleSortNameFix();
+            // Load last-known config hash from disk so we can detect changes that happened
+            // while the server was offline (e.g. API key was just added before a restart).
+            try
+            {
+                if (File.Exists(ConfigHashPath))
+                    _lastConfigHash = File.ReadAllText(ConfigHashPath).Trim();
+            }
+            catch { }
+
             var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
+            // Poll every 15s for the first ~3 minutes so config changes (API key, saved
+            // channels) are picked up quickly and the channel can refresh itself.
+            // After that, fall back to the user-configured WatchLater poll interval.
             _pollTimer = new Timer(PollTick, null,
-                TimeSpan.FromSeconds(30),
-                TimeSpan.FromMinutes(minutes));
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(15));
+            // Schedule a one-shot switch to the slower interval after 3 minutes.
+            new Timer(_ =>
+            {
+                try { _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes)); }
+                catch { }
+            }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
+        }
+
+        private static string ComputeConfigHash(string apiKey, string savedItems, string watchLater)
+        {
+            using var sha = System.Security.Cryptography.SHA1.Create();
+            var data = System.Text.Encoding.UTF8.GetBytes($"{apiKey}|{savedItems}|{watchLater}");
+            return Convert.ToHexString(sha.ComputeHash(data));
         }
 
         private void PollTick(object? state)
@@ -125,9 +159,60 @@ namespace Emby.YouTubePlugin
                 {
                     var config = Plugin.Instance?.Options;
                     if (config == null) return;
-                    var playlist = (config.WatchLaterPlaylist ?? "").Trim();
-                    if (playlist.Length <= 2) return;
+
                     var apiKey = (config.ApiKey ?? "").Trim();
+                    var savedItems = (config.SavedItems ?? "").Trim();
+                    var watchLaterRaw = (config.WatchLaterPlaylist ?? "").Trim();
+
+                    // Compare against the last-seen config hash (persisted to disk so this
+                    // also detects changes that happened while the server was offline).
+                    var currentHash = ComputeConfigHash(apiKey, savedItems, watchLaterRaw);
+                    bool configChanged = !string.Equals(currentHash, _lastConfigHash, StringComparison.Ordinal);
+                    _firstTickDone = true;
+
+                    if (configChanged && !string.IsNullOrEmpty(apiKey))
+                    {
+                        // Persist new hash so we don't trigger again unnecessarily
+                        try
+                        {
+                            var dir = Path.GetDirectoryName(ConfigHashPath);
+                            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                            File.WriteAllText(ConfigHashPath, currentHash);
+                        }
+                        catch { }
+                        _lastConfigHash = currentHash;
+
+                        // Drop everything cached + clear cross-folder dedup so the
+                        // next refresh starts with a clean slate.
+                        try { YouTubeApi.InvalidateAllCache(); } catch { }
+                        try { YouTubeChannel.ResetCrossFolderSeen(); } catch { }
+
+                        // First refresh: register / wake up the channel. The very
+                        // first call after server start often returns nothing because
+                        // Emby hasn't fully wired up the channel yet, so we kick off
+                        // a second refresh ~10s later as insurance.
+                        TriggerRefresh();
+                        _ = Task.Delay(TimeSpan.FromSeconds(12)).ContinueWith(_ =>
+                        {
+                            try { YouTubeChannel.ResetCrossFolderSeen(); } catch { }
+                            TriggerRefresh();
+                        });
+                    }
+                    else if (configChanged)
+                    {
+                        // API key still missing - just remember the (empty) hash but don't refresh.
+                        _lastConfigHash = currentHash;
+                    }
+
+                    // Watch Later polling: only the first playlist ID is polled to keep
+                    // quota usage at 1u per interval regardless of how many playlists
+                    // the user added (the rest get refreshed via the regular channel refresh).
+                    if (watchLaterRaw.Length <= 2) return;
+                    var playlist = watchLaterRaw
+                        .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim())
+                        .FirstOrDefault(s => s.Length > 2);
+                    if (string.IsNullOrEmpty(playlist)) return;
                     if (string.IsNullOrEmpty(apiKey)) return;
 
                     var url = $"https://www.googleapis.com/youtube/v3/playlistItems" +
@@ -172,7 +257,13 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                if (!EnsureChannelManager()) return;
+                if (!EnsureChannelManager())
+                {
+                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: ChannelManager not ready (will retry on next poll)");
+                    return;
+                }
+
+                YouTubeChannel.LogPublic($"[YT] TriggerRefresh: invoking {_refreshContentMethod!.Name} on registered YouTube channel");
 
                 var pars = _refreshContentMethod!.GetParameters();
                 var args = new object?[pars.Length];
@@ -185,7 +276,10 @@ namespace Emby.YouTubePlugin
                     else if (pt == typeof(CancellationToken))
                         args[i] = CancellationToken.None;
                     else if (name.Contains("maxRefresh", StringComparison.OrdinalIgnoreCase))
-                        args[i] = 2;
+                        // Hierarchy depth: root → channel_x_ → channelvideos_x_ → videos.
+                        // 2 only refreshed root + channel_x_ leaving channelvideos_x_ empty,
+                        // so videos never appeared in Latest until the user navigated in.
+                        args[i] = 5;
                     else if (pt == typeof(string))
                         args[i] = null;
                     else if (pars[i].HasDefaultValue)
@@ -196,9 +290,14 @@ namespace Emby.YouTubePlugin
 
                 var result = _refreshContentMethod.Invoke(_channelMgr, args);
                 if (result is Task task)
-                    task.Wait(TimeSpan.FromSeconds(60));
+                    task.Wait(TimeSpan.FromSeconds(120));
+
+                YouTubeChannel.LogPublic("[YT] TriggerRefresh: completed");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] TriggerRefresh failed: {ex.Message}");
+            }
         }
 
         private static bool EnsureChannelManager()

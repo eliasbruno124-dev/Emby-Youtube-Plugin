@@ -334,6 +334,17 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        /// <summary>
+        /// Drop the entire memory response cache. Used after the user changes the API
+        /// key or saved channels so the next channel refresh re-fetches with the new
+        /// configuration instead of serving stale data.
+        /// </summary>
+        public static void InvalidateAllCache()
+        {
+            try { ResponseCache.Clear(); }
+            catch (Exception ex) { Debug.WriteLine($"[YouTubeApi] InvalidateAllCache failed: {ex.Message}"); }
+        }
+
         // ── Channel Details ──
 
         public static async Task<(string? id, string? name, string? thumb, string? uploadsPlaylistId)>
@@ -564,7 +575,9 @@ namespace Emby.YouTubePlugin
             string apiKey, IEnumerable<string> videoIds, CancellationToken ct)
         {
             var ids = string.Join(",", videoIds);
-            var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails" +
+            // status part lets us filter out private/rejected/non-embeddable videos
+            // that would otherwise show up in the channel listing as broken posters.
+            var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails,status" +
                       $"&id={Uri.EscapeDataString(ids)}&key={Uri.EscapeDataString(apiKey)}";
             // Video metadata is effectively immutable — cache 1 year (disk 30d cap)
             return await TryGetCachedJsonAsync(url, ct, VideoDetailTtlMs).ConfigureAwait(false);
