@@ -90,11 +90,17 @@ namespace Emby.YouTubePlugin
                 CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
         }
 
-        // Called by Trending / Categories / Recently Added: drops videos already
-        // returned by ANY previously-seeded folder (channel uploads or another
-        // aggregator) and then seeds the surviving items so the next aggregator
-        // can dedup against this one. This kills duplicates between
-        // trending↔categories and recent↔channelvideos in the home "Latest" view.
+        // Called by Trending / Categories: drops videos already returned by ANY
+        // previously-seeded folder (channel uploads or another aggregator) and
+        // then seeds the surviving items so the next aggregator can dedup
+        // against this one.
+        //
+        // The dedup is REQUIRED to keep Emby's home "Latest" row from showing
+        // the same video twice — each Channel folder creates its own MediaItem
+        // row in Emby's DB, so the same videoId in two folders = two rows = two
+        // entries in Latest. Recently Added is intentionally NOT routed through
+        // here because it is by definition a subset of saved channels and the
+        // dedup would empty it.
         private static void DropIfSeenInChannelFolder(List<ChannelItemInfo> items)
         {
             if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
@@ -102,6 +108,88 @@ namespace Emby.YouTubePlugin
             items.RemoveAll(it => CrossFolderSeen.ContainsKey(StripPrefix(it.Id)));
             foreach (var it in items)
                 CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
+        }
+
+        // Pre-seeds the cross-folder seen-set from cached channel uploads so
+        // Trending / Recently Added can dedup against channel folders even when
+        // Emby happens to fetch them BEFORE the channel folders this cycle.
+        // Without this, the first-after-restart Trending/Recent fetch keeps every
+        // video, then channel folders later store their own copies → 2 MediaItems
+        // for the same video → home "Latest" view shows the video twice.
+        // Uses the 6h-cached uploads playlist endpoint, so this is free on warm
+        // cache and ~1 quota unit per channel on cold cache.
+        private static async Task PreSeedChannelSeenAsync(
+            string apiKey, PluginConfiguration config, CancellationToken ct)
+        {
+            try
+            {
+                if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
+                    ResetCrossFolderSeen();
+
+                var savedItems = (config.SavedItems ?? "")
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var channelIds = new List<string>();
+                foreach (var raw in savedItems)
+                {
+                    var term = raw.Trim();
+                    if (string.IsNullOrEmpty(term)) continue;
+                    if (term.StartsWith(HandlePrefix))
+                    {
+                        var d = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, true, ct).ConfigureAwait(false);
+                        if (!string.IsNullOrEmpty(d.id)) channelIds.Add(d.id!);
+                    }
+                    else if (term.StartsWith(ChannelIdPrefix) && term.Length > MinChannelIdLength)
+                    {
+                        channelIds.Add(term);
+                    }
+                }
+
+                // Also pre-seed from Watch Later playlists
+                var watchLater = (config.WatchLaterPlaylist ?? "")
+                    .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim()).Where(s => s.Length > 2).ToList();
+
+                async Task SeedFromDocAsync(JsonDocument? doc)
+                {
+                    await Task.CompletedTask;
+                    if (doc == null) return;
+                    if (!doc.RootElement.TryGetProperty("items", out var items)
+                        || items.ValueKind != JsonValueKind.Array) return;
+                    foreach (var el in items.EnumerateArray())
+                    {
+                        // playlistItems uses snippet.resourceId.videoId; videos.list uses id
+                        string? vid = null;
+                        if (el.TryGetProperty("snippet", out var sn)
+                            && sn.TryGetProperty("resourceId", out var ri)
+                            && ri.TryGetProperty("videoId", out var vidEl))
+                            vid = vidEl.GetString();
+                        if (string.IsNullOrEmpty(vid))
+                            vid = YouTubeApi.GetString(el, "id");
+                        if (!string.IsNullOrEmpty(vid))
+                            CrossFolderSeen.TryAdd(vid!, 1);
+                    }
+                }
+
+                foreach (var cid in channelIds)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, cid, null, ct, "date")
+                        .ConfigureAwait(false);
+                    await SeedFromDocAsync(doc).ConfigureAwait(false);
+                }
+                foreach (var pid in watchLater)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    using var doc = await YouTubeApi.GetPlaylistVideosAsync(apiKey, pid, null, ct)
+                        .ConfigureAwait(false);
+                    await SeedFromDocAsync(doc).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"[YT] PreSeedChannelSeenAsync failed: {ex.Message}");
+            }
         }
 
         // ── Rate limiter for enrichment ──
@@ -519,10 +607,28 @@ namespace Emby.YouTubePlugin
                         }
 
                         // Probe each category in parallel: only show categories that
-                        // currently have at least 1 trending video in the user's region
-                        // (e.g. Education, Pets, Travel are usually empty in DE).
-                        // GetTrendingAsync is cached 6h so repeated refreshes are cheap.
+                        // would actually contain at least 1 video AFTER all filters
+                        // (region restriction, HideShorts).
+                        // Probes try chart=mostPopular first (~free, 6h-cached) and
+                        // fall back to a viewCount-sorted search (100u, 6h-cached).
+                        // NOTE: deliberately does NOT pre-seed against channel uploads
+                        // — that caused categories to vanish whenever a saved channel
+                        // happened to dominate that category's trending.
                         var nonEmpty = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
+                        bool hideShorts = config.HideShorts;
+
+                        // Local helper: count videos in a doc that survive region/Shorts
+                        // filters. Returns true as soon as one survives.
+                        bool AnySurvives(JsonDocument doc)
+                        {
+                            foreach (var v in ExtractTrendingVideos(doc))
+                            {
+                                if (hideShorts && v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)) continue;
+                                return true;
+                            }
+                            return false;
+                        }
+
                         using (var probeSem = new SemaphoreSlim(6, 6))
                         {
                             var probes = candidates.Select(async cand =>
@@ -530,15 +636,41 @@ namespace Emby.YouTubePlugin
                                 await probeSem.WaitAsync(cancellationToken).ConfigureAwait(false);
                                 try
                                 {
-                                    using var td = await YouTubeApi.GetTrendingAsync(apiKey, region, cand.id, cancellationToken)
-                                        .ConfigureAwait(false);
-                                    if (td != null
-                                        && td.RootElement.TryGetProperty("items", out var ti)
-                                        && ti.ValueKind == JsonValueKind.Array
-                                        && ti.GetArrayLength() > 0)
+                                    // 1) Cheap chart probe
+                                    using (var td = await YouTubeApi.GetTrendingAsync(apiKey, region, cand.id, cancellationToken)
+                                        .ConfigureAwait(false))
                                     {
-                                        nonEmpty.TryAdd(cand.id, 1);
+                                        if (td != null && AnySurvives(td))
+                                        {
+                                            nonEmpty.TryAdd(cand.id, 1);
+                                            return;
+                                        }
                                     }
+                                    // 2) Search fallback: enrich first 50 search hits via
+                                    // videos.list so we can apply the same region filter.
+                                    using var sd = await YouTubeApi.SearchByCategoryAsync(apiKey, region, cand.id, cancellationToken)
+                                        .ConfigureAwait(false);
+                                    if (sd == null) return;
+                                    var ids = new List<string>();
+                                    if (sd.RootElement.TryGetProperty("items", out var sit)
+                                        && sit.ValueKind == JsonValueKind.Array)
+                                    {
+                                        foreach (var el in sit.EnumerateArray())
+                                        {
+                                            string? vid = null;
+                                            if (el.TryGetProperty("id", out var idEl)
+                                                && idEl.TryGetProperty("videoId", out var vidEl))
+                                                vid = vidEl.GetString();
+                                            if (string.IsNullOrEmpty(vid)) continue;
+                                            ids.Add(vid!);
+                                            if (ids.Count >= 50) break;
+                                        }
+                                    }
+                                    if (ids.Count == 0) return;
+                                    using var vd = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, ids, cancellationToken)
+                                        .ConfigureAwait(false);
+                                    if (vd != null && AnySurvives(vd))
+                                        nonEmpty.TryAdd(cand.id, 1);
                                 }
                                 catch { }
                                 finally { probeSem.Release(); }
@@ -849,14 +981,14 @@ namespace Emby.YouTubePlugin
                                 continue;
                             }
 
-                            // Region-blocked videos: if the configured trending region
-                            // (or "DE" as default for German users) is in the blocked
-                            // list, the iframe player will refuse to play it. Also drop
-                            // if the video is allowed only in a small whitelist that
-                            // doesn't include our region.
+                            // Region-blocked videos: only filter when the user has
+                            // explicitly configured a Trending Region. Without an explicit
+                            // region we cannot guess the server's geo (and the previous
+                            // "DE" fallback was wrongly dropping playable videos for
+                            // non-DE users). The check is a cheap JSON lookup.
                             var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
-                            if (string.IsNullOrEmpty(serverRegion)) serverRegion = "DE";
-                            if (cdEl.ValueKind == JsonValueKind.Object
+                            if (!string.IsNullOrEmpty(serverRegion)
+                                && cdEl.ValueKind == JsonValueKind.Object
                                 && cdEl.TryGetProperty("regionRestriction", out var rrEl)
                                 && rrEl.ValueKind == JsonValueKind.Object)
                             {
@@ -1020,40 +1152,13 @@ namespace Emby.YouTubePlugin
 
                 EvictExpiredMetaCache();
 
-                // Final playability probe: catch geo / sports-league restrictions
-                // that the API doesn't expose. Runs concurrently for surviving items
-                // and is cached so repeated refreshes are cheap.
-                var probeTargets = batch
-                    .Select(b =>
-                    {
-                        var raw = b.Id;
-                        if (raw.StartsWith(LivePrefix, StringComparison.Ordinal)) raw = raw.Substring(LivePrefix.Length);
-                        else if (raw.StartsWith(ReelPrefix, StringComparison.Ordinal)) raw = raw.Substring(ReelPrefix.Length);
-                        return raw;
-                    })
-                    .Where(id => !unplayableIds.Contains(id) && foundIds.Contains(id))
-                    .Distinct(StringComparer.Ordinal)
-                    .ToList();
-
-                if (probeTargets.Count > 0)
-                {
-                    using var probeSem = new SemaphoreSlim(6, 6);
-                    var probeLock = new object();
-                    var probeTasks = probeTargets.Select(async id =>
-                    {
-                        await probeSem.WaitAsync(ct).ConfigureAwait(false);
-                        try
-                        {
-                            if (!await IsPlayableAsync(id, ct).ConfigureAwait(false))
-                            {
-                                lock (probeLock) { unplayableIds.Add(id); }
-                                Log($"[YT] Dropping unplayable video {id} (watch-page playabilityStatus != OK)");
-                            }
-                        }
-                        finally { probeSem.Release(); }
-                    });
-                    try { await Task.WhenAll(probeTasks).ConfigureAwait(false); } catch { }
-                }
+                // NOTE: The watch-page playability HTTP probe used to run here. It
+                // made channel refresh extremely slow (one HTTPS round-trip per
+                // video, up to 8s timeout) and frequently false-dropped items when
+                // YouTube rate-limited the probe. The fast region/embeddable/
+                // private/duration filtering above is enough for the channel
+                // listing; the rare unplayable item is a much smaller annoyance
+                // than a multi-minute refresh.
 
                 // Drop unavailable videos: only items whose chunk request actually
                 // succeeded but whose ID was NOT returned by YouTube are considered
@@ -1127,6 +1232,9 @@ namespace Emby.YouTubePlugin
         private static async Task<ChannelItemResult> LoadRecentlyAdded(
             string apiKey, PluginConfiguration config, CancellationToken ct)
         {
+            // Pre-seed seen-set so dedup works regardless of folder fetch order.
+            await PreSeedChannelSeenAsync(apiKey, config, ct).ConfigureAwait(false);
+
             var perChannel = Math.Clamp(config.RecentlyAddedPerChannel, 1, 25);
             var savedItems = (config.SavedItems ?? "")
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1199,9 +1307,11 @@ namespace Emby.YouTubePlugin
             if (sorted.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No videos yet.");
 
-            // Recently Added is a convenience view across saved channels. Drop any
-            // video already shown in a channel folder so the home-screen Latest view
-            // doesn't list the same video 2-3x.
+            // Strict cross-folder dedup: drop any video that's already shown in a
+            // channel folder so Emby's home "Latest" row doesn't list it twice.
+            // Recently Added may legitimately end up sparse (or empty) when all
+            // saved channels' newest videos already appear in their channel
+            // folder — that is by design.
             DropIfSeenInChannelFolder(sorted);
 
             return new ChannelItemResult
@@ -1216,17 +1326,40 @@ namespace Emby.YouTubePlugin
             string apiKey, CancellationToken ct, string region = "", string category = "")
         {
             var allVideos = new List<ChannelItemInfo>();
-            var seenIds = new HashSet<string>();
+            var seenIds = new HashSet<string>(StringComparer.Ordinal);
+
+            // NOTE: Trending intentionally does NOT pre-seed against channel uploads.
+            // Doing so collapsed Trending to a handful of items whenever a saved
+            // channel happened to also be in the trending charts. Trending is now
+            // self-contained: dedupes within itself + across its own buckets.
+            var cfgForSeed = Plugin.Instance?.Options;
+            int target = ClampVideos(cfgForSeed?.MaxChannelVideos ?? 50);
+            bool hideShorts = cfgForSeed?.HideShorts == true;
+
+            // Helper: add a video if it's new in this build. Marks CrossFolderSeen
+            // so later folders (Recently Added, Categories children) skip it.
+            void TryAdd(ChannelItemInfo v)
+            {
+                var rawId = StripPrefix(v.Id);
+                if (!seenIds.Add(rawId)) return;
+                if (hideShorts && v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)) return;
+                allVideos.Add(v);
+                CrossFolderSeen.TryAdd(rawId, 1);
+            }
 
             try
             {
-                // Get trending for multiple categories
+                // 1) Trending charts (chart=mostPopular, ~free per call)
+                // Wider bucket list in root mode — chart hits overlap heavily across
+                // categories so we need many buckets to reach 150 unique items.
                 string?[] categories = string.IsNullOrEmpty(category)
-                    ? new string?[] { null, "10", "20", "1" } // All, Music, Gaming, Film
+                    ? new string?[] { null, "10", "20", "24", "17", "22", "23", "28", "1" }
+                    // All, Music, Gaming, Entertainment, Sports, People, Comedy, Tech, Film
                     : new string?[] { category };
 
                 foreach (var cat in categories)
                 {
+                    if (allVideos.Count >= target) break;
                     ct.ThrowIfCancellationRequested();
                     string? reg = string.IsNullOrEmpty(region) ? null : region;
 
@@ -1234,13 +1367,60 @@ namespace Emby.YouTubePlugin
                         .ConfigureAwait(false);
                     if (doc == null) continue;
 
-                    var videos = ExtractTrendingVideos(doc);
-                    foreach (var v in videos)
+                    foreach (var v in ExtractTrendingVideos(doc))
                     {
-                        var rawId = v.Id;
-                        if (rawId.StartsWith(LivePrefix)) rawId = rawId.Substring(LivePrefix.Length);
-                        else if (rawId.StartsWith(ReelPrefix)) rawId = rawId.Substring(ReelPrefix.Length);
-                        if (seenIds.Add(rawId)) allVideos.Add(v);
+                        TryAdd(v);
+                        if (allVideos.Count >= target) break;
+                    }
+                }
+
+                // 2) Supplement with viewCount-sorted search per category to fill
+                // the folder up to `target` after dedup. Each search costs 100u
+                // but is cached 6h. Hard cap: 1 page per bucket × 9 buckets =
+                // 900u worst case cold-cache, 0u when warm.
+                if (allVideos.Count < target)
+                {
+                    foreach (var cat in categories)
+                    {
+                        if (allVideos.Count >= target) break;
+                        if (string.IsNullOrEmpty(cat)) continue; // search needs a category id
+                        ct.ThrowIfCancellationRequested();
+
+                        using var sdoc = await YouTubeApi.SearchByCategoryAsync(apiKey, region, cat!, ct, null)
+                            .ConfigureAwait(false);
+                        if (sdoc == null) continue;
+
+                        // search.list returns lightweight items (id.videoId only).
+                        // Collect new IDs and enrich them via videos.list (1u/50).
+                        var newIds = new List<string>();
+                        if (sdoc.RootElement.TryGetProperty("items", out var sitems)
+                            && sitems.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var el in sitems.EnumerateArray())
+                            {
+                                string? vid = null;
+                                if (el.TryGetProperty("id", out var idEl)
+                                    && idEl.TryGetProperty("videoId", out var vidEl))
+                                    vid = vidEl.GetString();
+                                if (string.IsNullOrEmpty(vid)) continue;
+                                if (seenIds.Contains(vid!)) continue;
+                                newIds.Add(vid!);
+                                if (newIds.Count >= 50) break; // batch limit
+                            }
+                        }
+                        if (newIds.Count > 0)
+                        {
+                            using var vd = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, newIds, ct)
+                                .ConfigureAwait(false);
+                            if (vd != null)
+                            {
+                                foreach (var v in ExtractTrendingVideos(vd))
+                                {
+                                    TryAdd(v);
+                                    if (allVideos.Count >= target) break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1249,20 +1429,8 @@ namespace Emby.YouTubePlugin
                 return Msg(new List<ChannelItemInfo>(), $"ERROR: {ex.Message}");
             }
 
-            if (Plugin.Instance?.Options.HideShorts == true)
-                allVideos.RemoveAll(i => i.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
-
             if (allVideos.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No results.");
-
-            // Playability probe: trending feeds frequently include geo-restricted
-            // sports / news streams (FS1, Fox News, MLB, NFL …) that the
-            // videos.list endpoint reports as public+embeddable but that won't
-            // play in our region. The probe (cached) drops them.
-            await ProbeAndDropUnplayable(allVideos, ct).ConfigureAwait(false);
-
-            // Trending: drop videos already shown in a channel folder.
-            DropIfSeenInChannelFolder(allVideos);
 
             return new ChannelItemResult
             {
@@ -1279,10 +1447,43 @@ namespace Emby.YouTubePlugin
                 || items.ValueKind != JsonValueKind.Array)
                 return list;
 
+            // Cheap JSON-level region filter: replaces the slow watch-page HTTP
+            // probe. Only filters when the user explicitly set a Trending Region
+            // (without one we cannot guess the server's geo).
+            var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
+
             foreach (var el in items.EnumerateArray())
             {
                 var videoId = YouTubeApi.GetString(el, "id");
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
+
+                // Skip region-blocked entries before any further work
+                if (!string.IsNullOrEmpty(serverRegion)
+                    && el.TryGetProperty("contentDetails", out var cdRR)
+                    && cdRR.ValueKind == JsonValueKind.Object
+                    && cdRR.TryGetProperty("regionRestriction", out var rrEl)
+                    && rrEl.ValueKind == JsonValueKind.Object)
+                {
+                    bool blocked = false;
+                    if (rrEl.TryGetProperty("blocked", out var bl)
+                        && bl.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var b in bl.EnumerateArray())
+                            if (string.Equals(b.GetString(), serverRegion, StringComparison.OrdinalIgnoreCase))
+                            { blocked = true; break; }
+                    }
+                    if (!blocked
+                        && rrEl.TryGetProperty("allowed", out var al)
+                        && al.ValueKind == JsonValueKind.Array)
+                    {
+                        bool inAllowed = false;
+                        foreach (var a in al.EnumerateArray())
+                            if (string.Equals(a.GetString(), serverRegion, StringComparison.OrdinalIgnoreCase))
+                            { inAllowed = true; break; }
+                        if (!inAllowed) blocked = true;
+                    }
+                    if (blocked) continue;
+                }
 
                 var title = YouTubeApi.GetNestedString(el, "snippet", "title") ?? "Untitled";
                 var author = YouTubeApi.GetNestedString(el, "snippet", "channelTitle") ?? "Unknown";

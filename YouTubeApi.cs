@@ -569,6 +569,32 @@ namespace Emby.YouTubePlugin
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
         }
 
+        // ── Search by Category (popular videos in category, costs 100u) ──
+        // Used to supplement chart=mostPopular which often returns only a handful
+        // of videos for some categories. Cached 6h to keep quota usage in check.
+        public static async Task<JsonDocument?> SearchByCategoryAsync(
+            string apiKey, string regionCode, string categoryId, CancellationToken ct,
+            string? pageToken = null)
+        {
+            // Restrict to last 30 days so we get *current* popular uploads instead of
+            // all-time top hits (which heavily overlap with chart=mostPopular and
+            // capped result variety to ~80 deduped entries).
+            // CRITICAL: round to UTC day boundary so the URL is stable for 24h —
+            // otherwise the per-millisecond timestamp busts the 6h disk cache and
+            // every call costs 100u.
+            var publishedAfter = DateTime.UtcNow.Date.AddDays(-30)
+                .ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var url = $"{ApiBase}/search?part=snippet&type=video&order=viewCount" +
+                      $"&maxResults=50&videoCategoryId={Uri.EscapeDataString(categoryId)}" +
+                      $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
+                      $"&key={Uri.EscapeDataString(apiKey)}";
+            if (!string.IsNullOrEmpty(regionCode))
+                url += $"&regionCode={Uri.EscapeDataString(regionCode)}";
+            if (!string.IsNullOrEmpty(pageToken))
+                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+            return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
+        }
+
         // ── Batch Video Details (up to 50 IDs) ──
 
         public static async Task<JsonDocument?> GetVideoDetailsBatchAsync(
