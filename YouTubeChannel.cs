@@ -1328,105 +1328,106 @@ namespace Emby.YouTubePlugin
             var allVideos = new List<ChannelItemInfo>();
             var seenIds = new HashSet<string>(StringComparer.Ordinal);
 
-            // Pre-seed seen-set with channel uploads so Trending dedups against
-            // channel folders even when Emby happens to refresh Trending FIRST
-            // after a restart. Without this, the same video appears in both
-            // Trending and a channel folder → 2 MediaItems → "Latest" home row
-            // shows the video twice. The 9 trending buckets + search fallback
-            // give us plenty of headroom even after dedup.
-            var cfgForSeed = Plugin.Instance?.Options;
-            int target = ClampVideos(cfgForSeed?.MaxChannelVideos ?? 50);
-            bool hideShorts = cfgForSeed?.HideShorts == true;
-            if (cfgForSeed != null)
-            {
-                var apiKeySeed = (cfgForSeed.ApiKey ?? "").Trim();
-                if (!string.IsNullOrEmpty(apiKeySeed))
-                    await PreSeedChannelSeenAsync(apiKeySeed, cfgForSeed, ct).ConfigureAwait(false);
-            }
+            // Folders are fully INDEPENDENT and DETERMINISTIC.
+            //   - No CrossFolderSeen state: output depends only on the (6h-cached)
+            //     YouTube responses, so the same videos stay in the same slots
+            //     across refreshes (no "rotation"). The probe in the Categories
+            //     root sees the same content the folder will actually build, so
+            //     empty categories are correctly hidden.
+            //   - Trending root  → chart=mostPopular across 9 buckets, then
+            //                      SearchByCategory PAGE 1 fallback to fill 50.
+            //   - Category child → SearchByCategory PAGE 1 + PAGE 2 (chart is the
+            //                      same data Trending root already shows, so we
+            //                      skip it here and use page 2 to give the
+            //                      category folder content that's actually
+            //                      different from Trending root).
+            // Cross-folder duplicates (same video shown in 2+ folders) are tagged
+            // via ProviderIds["YouTube"] = videoId on the ChannelItemInfo so Emby
+            // can identify them as the same underlying entity.
+            var cfg = Plugin.Instance?.Options;
+            const int target = 50;
+            bool hideShorts = cfg?.HideShorts == true;
+            bool isCategoryChild = !string.IsNullOrEmpty(category);
 
-            // Helper: add a video if it's new in this build. Marks CrossFolderSeen
-            // so later folders (Recently Added, Categories children) skip it.
             void TryAdd(ChannelItemInfo v)
             {
                 var rawId = StripPrefix(v.Id);
                 if (!seenIds.Add(rawId)) return;
                 if (hideShorts && v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)) return;
                 allVideos.Add(v);
-                CrossFolderSeen.TryAdd(rawId, 1);
             }
 
             try
             {
-                // 1) Trending charts (chart=mostPopular, ~free per call)
-                // Wider bucket list in root mode — chart hits overlap heavily across
-                // categories so we need many buckets to reach 150 unique items.
-                string?[] categories = string.IsNullOrEmpty(category)
-                    ? new string?[] { null, "10", "20", "24", "17", "22", "23", "28", "1" }
-                    // All, Music, Gaming, Entertainment, Sports, People, Comedy, Tech, Film
-                    : new string?[] { category };
-
-                foreach (var cat in categories)
+                if (!isCategoryChild)
                 {
-                    if (allVideos.Count >= target) break;
-                    ct.ThrowIfCancellationRequested();
-                    string? reg = string.IsNullOrEmpty(region) ? null : region;
-
-                    using var doc = await YouTubeApi.GetTrendingAsync(apiKey, reg, cat, ct)
-                        .ConfigureAwait(false);
-                    if (doc == null) continue;
-
-                    foreach (var v in ExtractTrendingVideos(doc))
+                    // ── Trending root ──
+                    // 1) chart=mostPopular across 9 buckets (almost free, 6h-cached)
+                    string?[] buckets = new string?[] { null, "10", "20", "24", "17", "22", "23", "28", "1" };
+                    // All, Music, Gaming, Entertainment, Sports, People, Comedy, Tech, Film
+                    foreach (var cat in buckets)
                     {
-                        TryAdd(v);
                         if (allVideos.Count >= target) break;
+                        ct.ThrowIfCancellationRequested();
+                        string? reg = string.IsNullOrEmpty(region) ? null : region;
+                        using var doc = await YouTubeApi.GetTrendingAsync(apiKey, reg, cat, ct)
+                            .ConfigureAwait(false);
+                        if (doc == null) continue;
+                        foreach (var v in ExtractTrendingVideos(doc))
+                        {
+                            TryAdd(v);
+                            if (allVideos.Count >= target) break;
+                        }
+                    }
+
+                    // 2) SearchByCategory PAGE 1 fallback to fill (100u/bucket cold,
+                    //    0u warm). Stops as soon as we hit 50.
+                    if (allVideos.Count < target)
+                    {
+                        foreach (var cat in buckets)
+                        {
+                            if (allVideos.Count >= target) break;
+                            if (string.IsNullOrEmpty(cat)) continue;
+                            ct.ThrowIfCancellationRequested();
+                            await FillFromSearchAsync(apiKey, region, cat!, pageToken: null, ct, seenIds, TryAdd, target, allVideos)
+                                .ConfigureAwait(false);
+                        }
                     }
                 }
-
-                // 2) Supplement with viewCount-sorted search per category to fill
-                // the folder up to `target` after dedup. Each search costs 100u
-                // but is cached 6h. Hard cap: 1 page per bucket × 9 buckets =
-                // 900u worst case cold-cache, 0u when warm.
-                if (allVideos.Count < target)
+                else
                 {
-                    foreach (var cat in categories)
+                    // ── Category child ──
+                    // Use SearchByCategory page 1 + page 2 so the folder content
+                    // is genuinely different from Trending root (which uses chart).
+                    // Pages are 6h-cached → 200u cold per category, 0u warm.
+                    string? nextToken = await FillFromSearchAsync(
+                            apiKey, region, category, pageToken: null,
+                            ct, seenIds, TryAdd, target, allVideos)
+                        .ConfigureAwait(false);
+
+                    if (allVideos.Count < target && !string.IsNullOrEmpty(nextToken))
                     {
-                        if (allVideos.Count >= target) break;
-                        if (string.IsNullOrEmpty(cat)) continue; // search needs a category id
-                        ct.ThrowIfCancellationRequested();
-
-                        using var sdoc = await YouTubeApi.SearchByCategoryAsync(apiKey, region, cat!, ct, null)
+                        await FillFromSearchAsync(apiKey, region, category, pageToken: nextToken,
+                                ct, seenIds, TryAdd, target, allVideos)
                             .ConfigureAwait(false);
-                        if (sdoc == null) continue;
+                    }
 
-                        // search.list returns lightweight items (id.videoId only).
-                        // Collect new IDs and enrich them via videos.list (1u/50).
-                        var newIds = new List<string>();
-                        if (sdoc.RootElement.TryGetProperty("items", out var sitems)
-                            && sitems.ValueKind == JsonValueKind.Array)
+                    // Last-resort top-up: if search came up short (small category),
+                    // add the chart hits for this category so we still try to reach
+                    // 50. These will overlap with Trending root, but ProviderIds
+                    // lets Emby identify them as the same video.
+                    if (allVideos.Count < target)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        string? reg = string.IsNullOrEmpty(region) ? null : region;
+                        using var doc = await YouTubeApi.GetTrendingAsync(apiKey, reg, category, ct)
+                            .ConfigureAwait(false);
+                        if (doc != null)
                         {
-                            foreach (var el in sitems.EnumerateArray())
+                            foreach (var v in ExtractTrendingVideos(doc))
                             {
-                                string? vid = null;
-                                if (el.TryGetProperty("id", out var idEl)
-                                    && idEl.TryGetProperty("videoId", out var vidEl))
-                                    vid = vidEl.GetString();
-                                if (string.IsNullOrEmpty(vid)) continue;
-                                if (seenIds.Contains(vid!)) continue;
-                                newIds.Add(vid!);
-                                if (newIds.Count >= 50) break; // batch limit
-                            }
-                        }
-                        if (newIds.Count > 0)
-                        {
-                            using var vd = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, newIds, ct)
-                                .ConfigureAwait(false);
-                            if (vd != null)
-                            {
-                                foreach (var v in ExtractTrendingVideos(vd))
-                                {
-                                    TryAdd(v);
-                                    if (allVideos.Count >= target) break;
-                                }
+                                TryAdd(v);
+                                if (allVideos.Count >= target) break;
                             }
                         }
                     }
@@ -1445,6 +1446,54 @@ namespace Emby.YouTubePlugin
                 Items = allVideos,
                 TotalRecordCount = allVideos.Count
             };
+        }
+
+        // Helper: fetch one page of SearchByCategory, enrich via videos.list and
+        // append to allVideos via TryAdd. Returns the nextPageToken (or null).
+        private static async Task<string?> FillFromSearchAsync(
+            string apiKey, string region, string categoryId, string? pageToken,
+            CancellationToken ct, HashSet<string> seenIds,
+            Action<ChannelItemInfo> tryAdd, int target, List<ChannelItemInfo> allVideos)
+        {
+            using var sdoc = await YouTubeApi.SearchByCategoryAsync(apiKey, region, categoryId, ct, pageToken)
+                .ConfigureAwait(false);
+            if (sdoc == null) return null;
+
+            string? nextToken = null;
+            if (sdoc.RootElement.TryGetProperty("nextPageToken", out var npt)
+                && npt.ValueKind == JsonValueKind.String)
+                nextToken = npt.GetString();
+
+            var newIds = new List<string>();
+            if (sdoc.RootElement.TryGetProperty("items", out var sitems)
+                && sitems.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var el in sitems.EnumerateArray())
+                {
+                    string? vid = null;
+                    if (el.TryGetProperty("id", out var idEl)
+                        && idEl.TryGetProperty("videoId", out var vidEl))
+                        vid = vidEl.GetString();
+                    if (string.IsNullOrEmpty(vid)) continue;
+                    if (seenIds.Contains(vid!)) continue;
+                    newIds.Add(vid!);
+                    if (newIds.Count >= 50) break;
+                }
+            }
+            if (newIds.Count > 0)
+            {
+                using var vd = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, newIds, ct)
+                    .ConfigureAwait(false);
+                if (vd != null)
+                {
+                    foreach (var v in ExtractTrendingVideos(vd))
+                    {
+                        tryAdd(v);
+                        if (allVideos.Count >= target) break;
+                    }
+                }
+            }
+            return nextToken;
         }
 
         // ── Extract trending videos (from videos.list which has full details) ──
@@ -1594,6 +1643,10 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
+                    // Tag every video with its YouTube videoId so the SAME video
+                    // appearing in multiple folders (channel + trending + category)
+                    // can be identified as one underlying entity by Emby.
+                    ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
                     MediaSources = MakeMediaSources(videoId, isLive, isLive ? null : ts?.Ticks, origLang)
                 };
 
@@ -1674,6 +1727,7 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
+                    ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
                     MediaSources = MakeMediaSources(videoId, isLive, MetaCache.TryGetValue(itemId, out var __m) ? __m.RuntimeTicks : null, MetaCache.TryGetValue(itemId, out var __m2) ? __m2.OriginalLang : null)
                 };
 

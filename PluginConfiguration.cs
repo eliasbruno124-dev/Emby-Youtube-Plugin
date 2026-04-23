@@ -24,7 +24,7 @@ namespace Emby.YouTubePlugin
         public string SavedItems { get; set; } = "";
 
         [DisplayName("Watch Later Playlists")]
-        [Description("Comma-separated playlist IDs (PLxxxx). Each becomes its own folder; the first is polled regularly for new items.")]
+        [Description("Comma-separated playlist IDs (PLxxxx). Each becomes its own folder and is polled regularly for new items (1 quota unit per playlist per poll).")]
         public string WatchLaterPlaylist { get; set; } = "";
 
         [DisplayName("Show Trending")]
@@ -83,7 +83,7 @@ namespace Emby.YouTubePlugin
         public int RecentlyAddedPerChannel { get; set; } = 10;
 
         [DisplayName("Watch Later Poll Interval (minutes)")]
-        [Description("How often to poll Watch Later for new videos (1-60).")]
+        [Description("How often to poll Watch Later playlists for new videos (1-60). Cost = 1 quota unit per playlist per poll.")]
         [Range(1, 60)]
         public int WatchLaterPollMinutes { get; set; } = 3;
     }

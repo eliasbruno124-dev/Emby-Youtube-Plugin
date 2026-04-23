@@ -102,7 +102,10 @@ namespace Emby.YouTubePlugin
     public class PluginEntryPoint : IServerEntryPoint
     {
         private Timer? _pollTimer;
-        private string _lastVideoIds = "";
+        // Snapshot of the last-seen video IDs per polled playlist (key = playlist ID).
+        // Used to detect newly-added Watch Later videos so we can invalidate the
+        // matching cache entry and trigger a refresh.
+        private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         // Track config to detect first-time setup / changes and auto-trigger refresh.
         // Many users thought the plugin was broken because the channel was not refreshed
         // automatically after they entered their API key + saved channels for the first time.
@@ -144,11 +147,34 @@ namespace Emby.YouTubePlugin
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
         }
 
-        private static string ComputeConfigHash(string apiKey, string savedItems, string watchLater)
+        // Hash covers EVERY content-affecting setting so toggling any of them
+        // (e.g. Trending Region, Hide Shorts, Show Live Folders) wipes the
+        // cache and triggers an immediate channel refresh — otherwise users
+        // think the change "didn't apply" because Emby keeps showing the
+        // stale folder contents until the next scheduled refresh.
+        private static string ComputeConfigHash(PluginConfiguration c)
         {
             using var sha = System.Security.Cryptography.SHA1.Create();
-            var data = System.Text.Encoding.UTF8.GetBytes($"{apiKey}|{savedItems}|{watchLater}");
-            return Convert.ToHexString(sha.ComputeHash(data));
+            var blob = string.Join("|", new[]
+            {
+                (c.ApiKey ?? "").Trim(),
+                (c.SavedItems ?? "").Trim(),
+                (c.WatchLaterPlaylist ?? "").Trim(),
+                c.ShowTrending ? "1" : "0",
+                c.ShowCategories ? "1" : "0",
+                c.ShowRecentlyAdded ? "1" : "0",
+                c.ShowLiveFolders ? "1" : "0",
+                c.HideShorts ? "1" : "0",
+                (c.TrendingRegion ?? "").Trim(),
+                (c.TrendingCategory ?? "").Trim(),
+                c.ShowLikeCount ? "1" : "0",
+                c.ShowCommentCount ? "1" : "0",
+                (c.ChannelSortBy ?? "").Trim(),
+                c.MaxChannelVideos.ToString(),
+                c.MaxSearchVideos.ToString(),
+                c.RecentlyAddedPerChannel.ToString(),
+            });
+            return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(blob)));
         }
 
         private void PollTick(object? state)
@@ -166,7 +192,7 @@ namespace Emby.YouTubePlugin
 
                     // Compare against the last-seen config hash (persisted to disk so this
                     // also detects changes that happened while the server was offline).
-                    var currentHash = ComputeConfigHash(apiKey, savedItems, watchLaterRaw);
+                    var currentHash = ComputeConfigHash(config);
                     bool configChanged = !string.Equals(currentHash, _lastConfigHash, StringComparison.Ordinal);
                     _firstTickDone = true;
 
@@ -204,50 +230,63 @@ namespace Emby.YouTubePlugin
                         _lastConfigHash = currentHash;
                     }
 
-                    // Watch Later polling: only the first playlist ID is polled to keep
-                    // quota usage at 1u per interval regardless of how many playlists
-                    // the user added (the rest get refreshed via the regular channel refresh).
+                    // Watch Later polling: poll EVERY configured playlist so new
+                    // videos surface quickly regardless of which slot they're in.
+                    // Cost = 1 quota unit per playlist per poll interval.
+                    // (Tip: increase WatchLaterPollMinutes if you have many
+                    // playlists and want to keep daily quota usage low.)
                     if (watchLaterRaw.Length <= 2) return;
-                    var playlist = watchLaterRaw
+                    var playlists = watchLaterRaw
                         .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => s.Trim())
-                        .FirstOrDefault(s => s.Length > 2);
-                    if (string.IsNullOrEmpty(playlist)) return;
+                        .Where(s => s.Length > 2)
+                        .Distinct(StringComparer.Ordinal)
+                        .ToList();
+                    if (playlists.Count == 0) return;
                     if (string.IsNullOrEmpty(apiKey)) return;
 
-                    var url = $"https://www.googleapis.com/youtube/v3/playlistItems" +
-                              $"?part=contentDetails&playlistId={Uri.EscapeDataString(playlist)}" +
-                              $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-
-                    var json = await PollHttp.GetStringAsync(url).ConfigureAwait(false);
-                    QuotaTracker.Record(1);
-
-                    var ids = new List<string>();
-                    using var doc = JsonDocument.Parse(json);
-                    if (doc.RootElement.TryGetProperty("items", out var items)
-                        && items.ValueKind == JsonValueKind.Array)
+                    bool anyChanged = false;
+                    foreach (var playlist in playlists)
                     {
-                        foreach (var item in items.EnumerateArray())
+                        try
                         {
-                            if (item.TryGetProperty("contentDetails", out var cd)
-                                && cd.TryGetProperty("videoId", out var vid))
+                            var url = $"https://www.googleapis.com/youtube/v3/playlistItems" +
+                                      $"?part=contentDetails&playlistId={Uri.EscapeDataString(playlist)}" +
+                                      $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+
+                            var json = await PollHttp.GetStringAsync(url).ConfigureAwait(false);
+                            QuotaTracker.Record(1);
+
+                            var ids = new List<string>();
+                            using var doc = JsonDocument.Parse(json);
+                            if (doc.RootElement.TryGetProperty("items", out var items)
+                                && items.ValueKind == JsonValueKind.Array)
                             {
-                                var videoId = vid.GetString();
-                                if (!string.IsNullOrEmpty(videoId))
-                                    ids.Add(videoId);
+                                foreach (var item in items.EnumerateArray())
+                                {
+                                    if (item.TryGetProperty("contentDetails", out var cd)
+                                        && cd.TryGetProperty("videoId", out var vid))
+                                    {
+                                        var videoId = vid.GetString();
+                                        if (!string.IsNullOrEmpty(videoId))
+                                            ids.Add(videoId);
+                                    }
+                                }
                             }
+
+                            var current = string.Join(",", ids);
+                            _lastVideoIdsByPlaylist.TryGetValue(playlist, out var previous);
+                            if (!string.IsNullOrEmpty(previous) && current != previous)
+                            {
+                                YouTubeApi.InvalidateCacheContaining(playlist);
+                                anyChanged = true;
+                            }
+                            _lastVideoIdsByPlaylist[playlist] = current;
                         }
+                        catch { }
                     }
 
-                    var current = string.Join(",", ids);
-                    if (_lastVideoIds.Length > 0 && current != _lastVideoIds)
-                    {
-                        // Drop the cached playlist contents so the user actually sees the new state
-                        YouTubeApi.InvalidateCacheContaining(playlist);
-                        TriggerRefresh();
-                    }
-
-                    _lastVideoIds = current;
+                    if (anyChanged) TriggerRefresh();
                 }
                 catch { }
             });
