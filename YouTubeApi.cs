@@ -61,7 +61,9 @@ namespace Emby.YouTubePlugin
 
         private static readonly Queue<long> _requestTimestamps = new();
         private static readonly object _budgetLock = new();
-        private const int MaxRequestsPerWindow = 90;
+        // Hard cap of 240 requests per 60s. YouTube's per-IP soft limit kicks in well
+        // above this, but staying under 4 req/s avoids the 429 burst penalty.
+        private const int MaxRequestsPerWindow = 240;
         private const int BudgetWindowMs = 60_000;
 
         private static async Task ThrottleAsync(CancellationToken ct)

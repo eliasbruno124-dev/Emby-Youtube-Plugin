@@ -1307,12 +1307,12 @@ namespace Emby.YouTubePlugin
             if (sorted.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No videos yet.");
 
-            // Strict cross-folder dedup: drop any video that's already shown in a
-            // channel folder so Emby's home "Latest" row doesn't list it twice.
-            // Recently Added may legitimately end up sparse (or empty) when all
-            // saved channels' newest videos already appear in their channel
-            // folder — that is by design.
-            DropIfSeenInChannelFolder(sorted);
+            // NOTE: Previously dropped videos already seen in channel folders.
+            // That collapsed Recently Added to empty in practice, because every
+            // video here is BY DEFINITION also in a saved channel's uploads.
+            // We now keep them and just mark them as seen so other aggregators
+            // (Trending, Categories) can still dedup against this folder.
+            MarkAsSeen(sorted);
 
             return new ChannelItemResult
             {
@@ -1328,13 +1328,21 @@ namespace Emby.YouTubePlugin
             var allVideos = new List<ChannelItemInfo>();
             var seenIds = new HashSet<string>(StringComparer.Ordinal);
 
-            // NOTE: Trending intentionally does NOT pre-seed against channel uploads.
-            // Doing so collapsed Trending to a handful of items whenever a saved
-            // channel happened to also be in the trending charts. Trending is now
-            // self-contained: dedupes within itself + across its own buckets.
+            // Pre-seed seen-set with channel uploads so Trending dedups against
+            // channel folders even when Emby happens to refresh Trending FIRST
+            // after a restart. Without this, the same video appears in both
+            // Trending and a channel folder → 2 MediaItems → "Latest" home row
+            // shows the video twice. The 9 trending buckets + search fallback
+            // give us plenty of headroom even after dedup.
             var cfgForSeed = Plugin.Instance?.Options;
             int target = ClampVideos(cfgForSeed?.MaxChannelVideos ?? 50);
             bool hideShorts = cfgForSeed?.HideShorts == true;
+            if (cfgForSeed != null)
+            {
+                var apiKeySeed = (cfgForSeed.ApiKey ?? "").Trim();
+                if (!string.IsNullOrEmpty(apiKeySeed))
+                    await PreSeedChannelSeenAsync(apiKeySeed, cfgForSeed, ct).ConfigureAwait(false);
+            }
 
             // Helper: add a video if it's new in this build. Marks CrossFolderSeen
             // so later folders (Recently Added, Categories children) skip it.
