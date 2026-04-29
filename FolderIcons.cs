@@ -23,7 +23,7 @@ namespace Emby.YouTubePlugin
         private static readonly Dictionary<string, string> CategoryMap = new()
         {
             { "1",  Cdn + "1F3AC.png" }, // 🎬 Film & Animation
-            { "2",  Cdn + "1F697.png" }, // 🚗 Autos & Vehicles
+            { "2",  Cdn + "1F697.png" }, // 🚗 Cars & Vehicles
             { "10", Cdn + "1F3B5.png" }, // 🎵 Music
             { "15", Cdn + "1F43E.png" }, // 🐾 Pets & Animals
             { "17", Cdn + "26BD.png"  }, // ⚽ Sports
