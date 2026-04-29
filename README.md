@@ -120,3 +120,13 @@ After copying the DLL into Emby's plugin folder, restart Emby so the new version
 - This plugin uses the official YouTube Data API v3, but it is not an official Google or YouTube product.
 - Private YouTube account data is not supported. Use playlists that your API key can read.
 - If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
+
+## Sponsor
+
+If this plugin makes your Emby setup better and you want to support development, you can donate through PayPal.
+
+<p align="center">
+  <a href="https://paypal.me/eliasbruno123">
+    <img src="https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate with PayPal">
+  </a>
+</p>
