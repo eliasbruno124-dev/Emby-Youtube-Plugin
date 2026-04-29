@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -7,8 +8,9 @@ using System.Threading.Tasks;
 namespace Emby.YouTubePlugin
 {
     /// <summary>
-    /// Makes sure YouTube items are sorted with the newest first by rewriting SortName
-    /// directly in the Emby SQLite library. Runs twice after each load to catch items that might be added after the first pass.
+    /// Keeps YouTube items sorted newest-first by updating Emby's stored
+    /// SortName values. It runs twice because Emby may still be writing new
+    /// items during the first pass.
     /// </summary>
     internal static class SortNameFixer
     {
@@ -31,7 +33,10 @@ namespace Emby.YouTubePlugin
                     await Task.Delay(30_000).ConfigureAwait(false);
                     Apply();
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[SortNameFixer] Scheduled sort-name update failed: {ex.Message}");
+                }
                 finally { Interlocked.Exchange(ref _scheduled, 0); }
             });
         }

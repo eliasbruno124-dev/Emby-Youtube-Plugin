@@ -8,7 +8,7 @@ using System.Threading;
 namespace Emby.YouTubePlugin
 {
     /// <summary>
-    /// Tracks estimated YouTube Data API v3 quota usage.
+    /// Tracks the plugin's estimated YouTube Data API v3 quota usage.
     /// Quota costs (per call):
     ///   - search.list:        100
     ///   - videos.list:        1
@@ -17,7 +17,7 @@ namespace Emby.YouTubePlugin
     ///   - channels.list:      1
     ///   - captions.list:      50
     ///   - videoCategories:    1
-    /// Default daily budget is 10,000 units.
+    /// The default daily budget is 10,000 units.
     /// </summary>
     internal static class QuotaTracker
     {
@@ -30,26 +30,42 @@ namespace Emby.YouTubePlugin
         private static long _totalUsed;
         private static int _loaded;
 
-        // Quota resets at midnight Pacific Time (that's how YouTube does it)
-        private static readonly TimeZoneInfo PacificTime = TryGetPacific();
-        private static readonly bool _pacificFallback = !IsPacificResolved();
+        // YouTube resets quota at midnight Pacific Time.
+        private static readonly (TimeZoneInfo Zone, bool Fallback) PacificTimeInfo = ResolvePacific();
+        private static readonly TimeZoneInfo PacificTime = PacificTimeInfo.Zone;
+        private static readonly bool _pacificFallback = PacificTimeInfo.Fallback;
 
-        private static bool IsPacificResolved()
+        private static (TimeZoneInfo Zone, bool Fallback) ResolvePacific()
         {
-            try { TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles"); return true; } catch { }
-            try { TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); return true; } catch { }
-            return false;
+            var zone = TryFindTimeZone("America/Los_Angeles")
+                ?? TryFindTimeZone("Pacific Standard Time");
+
+            if (zone != null)
+                return (zone, false);
+
+            // If tzdata is missing, fall back to fixed UTC-8. It is not perfect
+            // during daylight saving time, but it is much closer to YouTube's
+            // reset window than using UTC.
+            return (
+                TimeZoneInfo.CreateCustomTimeZone(
+                    "Pacific-Approx", TimeSpan.FromHours(-8), "Pacific (approx)", "Pacific (approx)"),
+                true);
         }
 
-        private static TimeZoneInfo TryGetPacific()
+        private static TimeZoneInfo? TryFindTimeZone(string id)
         {
-            try { return TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles"); }
-            catch { }
-            try { return TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); }
-            catch { }
-            // If tzdata isn't available: create a fixed UTC-8 zone (no DST, about 1 hour off in summer, but much better than UTC which is 7-8 hours off and would cause a full-day mismatch against Google's actual midnight-PT reset).
-            return TimeZoneInfo.CreateCustomTimeZone(
-                "Pacific-Approx", TimeSpan.FromHours(-8), "Pacific (approx)", "Pacific (approx)");
+            try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
+            catch (TimeZoneNotFoundException) { return null; }
+            catch (InvalidTimeZoneException ex)
+            {
+                Debug.WriteLine($"[QuotaTracker] Invalid time zone '{id}': {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[QuotaTracker] Time zone lookup failed for '{id}': {ex.Message}");
+                return null;
+            }
         }
 
         private static DateTime CurrentQuotaDay()
@@ -67,7 +83,7 @@ namespace Emby.YouTubePlugin
         public static int EstimateCost(string url)
         {
             if (string.IsNullOrEmpty(url)) return 0;
-            // /search = 100 units; /captions = 50; everything else = 1
+            // Only a few endpoints have special costs; the rest are 1 unit.
             if (url.Contains("/search?", StringComparison.Ordinal)) return 100;
             if (url.Contains("/captions?", StringComparison.Ordinal)) return 50;
             return 1;
@@ -140,12 +156,13 @@ namespace Emby.YouTubePlugin
             return s.usedToday >= s.dailyQuota;
         }
 
-        // ── Persistence ──
+        // Persistence.
         private static string? FilePath()
         {
             var dir = Plugin.CachePath;
             if (string.IsNullOrEmpty(dir)) return null;
-            // Store one level above the cache dir so deleting cache/* doesn't wipe the quota file.
+            // Keep quota state outside the cache folder so clearing cached API
+            // responses does not erase the usage history.
             var parent = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
             if (string.IsNullOrEmpty(parent)) parent = dir;
             return Path.Combine(parent, StateFile);
@@ -162,14 +179,15 @@ namespace Emby.YouTubePlugin
                     _quotaDate = CurrentQuotaDay();
                     return;
                 }
-                // Move legacy file if it was previously stored inside the cache dir (which could get wiped).
+                // Older builds stored this inside the cache folder. Move it out
+                // once so future cache cleanup leaves it alone.
                 if (!File.Exists(path))
                 {
                     var legacy = Path.Combine(Plugin.CachePath ?? "", StateFile);
                     if (!string.IsNullOrEmpty(legacy) && File.Exists(legacy))
                     {
                         try { File.Move(legacy, path); }
-                        catch { /* ignore */ }
+                        catch (Exception ex) { Debug.WriteLine($"[QuotaTracker] Legacy quota file move failed: {ex.Message}"); }
                     }
                 }
                 if (!File.Exists(path))
@@ -205,7 +223,7 @@ namespace Emby.YouTubePlugin
         private static void SaveAsync()
         {
             var now = Environment.TickCount64;
-            // Only save at most every 5 seconds to avoid too many writes
+            // Save at most once every five seconds to avoid unnecessary writes.
             if (now - Interlocked.Read(ref _lastSaveTicks) < 5000) return;
             Interlocked.Exchange(ref _lastSaveTicks, now);
 

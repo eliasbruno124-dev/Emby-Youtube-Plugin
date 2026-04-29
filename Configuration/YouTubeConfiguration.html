@@ -1,0 +1,397 @@
+<div is="emby-scroller" data-controller="configurationpage?name=YouTubeConfigurationjs" class="view flex flex-direction-column scrollFrameY flex-grow" data-horizontal="false" data-forcescrollbar="true" data-centerfocus="true" data-bindheader="true" data-title="YouTube">
+    <style>
+        #youtubeConfigurationRoot .paper-card {
+            padding: 1.5em;
+            margin-top: 1.5em;
+        }
+
+        #youtubeConfigurationRoot .localnav {
+            margin-top: 1em;
+        }
+
+        #youtubeConfigurationRoot .settingsGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1em 1.5em;
+        }
+
+        #youtubeConfigurationRoot .settingsStack {
+            display: grid;
+            gap: 1.25em;
+        }
+
+        #youtubeConfigurationRoot .inputContainer,
+        #youtubeConfigurationRoot .selectContainer {
+            max-width: 680px;
+        }
+
+        #youtubeConfigurationRoot .inputContainer input,
+        #youtubeConfigurationRoot .selectContainer select {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #youtubeConfigurationRoot .hiddenConfigField {
+            display: none !important;
+        }
+
+        #youtubeConfigurationRoot .entryInputRow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.75em;
+            align-items: end;
+        }
+
+        #youtubeConfigurationRoot .itemList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            margin-top: 0.85em;
+        }
+
+        #youtubeConfigurationRoot .itemChip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45em;
+            max-width: 100%;
+            padding: 0.45em 0.55em 0.45em 0.75em;
+            border-radius: 4px;
+            background: rgba(82, 181, 75, 0.16);
+            border: 1px solid rgba(82, 181, 75, 0.35);
+        }
+
+        #youtubeConfigurationRoot .itemChipText {
+            overflow-wrap: anywhere;
+        }
+
+        #youtubeConfigurationRoot .entryBadge {
+            font-size: 0.8em;
+            opacity: 0.75;
+            white-space: nowrap;
+        }
+
+        #youtubeConfigurationRoot .removeEntryButton {
+            border: 0;
+            background: rgba(0, 0, 0, 0.24);
+            color: inherit;
+            width: 1.55em;
+            height: 1.55em;
+            border-radius: 50%;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        #youtubeConfigurationRoot .emptyListNote {
+            margin-top: 0.85em;
+            opacity: 0.72;
+        }
+
+        #youtubeConfigurationRoot .checkboxGroup {
+            display: grid;
+            gap: 0.75em;
+        }
+
+        #youtubeConfigurationRoot .checkboxGroup .checkboxContainer {
+            display: flex;
+            align-items: center;
+            min-height: 2.4em;
+            margin: 0;
+        }
+
+        #youtubeConfigurationRoot .buttonStack {
+            display: grid;
+            gap: 0.75em;
+            justify-items: start;
+        }
+
+        #youtubeConfigurationRoot .paypalButton {
+            background: #0070ba !important;
+            color: #fff !important;
+            border-radius: 4px !important;
+            min-width: 210px;
+            text-align: center;
+        }
+
+        #youtubeConfigurationRoot .paypalButton:hover {
+            background: #003087 !important;
+        }
+
+        #youtubeConfigurationRoot .guideSteps {
+            display: grid;
+            gap: 1em;
+        }
+
+        #youtubeConfigurationRoot .guideStep {
+            display: grid;
+            gap: 0.75em;
+            padding: 1em;
+            border-radius: 6px;
+            background: rgba(128, 128, 128, 0.08);
+        }
+
+        #youtubeConfigurationRoot .guideImageSlot {
+            min-height: 150px;
+            border: 1px dashed rgba(128, 128, 128, 0.55);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1em;
+            text-align: center;
+            opacity: 0.82;
+        }
+
+        #youtubeConfigurationRoot #txtQuotaStatus {
+            white-space: pre-wrap;
+            margin: 0;
+        }
+    </style>
+
+    <div class="scrollSlider flex-direction-column padded-left padded-left-page padded-right padded-top-page padded-bottom-page">
+        <div class="readOnlyContent auto-center" id="youtubeConfigurationRoot" style="max-width: 980px;">
+            <h1 class="pageTitle">YouTube</h1>
+
+            <div data-role="controlgroup" data-type="horizontal" class="localnav">
+                <a is="emby-linkbutton" class="nav-button ui-btn-active" href="#" data-role="button" data-target="settingsPage">Settings</a>
+                <a is="emby-linkbutton" class="nav-button" href="#" data-role="button" data-target="setupGuidePage">Setup Guide</a>
+            </div>
+
+            <div id="settingsPage" style="margin-top: 2em;">
+                <form class="youtubeConfigurationForm" novalidate>
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Quota</h2>
+                        <pre id="txtQuotaStatus" class="fieldDescription"></pre>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">API</h2>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="txtApiKey">YouTube Data API Key</label>
+                            <input is="emby-input" id="txtApiKey" type="password" autocomplete="off" />
+                            <div class="fieldDescription">
+                                Create a key in Google Cloud Console, enable YouTube Data API v3, then paste the API key here.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Content</h2>
+                        <div class="settingsStack">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="txtSavedItemEntry">My YouTube Content</label>
+                                <input id="txtSavedItems" class="hiddenConfigField" type="hidden" />
+                                <div class="entryInputRow">
+                                    <input is="emby-input" id="txtSavedItemEntry" type="text" autocomplete="off" placeholder="@handle, UC..., PL..., or search text" />
+                                    <button is="emby-button" type="button" id="btnAddSavedItem" class="raised button-submit">
+                                        <span>Add</span>
+                                    </button>
+                                </div>
+                                <div class="fieldDescription">
+                                    Paste one item or a comma, semicolon, or line-separated list. Accepted: @handle, channel ID, playlist ID, or search text.
+                                </div>
+                                <div id="savedItemsList" class="itemList"></div>
+                            </div>
+
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="txtWatchLaterEntry">Watch Later Playlists</label>
+                                <input id="txtWatchLaterPlaylist" class="hiddenConfigField" type="hidden" />
+                                <div class="entryInputRow">
+                                    <input is="emby-input" id="txtWatchLaterEntry" type="text" autocomplete="off" placeholder="PL..., WL..., or another playlist ID" />
+                                    <button is="emby-button" type="button" id="btnAddWatchLaterItem" class="raised button-submit">
+                                        <span>Add</span>
+                                    </button>
+                                </div>
+                                <div class="fieldDescription">
+                                    Paste one playlist ID or a comma, semicolon, or line-separated list. Each playlist becomes a folder and is polled for changes.
+                                </div>
+                                <div id="watchLaterItemsList" class="itemList"></div>
+                            </div>
+
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="numWatchLaterPollMinutes">Watch Later Poll Interval</label>
+                                <input is="emby-input" id="numWatchLaterPollMinutes" type="number" min="1" max="60" step="1" value="3" />
+                                <div class="fieldDescription">Minutes between playlist checks. Range: 1-60.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Folders</h2>
+                        <div class="checkboxGroup">
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowTrending" type="checkbox" />
+                                <span>Show Trending</span>
+                            </label>
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowCategories" type="checkbox" />
+                                <span>Show Categories Browser</span>
+                            </label>
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowRecentlyAdded" type="checkbox" />
+                                <span>Show Recently Added</span>
+                            </label>
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowLiveFolders" type="checkbox" />
+                                <span>Show Live &amp; Upcoming folders</span>
+                            </label>
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowShorts" type="checkbox" />
+                                <span>Show Shorts</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Display</h2>
+                        <div class="settingsStack">
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="selectTrendingRegion">Trending Region</label>
+                                <select is="emby-select" id="selectTrendingRegion"></select>
+                                <div class="fieldDescription">Choose the YouTube trending region. Empty uses YouTube default.</div>
+                            </div>
+
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="selectTrendingCategory">Trending Video Category</label>
+                                <select is="emby-select" id="selectTrendingCategory">
+                                    <option value="">All</option>
+                                    <option value="1">Film &amp; Animation</option>
+                                    <option value="10">Music</option>
+                                    <option value="17">Sports</option>
+                                    <option value="20">Gaming</option>
+                                    <option value="22">People &amp; Blogs</option>
+                                    <option value="23">Comedy</option>
+                                    <option value="24">Entertainment</option>
+                                    <option value="25">News &amp; Politics</option>
+                                    <option value="26">Howto &amp; Style</option>
+                                    <option value="27">Education</option>
+                                    <option value="28">Science &amp; Technology</option>
+                                </select>
+                            </div>
+
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="selectChannelSortBy">Sort Channel Videos By</label>
+                                <select is="emby-select" id="selectChannelSortBy">
+                                    <option value="date">Date</option>
+                                    <option value="viewCount">View count</option>
+                                    <option value="rating">Rating</option>
+                                    <option value="relevance">Relevance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="checkboxGroup" style="margin-top: 1em;">
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowLikeCount" type="checkbox" />
+                                <span>Show like count in descriptions</span>
+                            </label>
+                            <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowCommentCount" type="checkbox" />
+                                <span>Show comment count in descriptions</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Limits</h2>
+                        <div class="settingsStack">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="numMaxChannelVideos">Max Videos per Channel or Playlist</label>
+                                <input is="emby-input" id="numMaxChannelVideos" type="number" min="1" max="150" step="1" value="50" />
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="numMaxSearchVideos">Max Videos per Search Query</label>
+                                <input is="emby-input" id="numMaxSearchVideos" type="number" min="1" max="50" step="1" value="50" />
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="numRecentlyAddedPerChannel">Recently Added: Videos per Channel</label>
+                                <input is="emby-input" id="numRecentlyAddedPerChannel" type="number" min="1" max="25" step="1" value="10" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Support the Developer</h2>
+                        <p>
+                            This plugin is free and open-source, maintained with a lot of love in my spare time.
+                            If it brings value to your Emby setup, a small donation would mean the world to me.
+                        </p>
+                        <div class="buttonStack">
+                            <a is="emby-linkbutton" id="btnDonate" class="raised paypalButton" target="_blank" rel="noopener noreferrer">Donate with PayPal</a>
+                        </div>
+                    </div>
+
+                    <div class="buttons buttonStack" style="margin-top: 1.5em;">
+                        <button is="emby-button" type="submit" class="raised button-submit">
+                            <span>Save</span>
+                        </button>
+                    </div>
+
+                    <p id="youtubeConfigurationStatus" class="fieldDescription"></p>
+                </form>
+            </div>
+
+            <div id="setupGuidePage" class="hide" style="margin-top: 2em;">
+                <div class="paper-card">
+                    <h2 style="margin-top: 0;">Setup Guide</h2>
+                    <p class="fieldDescription">
+                        Follow these steps to create a YouTube Data API key. Add screenshots to the exact placeholder filenames shown below if you want this guide to become visual later.
+                    </p>
+                    <div class="buttonStack">
+                        <a is="emby-linkbutton" class="raised button-submit" href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer">Open YouTube Data API v3</a>
+                        <a is="emby-linkbutton" class="raised" href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Open Google Cloud Credentials</a>
+                    </div>
+                </div>
+
+                <div class="guideSteps">
+                    <div class="guideStep">
+                        <strong>1. Open Google Cloud Console</strong>
+                        <div class="fieldDescription">
+                            Go to Google Cloud Console and sign in with the Google account you want to use for the API key. The direct API library link is above.
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-01-console.png</div>
+                    </div>
+
+                    <div class="guideStep">
+                        <strong>2. Create or select a project</strong>
+                        <div class="fieldDescription">
+                            Click the project selector in the top bar. Choose an existing project or create a new one, for example "Emby YouTube Plugin".
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-02-project.png</div>
+                    </div>
+
+                    <div class="guideStep">
+                        <strong>3. Enable YouTube Data API v3</strong>
+                        <div class="fieldDescription">
+                            Open APIs &amp; Services, then Library. Search for "YouTube Data API v3", open it, and click Enable.
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-03-enable-api.png</div>
+                    </div>
+
+                    <div class="guideStep">
+                        <strong>4. Open Credentials</strong>
+                        <div class="fieldDescription">
+                            Go to APIs &amp; Services, then Credentials. This is where Google lets you create and manage keys for the selected project.
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-04-credentials.png</div>
+                    </div>
+
+                    <div class="guideStep">
+                        <strong>5. Create the API key</strong>
+                        <div class="fieldDescription">
+                            Click Create credentials, choose API key, then copy the generated key. You can restrict it to YouTube Data API v3 afterward if you want a tighter setup.
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-05-create-key.png</div>
+                    </div>
+
+                    <div class="guideStep">
+                        <strong>6. Paste and save in Emby</strong>
+                        <div class="fieldDescription">
+                            Return to the Settings tab, paste the key into YouTube Data API Key, add your channels or playlists, then click Save.
+                        </div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-06-emby-settings.png</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

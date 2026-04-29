@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Configuration\*.html" />
+    <EmbeddedResource Include="Configuration\*.js" />
     <EmbeddedResource Include="thumb.png" />
     <Content Include="thumb.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

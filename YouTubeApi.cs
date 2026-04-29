@@ -18,20 +18,22 @@ namespace Emby.YouTubePlugin
     {
         private const string ApiBase = "https://www.googleapis.com/youtube/v3";
 
-        // Response cache: helps minimize API calls by storing recent responses.
+        // Keep recent API responses around so the plugin does not ask YouTube
+        // for the same data more often than needed.
         private record CachedResponse(string Json, long CachedAtMs);
         private static readonly ConcurrentDictionary<string, CachedResponse> ResponseCache = new();
         private const int MaxCacheEntries = 200;
 
-        // How long to keep things in memory before checking disk again (memory TTLs)
-        private const long CacheTtlMs = 15 * 60 * 1000;            // 15 min default
-        private const long FreshListTtlMs = 6 * 60 * 60 * 1000;       // 6 h: trending, uploads
-        private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000;       // 6 h
-        private const long LiveSearchTtlMs = 12 * 60 * 60 * 1000;       // 12 h: live/upcoming (search = 100u!)
-        private const long CategoriesTtlMs = 30L * 24 * 60 * 60 * 1000; // 30 d: video categories almost never change
-        private const long VideoDetailTtlMs = 365L * 24 * 60 * 60 * 1000; // 1 y: video metadata is immutable
+        // Memory cache lifetimes. Disk uses the same value per request, capped below.
+        private const long CacheTtlMs = 15 * 60 * 1000;            // Default: 15 minutes.
+        private const long FreshListTtlMs = 6 * 60 * 60 * 1000;       // Trending, uploads, and playlists: 6 hours.
+        private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000;       // Channel names and thumbnails: 6 hours.
+        private const long SearchTtlMs = 24 * 60 * 60 * 1000;           // Search is expensive, so keep it for a day.
+        private const long CategoriesTtlMs = 30L * 24 * 60 * 60 * 1000; // Categories rarely change.
+        private const long VideoDetailTtlMs = 365L * 24 * 60 * 60 * 1000; // Video details are mostly stable.
 
-        // Disk TTL is capped at 30 days (per YouTube ToS). For each call, we use the smaller of the requested TTL or 30 days, so "fresh" lists aren't served stale from disk.
+        // YouTube's API terms cap persisted API data at 30 days. Each call gets
+        // the shorter value between its own TTL and this disk limit.
         private const long DiskCacheTtlMs = 30L * 24 * 60 * 60 * 1000;
         private static int _diskCleanupDone = 0;
 
@@ -53,14 +55,15 @@ namespace Emby.YouTubePlugin
 
         private static readonly int[] RetryDelaysMs = { 1500, 4000 };
 
-        // Rate limiter: keeps us from hitting YouTube's request limits too quickly.
+        // Keep bursts gentle enough that YouTube is less likely to answer with 429s.
         private static readonly SemaphoreSlim ApiGate = new(6, 6);
         private static long _lastCallTicks = 0;
         private const int MinCallIntervalMs = 100;
 
         private static readonly Queue<long> _requestTimestamps = new();
         private static readonly object _budgetLock = new();
-        // Hard cap: 240 requests per 60 seconds. YouTube's soft limit is higher, but staying under 4 requests per second helps avoid 429 errors.
+        // Hard local cap: 240 requests per minute. Staying below roughly four
+        // requests per second keeps refreshes polite and predictable.
         private const int MaxRequestsPerWindow = 240;
         private const int BudgetWindowMs = 60_000;
 
@@ -174,29 +177,34 @@ namespace Emby.YouTubePlugin
             string url, CancellationToken ct, long? customTtlMs = null)
         {
             var memTtl = customTtlMs ?? CacheTtlMs;
-            // Disk TTL matches memory TTL (but never more than 30 days), so "fresh" lists aren't served stale from disk after memory expires.
+            // Disk follows the same freshness window as memory, with the global
+            // 30-day cap applied.
             var diskTtl = Math.Min(memTtl, DiskCacheTtlMs);
             var now = Environment.TickCount64;
 
-            // First level: in-memory cache
+            // First stop: memory cache.
             if (ResponseCache.TryGetValue(url, out var cached)
                 && (now - cached.CachedAtMs) < memTtl)
             {
                 try { return JsonDocument.Parse(cached.Json); }
-                catch { ResponseCache.TryRemove(url, out _); }
+                catch (JsonException ex)
+                {
+                    Debug.WriteLine($"[YouTubeApi] Dropping invalid memory cache entry: {ex.Message}");
+                    ResponseCache.TryRemove(url, out _);
+                }
             }
 
-            // Second level: disk cache (per-call TTL, max 30 days)
+            // Next stop: disk cache.
             var diskJson = TryReadDiskCache(url, diskTtl);
             if (diskJson != null)
             {
-                // If we hit disk cache, refresh in-memory cache from disk
+                // Promote the disk hit back into memory for the next caller.
                 ResponseCache[url] = new CachedResponse(diskJson, now);
                 EvictCacheIfNeeded();
                 return JsonDocument.Parse(diskJson);
             }
 
-            // Third: make the actual API call (this counts against your quota)
+            // Last normal option: call YouTube. This is the point that costs quota.
             var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
             if (doc != null)
             {
@@ -209,14 +217,15 @@ namespace Emby.YouTubePlugin
                 return JsonDocument.Parse(json);
             }
 
-            // Fourth: if the API is unavailable (quota exhausted, network error, etc.), serve the most recent disk-cached response, no matter how old it is.
-            // This way, users still see channel content instead of an empty list when the daily quota runs out.
+            // If YouTube is unavailable, fall back to the newest disk copy we
+            // have. Stale content is better than an empty channel during an
+            // outage or after quota is exhausted.
             var staleJson = TryReadDiskCache(url, long.MaxValue);
             if (staleJson != null)
             {
                 Debug.WriteLine("[YouTubeApi] API unavailable, serving stale cache");
-                // Cache in memory with a 5-minute TTL so we retry the API soon
-                // but avoid hitting disk on every request during the outage.
+                // Keep the stale copy in memory briefly so we retry soon without
+                // hitting the disk on every request during an outage.
                 var shortTtlAnchor = now - memTtl + (5 * 60 * 1000);
                 ResponseCache[url] = new CachedResponse(staleJson, shortTtlAnchor);
                 EvictCacheIfNeeded();
@@ -226,7 +235,7 @@ namespace Emby.YouTubePlugin
             return null;
         }
 
-        // Disk cache helpers
+        // Disk cache helpers.
 
         private static string GetDiskCacheKey(string url)
         {
@@ -246,15 +255,20 @@ namespace Emby.YouTubePlugin
                 var key = GetDiskCacheKey(url);
                 var file = Path.Combine(cacheDir, key + ".json");
 
-                // Backward compatibility: older plugin versions used 32-character (truncated) keys.
-                // If the 64-character file is missing, check for the legacy file and rename it so the next WriteDiskCache uses the right name.
+                // Older versions used a 32-character cache key. Pick it up once
+                // and move it to the current 64-character key when possible.
                 if (!File.Exists(file))
                 {
                     var legacyKey = key.Substring(0, 32);
                     var legacyFile = Path.Combine(cacheDir, legacyKey + ".json");
                     if (File.Exists(legacyFile))
                     {
-                        try { File.Move(legacyFile, file); } catch { file = legacyFile; }
+                        try { File.Move(legacyFile, file); }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[YouTubeApi] Legacy disk cache rename failed: {ex.Message}");
+                            file = legacyFile;
+                        }
                     }
                     else
                     {
@@ -264,13 +278,15 @@ namespace Emby.YouTubePlugin
 
                 var lastWrite = File.GetLastWriteTimeUtc(file);
                 var ageMs = (long)(DateTime.UtcNow - lastWrite).TotalMilliseconds;
-                // Per-call TTL (set by the caller). Don't delete the file just because it's stale for this call—30-day cleanup will handle deletion.
+                // This call may need fresher data, but the file can still be
+                // useful as a stale fallback until the 30-day cleanup removes it.
                 if (ageMs > ttlMs) return null;
 
                 return File.ReadAllText(file, Encoding.UTF8);
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[YouTubeApi] ReadDiskCache failed: {ex.Message}");
                 return null;
             }
         }
@@ -306,11 +322,17 @@ namespace Emby.YouTubePlugin
                             if (File.GetLastWriteTimeUtc(file) < cutoff)
                                 File.Delete(file);
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[YouTubeApi] Disk cache cleanup skipped {Path.GetFileName(file)}: {ex.Message}");
+                        }
                     }
                     Debug.WriteLine("[YouTubeApi] Disk cache cleanup done.");
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[YouTubeApi] Disk cache cleanup failed: {ex.Message}");
+                }
             });
         }
 
@@ -329,9 +351,9 @@ namespace Emby.YouTubePlugin
         }
 
         /// <summary>
-        /// Invalidate all cached entries (memory + disk) whose URL contains the given substring.
-        /// Used by the Watch Later poll: when the playlist contents change, we must drop the
-        /// 6h-cached playlistItems so the user sees the fresh list.
+        /// Clears cached responses whose URL contains the given text.
+        /// The Watch Later poll uses this when a playlist changes, so the next
+        /// refresh does not keep showing the old six-hour playlist cache.
         /// </summary>
         public static void InvalidateCacheContaining(string substring)
         {
@@ -352,7 +374,10 @@ namespace Emby.YouTubePlugin
                                 if (File.Exists(file)) File.Delete(file);
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[YouTubeApi] Disk cache delete failed: {ex.Message}");
+                        }
                     }
                 }
             }
@@ -363,9 +388,9 @@ namespace Emby.YouTubePlugin
         }
 
         /// <summary>
-        /// Drop the entire memory response cache. Used after the user changes the API
-        /// key or saved channels so the next channel refresh re-fetches with the new
-        /// configuration instead of serving stale data.
+        /// Drops the in-memory response cache after settings change.
+        /// Disk cache remains available for normal TTL-based reuse and stale
+        /// fallback behavior.
         /// </summary>
         public static void InvalidateAllCache()
         {
@@ -373,7 +398,7 @@ namespace Emby.YouTubePlugin
             catch (Exception ex) { Debug.WriteLine($"[YouTubeApi] InvalidateAllCache failed: {ex.Message}"); }
         }
 
-        // Channel details
+        // Channel details.
 
         public static async Task<(string? id, string? name, string? thumb, string? uploadsPlaylistId)>
             GetChannelDetailsAsync(string apiKey, string query, bool isHandle, CancellationToken ct)
@@ -382,7 +407,8 @@ namespace Emby.YouTubePlugin
             {
                 if (isHandle)
                 {
-                    // Use channels?forHandle= (costs 1 unit) instead of search (which costs 100 units)
+                    // Resolve handles through channels?forHandle instead of
+                    // search.list. It is cheaper and more exact.
                     var handle = query.TrimStart('@');
                     var url = $"{ApiBase}/channels?part=snippet,contentDetails&forHandle={Uri.EscapeDataString(handle)}&key={Uri.EscapeDataString(apiKey)}";
                     using var doc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
@@ -445,7 +471,7 @@ namespace Emby.YouTubePlugin
             return (channelId, null, null, null);
         }
 
-        // Playlist details
+        // Playlist details.
 
         public static async Task<(string? name, string? thumb, int videoCount)>
             GetPlaylistDetailsAsync(string apiKey, string playlistId, CancellationToken ct)
@@ -479,8 +505,8 @@ namespace Emby.YouTubePlugin
             return (null, null, 0);
         }
 
-        // Search videos
-
+        // Search is the expensive path: search.list costs 100 quota units.
+        // Cache each query for a full day.
         public static async Task<JsonDocument?> SearchVideosAsync(
             string apiKey, string query, string? pageToken, CancellationToken ct)
         {
@@ -488,66 +514,23 @@ namespace Emby.YouTubePlugin
             var url = $"{ApiBase}/search?part=snippet&q={q}&type=video&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Search costs 100 units—cache for 6 hours
-            return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
+            return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
         }
 
-        // Channel videos (via uploads playlist—costs 1 unit instead of 100 for search)
+        // Channel uploads are read through the uploads playlist, which costs 1
+        // quota unit instead of using search.list.
 
         public static async Task<JsonDocument?> GetChannelVideosAsync(
             string apiKey, string channelId, string? pageToken, CancellationToken ct,
             string sortBy = "date")
         {
-            // Derive uploads playlist ID: UC... → UU...
+            // YouTube upload playlists mirror channel IDs: UC... becomes UU...
             var uploadsPlaylistId = "UU" + channelId.Substring(2);
             return await GetPlaylistVideosAsync(apiKey, uploadsPlaylistId, pageToken, ct)
                 .ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Search channel videos by duration (short, medium, or long).
-        /// "short" means Shorts, "medium" and "long" are regular videos.
-        /// Uses search.list (costs 100 quota units per call).
-        /// </summary>
-        public static async Task<JsonDocument?> SearchChannelByDurationAsync(
-            string apiKey, string channelId, string videoDuration,
-            string? pageToken, CancellationToken ct, string order = "date")
-        {
-            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
-                      $"&type=video&videoDuration={Uri.EscapeDataString(videoDuration)}" +
-                      $"&order={Uri.EscapeDataString(NormalizeSortBy(order))}" +
-                      $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-            if (!string.IsNullOrEmpty(pageToken))
-                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Search costs 100 units—cache for 6 hours
-            return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
-        }
-
-        // Channel live and upcoming streams
-
-        public static async Task<JsonDocument?> GetChannelLiveAsync(
-            string apiKey, string channelId, string? pageToken, CancellationToken ct)
-        {
-            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
-                      $"&type=video&eventType=live&order=date&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-            if (!string.IsNullOrEmpty(pageToken))
-                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Live search costs 100 units, changes rarely—cache for 12 hours
-            return await TryGetCachedJsonAsync(url, ct, LiveSearchTtlMs).ConfigureAwait(false);
-        }
-
-        public static async Task<JsonDocument?> GetChannelUpcomingAsync(
-            string apiKey, string channelId, string? pageToken, CancellationToken ct)
-        {
-            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
-                      $"&type=video&eventType=upcoming&order=date&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-            if (!string.IsNullOrEmpty(pageToken))
-                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Upcoming search costs 100 units—cache for 12 hours
-            return await TryGetCachedJsonAsync(url, ct, LiveSearchTtlMs).ConfigureAwait(false);
-        }
-
-        // Playlist videos
+        // Playlist videos.
 
         public static async Task<JsonDocument?> GetPlaylistVideosAsync(
             string apiKey, string playlistId, string? pageToken, CancellationToken ct)
@@ -556,11 +539,12 @@ namespace Emby.YouTubePlugin
                       $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Uploads and playlists update often (costs 1 unit)—cache for 6 hours
+            // Uploads and playlists are cheap but noisy, so six hours is a good
+            // balance for normal browsing.
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
         }
 
-        // Trending videos
+        // Trending videos.
 
         public static async Task<JsonDocument?> GetTrendingAsync(
             string apiKey, string? regionCode, string? categoryId, CancellationToken ct)
@@ -571,106 +555,42 @@ namespace Emby.YouTubePlugin
                 url += $"&regionCode={Uri.EscapeDataString(regionCode)}";
             if (!string.IsNullOrEmpty(categoryId) && categoryId != "0")
                 url += $"&videoCategoryId={Uri.EscapeDataString(categoryId)}";
-            // Trending changes every hour, but we cache for 6 hours to save quota
+            // Trending changes regularly, but a six-hour cache keeps quota usage calm.
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
         }
 
-        // Video categories (for the Categories browser)
+        // Video categories for the Categories browser.
 
         public static async Task<JsonDocument?> GetVideoCategoriesAsync(
             string apiKey, string regionCode, CancellationToken ct)
         {
             var url = $"{ApiBase}/videoCategories?part=snippet&regionCode={Uri.EscapeDataString(regionCode)}" +
                       $"&key={Uri.EscapeDataString(apiKey)}";
-            // Categories almost never change—cache for 30 days
+            // Categories almost never change, so keep them for the full disk window.
             return await TryGetCachedJsonAsync(url, ct, CategoriesTtlMs).ConfigureAwait(false);
         }
 
-        // Search videos by category (Trending in Category, no search query)
-
-        public static async Task<JsonDocument?> GetTrendingByCategoryAsync(
-            string apiKey, string regionCode, string categoryId, CancellationToken ct)
-        {
-            var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics" +
-                      $"&chart=mostPopular&maxResults=50&regionCode={Uri.EscapeDataString(regionCode)}" +
-                      $"&videoCategoryId={Uri.EscapeDataString(categoryId)}&key={Uri.EscapeDataString(apiKey)}";
-            return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
-        }
-
-        // Search by category (popular videos in a category, costs 100 units)
-        // Used to supplement chart=mostPopular, which often returns only a few videos for some categories. Cached for 6 hours to keep quota usage reasonable.
-        public static async Task<JsonDocument?> SearchByCategoryAsync(
-            string apiKey, string regionCode, string categoryId, CancellationToken ct,
-            string? pageToken = null)
-        {
-            // Restrict to the last 30 days so we get current popular uploads instead of all-time top hits (which overlap a lot with chart=mostPopular and limit variety).
-            // Important: round to the UTC day boundary so the URL stays stable for 24 hours—otherwise, the per-millisecond timestamp would break the 6-hour disk cache and every call would cost 100 units.
-            var publishedAfter = DateTime.UtcNow.Date.AddDays(-30)
-                .ToString("yyyy-MM-ddTHH:mm:ssZ");
-            var url = $"{ApiBase}/search?part=snippet&type=video&order=viewCount" +
-                      $"&maxResults=50&videoCategoryId={Uri.EscapeDataString(categoryId)}" +
-                      $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
-                      $"&key={Uri.EscapeDataString(apiKey)}";
-            if (!string.IsNullOrEmpty(regionCode))
-                url += $"&regionCode={Uri.EscapeDataString(regionCode)}";
-            if (!string.IsNullOrEmpty(pageToken))
-                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
-        }
-
-        // Batch video details (up to 50 IDs at once)
+        // Batch video details, up to 50 IDs per request.
 
         public static async Task<JsonDocument?> GetVideoDetailsBatchAsync(
             string apiKey, IEnumerable<string> videoIds, CancellationToken ct)
         {
             var ids = string.Join(",", videoIds);
-            // The status part lets us filter out private, rejected, or non-embeddable videos that would otherwise show up in the channel listing as broken posters.
+            // The status part lets us remove private, rejected, and
+            // non-embeddable videos before they show up as broken items.
             var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails,status" +
                       $"&id={Uri.EscapeDataString(ids)}&key={Uri.EscapeDataString(apiKey)}";
-            // Video metadata doesn't change—cache for 1 year (disk cache capped at 30 days)
+            // Metadata is stable, while disk persistence is still capped at 30 days.
             return await TryGetCachedJsonAsync(url, ct, VideoDetailTtlMs).ConfigureAwait(false);
         }
 
-        // Helper methods
-
-        private static string NormalizeSortBy(string sortBy)
-        {
-            return (sortBy ?? "").Trim().ToLowerInvariant() switch
-            {
-                "date" => "date",
-                "newest" => "date",
-                "viewcount" => "viewCount",
-                "popular" => "viewCount",
-                "rating" => "rating",
-                "relevance" => "relevance",
-                "oldest" => "date",
-                _ => "date"
-            };
-        }
+        // Helper methods.
 
         public static string? GetString(JsonElement el, string name)
         {
             if (el.ValueKind != JsonValueKind.Object) return null;
             if (!el.TryGetProperty(name, out var p)) return null;
             return p.ValueKind == JsonValueKind.String ? p.GetString() : p.ToString();
-        }
-
-        public static int? GetInt(JsonElement el, string name)
-        {
-            if (el.ValueKind != JsonValueKind.Object) return null;
-            if (!el.TryGetProperty(name, out var p)) return null;
-            if (p.ValueKind == JsonValueKind.Number && p.TryGetInt32(out var i)) return i;
-            if (p.ValueKind == JsonValueKind.String && int.TryParse(p.GetString(), out var s)) return s;
-            return null;
-        }
-
-        public static long? GetLong(JsonElement el, string name)
-        {
-            if (el.ValueKind != JsonValueKind.Object) return null;
-            if (!el.TryGetProperty(name, out var p)) return null;
-            if (p.ValueKind == JsonValueKind.Number && p.TryGetInt64(out var i)) return i;
-            if (p.ValueKind == JsonValueKind.String && long.TryParse(p.GetString(), out var s)) return s;
-            return null;
         }
 
         public static string? GetNestedString(JsonElement el, string parent, string child)
@@ -686,7 +606,7 @@ namespace Emby.YouTubePlugin
             if (!snippet.TryGetProperty("thumbnails", out var thumbs)) return null;
             if (thumbs.ValueKind != JsonValueKind.Object) return null;
 
-            // Prefer: maxres > high > medium > default
+            // Prefer the sharpest thumbnail YouTube reports.
             foreach (var quality in new[] { "maxres", "high", "medium", "default" })
             {
                 if (thumbs.TryGetProperty(quality, out var t))
@@ -700,15 +620,15 @@ namespace Emby.YouTubePlugin
 
         public static string GetStableVideoThumbnailUrl(string videoId, string? preferredUrl)
         {
-            // Always use mqdefault.jpg—it's the only thumbnail size YouTube guarantees for every video (including upcoming streams, brand-new uploads, and videos without maxres/hqdefault yet).
-            // hqdefault and maxresdefault can return 404 for many edge cases.
+            // mqdefault.jpg is the safest direct thumbnail URL. Larger variants
+            // often return 404 for fresh uploads, upcoming streams, or older videos.
             if (string.IsNullOrWhiteSpace(videoId))
                 return preferredUrl ?? string.Empty;
             return $"https://i.ytimg.com/vi/{videoId}/mqdefault.jpg";
         }
 
         /// <summary>
-        /// Parses ISO 8601 duration (PT1H2M3S) to TimeSpan.
+        /// Parses a YouTube ISO 8601 duration, such as PT1H2M3S.
         /// </summary>
         public static TimeSpan? ParseDuration(string? duration)
         {
@@ -717,14 +637,19 @@ namespace Emby.YouTubePlugin
             {
                 return System.Xml.XmlConvert.ToTimeSpan(duration);
             }
-            catch
+            catch (FormatException)
             {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[YouTubeApi] ParseDuration failed for '{duration}': {ex.Message}");
                 return null;
             }
         }
 
         /// <summary>
-        /// Parses a YouTube publishedAt string (ISO 8601) to DateTime.
+        /// Parses YouTube's publishedAt timestamp.
         /// </summary>
         public static DateTime? ParsePublishedAt(string? publishedAt)
         {

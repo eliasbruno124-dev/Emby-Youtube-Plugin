@@ -3,8 +3,8 @@ using System.Collections.Generic;
 namespace Emby.YouTubePlugin
 {
     /// <summary>
-    /// Maps folder names or YouTube category IDs to icon URLs for the UI.
-    /// Uses OpenMoji 618x618 PNGs (CC BY-SA 4.0) for nice, large folder thumbnails.
+    /// Provides folder artwork for the channel UI.
+    /// OpenMoji's 618x618 PNGs are large enough to look good in Emby grids.
     /// </summary>
     internal static class FolderIcons
     {
@@ -19,7 +19,7 @@ namespace Emby.YouTubePlugin
         public static readonly string Live = Cdn + "1F534.png";  // 🔴
         public static readonly string Search = Cdn + "1F50D.png";  // 🔍
 
-        // Map YouTube videoCategoryId → emoji icon URL
+        // YouTube videoCategoryId to icon URL.
         private static readonly Dictionary<string, string> CategoryMap = new()
         {
             { "1",  Cdn + "1F3AC.png" }, // 🎬 Film & Animation
