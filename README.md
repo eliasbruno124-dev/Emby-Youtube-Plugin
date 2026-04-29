@@ -1,6 +1,6 @@
 # Emby YouTube Plugin
 
-An unofficial Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
+An Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
 
 The plugin adds a YouTube entry to Emby and lets you browse saved channels, playlists, Watch Later-style playlists, trending videos, categories, Shorts, live streams, and recently added uploads from one place.
 
