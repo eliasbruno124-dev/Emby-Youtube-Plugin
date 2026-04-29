@@ -248,8 +248,25 @@ namespace Emby.YouTubePlugin
 
                 RunDiskCleanupOnce(cacheDir);
 
-                var file = Path.Combine(cacheDir, GetDiskCacheKey(url) + ".json");
-                if (!File.Exists(file)) return null;
+                var key = GetDiskCacheKey(url);
+                var file = Path.Combine(cacheDir, key + ".json");
+
+                // Backward-compat: older plugin versions wrote 32-char (truncated) keys.
+                // If the 64-char file is missing, check the legacy path and rename it so
+                // the next WriteDiskCache stores under the correct name.
+                if (!File.Exists(file))
+                {
+                    var legacyKey = key.Substring(0, 32);
+                    var legacyFile = Path.Combine(cacheDir, legacyKey + ".json");
+                    if (File.Exists(legacyFile))
+                    {
+                        try { File.Move(legacyFile, file); } catch { file = legacyFile; }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
 
                 var lastWrite = File.GetLastWriteTimeUtc(file);
                 var ageMs = (long)(DateTime.UtcNow - lastWrite).TotalMilliseconds;
