@@ -50,5 +50,26 @@ namespace Emby.YouTubePlugin
 
         [XmlIgnore]
         public string QuotaStatus => QuotaTracker.FormatStatus();
+
+        // Structured quota data so the settings UI can render a real progress bar
+        // instead of the ASCII version embedded in QuotaStatus.
+        [XmlIgnore]
+        public long QuotaUsedToday => QuotaTracker.GetStats().usedToday;
+
+        [XmlIgnore]
+        public long QuotaDailyLimit => QuotaTracker.GetStats().dailyQuota;
+
+        [XmlIgnore]
+        public long QuotaResetSeconds
+        {
+            get
+            {
+                var sec = (long)QuotaTracker.GetStats().untilReset.TotalSeconds;
+                return sec < 0 ? 0 : sec;
+            }
+        }
+
+        [XmlIgnore]
+        public long QuotaLifetime => QuotaTracker.GetStats().totalUsed;
     }
 }

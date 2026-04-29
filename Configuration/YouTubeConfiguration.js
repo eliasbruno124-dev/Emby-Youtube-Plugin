@@ -149,6 +149,49 @@ define([
         return result;
     }
 
+    function formatNumber(n) {
+        const value = Number(n) || 0;
+        try { return value.toLocaleString(); }
+        catch (e) { return String(value); }
+    }
+
+    function formatResetCountdown(seconds) {
+        const total = Math.max(0, Math.floor(Number(seconds) || 0));
+        if (total <= 0) return 'now';
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        if (h >= 1) return h + 'h ' + m + 'm';
+        return m + 'm';
+    }
+
+    function renderQuota(view, config) {
+        const used = Number(config.QuotaUsedToday) || 0;
+        const limit = Number(config.QuotaDailyLimit) || 10000;
+        const lifetime = Number(config.QuotaLifetime) || 0;
+        const resetSec = Number(config.QuotaResetSeconds) || 0;
+        const pct = limit > 0 ? Math.min(100, Math.max(0, (used / limit) * 100)) : 0;
+
+        setText(view, 'quotaNumber', formatNumber(used));
+        setText(view, 'quotaTotal', formatNumber(limit));
+        setText(view, 'quotaPercent', pct.toFixed(1) + '%');
+        setText(view, 'quotaLifetime', 'Lifetime: ' + formatNumber(lifetime) + ' units');
+
+        const reset = field(view, 'quotaReset');
+        if (reset) {
+            reset.textContent = '⏱ Reset in ' + formatResetCountdown(resetSec);
+            reset.classList.toggle('quotaResetWarn', resetSec > 0 && resetSec < 1800);
+        }
+
+        const bar = field(view, 'quotaBar');
+        const fill = field(view, 'quotaBarFill');
+        if (fill) fill.style.width = pct.toFixed(2) + '%';
+        if (bar) {
+            bar.classList.remove('warn', 'danger');
+            if (pct >= 90) bar.classList.add('danger');
+            else if (pct >= 70) bar.classList.add('warn');
+        }
+    }
+
     function classifySavedItem(item) {
         if (item.indexOf('@') === 0) {
             return 'Handle';
@@ -408,7 +451,7 @@ define([
                 setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
                 setValue(view, 'numRecentlyAddedPerChannel', config.RecentlyAddedPerChannel || 10);
                 setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
-                setText(view, 'txtQuotaStatus', config.QuotaStatus || 'Quota usage will appear after the first plugin load.');
+                renderQuota(view, config);
                 setDonateButton(view);
                 setStatus(view, '');
                 loading.hide();
@@ -449,6 +492,10 @@ define([
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
             config.Donate = defaultDonateUrl;
             delete config.QuotaStatus;
+            delete config.QuotaUsedToday;
+            delete config.QuotaDailyLimit;
+            delete config.QuotaResetSeconds;
+            delete config.QuotaLifetime;
             delete config.ShortsEnabled;
 
             loading.show();

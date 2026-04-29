@@ -161,6 +161,85 @@
             white-space: pre-wrap;
             margin: 0;
         }
+
+        #youtubeConfigurationRoot .quotaCard {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65em;
+        }
+        #youtubeConfigurationRoot .quotaTopRow {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        #youtubeConfigurationRoot .quotaUsage {
+            display: flex;
+            align-items: baseline;
+            gap: 0.3em;
+        }
+        #youtubeConfigurationRoot .quotaNumber {
+            font-size: 1.8em;
+            font-weight: 600;
+            line-height: 1;
+        }
+        #youtubeConfigurationRoot .quotaSlash {
+            opacity: 0.45;
+            font-size: 1.1em;
+        }
+        #youtubeConfigurationRoot .quotaTotal {
+            opacity: 0.6;
+            font-size: 1.05em;
+        }
+        #youtubeConfigurationRoot .quotaUnit {
+            margin-left: 0.5em;
+            font-size: 0.85em;
+            opacity: 0.55;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        #youtubeConfigurationRoot .quotaPercent {
+            font-size: 1.4em;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        #youtubeConfigurationRoot .quotaBar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+        #youtubeConfigurationRoot .quotaBarFill {
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+            transition: width 0.4s ease, background 0.4s ease;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.45);
+        }
+        #youtubeConfigurationRoot .quotaBar.warn .quotaBarFill {
+            background: linear-gradient(90deg, #fb8c00 0%, #ffb74d 100%);
+            box-shadow: 0 0 8px rgba(251, 140, 0, 0.5);
+        }
+        #youtubeConfigurationRoot .quotaBar.danger .quotaBarFill {
+            background: linear-gradient(90deg, #e53935 0%, #ef5350 100%);
+            box-shadow: 0 0 10px rgba(229, 57, 53, 0.55);
+        }
+        #youtubeConfigurationRoot .quotaFooter {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            opacity: 0.7;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        #youtubeConfigurationRoot .quotaResetWarn {
+            color: #ffb74d;
+            opacity: 0.95;
+        }
     </style>
 
     <div class="scrollSlider flex-direction-column padded-left padded-left-page padded-right padded-top-page padded-bottom-page">
@@ -175,8 +254,23 @@
             <div id="settingsPage" style="margin-top: 2em;">
                 <form class="youtubeConfigurationForm" novalidate>
                     <div class="paper-card">
-                        <h2 style="margin-top: 0;">Quota</h2>
-                        <pre id="txtQuotaStatus" class="fieldDescription"></pre>
+                        <h2 style="margin-top: 0;">Daily API Quota</h2>
+                        <div class="quotaCard">
+                            <div class="quotaTopRow">
+                                <div class="quotaUsage">
+                                    <span class="quotaNumber" id="quotaNumber">0</span>
+                                    <span class="quotaSlash">/</span>
+                                    <span class="quotaTotal" id="quotaTotal">10,000</span>
+                                    <span class="quotaUnit">units</span>
+                                </div>
+                                <div class="quotaPercent" id="quotaPercent">0%</div>
+                            </div>
+                            <div class="quotaBar" id="quotaBar"><div class="quotaBarFill" id="quotaBarFill"></div></div>
+                            <div class="quotaFooter">
+                                <span id="quotaReset">⏱ Reset in --</span>
+                                <span id="quotaLifetime">Lifetime: 0 units</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="paper-card">
