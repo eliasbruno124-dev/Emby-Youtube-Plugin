@@ -18,8 +18,13 @@ namespace Emby.YouTubePlugin
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private Timer? _pollTimer;
         private Timer? _switchTimer;
-        private string _lastConfigHash = "";
         private int _pollRunning;
+        private int _currentPollMinutes;
+
+        // Static so Plugin.SaveConfiguration can update the hash directly when
+        // settings are saved through the UI. Without that, the next poll would
+        // re-detect the same change and trigger a duplicate refresh.
+        internal static string LastConfigHash = "";
 
         private static string ConfigHashPath =>
             Path.Combine(Plugin.CachePath ?? Path.GetTempPath(), "..", "youtube-config-hash.txt");
@@ -31,21 +36,35 @@ namespace Emby.YouTubePlugin
             try
             {
                 if (File.Exists(ConfigHashPath))
-                    _lastConfigHash = File.ReadAllText(ConfigHashPath).Trim();
+                    LastConfigHash = File.ReadAllText(ConfigHashPath).Trim();
             }
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Failed to read config hash: {ex.Message}");
             }
 
-            var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
             _pollTimer = new Timer(PollTick, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15));
             _switchTimer = new Timer(_ =>
             {
-                try { _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes)); }
+                try
+                {
+                    var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
+                    _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes));
+                    _currentPollMinutes = minutes;
+                }
                 catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to switch poll interval: {ex.Message}"); }
                 _switchTimer?.Dispose();
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
+        }
+
+        // Called from Plugin.SaveConfiguration so a settings save updates the
+        // hash and the running poll interval in one place. Returns the new hash.
+        internal static string MarkConfigSaved(PluginConfiguration config)
+        {
+            var hash = ComputeConfigHash(config);
+            LastConfigHash = hash;
+            TrySaveConfigHash(hash);
+            return hash;
         }
 
         private void PollTick(object? state)
@@ -66,6 +85,7 @@ namespace Emby.YouTubePlugin
                 var apiKey = (config.ApiKey ?? "").Trim();
                 var watchLaterRaw = (config.WatchLaterPlaylist ?? "").Trim();
 
+                AdjustPollIntervalToConfig(config);
                 await RefreshOnConfigChange(apiKey, config).ConfigureAwait(false);
                 await PollWatchLaterPlaylists(apiKey, watchLaterRaw).ConfigureAwait(false);
             }
@@ -79,15 +99,35 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private void AdjustPollIntervalToConfig(PluginConfiguration config)
+        {
+            // Only matters once we've moved past the bootstrap fast-poll phase.
+            if (_currentPollMinutes <= 0) return;
+
+            var configured = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
+            if (configured == _currentPollMinutes) return;
+
+            try
+            {
+                _pollTimer?.Change(TimeSpan.FromMinutes(configured), TimeSpan.FromMinutes(configured));
+                _currentPollMinutes = configured;
+                YouTubeChannel.LogPublic($"[YT] Watch Later poll interval updated to {configured} min");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Failed to adjust poll interval: {ex.Message}");
+            }
+        }
+
         private async Task RefreshOnConfigChange(string apiKey, PluginConfiguration config)
         {
             var currentHash = ComputeConfigHash(config);
-            var configChanged = !string.Equals(currentHash, _lastConfigHash, StringComparison.Ordinal);
+            var configChanged = !string.Equals(currentHash, LastConfigHash, StringComparison.Ordinal);
 
             if (!configChanged)
                 return;
 
-            _lastConfigHash = currentHash;
+            LastConfigHash = currentHash;
             TrySaveConfigHash(currentHash);
 
             if (string.IsNullOrEmpty(apiKey))
@@ -193,7 +233,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static string ComputeConfigHash(PluginConfiguration c)
+        internal static string ComputeConfigHash(PluginConfiguration c)
         {
             using var sha = System.Security.Cryptography.SHA1.Create();
             var blob = string.Join("|", new[]

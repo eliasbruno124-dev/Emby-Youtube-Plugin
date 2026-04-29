@@ -318,6 +318,13 @@ define([
                 return;
             }
 
+            const header = document.createElement('div');
+            header.className = 'fieldDescription';
+            header.style.width = '100%';
+            header.style.marginTop = '0';
+            header.innerHTML = items.length + ' entr' + (items.length === 1 ? 'y' : 'ies');
+            list.appendChild(header);
+
             items.forEach(item => {
                 const chip = document.createElement('div');
                 chip.className = 'itemChip';
@@ -335,8 +342,9 @@ define([
                 const remove = document.createElement('button');
                 remove.type = 'button';
                 remove.className = 'removeEntryButton';
-                remove.title = 'Remove';
-                remove.textContent = 'x';
+                remove.title = 'Remove "' + item + '"';
+                remove.setAttribute('aria-label', 'Remove ' + item);
+                remove.textContent = '×';
                 remove.addEventListener('click', () => {
                     setItems(getItems().filter(existing => existing !== item));
                     this.renderEntryList(view, listId, getItems, setItems, classify);
@@ -436,7 +444,7 @@ define([
             config.ShowCommentCount = checked(view, 'chkShowCommentCount');
             config.ChannelSortBy = value(view, 'selectChannelSortBy') || 'date';
             config.MaxChannelVideos = numberValue(view, 'numMaxChannelVideos', 50, 1, 150);
-            config.MaxSearchVideos = numberValue(view, 'numMaxSearchVideos', 50, 1, 50);
+            config.MaxSearchVideos = numberValue(view, 'numMaxSearchVideos', 50, 1, 150);
             config.RecentlyAddedPerChannel = numberValue(view, 'numRecentlyAddedPerChannel', 10, 1, 25);
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
             config.Donate = defaultDonateUrl;

@@ -72,6 +72,11 @@ namespace Emby.YouTubePlugin
             try { YouTubeChannel.ResetCrossFolderSeen(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset after settings save failed: {ex.Message}"); }
 
+            // Update the shared config hash so the polling loop won't re-detect
+            // this same change and trigger a duplicate refresh.
+            try { PluginEntryPoint.MarkConfigSaved(Configuration); }
+            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
+
             // Kick off a channel refresh right away so users see their changes
             // immediately instead of waiting up to 15s for the next config-hash poll.
             // Fire-and-forget — SaveConfiguration must stay synchronous for Emby.
@@ -140,7 +145,7 @@ namespace Emby.YouTubePlugin
                 config.TrendingCategory = string.Empty;
             config.ChannelSortBy = NormalizeSort(config.ChannelSortBy);
             config.MaxChannelVideos = Math.Clamp(config.MaxChannelVideos, 1, 150);
-            config.MaxSearchVideos = Math.Clamp(config.MaxSearchVideos, 1, 50);
+            config.MaxSearchVideos = Math.Clamp(config.MaxSearchVideos, 1, 150);
             config.RecentlyAddedPerChannel = Math.Clamp(config.RecentlyAddedPerChannel, 1, 25);
             config.WatchLaterPollMinutes = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
             if (config.HideShorts)

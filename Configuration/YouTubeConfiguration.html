@@ -74,11 +74,27 @@
             border: 0;
             background: rgba(0, 0, 0, 0.24);
             color: inherit;
-            width: 1.55em;
-            height: 1.55em;
+            width: 1.6em;
+            height: 1.6em;
             border-radius: 50%;
             cursor: pointer;
             line-height: 1;
+            font-size: 1em;
+            font-weight: 600;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+        #youtubeConfigurationRoot .removeEntryButton:hover {
+            background: rgba(220, 50, 50, 0.85);
+            color: #fff;
+        }
+        #youtubeConfigurationRoot .listCount {
+            font-size: 0.85em;
+            opacity: 0.65;
+            margin-left: 0.5em;
         }
 
         #youtubeConfigurationRoot .emptyListNote {
@@ -300,7 +316,7 @@
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="numMaxSearchVideos">Max Videos per Search Query</label>
-                                <input is="emby-input" id="numMaxSearchVideos" type="number" min="1" max="50" step="1" value="50" />
+                                <input is="emby-input" id="numMaxSearchVideos" type="number" min="1" max="150" step="1" value="50" />
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="numRecentlyAddedPerChannel">Recently Added: Videos per Channel</label>
