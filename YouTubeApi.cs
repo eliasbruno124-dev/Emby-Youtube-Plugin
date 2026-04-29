@@ -212,6 +212,22 @@ namespace Emby.YouTubePlugin
                 return JsonDocument.Parse(json);
             }
 
+            // 4th: API unavailable (quota exhausted, network error, etc.) →
+            // serve the most recent disk-cached response regardless of age.
+            // This keeps existing channel content visible instead of returning
+            // an empty list when the daily quota runs out.
+            var staleJson = TryReadDiskCache(url, long.MaxValue);
+            if (staleJson != null)
+            {
+                Debug.WriteLine("[YouTubeApi] API unavailable, serving stale cache");
+                // Cache in memory with a 5-minute TTL so we retry the API soon
+                // but avoid hitting disk on every request during the outage.
+                var shortTtlAnchor = now - memTtl + (5 * 60 * 1000);
+                ResponseCache[url] = new CachedResponse(staleJson, shortTtlAnchor);
+                EvictCacheIfNeeded();
+                return JsonDocument.Parse(staleJson);
+            }
+
             return null;
         }
 

@@ -4,6 +4,7 @@ using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Entities;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -24,6 +25,15 @@ namespace Emby.YouTubePlugin
     public class YouTubeImageProvider : IDynamicImageProvider, IHasItemChangeMonitor
     {
         public string Name => "YouTube";
+
+        // Per-item cooldown after a failed thumbnail fetch.
+        // Prevents the Episode-Refresh-wipes → HasChanged-fires → fetch-fails-again
+        // cycle that causes the same items to show missing thumbnails every hour.
+        // Key = item.InternalId, Value = UTC time of the failed attempt.
+        // On a successful fetch the entry is removed so a future metadata wipe
+        // (e.g. by Episode Refresh) still triggers a fresh download.
+        private static readonly ConcurrentDictionary<long, DateTime> _failedFetches = new();
+        private static readonly TimeSpan FailedFetchCooldown = TimeSpan.FromHours(2);
 
         private static readonly Regex VideoIdRegex = new(
             @"(?:youtube\.com/watch\?v=|youtu\.be/|/vi/)([A-Za-z0-9_-]{6,})",
@@ -80,6 +90,10 @@ namespace Emby.YouTubePlugin
                     if (!resp.IsSuccessStatusCode) continue;
                     var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
                     if (bytes == null || bytes.Length < 1024) continue; // skip 1x1 placeholders
+                    // Success: clear any previous failure record so a future metadata
+                    // wipe (e.g. by Episode Refresh) triggers a fresh download.
+                    if (result?.BaseItem != null)
+                        _failedFetches.TryRemove(result.BaseItem.InternalId, out _);
                     response.Format = ImageFormat.Jpg;
                     response.Stream = new MemoryStream(bytes, writable: false);
                     return response;
@@ -88,18 +102,35 @@ namespace Emby.YouTubePlugin
                 catch { }
             }
 
+            // All candidates failed (video deleted / unavailable / thumbnail not
+            // yet generated). Record the failure so HasChanged won't re-trigger
+            // for another 2 hours.
+            if (result?.BaseItem != null)
+                _failedFetches[result.BaseItem.InternalId] = DateTime.UtcNow;
+
             return response;
         }
 
         public bool HasChanged(BaseItem item, LibraryOptions libraryOptions, IDirectoryService directoryService)
         {
-            // YouTube thumbnails for a given video ID are immutable; only
-            // (re-)fetch when the item is missing both Primary and Thumb
-            // (e.g. right after "Replace existing metadata" wiped them).
+            // YouTube thumbnails are immutable per video ID; only (re-)fetch when
+            // both image slots are empty (e.g. right after "Replace existing metadata"
+            // wiped them). Once Emby stores a valid image HasImage returns true and
+            // we never re-trigger.
             try
             {
-                if (!item.HasImage(ImageType.Primary) && !item.HasImage(ImageType.Thumb))
-                    return true;
+                if (item.HasImage(ImageType.Primary) || item.HasImage(ImageType.Thumb))
+                    return false;
+
+                // Don't hammer YouTube for items whose last fetch failed recently.
+                // A 2-hour cooldown covers both "YouTube still processing the thumbnail
+                // for a brand-new upload" and "video permanently unavailable" cases
+                // without blocking legitimate recovery after an Episode-Refresh wipe.
+                if (_failedFetches.TryGetValue(item.InternalId, out var lastFail)
+                    && (DateTime.UtcNow - lastFail) < FailedFetchCooldown)
+                    return false;
+
+                return true;
             }
             catch { }
             return false;
