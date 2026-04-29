@@ -21,41 +21,74 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 
 ## Screenshots
 
-Screenshots are not required for the plugin to work, but these are the best ones to add later:
+Save screenshots in `docs/screenshots/` with the exact filenames below. The README already references these paths, so the images will appear on GitHub as soon as the files are added.
 
-| Screenshot | Recommended file | What it should show |
-| --- | --- | --- |
-| Settings page | `docs/screenshots/settings.png` | API key field blurred, saved content chips, Watch Later entries, toggles, and quota panel. |
-| Setup guide | `docs/screenshots/setup-guide.png` | The built-in setup guide with the Google Cloud steps and images. |
-| Emby root folder | `docs/screenshots/root-folders.png` | Watch Later, Trending, Categories, Recently Added, and saved YouTube entries. |
-| Channel folders | `docs/screenshots/channel-folders.png` | A saved channel with Videos, Shorts, and Live & Upcoming. |
-| Video listing | `docs/screenshots/videos.png` | A normal Emby grid/list view with YouTube videos and thumbnails. |
+Use a clean browser window, keep the Emby theme consistent, and blur or cover the API key before committing screenshots.
 
-When screenshots exist, place them in the relevant section with normal Markdown image tags:
+### Settings
 
-```md
 ![Settings page](docs/screenshots/settings.png)
-```
 
-Do not commit screenshots that show a real API key.
+Capture the **Settings** tab with the API key field blurred, saved content chips, Watch Later playlists, quota panel, and the main toggles visible.
+
+### Setup Guide
+
+![Setup guide](docs/screenshots/setup-guide.png)
+
+Capture the **Setup Guide** tab with the step cards and guide images visible. This is the best screenshot to show that new users do not need to guess how to create the API key.
+
+### Emby Root Folder
+
+![Emby root folder](docs/screenshots/root-folders.png)
+
+Capture the YouTube channel root in Emby with folders such as Watch Later, Trending, Categories, Recently Added, and saved channels/playlists.
+
+### Channel Folders
+
+![Channel folders](docs/screenshots/channel-folders.png)
+
+Open a saved channel that has enough content to show **Videos**, **Shorts**, and **Live & Upcoming**. This makes the folder behavior obvious.
+
+### Video Listing
+
+![Video listing](docs/screenshots/videos.png)
+
+Open a Videos folder and capture the normal Emby video grid/list with thumbnails loaded.
+
+Optional extra screenshots:
+
+| File | What to capture |
+| --- | --- |
+| `docs/screenshots/quota.png` | A close crop of the quota panel after a few API calls. |
+| `docs/screenshots/shorts-hidden.png` | A channel view with Shorts disabled, showing the cleaner long-form layout. |
+| `docs/screenshots/watch-later.png` | A Watch Later playlist folder with videos loaded. |
 
 ## Requirements
 
-- Emby Server with plugin support.
+- Emby Server.
 - .NET 8 SDK for building from source.
 - A YouTube Data API v3 key from Google Cloud.
 
-The API key only needs access to public YouTube data. Restricting the key to **YouTube Data API v3** is recommended.
+The API key only needs access to public YouTube data. After installation, open the plugin settings and use the built-in **Setup Guide** to create and restrict the key.
 
-## Setup
+## Installation
 
-1. Build the plugin and copy `Emby.YouTubePlugin.dll` into your Emby plugins folder.
-2. Restart Emby.
-3. Open the YouTube plugin settings.
-4. Use the **Setup Guide** tab to create a YouTube Data API v3 key.
-5. Paste the API key into the **Settings** tab.
-6. Add at least one channel, playlist, or search entry.
-7. Save the settings.
+1. Build or download `Emby.YouTubePlugin.dll`.
+2. Copy the DLL into Emby's plugin folder.
+3. Restart Emby.
+4. Open the YouTube plugin settings.
+5. Use the **Setup Guide** tab to create a YouTube Data API v3 key.
+6. Paste the API key into the **Settings** tab.
+7. Add at least one channel, playlist, or search entry.
+8. Save the settings.
+
+On many Windows installations, the plugin folder is:
+
+```text
+C:\ProgramData\Emby-Server\programdata\plugins
+```
+
+If your Emby data path is different, use the `plugins` folder inside that Emby program data directory.
 
 Useful Google Cloud pages:
 
