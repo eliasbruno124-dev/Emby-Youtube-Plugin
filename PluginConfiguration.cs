@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Emby.YouTubePlugin
 {
+    // This class holds the configuration for the YouTube plugin.
     public class PluginConfiguration : EditableOptionsBase
     {
         public override string EditorTitle => "YouTube Plugin Settings";

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 namespace Emby.YouTubePlugin
 {
     /// <summary>
-    /// Maps logical folder names / YouTube category IDs to icon URLs.
-    /// Uses OpenMoji 618x618 PNGs (CC BY-SA 4.0) for nice large folder thumbnails.
+    /// Maps folder names or YouTube category IDs to icon URLs for the UI.
+    /// Uses OpenMoji 618x618 PNGs (CC BY-SA 4.0) for nice, large folder thumbnails.
     /// </summary>
     internal static class FolderIcons
     {

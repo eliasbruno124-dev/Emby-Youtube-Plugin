@@ -50,19 +50,12 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan MetaCacheTtl = TimeSpan.FromDays(365);
         private static readonly TimeSpan NegativeCacheTtl = TimeSpan.FromHours(1);
 
-        // ── Cross-folder dedup ──
-        // The same YouTube video may legitimately appear in many folders. To avoid
-        // showing it 3-5x in Emby's home-screen "Latest" view we apply asymmetric
-        // dedup:
-        //   - Channel folders (channel/playlist/watchlater/...): NEVER drop anything,
-        //     just remember which video IDs they returned. Channel folders are the
-        //     primary view, so they always show their full content.
-        //   - Trending / Recently Added: DROP videos already returned by a channel
-        //     folder this refresh cycle. They keep their own internal dedup.
+        // Cross-folder deduplication:
+        // YouTube videos can show up in multiple folders, so to keep Emby's "Latest" view clean, we use a smart deduplication approach:
+        //   - Channel folders (like channel, playlist, watch later, etc.): We never remove anything here. We just keep track of which video IDs each folder returns. These are the main views, so they always show everything.
+        //   - Trending / Recently Added: Here, we skip videos that have already shown up in a channel folder during this refresh. Each of these keeps its own deduplication list.
         //
-        // The seen-set is reset only when the API cache is invalidated (config change)
-        // and on a hard timeout (10 min) so a manual / scheduled refresh always sees
-        // up-to-date content.
+        // The "seen" set resets only if the API cache is cleared (like after a config change) or after a hard timeout (10 minutes), so a manual or scheduled refresh always gets the latest content.
         private static readonly ConcurrentDictionary<string, byte> CrossFolderSeen = new(StringComparer.Ordinal);
         private static DateTime _crossFolderSeenStartedAt = DateTime.UtcNow;
         private static readonly TimeSpan CrossFolderSeenMaxAge = TimeSpan.FromMinutes(10);
@@ -80,8 +73,7 @@ namespace Emby.YouTubePlugin
             return id;
         }
 
-        // Called by channel folders: remembers which video IDs this folder returned
-        // but never drops anything from the input list.
+        // Used by channel folders: just marks which video IDs this folder returned, but never removes anything from the list.
         private static void MarkAsSeen(IEnumerable<ChannelItemInfo> items)
         {
             if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
@@ -90,17 +82,9 @@ namespace Emby.YouTubePlugin
                 CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
         }
 
-        // Called by Trending / Categories: drops videos already returned by ANY
-        // previously-seeded folder (channel uploads or another aggregator) and
-        // then seeds the surviving items so the next aggregator can dedup
-        // against this one.
+        // Used by Trending and Categories: removes videos that have already been shown by any previously-seeded folder (like channel uploads or another aggregator), then marks the remaining ones so the next aggregator can deduplicate against them.
         //
-        // The dedup is REQUIRED to keep Emby's home "Latest" row from showing
-        // the same video twice — each Channel folder creates its own MediaItem
-        // row in Emby's DB, so the same videoId in two folders = two rows = two
-        // entries in Latest. Recently Added is intentionally NOT routed through
-        // here because it is by definition a subset of saved channels and the
-        // dedup would empty it.
+        // This deduplication is necessary to keep Emby's "Latest" row from showing the same video more than once. Each channel folder creates its own MediaItem row in Emby's database, so the same video ID in two folders means two rows and two entries in Latest. We don't use this for Recently Added, since that's always a subset of saved channels and deduping would make it empty.
         private static void DropIfSeenInChannelFolder(List<ChannelItemInfo> items)
         {
             if ((DateTime.UtcNow - _crossFolderSeenStartedAt) > CrossFolderSeenMaxAge)
@@ -110,14 +94,8 @@ namespace Emby.YouTubePlugin
                 CrossFolderSeen.TryAdd(StripPrefix(it.Id), 1);
         }
 
-        // Pre-seeds the cross-folder seen-set from cached channel uploads so
-        // Trending / Recently Added can dedup against channel folders even when
-        // Emby happens to fetch them BEFORE the channel folders this cycle.
-        // Without this, the first-after-restart Trending/Recent fetch keeps every
-        // video, then channel folders later store their own copies → 2 MediaItems
-        // for the same video → home "Latest" view shows the video twice.
-        // Uses the 6h-cached uploads playlist endpoint, so this is free on warm
-        // cache and ~1 quota unit per channel on cold cache.
+        // This method pre-fills the "seen" set from cached channel uploads, so Trending and Recently Added can deduplicate against channel folders—even if Emby fetches them before the channel folders during a refresh cycle.
+        // Without this, after a restart, Trending/Recent would keep every video, and then channel folders would later add their own copies, causing the same video to show up twice in the "Latest" view. This uses the 6-hour-cached uploads playlist endpoint, so it's fast if the cache is warm and only costs about 1 quota unit per channel if it's cold.
         private static async Task PreSeedChannelSeenAsync(
             string apiKey, PluginConfiguration config, CancellationToken ct)
         {
@@ -192,18 +170,13 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        // ── Rate limiter for enrichment ──
+        // Rate limiter for enrichment requests
         private static readonly SemaphoreSlim EnrichSemaphore = new(4, 4);
         private const int EnrichDelayMs = 200;
         private const int MaxForegroundEnrich = 0;
 
-        // Playability probe: YouTube's videos.list API does NOT expose every form
-        // of geo / partner / sports-league restriction. Items can be marked
-        // privacyStatus=public, embeddable=true, with no regionRestriction set,
-        // yet still refuse to play in our region (e.g. MLB / FS1 sports streams).
-        // The watch-page HTML contains a `playabilityStatus":"OK|UNPLAYABLE|ERROR|LOGIN_REQUIRED"`
-        // field that reflects the *actual* playability from the server's IP, so
-        // we probe it as a last line of defense after the API checks pass.
+        // Playability check: YouTube's videos.list API doesn't tell us about every kind of restriction (like geo-blocks or sports league limits).
+        // Sometimes, a video looks public and embeddable, but still won't play in your region. The watch-page HTML has a "playabilityStatus" field that shows the real status from the server's point of view, so we check that as a last resort after the API checks.
         private static readonly System.Net.Http.HttpClient PlayabilityProbeHttp =
             new(new System.Net.Http.HttpClientHandler { AllowAutoRedirect = true })
             { Timeout = TimeSpan.FromSeconds(8) };
@@ -253,7 +226,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        // Runs IsPlayableAsync in parallel for every item and removes the unplayable ones.
+        // Checks playability for every item in parallel and removes any that can't be played.
         private static async Task ProbeAndDropUnplayable(List<ChannelItemInfo> items, CancellationToken ct)
         {
             if (items.Count == 0) return;
@@ -301,13 +274,9 @@ namespace Emby.YouTubePlugin
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
         {
-            // Extra parameters (runTimeTicks, originalLang) are accepted for signature
-            // compatibility with callers but intentionally NOT applied to MediaSourceInfo:
-            //  - YouTube's &hl= is UI-only and does NOT influence audio-track selection.
-            //  - Setting RunTimeTicks on the MediaSource makes Emby Web try to direct-play
-            //    the watch URL as a raw stream, which hangs forever. Leaving it null lets
-            //    the web client recognise the watch URL and fall back to the YouTube
-            //    embed/iframe player (the behaviour that worked in v1.14.x and earlier).
+            // Note: runTimeTicks and originalLang are here for compatibility, but we don't actually use them in MediaSourceInfo:
+            //  - YouTube's &hl= only affects the UI, not the audio track.
+            //  - If we set RunTimeTicks, Emby Web tries to direct-play the watch URL as a raw stream, which just hangs. Leaving it null lets the web client recognize the watch URL and use the YouTube embed/iframe player, which works as expected.
             string url = $"https://www.youtube.com/watch?v={videoId}";
             return new List<MediaSourceInfo>
             {
@@ -1228,7 +1197,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        // ── Recently Added: cross-channel newest mix ──
+        // Recently Added: mixes the newest videos from all saved channels
         private static async Task<ChannelItemResult> LoadRecentlyAdded(
             string apiKey, PluginConfiguration config, CancellationToken ct)
         {
@@ -1321,29 +1290,19 @@ namespace Emby.YouTubePlugin
             };
         }
 
-        // ── Trending ──
+        // Trending: shows popular videos, optionally filtered by region or category
         private static async Task<ChannelItemResult> LoadTrending(
             string apiKey, CancellationToken ct, string region = "", string category = "")
         {
             var allVideos = new List<ChannelItemInfo>();
             var seenIds = new HashSet<string>(StringComparer.Ordinal);
 
-            // Folders are fully INDEPENDENT and DETERMINISTIC.
-            //   - No CrossFolderSeen state: output depends only on the (6h-cached)
-            //     YouTube responses, so the same videos stay in the same slots
-            //     across refreshes (no "rotation"). The probe in the Categories
-            //     root sees the same content the folder will actually build, so
-            //     empty categories are correctly hidden.
-            //   - Trending root  → chart=mostPopular across 9 buckets, then
-            //                      SearchByCategory PAGE 1 fallback to fill 50.
-            //   - Category child → SearchByCategory PAGE 1 + PAGE 2 (chart is the
-            //                      same data Trending root already shows, so we
-            //                      skip it here and use page 2 to give the
-            //                      category folder content that's actually
-            //                      different from Trending root).
-            // Cross-folder duplicates (same video shown in 2+ folders) are tagged
-            // via ProviderIds["YouTube"] = videoId on the ChannelItemInfo so Emby
-            // can identify them as the same underlying entity.
+            // Each folder here is independent and deterministic:
+            //   - No CrossFolderSeen state: the output only depends on the (6-hour-cached) YouTube responses, so videos stay in the same order across refreshes (no random "rotation").
+            //   - The Categories root checks the same content the folder will actually show, so empty categories are hidden correctly.
+            //   - Trending root: uses chart=mostPopular across 9 categories, then falls back to SearchByCategory to fill up to 50 videos.
+            //   - Category child: uses SearchByCategory for two pages (skipping chart, since that's already in Trending root) to give each category folder unique content.
+            // If a video appears in more than one folder, we tag it with ProviderIds["YouTube"] = videoId so Emby knows it's the same video.
             var cfg = Plugin.Instance?.Options;
             const int target = 50;
             bool hideShorts = cfg?.HideShorts == true;
@@ -1448,8 +1407,7 @@ namespace Emby.YouTubePlugin
             };
         }
 
-        // Helper: fetch one page of SearchByCategory, enrich via videos.list and
-        // append to allVideos via TryAdd. Returns the nextPageToken (or null).
+        // Helper: fetches one page of SearchByCategory, enriches the results, and adds them to allVideos using TryAdd. Returns the nextPageToken (or null).
         private static async Task<string?> FillFromSearchAsync(
             string apiKey, string region, string categoryId, string? pageToken,
             CancellationToken ct, HashSet<string> seenIds,
@@ -1496,7 +1454,7 @@ namespace Emby.YouTubePlugin
             return nextToken;
         }
 
-        // ── Extract trending videos (from videos.list which has full details) ──
+        // Extracts trending videos from videos.list (which has all the details)
         private static List<ChannelItemInfo> ExtractTrendingVideos(JsonDocument doc)
         {
             var list = new List<ChannelItemInfo>();
@@ -1504,9 +1462,7 @@ namespace Emby.YouTubePlugin
                 || items.ValueKind != JsonValueKind.Array)
                 return list;
 
-            // Cheap JSON-level region filter: replaces the slow watch-page HTTP
-            // probe. Only filters when the user explicitly set a Trending Region
-            // (without one we cannot guess the server's geo).
+            // Quick region filter using JSON: this replaces the slower watch-page HTTP check. Only filters if the user set a Trending Region (otherwise, we can't guess the server's location).
             var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
 
             foreach (var el in items.EnumerateArray())
@@ -1514,7 +1470,7 @@ namespace Emby.YouTubePlugin
                 var videoId = YouTubeApi.GetString(el, "id");
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
 
-                // Skip region-blocked entries before any further work
+                // Skip videos blocked in the selected region before doing anything else
                 if (!string.IsNullOrEmpty(serverRegion)
                     && el.TryGetProperty("contentDetails", out var cdRR)
                     && cdRR.ValueKind == JsonValueKind.Object
@@ -1551,7 +1507,7 @@ namespace Emby.YouTubePlugin
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
 
-                // Original language for &hl= hint
+                // Used for &hl= language hint
                 var origLang = YouTubeApi.GetNestedString(el, "snippet", "defaultAudioLanguage")
                             ?? YouTubeApi.GetNestedString(el, "snippet", "defaultLanguage");
 
@@ -1559,7 +1515,7 @@ namespace Emby.YouTubePlugin
                 var duration = YouTubeApi.GetNestedString(el, "contentDetails", "duration");
                 var ts = YouTubeApi.ParseDuration(duration);
 
-                // View / like / comment count
+                // Get view, like, and comment counts
                 long? viewCount = null;
                 long? likeCount = null;
                 long? commentCount = null;
@@ -1584,7 +1540,7 @@ namespace Emby.YouTubePlugin
                 else if (statsLine.Length > 0)
                     overview = statsLine;
 
-                // Live detection
+                // Check if the video is live
                 bool isLive = false;
                 if (el.TryGetProperty("liveStreamingDetails", out var lsd))
                 {
@@ -1593,8 +1549,7 @@ namespace Emby.YouTubePlugin
                         isLive = true;
                 }
 
-                // Shorts detection: duration ≤ ReelMaxSeconds OR explicit "shorts" tag
-                // OR #shorts hashtag in title/description (matches EnrichBatch logic)
+                // Detect Shorts: if duration is ≤ ReelMaxSeconds, or there's a "shorts" tag, or #shorts in the title/description (same logic as EnrichBatch)
                 bool isReel = !isLive && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= ReelMaxSeconds;
                 if (!isReel && !isLive && el.TryGetProperty("snippet", out var snipForReel))
                 {
@@ -1643,9 +1598,7 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
-                    // Tag every video with its YouTube videoId so the SAME video
-                    // appearing in multiple folders (channel + trending + category)
-                    // can be identified as one underlying entity by Emby.
+                    // Tag each video with its YouTube videoId so if it shows up in multiple folders (like channel, trending, or category), Emby knows it's the same video.
                     ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
                     MediaSources = MakeMediaSources(videoId, isLive, isLive ? null : ts?.Ticks, origLang)
                 };
@@ -1656,7 +1609,7 @@ namespace Emby.YouTubePlugin
             return list;
         }
 
-        // ── Extract videos from search/channel/playlist results ──
+        // Extracts videos from search, channel, or playlist results
         private static List<ChannelItemInfo> ExtractVideos(JsonDocument doc, bool isPlaylist = false)
         {
             var list = new List<ChannelItemInfo>();
@@ -1704,7 +1657,7 @@ namespace Emby.YouTubePlugin
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
 
-                // Live badge from snippet
+                // Add live badge if the snippet says it's live
                 var liveBroadcastContent = YouTubeApi.GetNestedString(el, "snippet", "liveBroadcastContent");
                 bool isLive = liveBroadcastContent == "live" || liveBroadcastContent == "upcoming";
 

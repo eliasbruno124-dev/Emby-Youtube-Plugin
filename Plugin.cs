@@ -103,15 +103,12 @@ namespace Emby.YouTubePlugin
     {
         private Timer? _pollTimer;
         private Timer? _switchTimer;
-        // Snapshot of the last-seen video IDs per polled playlist (key = playlist ID).
-        // Used to detect newly-added Watch Later videos so we can invalidate the
-        // matching cache entry and trigger a refresh.
+        // Keeps track of the last video IDs seen for each polled playlist (key = playlist ID).
+        // This helps us spot new Watch Later videos so we can clear the cache and refresh the list.
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
-        // Track config to detect first-time setup / changes and auto-trigger refresh.
-        // Many users thought the plugin was broken because the channel was not refreshed
-        // automatically after they entered their API key + saved channels for the first time.
-        // The hash of the last-seen config is persisted to disk so this also works across
-        // server restarts (e.g. user adds API key, then restarts emby).
+        // Tracks the config to detect first-time setup or changes and auto-refreshes when needed.
+        // This avoids confusion—some users thought the plugin was broken because the channel didn't refresh automatically after entering their API key and saved channels for the first time.
+        // We save the last config hash to disk so this works even after a server restart (like when a user adds an API key and then restarts Emby).
         private string _lastConfigHash = "";
         private bool _firstTickDone;
         private static string ConfigHashPath =>
@@ -124,8 +121,7 @@ namespace Emby.YouTubePlugin
         public void Run()
         {
             YouTubeChannel.ScheduleSortNameFix();
-            // Load last-known config hash from disk so we can detect changes that happened
-            // while the server was offline (e.g. API key was just added before a restart).
+            // Loads the last-known config hash from disk so we can spot changes that happened while the server was offline (for example, if the API key was just added before a restart).
             try
             {
                 if (File.Exists(ConfigHashPath))
@@ -134,14 +130,13 @@ namespace Emby.YouTubePlugin
             catch { }
 
             var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
-            // Poll every 15s for the first ~3 minutes so config changes (API key, saved
-            // channels) are picked up quickly and the channel can refresh itself.
-            // After that, fall back to the user-configured WatchLater poll interval.
+            // Poll every 15 seconds for the first ~3 minutes so config changes (like API key or saved channels) are picked up quickly and the channel can refresh itself.
+            // After that, we switch to the user-configured Watch Later poll interval.
             _pollTimer = new Timer(PollTick, null,
                 TimeSpan.FromSeconds(10),
                 TimeSpan.FromSeconds(15));
-            // Schedule a one-shot switch to the slower interval after 3 minutes.
-            // Reference must be stored — an unreferenced Timer can be GC'd before firing.
+            // Schedules a one-time switch to the slower interval after 3 minutes.
+            // We keep a reference to the timer so it doesn't get garbage collected before it fires.
             _switchTimer = new Timer(_ =>
             {
                 try { _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes)); }
@@ -150,11 +145,8 @@ namespace Emby.YouTubePlugin
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
         }
 
-        // Hash covers EVERY content-affecting setting so toggling any of them
-        // (e.g. Trending Region, Hide Shorts, Show Live Folders) wipes the
-        // cache and triggers an immediate channel refresh — otherwise users
-        // think the change "didn't apply" because Emby keeps showing the
-        // stale folder contents until the next scheduled refresh.
+        // The hash includes every setting that affects content, so changing any of them (like Trending Region, Hide Shorts, Show Live Folders) clears the cache and triggers an immediate channel refresh.
+        // Without this, users might think their changes "didn't apply" because Emby would keep showing old folder contents until the next scheduled refresh.
         private static string ComputeConfigHash(PluginConfiguration c)
         {
             using var sha = System.Security.Cryptography.SHA1.Create();
@@ -193,15 +185,14 @@ namespace Emby.YouTubePlugin
                     var savedItems = (config.SavedItems ?? "").Trim();
                     var watchLaterRaw = (config.WatchLaterPlaylist ?? "").Trim();
 
-                    // Compare against the last-seen config hash (persisted to disk so this
-                    // also detects changes that happened while the server was offline).
+                    // Compare with the last-seen config hash (saved to disk so we also catch changes that happened while the server was offline).
                     var currentHash = ComputeConfigHash(config);
                     bool configChanged = !string.Equals(currentHash, _lastConfigHash, StringComparison.Ordinal);
                     _firstTickDone = true;
 
                     if (configChanged && !string.IsNullOrEmpty(apiKey))
                     {
-                        // Persist new hash so we don't trigger again unnecessarily
+                        // Save the new hash so we don't trigger another refresh unnecessarily
                         try
                         {
                             var dir = Path.GetDirectoryName(ConfigHashPath);
@@ -211,15 +202,11 @@ namespace Emby.YouTubePlugin
                         catch { }
                         _lastConfigHash = currentHash;
 
-                        // Drop everything cached + clear cross-folder dedup so the
-                        // next refresh starts with a clean slate.
+                        // Clear all cached data and reset cross-folder deduplication so the next refresh starts fresh.
                         try { YouTubeApi.InvalidateAllCache(); } catch { }
                         try { YouTubeChannel.ResetCrossFolderSeen(); } catch { }
 
-                        // First refresh: register / wake up the channel. The very
-                        // first call after server start often returns nothing because
-                        // Emby hasn't fully wired up the channel yet, so we kick off
-                        // a second refresh ~10s later as insurance.
+                        // First refresh: register or wake up the channel. The very first call after server start often returns nothing because Emby hasn't fully set up the channel yet, so we trigger a second refresh about 10 seconds later just in case.
                         TriggerRefresh();
                         _ = Task.Delay(TimeSpan.FromSeconds(12)).ContinueWith(_ =>
                         {
@@ -229,15 +216,13 @@ namespace Emby.YouTubePlugin
                     }
                     else if (configChanged)
                     {
-                        // API key still missing - just remember the (empty) hash but don't refresh.
+                        // API key is still missing—just remember the (empty) hash but don't refresh yet.
                         _lastConfigHash = currentHash;
                     }
 
-                    // Watch Later polling: poll EVERY configured playlist so new
-                    // videos surface quickly regardless of which slot they're in.
-                    // Cost = 1 quota unit per playlist per poll interval.
-                    // (Tip: increase WatchLaterPollMinutes if you have many
-                    // playlists and want to keep daily quota usage low.)
+                    // Watch Later polling: poll every configured playlist so new videos show up quickly, no matter which slot they're in.
+                    // This costs 1 quota unit per playlist per poll interval.
+                    // (Tip: If you have a lot of playlists and want to save quota, increase WatchLaterPollMinutes.)
                     if (watchLaterRaw.Length <= 2) return;
                     var playlists = watchLaterRaw
                         .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
@@ -318,9 +303,8 @@ namespace Emby.YouTubePlugin
                     else if (pt == typeof(CancellationToken))
                         args[i] = CancellationToken.None;
                     else if (name.Contains("maxRefresh", StringComparison.OrdinalIgnoreCase))
-                        // Hierarchy depth: root → channel_x_ → channelvideos_x_ → videos.
-                        // 2 only refreshed root + channel_x_ leaving channelvideos_x_ empty,
-                        // so videos never appeared in Latest until the user navigated in.
+                            // Hierarchy depth: root → channel_x_ → channelvideos_x_ → videos.
+                            // If set to 2, only root and channel_x_ get refreshed, leaving channelvideos_x_ empty, so videos never appeared in Latest until the user navigated in.
                         args[i] = 5;
                     else if (pt == typeof(string))
                         args[i] = null;

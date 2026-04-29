@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 namespace Emby.YouTubePlugin
 {
     /// <summary>
-    /// Forces newest-first sorting for YouTube items by rewriting SortName
-    /// directly in the Emby SQLite library. Runs twice after each load to
-    /// catch items inserted after the first pass.
+    /// Makes sure YouTube items are sorted with the newest first by rewriting SortName
+    /// directly in the Emby SQLite library. Runs twice after each load to catch items that might be added after the first pass.
     /// </summary>
     internal static class SortNameFixer
     {

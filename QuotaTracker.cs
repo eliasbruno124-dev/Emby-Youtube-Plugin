@@ -30,7 +30,7 @@ namespace Emby.YouTubePlugin
         private static long _totalUsed;
         private static int _loaded;
 
-        // Pacific Time = quota reset point (midnight PT)
+        // Quota resets at midnight Pacific Time (that's how YouTube does it)
         private static readonly TimeZoneInfo PacificTime = TryGetPacific();
         private static readonly bool _pacificFallback = !IsPacificResolved();
 
@@ -47,9 +47,7 @@ namespace Emby.YouTubePlugin
             catch { }
             try { return TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); }
             catch { }
-            // tzdata not available: synthesize a fixed UTC-8 zone (no DST, ~1h off during
-            // summer but infinitely better than UTC which is 7-8h off and causes a full-day
-            // window mismatch against Google's actual midnight-PT reset).
+            // If tzdata isn't available: create a fixed UTC-8 zone (no DST, about 1 hour off in summer, but much better than UTC which is 7-8 hours off and would cause a full-day mismatch against Google's actual midnight-PT reset).
             return TimeZoneInfo.CreateCustomTimeZone(
                 "Pacific-Approx", TimeSpan.FromHours(-8), "Pacific (approx)", "Pacific (approx)");
         }
@@ -69,7 +67,7 @@ namespace Emby.YouTubePlugin
         public static int EstimateCost(string url)
         {
             if (string.IsNullOrEmpty(url)) return 0;
-            // /search → 100 units; /captions → 50; everything else → 1
+            // /search = 100 units; /captions = 50; everything else = 1
             if (url.Contains("/search?", StringComparison.Ordinal)) return 100;
             if (url.Contains("/captions?", StringComparison.Ordinal)) return 50;
             return 1;
@@ -147,7 +145,7 @@ namespace Emby.YouTubePlugin
         {
             var dir = Plugin.CachePath;
             if (string.IsNullOrEmpty(dir)) return null;
-            // Store one level above the cache dir so `rm -rf cache/*` does not wipe quota.
+            // Store one level above the cache dir so deleting cache/* doesn't wipe the quota file.
             var parent = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
             if (string.IsNullOrEmpty(parent)) parent = dir;
             return Path.Combine(parent, StateFile);
@@ -164,7 +162,7 @@ namespace Emby.YouTubePlugin
                     _quotaDate = CurrentQuotaDay();
                     return;
                 }
-                // Migrate legacy file (previously stored inside the cache dir which got wiped).
+                // Move legacy file if it was previously stored inside the cache dir (which could get wiped).
                 if (!File.Exists(path))
                 {
                     var legacy = Path.Combine(Plugin.CachePath ?? "", StateFile);
@@ -207,7 +205,7 @@ namespace Emby.YouTubePlugin
         private static void SaveAsync()
         {
             var now = Environment.TickCount64;
-            // throttle saves: at most every 5 seconds
+            // Only save at most every 5 seconds to avoid too many writes
             if (now - Interlocked.Read(ref _lastSaveTicks) < 5000) return;
             Interlocked.Exchange(ref _lastSaveTicks, now);
 
