@@ -488,51 +488,53 @@
 
                 <div class="guideSteps">
                     <div class="guideStep">
-                        <strong>1. Open Google Cloud Console</strong>
+                        <strong>1. Sign in and create a project</strong>
                         <div class="fieldDescription">
-                            Go to Google Cloud Console and sign in with the Google account you want to use for the API key. The direct API library link is above.
+                            Go to <strong>console.cloud.google.com</strong> and sign in with your Google account.
+                            Click the project selector in the top bar and choose an existing project or create a new one
+                            (e.g. "Emby YouTube Plugin"). A project is required before you can enable any API.
                         </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-01-console.png</div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-01-project.png</div>
                     </div>
 
                     <div class="guideStep">
-                        <strong>2. Create or select a project</strong>
+                        <strong>2. Enable YouTube Data API v3</strong>
                         <div class="fieldDescription">
-                            Click the project selector in the top bar. Choose an existing project or create a new one, for example "Emby YouTube Plugin".
+                            <em>Do this before creating credentials</em> — Google only lets you restrict a key to APIs that are already enabled.
+                            Go to <strong>APIs &amp; Services → Library</strong>, search for <em>YouTube Data API v3</em>, open the result and click <strong>Enable</strong>.
+                            The direct link is the button above.
                         </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-02-project.png</div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-02-enable-api.png</div>
                     </div>
 
                     <div class="guideStep">
-                        <strong>3. Enable YouTube Data API v3</strong>
+                        <strong>3. Open Credentials</strong>
                         <div class="fieldDescription">
-                            Open APIs &amp; Services, then Library. Search for "YouTube Data API v3", open it, and click Enable.
+                            Navigate to <strong>APIs &amp; Services → Credentials</strong>. This is where you create and manage API keys for the project.
+                            The direct link is the button above.
                         </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-03-enable-api.png</div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-03-credentials.png</div>
                     </div>
 
                     <div class="guideStep">
-                        <strong>4. Open Credentials</strong>
+                        <strong>4. Create an API key</strong>
                         <div class="fieldDescription">
-                            Go to APIs &amp; Services, then Credentials. This is where Google lets you create and manage keys for the selected project.
+                            Click <strong>Create credentials → API key</strong>. Google generates the key immediately.
+                            Copy it — you will need it in the next step.
+                            Optionally click <em>Edit API key</em>, set "API restrictions" to <em>YouTube Data API v3</em>,
+                            and save. This limits damage if the key is ever leaked.
                         </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-04-credentials.png</div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-04-create-key.png</div>
                     </div>
 
                     <div class="guideStep">
-                        <strong>5. Create the API key</strong>
+                        <strong>5. Paste the key into Emby and save</strong>
                         <div class="fieldDescription">
-                            Click Create credentials, choose API key, then copy the generated key. You can restrict it to YouTube Data API v3 afterward if you want a tighter setup.
+                            Switch to the <strong>Settings</strong> tab, paste the key into <em>YouTube Data API Key</em>,
+                            add at least one channel or playlist, then click <strong>Save</strong>.
+                            The plugin will fetch your content immediately after saving.
                         </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-05-create-key.png</div>
-                    </div>
-
-                    <div class="guideStep">
-                        <strong>6. Paste and save in Emby</strong>
-                        <div class="fieldDescription">
-                            Return to the Settings tab, paste the key into YouTube Data API Key, add your channels or playlists, then click Save.
-                        </div>
-                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-06-emby-settings.png</div>
+                        <div class="guideImageSlot">Screenshot here: docs/screenshots/setup-api-key-05-emby-settings.png</div>
                     </div>
                 </div>
             </div>

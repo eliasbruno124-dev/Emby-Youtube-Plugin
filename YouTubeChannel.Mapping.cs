@@ -168,6 +168,28 @@ namespace Emby.YouTubePlugin
                          || sDesc.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0)
                             isReel = true;
                     }
+
+                    // Portrait thumbnail + duration ≤ 60 s — same combined heuristic
+                    // as the enrichment pass. Trending items already carry full snippet
+                    // data including thumbnail dimensions, so the check is free.
+                    if (!isReel
+                        && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60
+                        && snipForReel.TryGetProperty("thumbnails", out var thumbsElR)
+                        && thumbsElR.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var thumbEntry in thumbsElR.EnumerateObject())
+                        {
+                            if (thumbEntry.Value.ValueKind != JsonValueKind.Object) continue;
+                            if (thumbEntry.Value.TryGetProperty("width", out var wEl)
+                                && thumbEntry.Value.TryGetProperty("height", out var hEl)
+                                && wEl.TryGetInt32(out var tw) && hEl.TryGetInt32(out var th)
+                                && th > tw)
+                            {
+                                isReel = true;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 string itemId = isLive ? LivePrefix + videoId

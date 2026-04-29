@@ -226,6 +226,30 @@ namespace Emby.YouTubePlugin
                                     isShort = true;
                             }
 
+                            // 3. Portrait thumbnail + duration ≤ 60 s.
+                            //    YouTube Shorts are always vertical (height > width) and
+                            //    at most 60 seconds long. Neither signal alone is safe
+                            //    (some regular videos are short; some channels post portrait
+                            //    art), but both together are highly reliable.
+                            if (!isShort && hasSnippet
+                                && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60
+                                && snipEl.TryGetProperty("thumbnails", out var thumbsEl)
+                                && thumbsEl.ValueKind == JsonValueKind.Object)
+                            {
+                                foreach (var thumbEntry in thumbsEl.EnumerateObject())
+                                {
+                                    if (thumbEntry.Value.ValueKind != JsonValueKind.Object) continue;
+                                    if (thumbEntry.Value.TryGetProperty("width", out var wEl)
+                                        && thumbEntry.Value.TryGetProperty("height", out var hEl)
+                                        && wEl.TryGetInt32(out var tw) && hEl.TryGetInt32(out var th)
+                                        && th > tw)
+                                    {
+                                        isShort = true;
+                                        break;
+                                    }
+                                }
+                            }
+
                             if (isShort
                                 && !batchItem.Id.StartsWith(ReelPrefix)
                                 && !batchItem.Id.StartsWith(LivePrefix))
