@@ -71,6 +71,15 @@ namespace Emby.YouTubePlugin
 
             try { YouTubeChannel.ResetCrossFolderSeen(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset after settings save failed: {ex.Message}"); }
+
+            // Kick off a channel refresh right away so users see their changes
+            // immediately instead of waiting up to 15s for the next config-hash poll.
+            // Fire-and-forget — SaveConfiguration must stay synchronous for Emby.
+            _ = System.Threading.Tasks.Task.Run(async () =>
+            {
+                try { await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false); }
+                catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Immediate refresh after save failed: {ex.Message}"); }
+            });
         }
 
         public override PluginInfo GetPluginInfo()

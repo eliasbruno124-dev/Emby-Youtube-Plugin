@@ -159,13 +159,25 @@ namespace Emby.YouTubePlugin
                 Log($"[YT] Channel details lookup failed for {term}: {ex.Message}");
             }
 
+            var includeShorts = config.ShortsEnabled;
+            var includeLive = config.ShowLiveFolders
+                && await ChannelHasLiveAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
+
+            // If the channel would only have a single "Videos" subfolder, skip the
+            // wrapper level and return the videos directly so users don't have to
+            // click through an empty parent folder containing one child.
+            if (!includeShorts && !includeLive)
+            {
+                return await LoadMediaFolderAsync(apiKey, config, "channelvideos", term, ct)
+                    .ConfigureAwait(false);
+            }
+
             items.Add(Folder("📺 Videos", $"channelvideos{FolderSeparator}{term}", channelThumb ?? FolderIcons.Videos));
 
-            if (config.ShortsEnabled)
+            if (includeShorts)
                 items.Add(Folder("⚡ Shorts", $"channelshorts{FolderSeparator}{term}", channelThumb ?? FolderIcons.Shorts));
 
-            if (config.ShowLiveFolders
-                && await ChannelHasLiveAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false))
+            if (includeLive)
             {
                 items.Add(Folder(
                     "🔴 Live & Upcoming",
