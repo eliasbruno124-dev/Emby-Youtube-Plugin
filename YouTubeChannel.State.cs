@@ -149,6 +149,5 @@ namespace Emby.YouTubePlugin
 
         private const string LivePrefix = "LIVE_";
         private const string ReelPrefix = "REEL_";
-        private const int ReelMaxSeconds = 180;
     }
 }

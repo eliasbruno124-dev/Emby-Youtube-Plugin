@@ -191,7 +191,11 @@ namespace Emby.YouTubePlugin
                                 continue;
                             }
 
-                            // Detect Shorts with stable signals.
+                            // Detect Shorts with stable signals only. Duration alone is
+                            // unreliable: lots of legitimate short videos (music clips,
+                            // news, tutorial intros) are under three minutes without
+                            // being Shorts, and would otherwise disappear when the user
+                            // disabled "Show Shorts".
                             bool isShort = false;
                             JsonElement snipEl = default;
                             bool hasSnippet = detail.TryGetProperty("snippet", out snipEl);
@@ -221,12 +225,6 @@ namespace Emby.YouTubePlugin
                                  || sDesc.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0)
                                     isShort = true;
                             }
-
-                            // 3. Shorts can be up to three minutes, so the
-                            // duration threshold must match that or Emby may
-                            // treat the same video as two different items.
-                            if (!isShort && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= ReelMaxSeconds)
-                                isShort = true;
 
                             if (isShort
                                 && !batchItem.Id.StartsWith(ReelPrefix)

@@ -140,9 +140,12 @@ namespace Emby.YouTubePlugin
                         isLive = true;
                 }
 
-                // Detect Shorts with the same signals used during enrichment.
-                bool isReel = !isLive && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= ReelMaxSeconds;
-                if (!isReel && !isLive && el.TryGetProperty("snippet", out var snipForReel))
+                // Detect Shorts with the same explicit signals used during enrichment.
+                // Duration alone is unreliable — many normal videos are under three
+                // minutes, so we only mark a video as a Short when YouTube tags it
+                // or the creator added a #shorts hashtag.
+                bool isReel = false;
+                if (!isLive && el.TryGetProperty("snippet", out var snipForReel))
                 {
                     if (snipForReel.TryGetProperty("tags", out var tagsEl)
                         && tagsEl.ValueKind == JsonValueKind.Array)
