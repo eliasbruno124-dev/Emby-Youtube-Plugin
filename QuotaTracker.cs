@@ -32,15 +32,26 @@ namespace Emby.YouTubePlugin
 
         // Pacific Time = quota reset point (midnight PT)
         private static readonly TimeZoneInfo PacificTime = TryGetPacific();
+        private static readonly bool _pacificFallback = !IsPacificResolved();
+
+        private static bool IsPacificResolved()
+        {
+            try { TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles"); return true; } catch { }
+            try { TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); return true; } catch { }
+            return false;
+        }
 
         private static TimeZoneInfo TryGetPacific()
         {
             try { return TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles"); }
-            catch
-            {
-                try { return TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); }
-                catch { return TimeZoneInfo.Utc; }
-            }
+            catch { }
+            try { return TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); }
+            catch { }
+            // tzdata not available: synthesize a fixed UTC-8 zone (no DST, ~1h off during
+            // summer but infinitely better than UTC which is 7-8h off and causes a full-day
+            // window mismatch against Google's actual midnight-PT reset).
+            return TimeZoneInfo.CreateCustomTimeZone(
+                "Pacific-Approx", TimeSpan.FromHours(-8), "Pacific (approx)", "Pacific (approx)");
         }
 
         private static DateTime CurrentQuotaDay()
@@ -108,10 +119,13 @@ namespace Emby.YouTubePlugin
             string resetIn = s.untilReset.TotalHours >= 1
                 ? $"{(int)s.untilReset.TotalHours}h {s.untilReset.Minutes}m"
                 : $"{s.untilReset.Minutes}m";
+            string tzNote = _pacificFallback
+                ? " ⚠ tzdata missing — using UTC-8 approximation"
+                : " (resets midnight Pacific Time)";
 
             return
                 $"Today: {s.usedToday:N0} / {s.dailyQuota:N0} units ({pct:F1}%)  {bar}\n" +
-                $"Reset in: {resetIn}\n" +
+                $"Reset in: {resetIn}{tzNote}\n" +
                 $"Lifetime tracked: {s.totalUsed:N0} units";
         }
 
