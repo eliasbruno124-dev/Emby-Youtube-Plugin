@@ -102,6 +102,7 @@ namespace Emby.YouTubePlugin
     public class PluginEntryPoint : IServerEntryPoint
     {
         private Timer? _pollTimer;
+        private Timer? _switchTimer;
         // Snapshot of the last-seen video IDs per polled playlist (key = playlist ID).
         // Used to detect newly-added Watch Later videos so we can invalidate the
         // matching cache entry and trigger a refresh.
@@ -140,10 +141,12 @@ namespace Emby.YouTubePlugin
                 TimeSpan.FromSeconds(10),
                 TimeSpan.FromSeconds(15));
             // Schedule a one-shot switch to the slower interval after 3 minutes.
-            new Timer(_ =>
+            // Reference must be stored — an unreferenced Timer can be GC'd before firing.
+            _switchTimer = new Timer(_ =>
             {
                 try { _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes)); }
                 catch { }
+                _switchTimer?.Dispose();
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
         }
 
@@ -392,6 +395,7 @@ namespace Emby.YouTubePlugin
         public void Dispose()
         {
             _pollTimer?.Dispose();
+            _switchTimer?.Dispose();
         }
     }
 }

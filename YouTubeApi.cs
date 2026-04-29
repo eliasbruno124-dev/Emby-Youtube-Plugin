@@ -236,7 +236,7 @@ namespace Emby.YouTubePlugin
         private static string GetDiskCacheKey(string url)
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(url));
-            return Convert.ToHexString(bytes).Substring(0, 32).ToLowerInvariant();
+            return Convert.ToHexString(bytes).ToLowerInvariant();
         }
 
         private static string? TryReadDiskCache(string url, long ttlMs)

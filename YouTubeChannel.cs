@@ -1728,7 +1728,9 @@ namespace Emby.YouTubePlugin
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
                     ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
-                    MediaSources = MakeMediaSources(videoId, isLive, MetaCache.TryGetValue(itemId, out var __m) ? __m.RuntimeTicks : null, MetaCache.TryGetValue(itemId, out var __m2) ? __m2.OriginalLang : null)
+                    MediaSources = MakeMediaSources(videoId, isLive,
+                        MetaCache.TryGetValue(itemId, out var __m) ? __m.RuntimeTicks : null,
+                        __m?.OriginalLang)
                 };
 
                 list.Add(info);
