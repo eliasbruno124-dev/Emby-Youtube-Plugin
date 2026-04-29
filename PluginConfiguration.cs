@@ -86,5 +86,12 @@ namespace Emby.YouTubePlugin
         [Description("How often to poll Watch Later playlists for new videos (1-60). Cost = 1 quota unit per playlist per poll.")]
         [Range(1, 60)]
         public int WatchLaterPollMinutes { get; set; } = 3;
+
+        [DisplayName("❤️  Support the Developer")]
+        [Description("This plugin is free and open-source — maintained with a lot of love in my spare time.\n"
+            + "If it brings value to your Emby setup, a small donation would mean the world to me!\n\n"
+            + "👉  paypal.me/eliasbruno123")]
+        [ReadOnly(true)]
+        public string Donate { get; set; } = "https://paypal.me/eliasbruno123";
     }
 }
