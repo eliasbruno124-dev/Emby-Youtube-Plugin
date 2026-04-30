@@ -19,39 +19,46 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Cache API responses to reduce quota usage and speed up browsing.
 - Restore missing thumbnails after Emby metadata refreshes.
 
-## Screenshots
-
-Save screenshots in `docs/screenshots/` with the exact filenames below. The README already references these paths, so the images will appear on GitHub as soon as the files are added.
-
-Use a clean browser window, keep the Emby theme consistent, and blur or cover the API key before committing screenshots.
 
 ### Settings
 
-![Settings page](docs/screenshots/settings.png)
 
-Capture the **Settings** tab with the API key field blurred, saved content chips, Watch Later playlists, quota panel, and the main toggles visible.
+<img width="600" height="821" alt="setting 1" src="https://github.com/user-attachments/assets/33b71a79-1ac1-4993-8d0f-e17abef024a4" />
+<br>
+<img width="600" height="923" alt="setting 2" src="https://github.com/user-attachments/assets/a6ee08c9-debb-4a10-9f78-b7bbffad0238" />
+<br>
+<img width="600" height="929" alt="setting 3" src="https://github.com/user-attachments/assets/fdf3384f-4c8e-4176-b295-a3b4e3ed4dae" />
+
+
 
 ### Setup Guide
 
-<img width="741" height="884" alt="setup 1" src="https://github.com/user-attachments/assets/4389d805-1a44-4823-8017-9900bdc8564c" />
 
-<img width="743" height="498" alt="setup 2" src="https://github.com/user-attachments/assets/c6754257-73fb-483e-bd2f-67116190d2be" />
+<img width="740" height="882" alt="setup 1" src="https://github.com/user-attachments/assets/f02db634-08b5-42d1-ad17-48b2c74faefc" />
+<br>
+<img width="740" height="495" alt="setup 2" src="https://github.com/user-attachments/assets/fc3f3c08-b1b6-41c8-9daf-bf1818f2b501" />
+<br>
+<img width="740" height="523" alt="setup 3" src="https://github.com/user-attachments/assets/9b802063-d7e1-4e1e-b469-0041e84d293a" />
+<br>
+<img width="740" height="601" alt="setup 4" src="https://github.com/user-attachments/assets/8adf7113-84a4-42e3-9d07-7a4f819de200" />
+<br>
+<img width="740" height="628" alt="setup 5" src="https://github.com/user-attachments/assets/dc174935-95b7-4901-b5d6-ba919432afd7" />
 
-<img width="741" height="524" alt="setup 3" src="https://github.com/user-attachments/assets/9caecbe5-e7c0-4415-afe3-c7694bb4caa1" />
-
-<img width="743" height="604" alt="setup 4" src="https://github.com/user-attachments/assets/d2efff79-1dd1-4b85-ad36-091b4a3adf6a" />
-
-<img width="743" height="631" alt="setup 5" src="https://github.com/user-attachments/assets/87b95b3f-4498-4e44-b633-bae4def5668b" />
 
 ### Emby Root Folder
 
+
 <img width="1702" height="383" alt="Root Folder" src="https://github.com/user-attachments/assets/f21d1775-3b38-4477-aeac-ef0e3e701b6d" />
+
 
 ### Channel Folders
 
+
 <img width="1708" height="322" alt="channel folder" src="https://github.com/user-attachments/assets/40b91757-f8b5-4ef1-b41d-513c97e75ee6" />
 
+
 ### Video Listing
+
 
 <img width="1713" height="842" alt="trending videos" src="https://github.com/user-attachments/assets/32defc56-dc0a-4a7a-9cf3-315cbe1eb4bc" />
 
