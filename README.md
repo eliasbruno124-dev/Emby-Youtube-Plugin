@@ -64,21 +64,13 @@ The API key only needs access to public YouTube data. After installation, open t
 ## Installation
 
 1. Download the latest `Emby.YouTubePlugin.dll` release.
-2. Copy the DLL into Emby's program data `plugins` folder.
+2. Copy the DLL into Emby's  `programdata/plugins` folder.
 3. Restart Emby.
 4. Open the YouTube plugin settings.
 5. Use the **Setup Guide** tab to create a YouTube Data API v3 key.
 6. Paste the API key into the **Settings** tab.
 7. Add at least one channel, playlist, or search entry.
 8. Save the settings.
-
-On many Windows installations, the plugin folder is:
-
-```text
-C:\ProgramData\Emby-Server\programdata\plugins
-```
-
-If your Emby data path is different, use the `plugins` folder inside that Emby program data directory.
 
 Useful Google Cloud pages:
 
