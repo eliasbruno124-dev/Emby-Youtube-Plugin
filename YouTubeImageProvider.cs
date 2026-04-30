@@ -49,18 +49,38 @@ namespace Emby.YouTubePlugin
             if (item == null) return null;
             try
             {
+                var providerId = NormalizeVideoId(item.GetProviderId("YouTube"));
+                if (!string.IsNullOrEmpty(providerId))
+                    return providerId;
+
                 var path = item.Path;
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var m = VideoIdRegex.Match(path);
-                    if (m.Success) return m.Groups[1].Value;
+                    var videoId = NormalizeVideoId(path);
+                    if (!string.IsNullOrEmpty(videoId))
+                        return videoId;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[YouTubeImageProvider] Could not inspect item path: {ex.Message}");
+                Debug.WriteLine($"[YouTubeImageProvider] Could not inspect item: {ex.Message}");
             }
             return null;
+        }
+
+        private static string? NormalizeVideoId(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var trimmed = value.Trim();
+            var m = VideoIdRegex.Match(trimmed);
+            if (m.Success)
+                return m.Groups[1].Value;
+
+            return Regex.IsMatch(trimmed, @"^[A-Za-z0-9_-]{6,}$")
+                ? trimmed
+                : null;
         }
 
         public bool Supports(BaseItem item) => TryGetVideoId(item) != null;
