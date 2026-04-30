@@ -212,6 +212,25 @@ define([
         }
     }
 
+    function pluginUrl(path) {
+        const apiClient = client();
+        if (apiClient && apiClient.getUrl) {
+            return apiClient.getUrl(path);
+        }
+
+        return path.charAt(0) === '/' ? path : '/' + path;
+    }
+
+    function setGuideImages(view) {
+        const images = view.querySelectorAll('[data-guide-image]');
+        images.forEach(img => {
+            const name = img.getAttribute('data-guide-image');
+            if (name && !img.src) {
+                img.src = pluginUrl('YouTubePlugin/GuideImage/' + encodeURIComponent(name));
+            }
+        });
+    }
+
     function populateTrendingRegions(view) {
         const select = field(view, 'selectTrendingRegion');
         if (!select || select.youtubeRegionsLoaded) {
@@ -275,6 +294,7 @@ define([
         onResume(options) {
             super.onResume(options);
             populateTrendingRegions(this.view);
+            setGuideImages(this.view);
             this.bindEventListeners(this.view);
             this.loadData(this.view);
         }

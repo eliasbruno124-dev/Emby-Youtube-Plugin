@@ -159,7 +159,8 @@ namespace Emby.YouTubePlugin
                 Log($"[YT] Channel details lookup failed for {term}: {ex.Message}");
             }
 
-            var includeShorts = config.ShortsEnabled;
+            var includeShorts = config.ShortsEnabled
+                && await ChannelHasShortsAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
             var includeLive = config.ShowLiveFolders
                 && await ChannelHasLiveAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
 
@@ -168,14 +169,14 @@ namespace Emby.YouTubePlugin
             // click through an empty parent folder containing one child.
             if (!includeShorts && !includeLive)
             {
-                return await LoadMediaFolderAsync(apiKey, config, "channelvideos", term, ct)
+                return await LoadMediaFolderAsync(apiKey, config, "channelvideos", resolvedChannelId, ct)
                     .ConfigureAwait(false);
             }
 
-            items.Add(Folder("📺 Videos", $"channelvideos{FolderSeparator}{term}", channelThumb ?? FolderIcons.Videos));
+            items.Add(Folder("📺 Videos", $"channelvideos{FolderSeparator}{resolvedChannelId}", channelThumb ?? FolderIcons.Videos));
 
             if (includeShorts)
-                items.Add(Folder("⚡ Shorts", $"channelshorts{FolderSeparator}{term}", channelThumb ?? FolderIcons.Shorts));
+                items.Add(Folder("⚡ Shorts", $"channelshorts{FolderSeparator}{resolvedChannelId}", channelThumb ?? FolderIcons.Shorts));
 
             if (includeLive)
             {
@@ -229,10 +230,17 @@ namespace Emby.YouTubePlugin
                 if (category.TryGetProperty("snippet", out var snippet)
                     && snippet.TryGetProperty("assignable", out var assignable)
                     && assignable.ValueKind == JsonValueKind.False) continue;
-                candidates.Add((id, name));
+                candidates.Add((id, NormalizeCategoryName(name)));
             }
 
             return candidates;
+        }
+
+        private static string NormalizeCategoryName(string name)
+        {
+            return string.Equals(name, "Autos & Vehicles", StringComparison.OrdinalIgnoreCase)
+                ? "Cars & Vehicles"
+                : name;
         }
 
         private static async Task<ConcurrentDictionary<string, byte>> ProbeNonEmptyCategoriesAsync(

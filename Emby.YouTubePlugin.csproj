@@ -4,14 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.8</Version>
-    <AssemblyVersion>2.0.8.0</AssemblyVersion>
-    <FileVersion>2.0.8.0</FileVersion>
+    <Version>2.0.8.1</Version>
+    <AssemblyVersion>2.0.8.1</AssemblyVersion>
+    <FileVersion>2.0.8.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Configuration\*.html" />
     <EmbeddedResource Include="Configuration\*.js" />
+    <EmbeddedResource Include="Configuration\guide\*.png" />
     <EmbeddedResource Include="thumb.png" />
     <Content Include="thumb.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

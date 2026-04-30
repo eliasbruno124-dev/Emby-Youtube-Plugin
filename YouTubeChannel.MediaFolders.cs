@@ -18,6 +18,8 @@ namespace Emby.YouTubePlugin
 {
     public partial class YouTubeChannel
     {
+        private const int ChannelContentProbePageLimit = 3;
+
         private static async Task<ChannelItemResult> LoadMediaFolderAsync(
             string apiKey,
             PluginConfiguration config,
@@ -32,6 +34,9 @@ namespace Emby.YouTubePlugin
             var seenIds = new HashSet<string>();
             string? pageToken = null;
             var hasMore = true;
+            var reachedEnd = false;
+            var observedShorts = false;
+            var observedLive = false;
 
             while (items.Count < limit && hasMore)
             {
@@ -45,7 +50,11 @@ namespace Emby.YouTubePlugin
                 pageToken = GetNextPageToken(doc);
                 hasMore = type != "search" && !string.IsNullOrEmpty(pageToken);
 
-                if (batch.Count == 0) break;
+                if (batch.Count == 0)
+                {
+                    reachedEnd = true;
+                    break;
+                }
 
                 var videoIds = AddUniqueItemsForPage(items, batch, seenIds, limit);
                 if (videoIds.Count > 0)
@@ -53,9 +62,18 @@ namespace Emby.YouTubePlugin
 
                 CacheInitialThumbnails(batch);
                 ApplyCachedMeta(batch);
+
+                observedShorts |= batch.Any(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
+                observedLive |= batch.Any(item => item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+
                 ApplyFolderFilters(batch, type, config);
                 items.AddRange(batch);
+
+                if (!hasMore)
+                    reachedEnd = true;
             }
+
+            UpdateChannelContentFlags(type, term, observedShorts, observedLive, reachedEnd);
 
             if (items.Count == 0)
                 return Msg(items, "No results found.");
@@ -161,22 +179,109 @@ namespace Emby.YouTubePlugin
                 batch.RemoveAll(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
         }
 
+        private static void UpdateChannelContentFlags(
+            string type,
+            string term,
+            bool observedShorts,
+            bool observedLive,
+            bool reachedEnd)
+        {
+            if (!IsChannelId(term))
+                return;
+
+            if (observedShorts)
+                ChannelContentFlags.SetHasShorts(term, true);
+            else if (reachedEnd && (type == "channelvideos" || type == "channelshorts"))
+                ChannelContentFlags.SetHasShorts(term, false);
+
+            if (observedLive)
+                ChannelContentFlags.SetHasLive(term, true);
+            else if (reachedEnd && (type == "channelvideos" || type == "channellive"))
+                ChannelContentFlags.SetHasLive(term, false);
+        }
+
+        private static bool IsChannelId(string channelId) =>
+            channelId.StartsWith(ChannelIdPrefix, StringComparison.Ordinal)
+            && channelId.Length > MinChannelIdLength;
+
+        private static async Task<bool> ChannelHasShortsAsync(
+            string apiKey, string channelId, CancellationToken ct)
+        {
+            if (!IsChannelId(channelId))
+                return false;
+
+            var cached = ChannelContentFlags.Get(channelId);
+            string? pageToken = null;
+
+            try
+            {
+                for (var page = 0; page < ChannelContentProbePageLimit; page++)
+                {
+                    using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, channelId, pageToken, ct, "date")
+                        .ConfigureAwait(false);
+                    if (doc == null)
+                        return cached?.HasShorts ?? false;
+
+                    var probeItems = ExtractVideos(doc, isPlaylist: true);
+                    pageToken = GetNextPageToken(doc);
+                    if (probeItems.Count == 0)
+                    {
+                        ChannelContentFlags.SetHasShorts(channelId, false);
+                        return false;
+                    }
+
+                    var videoIds = probeItems
+                        .Select(i => StripPrefix(i.Id))
+                        .Distinct(StringComparer.Ordinal)
+                        .Take(50)
+                        .ToList();
+
+                    await EnrichBatch(apiKey, probeItems, videoIds, ct).ConfigureAwait(false);
+                    ApplyCachedMeta(probeItems);
+
+                    if (probeItems.Any(i => i.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)))
+                    {
+                        ChannelContentFlags.SetHasShorts(channelId, true);
+                        return true;
+                    }
+
+                    if (string.IsNullOrEmpty(pageToken))
+                    {
+                        ChannelContentFlags.SetHasShorts(channelId, false);
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"[YT] Shorts folder probe failed for {channelId}: {ex.Message}");
+                return cached?.HasShorts ?? false;
+            }
+
+            ChannelContentFlags.SetHasShorts(channelId, false);
+            return false;
+        }
 
         private static async Task<bool> ChannelHasLiveAsync(
             string apiKey, string channelId, CancellationToken ct)
         {
-            if (!channelId.StartsWith(ChannelIdPrefix, StringComparison.Ordinal)
-                || channelId.Length <= MinChannelIdLength)
+            if (!IsChannelId(channelId))
                 return false;
+
+            var cached = ChannelContentFlags.Get(channelId);
 
             try
             {
                 using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, channelId, null, ct, "date")
                     .ConfigureAwait(false);
-                if (doc == null) return false;
+                if (doc == null) return cached?.HasLive ?? false;
 
                 var probeItems = ExtractVideos(doc, isPlaylist: true);
-                if (probeItems.Count == 0) return false;
+                if (probeItems.Count == 0)
+                {
+                    ChannelContentFlags.SetHasLive(channelId, false);
+                    return false;
+                }
 
                 var videoIds = probeItems
                     .Select(i => StripPrefix(i.Id))
@@ -187,12 +292,14 @@ namespace Emby.YouTubePlugin
                 await EnrichBatch(apiKey, probeItems, videoIds, ct).ConfigureAwait(false);
                 ApplyCachedMeta(probeItems);
 
-                return probeItems.Any(i => i.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+                var hasLive = probeItems.Any(i => i.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+                ChannelContentFlags.SetHasLive(channelId, hasLive);
+                return hasLive;
             }
             catch (Exception ex)
             {
                 Log($"[YT] Live folder probe failed for {channelId}: {ex.Message}");
-                return false;
+                return cached?.HasLive ?? false;
             }
         }
     }
