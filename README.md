@@ -16,8 +16,7 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Hide Shorts globally if you prefer a long-form-only view.
 - Hide empty playlists, categories, Shorts folders, and live folders.
 - Track estimated daily YouTube API quota usage.
-- Cache API responses to reduce quota usage and speed up browsing.
-- Restore missing thumbnails after Emby metadata refreshes.
+
 
 ## Screenshots
 
