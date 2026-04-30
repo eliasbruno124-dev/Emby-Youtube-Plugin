@@ -16,7 +16,7 @@ namespace Emby.YouTubePlugin
     public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages, IHasThumbImage
     {
         private static readonly string PluginVersion =
-            typeof(Plugin).Assembly.GetName().Version?.ToString() ?? "0.0.0";
+            typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
         public override string Name => "YouTube";
         public override string Description => $"Official YouTube integration for Emby via YouTube Data API v3. (v{PluginVersion})";
