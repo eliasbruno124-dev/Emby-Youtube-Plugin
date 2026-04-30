@@ -19,67 +19,57 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Cache API responses to reduce quota usage and speed up browsing.
 - Restore missing thumbnails after Emby metadata refreshes.
 
+## Screenshots
 
 ### Settings
 
-
-<img width="600" height="821" alt="setting 1" src="https://github.com/user-attachments/assets/33b71a79-1ac1-4993-8d0f-e17abef024a4" />
+<img width="600" alt="Settings screen 1" src="docs/screenshots/setting%201.png" />
 <br>
-<img width="600" height="923" alt="setting 2" src="https://github.com/user-attachments/assets/a6ee08c9-debb-4a10-9f78-b7bbffad0238" />
+<img width="600" alt="Settings screen 2" src="docs/screenshots/setting%202.png" />
 <br>
-<img width="600" height="929" alt="setting 3" src="https://github.com/user-attachments/assets/fdf3384f-4c8e-4176-b295-a3b4e3ed4dae" />
-
-
+<img width="600" alt="Settings screen 3" src="docs/screenshots/setting%203.png" />
 
 ### Setup Guide
 
-
-<img width="740" height="882" alt="setup 1" src="https://github.com/user-attachments/assets/f02db634-08b5-42d1-ad17-48b2c74faefc" />
+<img width="740" alt="Setup guide 1" src="docs/screenshots/setup%201.png" />
 <br>
-<img width="740" height="495" alt="setup 2" src="https://github.com/user-attachments/assets/fc3f3c08-b1b6-41c8-9daf-bf1818f2b501" />
+<img width="740" alt="Setup guide 2" src="docs/screenshots/setup%202.png" />
 <br>
-<img width="740" height="523" alt="setup 3" src="https://github.com/user-attachments/assets/9b802063-d7e1-4e1e-b469-0041e84d293a" />
+<img width="740" alt="Setup guide 3" src="docs/screenshots/setup%203.png" />
 <br>
-<img width="740" height="601" alt="setup 4" src="https://github.com/user-attachments/assets/8adf7113-84a4-42e3-9d07-7a4f819de200" />
+<img width="740" alt="Setup guide 4" src="docs/screenshots/setup%204.png" />
 <br>
-<img width="740" height="628" alt="setup 5" src="https://github.com/user-attachments/assets/dc174935-95b7-4901-b5d6-ba919432afd7" />
-
+<img width="740" alt="Setup guide 5" src="docs/screenshots/setup%205.png" />
 
 ### Emby Root Folder
 
-
-<img width="1702" height="383" alt="Root Folder" src="https://github.com/user-attachments/assets/f21d1775-3b38-4477-aeac-ef0e3e701b6d" />
-
+<img width="900" alt="Emby root folder" src="docs/screenshots/Root%20Folder.png" />
 
 ### Channel Folders
 
-
-<img width="1708" height="322" alt="channel folder" src="https://github.com/user-attachments/assets/40b91757-f8b5-4ef1-b41d-513c97e75ee6" />
-
+<img width="900" alt="Channel folder layout" src="docs/screenshots/channel%20folder.png" />
 
 ### Video Listing
 
-
-<img width="1713" height="842" alt="trending videos" src="https://github.com/user-attachments/assets/32defc56-dc0a-4a7a-9cf3-315cbe1eb4bc" />
-
+<img width="900" alt="Trending video listing" src="docs/screenshots/trending%20videos.png" />
 
 ## Requirements
 
-- A selfhostet Emby Server.
-- .NET 8 SDK for building from source
-- A YouTube Data API v3 key from Google Cloud (it's free)
+- An Emby Server.
+- A YouTube Data API v3 key from Google Cloud. The built-in Setup Guide walks you through creating one.
+- .NET 8 SDK, only if you want to build the plugin from source.
 
 The API key only needs access to public YouTube data. After installation, open the plugin settings and use the built-in **Setup Guide** to create and restrict the key.
 
 ## Installation
 
-1. Download the latest `Emby.YouTubePlugin.dll` release
-2. Copy the DLL into Emby's Programdata/plugin folder
-3. Restart Emby
-4. Open the YouTube plugin settings
-5. Use the **Setup Guide** tab to create a YouTube Data API v3 key
-6. Paste the API key into the **Settings** tab
-7. Add at least one channel, playlist, or search entry
+1. Download the latest `Emby.YouTubePlugin.dll` release.
+2. Copy the DLL into Emby's program data `plugins` folder.
+3. Restart Emby.
+4. Open the YouTube plugin settings.
+5. Use the **Setup Guide** tab to create a YouTube Data API v3 key.
+6. Paste the API key into the **Settings** tab.
+7. Add at least one channel, playlist, or search entry.
 8. Save the settings.
 
 On many Windows installations, the plugin folder is:
@@ -112,10 +102,10 @@ The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes 
 
 Saved channels open in the cleanest layout the plugin can provide:
 
-- If a channel only has normal videos, Emby opens the video list directly
-- If Shorts or live content exist, the channel shows subfolders
-- Empty Shorts and Live & Upcoming folders are hidden
-- Empty playlists and empty category folders are hidden
+- If a channel only has normal videos, Emby opens the video list directly.
+- If Shorts or live content exist, the channel shows subfolders.
+- Empty Shorts and Live & Upcoming folders are hidden.
+- Empty playlists and empty category folders are hidden.
 
 Shorts detection uses YouTube metadata such as tags, `#shorts`, and vertical player dimensions. It does not rely on video length alone, because many normal videos are short without being YouTube Shorts.
 
@@ -133,12 +123,15 @@ Most browsing uses low-cost YouTube API endpoints:
 
 The plugin caches responses on disk. Search results are cached longer because search is the most expensive operation.
 
-
 ## Notes
 
-- This plugin uses the official YouTube Data API v3
-- Private YouTube account data is not supported. Use playlists that your API key can read
-- If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app
+- This plugin uses the official YouTube Data API v3.
+- Private YouTube account data is not supported. Use playlists that your API key can read.
+- If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Support the Developer
 
