@@ -58,9 +58,10 @@ namespace Emby.YouTubePlugin
 
                 var videoIds = AddUniqueItemsForPage(items, batch, seenIds, limit);
 
-                // Fetch the channel's /shorts list before enrichment so we can
-                // pass it into EnrichBatch and skip per-video URL probes
-                // entirely. The list is cached, so the second batch reuses it.
+                // Pull the channel's /shorts list before enrichment so we can
+                // hand it to EnrichBatch and skip per-video URL probes for
+                // anything we already know is a Short. The list is cached so
+                // the second batch reuses it.
                 HashSet<string>? knownShortsIds = null;
                 HashSet<string>? knownLiveIds = null;
                 if ((type == "channelvideos" || type == "channelshorts" || type == "channellive")
@@ -230,10 +231,10 @@ namespace Emby.YouTubePlugin
 
             try
             {
-                // The channel's /shorts page is the cheapest authoritative
-                // signal: zero quota cost and reflects what YouTube itself
-                // marks as a Short. Heavy enrichment used to live here and
-                // burned quota on every root refresh.
+                // The channel's /shorts page is by far the cheapest reliable
+                // signal: zero quota and it matches what YouTube itself calls
+                // a Short. We used to do heavy enrichment here, which burned
+                // quota on every root refresh.
                 var shortsVideoIds = await GetChannelShortVideoIdsAsync(channelId, ct).ConfigureAwait(false);
                 var hasShorts = shortsVideoIds.Count > 0;
                 ChannelContentFlags.SetHasShorts(channelId, hasShorts);
@@ -257,7 +258,7 @@ namespace Emby.YouTubePlugin
             try
             {
                 // Local detection: scrape the channel's /streams page and
-                // look for LIVE/UPCOMING badge markers. Zero API quota.
+                // look for LIVE/UPCOMING badges. No API quota at all.
                 var liveIds = await GetChannelLiveAndUpcomingIdsAsync(channelId, ct)
                     .ConfigureAwait(false);
                 var hasLive = liveIds.Count > 0;

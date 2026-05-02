@@ -27,10 +27,10 @@ namespace Emby.YouTubePlugin
         private sealed record ShortsPageCacheEntry(System.Collections.Generic.HashSet<string> VideoIds, DateTime CachedAt);
 
         // Backwards-compatible no-op kept for callers that still invoke it.
-        // Cross-folder deduplication used to live here, but the seen set was
-        // never consulted while building aggregator views, so it just spent
-        // quota and held memory. Keeping the public method avoids breaking
-        // calling code while the rest of the plugin is rewired.
+        // Cross-folder dedup used to live here, but the seen set was never
+        // consulted while building aggregator views — so it just spent quota
+        // and held memory. Keeping the public method around so we don't break
+        // existing callers while the rest of the plugin gets rewired.
         public static void ResetCrossFolderSeen() { }
 
         private static string StripPrefix(string id)

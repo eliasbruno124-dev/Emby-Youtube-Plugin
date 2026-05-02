@@ -19,7 +19,7 @@ namespace Emby.YouTubePlugin
         public static readonly string Live = Cdn + "1F534.png";  // 🔴
         public static readonly string Search = Cdn + "1F50D.png";  // 🔍
 
-        // YouTube videoCategoryId to icon URL.
+        // YouTube videoCategoryId -> icon URL.
         private static readonly Dictionary<string, string> CategoryMap = new()
         {
             { "1",  Cdn + "1F3AC.png" }, // 🎬 Film & Animation

@@ -20,9 +20,9 @@ namespace Emby.YouTubePlugin
     {
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
         {
-            // Do not set RunTimeTicks here. Setting it makes Emby Web treat the
-            // watch page like a raw stream and the player can hang. Leaving it
-            // unset lets the client use YouTube's embed player.
+            // Don't set RunTimeTicks here. If we do, Emby Web treats the watch
+            // page like a raw stream and the player can hang. Leaving it unset
+            // lets the client fall back to YouTube's embed player.
             string url = $"https://www.youtube.com/watch?v={videoId}";
             return new List<MediaSourceInfo>
             {
@@ -51,8 +51,8 @@ namespace Emby.YouTubePlugin
                 return list;
 
             // Use the API's region metadata instead of probing the watch page.
-            // Only apply this when the user chose a region; otherwise we cannot
-            // safely guess where the server is.
+            // We only do this when the user actually picked a region —
+            // otherwise we'd be guessing where the server is.
             var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
 
             foreach (var el in items.EnumerateArray())
@@ -60,7 +60,7 @@ namespace Emby.YouTubePlugin
                 var videoId = YouTubeApi.GetString(el, "id");
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
 
-                // Drop videos blocked in the selected region before building items.
+                // Toss anything that's blocked in the selected region.
                 if (!string.IsNullOrEmpty(serverRegion)
                     && el.TryGetProperty("contentDetails", out var cdRR)
                     && cdRR.ValueKind == JsonValueKind.Object
@@ -97,7 +97,7 @@ namespace Emby.YouTubePlugin
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
 
-                // Used as a harmless language hint for the YouTube watch URL.
+                // Harmless language hint for the watch URL.
                 var origLang = YouTubeApi.GetNestedString(el, "snippet", "defaultAudioLanguage")
                             ?? YouTubeApi.GetNestedString(el, "snippet", "defaultLanguage");
 
@@ -105,7 +105,7 @@ namespace Emby.YouTubePlugin
                 var duration = YouTubeApi.GetNestedString(el, "contentDetails", "duration");
                 var ts = YouTubeApi.ParseDuration(duration);
 
-                // Optional engagement stats for the item overview.
+                // Optional engagement stats for the overview line.
                 long? viewCount = null;
                 long? likeCount = null;
                 long? commentCount = null;
@@ -130,7 +130,7 @@ namespace Emby.YouTubePlugin
                 else if (statsLine.Length > 0)
                     overview = statsLine;
 
-                // Mark currently live videos early so folder filters can see them.
+                // Flag currently-live videos early so folder filters see them.
                 bool isLive = false;
                 if (el.TryGetProperty("liveStreamingDetails", out var lsd))
                 {
@@ -139,7 +139,7 @@ namespace Emby.YouTubePlugin
                         isLive = true;
                 }
 
-                // Detect Shorts with the same explicit signals used during enrichment.
+                // Same Shorts signals we use during enrichment.
                 bool isReel = !isLive && HasShortsTagOrHashtag(el);
 
                 string itemId = isLive ? LivePrefix + videoId
@@ -164,8 +164,8 @@ namespace Emby.YouTubePlugin
                     Type = ChannelItemType.Media,
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
-                    // Use the YouTube video ID as the external ID so Emby can
-                    // recognize the same video across multiple folders.
+                    // Use the YouTube video ID as the external ID so the same
+                    // video can be recognized across multiple folders.
                     ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
                     MediaSources = MakeMediaSources(videoId, isLive)
                 };
@@ -176,7 +176,7 @@ namespace Emby.YouTubePlugin
             return list;
         }
 
-        // Converts search, channel, and playlist API responses into Emby items.
+        // Turns search/channel/playlist API responses into Emby items.
         private static List<ChannelItemInfo> ExtractVideos(JsonDocument doc, bool isPlaylist = false)
         {
             var list = new List<ChannelItemInfo>();
@@ -192,7 +192,7 @@ namespace Emby.YouTubePlugin
                 {
                     videoId = YouTubeApi.GetNestedString(el, "contentDetails", "videoId");
 
-                    // playlistItems keeps the video ID under snippet.resourceId.
+                    // playlistItems puts the video ID under snippet.resourceId.
                     if (string.IsNullOrEmpty(videoId)
                         && el.TryGetProperty("snippet", out var snip)
                         && snip.TryGetProperty("resourceId", out var rid))
@@ -202,8 +202,8 @@ namespace Emby.YouTubePlugin
                 }
 
                 // Fall back to search.list-style id when the playlist/uploads
-                // shape is missing. Channel listings switch to search.list
-                // when the user picks a non-default sort order.
+                // shape isn't there. Channel listings switch to search.list
+                // once the user picks a non-default sort order.
                 if (string.IsNullOrEmpty(videoId) && el.TryGetProperty("id", out var idProp))
                 {
                     if (idProp.ValueKind == JsonValueKind.Object)
@@ -223,7 +223,7 @@ namespace Emby.YouTubePlugin
                     videoId,
                     YouTubeApi.GetBestThumbnail(el));
 
-                // Add a live badge when the lightweight snippet already knows it.
+                // Live badge if the lightweight snippet already knows about it.
                 var liveBroadcastContent = YouTubeApi.GetNestedString(el, "snippet", "liveBroadcastContent");
                 bool isLive = liveBroadcastContent == "live" || liveBroadcastContent == "upcoming";
 

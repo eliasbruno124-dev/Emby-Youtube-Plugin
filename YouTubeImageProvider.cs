@@ -18,23 +18,23 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    // Emby can wipe channel thumbnails during a "Replace existing metadata"
-    // refresh. This provider quietly puts them back.
+    // Emby can wipe channel thumbnails on a "Replace existing metadata" refresh.
+    // This provider quietly puts them back.
     //
     // ChannelItemInfo.ImageUrl only helps when the item is first created. After
     // that, an image provider has to claim the item again. We rebuild the
-    // thumbnail URL from the video ID in the item path, so this does not spend
+    // thumbnail URL from the video ID in the item's path, so this doesn't cost
     // any YouTube Data API quota.
     public class YouTubeImageProvider : IDynamicImageProvider, IRemoteImageProvider, IHasItemChangeMonitor, IHasItemChangeWithItemResultMonitor
     {
         public string Name => "YouTube";
 
-        // Remember failed thumbnail fetches for a short while. Without this
-        // cooldown, Emby can get stuck asking for the same missing image over
-        // and over after a metadata refresh.
+        // Remember failed thumbnail fetches briefly. Without this cooldown,
+        // Emby can get stuck hammering the same missing image over and over
+        // after a metadata refresh.
         // Key: item.InternalId. Value: UTC time of the failed attempt.
         // A successful fetch clears the entry so a later metadata wipe can try
-        // normally again.
+        // again normally.
         private static readonly ConcurrentDictionary<long, DateTime> _failedFetches = new();
         private static readonly TimeSpan FailedFetchCooldown = TimeSpan.FromHours(2);
 
@@ -47,8 +47,8 @@ namespace Emby.YouTubePlugin
         private static HttpClient CreateImageHttp()
         {
             var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-            // i.ytimg.com sometimes serves a tiny placeholder when the request
-            // does not look like a browser. A real User-Agent prevents that.
+            // i.ytimg.com sometimes hands back a tiny placeholder when the
+            // request doesn't look like a browser. A real User-Agent fixes that.
             client.DefaultRequestHeaders.TryAddWithoutValidation(
                 "User-Agent",
                 "Mozilla/5.0 (compatible; EmbyYouTubePlugin/1.0)");
@@ -121,8 +121,8 @@ namespace Emby.YouTubePlugin
                     if (!resp.IsSuccessStatusCode) continue;
                     var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
                     if (bytes == null || bytes.Length < 1024) continue; // Ignore tiny placeholder images.
-                    // The item has a usable thumbnail again. Future refreshes
-                    // can try normally if the image ever gets wiped.
+                    // We've got a usable thumbnail again. If the image ever
+                    // gets wiped later, future refreshes can retry normally.
                     if (result?.BaseItem != null)
                         _failedFetches.TryRemove(result.BaseItem.InternalId, out _);
                     response.Format = ImageFormat.Jpg;
@@ -136,7 +136,7 @@ namespace Emby.YouTubePlugin
                 }
             }
 
-            // Nothing worked. The video may be gone, unavailable, or still
+            // Nothing worked. Video might be gone, unavailable, or still
             // waiting for YouTube to generate its thumbnails.
             if (result?.BaseItem != null)
             {
@@ -225,7 +225,7 @@ namespace Emby.YouTubePlugin
 
         public bool HasChanged(BaseItem item, LibraryOptions libraryOptions, IDirectoryService directoryService)
         {
-            // YouTube thumbnails are stable for a video ID, so only step in
+            // YouTube thumbnails are stable per video ID, so we only step in
             // when Emby has no stored image left.
             try
             {
@@ -233,8 +233,8 @@ namespace Emby.YouTubePlugin
                     return false;
 
                 // Give missing thumbnails some breathing room before trying
-                // again. This covers both brand-new uploads and permanently
-                // unavailable videos without getting noisy.
+                // again. Covers both brand-new uploads and permanently
+                // unavailable videos without getting too chatty.
                 if (_failedFetches.TryGetValue(item.InternalId, out var lastFail)
                     && (DateTime.UtcNow - lastFail) < FailedFetchCooldown)
                     return false;
@@ -305,8 +305,8 @@ namespace Emby.YouTubePlugin
         private static IEnumerable<string> GetThumbnailCandidates(string videoId)
         {
             // mqdefault.jpg is the same stable URL we expose as a remote image.
-            // Bigger variants are useful as a dynamic fallback, but many videos
-            // never receive maxres/sd thumbnails.
+            // Bigger variants are useful as a dynamic fallback, but lots of
+            // videos never get maxres/sd thumbnails.
             yield return GetStableThumbnailUrl(videoId);
             yield return $"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg";
             yield return $"https://i.ytimg.com/vi/{videoId}/sddefault.jpg";

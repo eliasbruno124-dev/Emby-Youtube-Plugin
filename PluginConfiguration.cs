@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Emby.YouTubePlugin
 {
-    // Settings saved by the custom configuration page.
+    // Settings persisted by the custom configuration page.
     public class PluginConfiguration : BasePluginConfiguration
     {
         public string ApiKey { get; set; } = "";
@@ -22,7 +22,7 @@ namespace Emby.YouTubePlugin
 
         public bool ShowShorts { get; set; } = true;
 
-        // Kept only so older saved configurations can migrate cleanly.
+        // Kept around so older saved configs migrate cleanly.
         public bool HideShorts { get; set; } = false;
 
         [XmlIgnore]
@@ -51,8 +51,8 @@ namespace Emby.YouTubePlugin
         [XmlIgnore]
         public string QuotaStatus => QuotaTracker.FormatStatus();
 
-        // Structured quota data so the settings UI can render a real progress bar
-        // instead of the ASCII version embedded in QuotaStatus.
+        // Structured quota data so the settings UI can draw a real progress
+        // bar instead of the ASCII version embedded in QuotaStatus.
         [XmlIgnore]
         public long QuotaUsedToday => QuotaTracker.GetStats().usedToday;
 

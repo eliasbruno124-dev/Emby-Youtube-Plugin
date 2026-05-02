@@ -27,7 +27,7 @@ namespace Emby.YouTubePlugin
         private int _currentPollMinutes;
 
         // Static so Plugin.SaveConfiguration can update the hash directly when
-        // settings are saved through the UI. Without that, the next poll would
+        // settings are saved through the UI. Otherwise the next poll would
         // re-detect the same change and trigger a duplicate refresh.
         internal static string LastConfigHash = "";
 
@@ -41,10 +41,10 @@ namespace Emby.YouTubePlugin
         public void Run()
         {
             // If the plugin DLL was updated, wipe transient caches automatically
-            // so users do not have to clear them by hand. Library items stay
-            // intact; only HTTP/JSON/probe caches under the plugin's cache dir
-            // get removed. Runs BEFORE LoadShortsProbeCache so a stale cache
-            // from a previous version cannot be re-loaded into memory.
+            // so users don't have to clear them by hand. Library items are
+            // left alone — only HTTP/JSON/probe caches under the plugin's
+            // cache dir get nuked. Runs BEFORE LoadShortsProbeCache so a stale
+            // cache from a previous version can't sneak back into memory.
             WipeCachesIfPluginUpgraded();
 
             YouTubeChannel.ScheduleSortNameFix();
@@ -78,9 +78,10 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
-        // Wipes transient caches when the installed plugin version differs from
-        // the one recorded last time. This avoids users having to manually
-        // clear caches after each upgrade. Library items are NOT touched.
+        // Wipes transient caches when the installed plugin version differs
+        // from the one we recorded last time. Saves the user from having to
+        // clear caches by hand after every upgrade. Library items are NOT
+        // touched.
         private void WipeCachesIfPluginUpgraded()
         {
             try
@@ -112,17 +113,17 @@ namespace Emby.YouTubePlugin
                 if (!string.IsNullOrEmpty(dataDir) && Directory.Exists(dataDir))
                 {
                     // Wipe every file the plugin has ever written into the
-                    // Emby data dir. Naming pattern is consistent ("youtube-*"
-                    // and "shorts-probe-cache.json"), so this catches legacy
-                    // names from older plugin versions too without listing
-                    // them by hand.
+                    // Emby data dir. The naming pattern is consistent
+                    // ("youtube-*" and "shorts-probe-cache.json"), so this
+                    // also catches legacy names from older plugin versions
+                    // without having to list each one by hand.
                     foreach (var file in Directory.EnumerateFiles(dataDir, "youtube-*"))
                     {
                         var name = Path.GetFileName(file);
-                        // Keep the version stamp itself; it is rewritten below.
+                        // Keep the version stamp itself — we rewrite it below.
                         if (name == "youtube-plugin-version.txt") continue;
-                        // Preserve the API quota counter so the daily limit
-                        // tracking stays accurate across plugin upgrades.
+                        // Keep the API quota counter so daily-limit tracking
+                        // stays accurate across plugin upgrades.
                         if (name == "youtube-quota.json") continue;
                         try { File.Delete(file); } catch { }
                     }
@@ -219,7 +220,7 @@ namespace Emby.YouTubePlugin
         }
 
         // Called from Plugin.SaveConfiguration so a settings save updates the
-        // hash and the running poll interval in one place. Returns the new hash.
+        // hash and the running poll interval in one shot. Returns the new hash.
         internal static string MarkConfigSaved(PluginConfiguration config)
         {
             var hash = ComputeConfigHash(config);
@@ -248,10 +249,10 @@ namespace Emby.YouTubePlugin
 
                 AdjustPollIntervalToConfig(config);
 
-                // Catch the case where the plugin was redeployed without going
-                // through SaveConfiguration (e.g. user edited the XML on disk).
-                // We only do this once per process so the poll loop stays
-                // dedicated to playlist change detection.
+                // Catches the case where the plugin was redeployed without
+                // going through SaveConfiguration (e.g. someone edited the XML
+                // on disk). We only do this once per process so the poll loop
+                // stays focused on playlist change detection.
                 if (Interlocked.CompareExchange(ref _bootstrapHashChecked, 1, 0) == 0)
                     await RefreshOnConfigChange(apiKey, config).ConfigureAwait(false);
 
@@ -271,7 +272,7 @@ namespace Emby.YouTubePlugin
 
         private void AdjustPollIntervalToConfig(PluginConfiguration config)
         {
-            // Only matters once we've moved past the bootstrap fast-poll phase.
+            // Only matters once we're past the bootstrap fast-poll phase.
             if (_currentPollMinutes <= 0) return;
 
             var configured = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
@@ -330,8 +331,8 @@ namespace Emby.YouTubePlugin
                 try
                 {
                     // Up to 250 IDs gives us solid change detection without
-                    // burning excessive quota every poll. The call goes through
-                    // the cache-bypass helper so we always see the live state.
+                    // burning extra quota every poll. Goes through the
+                    // cache-bypass helper so we always see live state.
                     var ids = await YouTubeApi.GetPlaylistVideoIdsFreshAsync(
                             apiKey, playlist, 250, CancellationToken.None)
                         .ConfigureAwait(false);
@@ -414,7 +415,7 @@ namespace Emby.YouTubePlugin
         private static MethodInfo? _refreshContentMethod;
 
         // Serializes channel refreshes. Save-triggered refreshes, watch-later
-        // changes, and bootstrap config-hash mismatches all funnel through the
+        // changes and bootstrap config-hash mismatches all funnel through the
         // same lock so we never run two YouTube scans at the same time.
         private static readonly SemaphoreSlim RefreshGate = new(1, 1);
 
@@ -422,9 +423,9 @@ namespace Emby.YouTubePlugin
         {
             if (!await RefreshGate.WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false))
             {
-                // A refresh is already running. Coalesce: the in-flight refresh
-                // will pick up whatever the latest config says, so this caller
-                // does not need to wait its turn.
+                // A refresh is already in flight. Just bail out — the running
+                // refresh will pick up whatever the latest config says, so this
+                // caller doesn't need to wait its turn.
                 YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped (refresh already in progress)");
                 return;
             }

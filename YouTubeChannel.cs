@@ -57,14 +57,14 @@ namespace Emby.YouTubePlugin
 
             try
             {
-                // Root level: build the visible folders.
+                // Root: build the visible folders.
                 if (string.IsNullOrEmpty(query.FolderId))
                 {
                     return await BuildRootItemsAsync(apiKey, config, cancellationToken)
                         .ConfigureAwait(false);
                 }
 
-                // Subfolder: load videos or another folder level.
+                // Subfolder: load videos or drop one more level.
                 if (query.FolderId.Contains(FolderSeparator))
                 {
                     var sepIdx = query.FolderId.IndexOf(FolderSeparator, StringComparison.Ordinal);
@@ -72,7 +72,7 @@ namespace Emby.YouTubePlugin
                     string type = query.FolderId.Substring(0, sepIdx);
                     string term = query.FolderId.Substring(sepIdx + FolderSeparator.Length);
 
-                    // Channel folders open into Videos, Shorts, and Live.
+                    // Channel folders open into Videos / Shorts / Live.
                     if (type == "channel")
                     {
                         return await BuildChannelSubfoldersAsync(apiKey, config, term, cancellationToken)
@@ -89,14 +89,14 @@ namespace Emby.YouTubePlugin
                         return trendingResult;
                     }
 
-                    // Categories browser root.
+                    // Root of the categories browser.
                     if (type == "categories" && term == "root")
                     {
                         return await LoadCategoryRootAsync(apiKey, config, cancellationToken)
                             .ConfigureAwait(false);
                     }
 
-                    // A single category uses the trending endpoint with a category filter.
+                    // A single category just hits the trending endpoint with a category filter.
                     if (type == "category")
                     {
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
@@ -105,7 +105,7 @@ namespace Emby.YouTubePlugin
                         return catResult;
                     }
 
-                    // Newest uploads across all saved channels.
+                    // Newest uploads across every saved channel.
                     if (type == "recent" && term == "all")
                     {
                         var recentResult = await LoadRecentlyAdded(apiKey, config, cancellationToken)
@@ -174,7 +174,7 @@ namespace Emby.YouTubePlugin
                 TotalRecordCount = items.Count
             };
 
-        // Keep Emby's stored sort names aligned after channel items are created.
+        // Keep Emby's stored sort names in sync after channel items are created.
         internal static void ScheduleSortNameFix() => SortNameFixer.Schedule();
     }
 }

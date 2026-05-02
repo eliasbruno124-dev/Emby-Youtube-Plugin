@@ -298,36 +298,48 @@ define([
         return 0;
     }
 
-    // Cache the latest-release lookup for 5 minutes in sessionStorage so
-    // re-opening the settings page doesn't hammer GitHub on every visit, but
-    // we still pick up new releases reasonably quickly.
+    // Cache the latest-release lookup briefly in sessionStorage so we don't
+    // hammer GitHub on every page open, but still pick up new releases fast.
     function fetchLatestGithubVersion() {
         const cacheKey = 'ytPluginLatestRelease';
+        // Only cache positive results — never cache "no release found"
+        // (otherwise a single hiccup hides updates for the whole session).
         try {
             const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
-            if (cached && (Date.now() - cached.t) < 5 * 60 * 1000 && cached.v) {
+            if (cached && cached.v && (Date.now() - cached.t) < 60 * 1000) {
                 return Promise.resolve(cached.v);
             }
         } catch (e) { /* ignore */ }
 
         const repo = 'eliasbruno124-dev/Emby-Youtube-Plugin';
         const headers = { 'Accept': 'application/vnd.github+json' };
+        const opts = { headers, cache: 'no-store' };
+        const bust = '?_=' + Date.now();
 
-        // Primary endpoint: /releases/latest (only returns releases marked
-        // as "latest"). Fallback: /releases?per_page=1 catches a tag that was
-        // published without the "Set as the latest release" flag.
-        return fetch('https://api.github.com/repos/' + repo + '/releases/latest', { headers })
-            .then(r => r.ok ? r.json() : null)
+        // /releases/latest only returns releases marked as "latest". Fall back
+        // to /releases?per_page=1 if the tag was published without that flag
+        // (or if the user is using a draft / pre-release).
+        return fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)
+            .then(r => {
+                if (!r.ok) {
+                    console.log('[YT] /releases/latest returned', r.status);
+                    return null;
+                }
+                return r.json();
+            })
             .then(json => json && (json.tag_name || json.name))
-            .catch(() => null)
+            .catch(err => { console.log('[YT] /releases/latest failed', err); return null; })
             .then(tag => {
                 if (tag) return tag;
-                return fetch('https://api.github.com/repos/' + repo + '/releases?per_page=1', { headers })
+                return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)
                     .then(r => r.ok ? r.json() : null)
-                    .then(arr => Array.isArray(arr) && arr.length > 0
-                        ? (arr[0].tag_name || arr[0].name)
-                        : null)
-                    .catch(() => null);
+                    .then(arr => {
+                        if (!Array.isArray(arr) || arr.length === 0) return null;
+                        // Prefer non-draft, anything else if all are drafts.
+                        const pick = arr.find(x => x && !x.draft) || arr[0];
+                        return pick.tag_name || pick.name || null;
+                    })
+                    .catch(err => { console.log('[YT] /releases fallback failed', err); return null; });
             })
             .then(tag => {
                 if (!tag) {
@@ -345,26 +357,53 @@ define([
         const badgeEl = view.querySelector('#ytUpdateBadge');
         if (!versionEl) return;
 
+        const showUpdateBadge = (latest) => {
+            if (!badgeEl) return;
+            badgeEl.textContent = 'Update available: ' + String(latest).replace(/^v/i, '');
+            // Inline overrides win over the HTML's inline display:none.
+            badgeEl.style.cssText = 'display:inline-block;padding:2px 10px;border-radius:999px;background:#d12c2c;color:#fff;font-weight:700;font-size:0.8em;letter-spacing:0.02em;';
+        };
+
         const finish = (currentVersion) => {
             versionEl.textContent = currentVersion || 'unknown';
-            if (!currentVersion || !badgeEl) return;
+            console.log('[YT] Installed plugin version =', currentVersion);
             fetchLatestGithubVersion().then(latest => {
                 if (!latest) return;
+                if (!currentVersion) {
+                    // Couldn't determine installed version — show the badge
+                    // anyway so the user at least sees a release exists.
+                    console.log('[YT] No installed version, showing badge for', latest);
+                    showUpdateBadge(latest);
+                    return;
+                }
                 const cmp = compareVersions(latest, currentVersion);
                 console.log('[YT] Version check installed=' + currentVersion + ' latest=' + latest + ' cmp=' + cmp);
-                if (cmp > 0) {
-                    badgeEl.textContent = 'Update available: ' + String(latest).replace(/^v/i, '');
-                    badgeEl.style.display = '';
-                }
+                if (cmp > 0) showUpdateBadge(latest);
             });
+        };
+
+        const findPlugin = (plugins) => {
+            if (!Array.isArray(plugins)) return null;
+            // Match by Id first (case-insensitive). Some Emby builds drop
+            // dashes from the GUID, so compare normalized too.
+            const wantA = pluginId.toLowerCase();
+            const wantB = wantA.replace(/-/g, '');
+            const byId = plugins.find(p => {
+                const id = ((p && p.Id) || '').toLowerCase();
+                return id === wantA || id.replace(/-/g, '') === wantB;
+            });
+            if (byId) return byId;
+            // Fall back to matching by name.
+            return plugins.find(p =>
+                p && typeof p.Name === 'string'
+                && p.Name.toLowerCase().indexOf('youtube') >= 0);
         };
 
         if (apiClient && typeof apiClient.getInstalledPlugins === 'function') {
             apiClient.getInstalledPlugins().then(plugins => {
-                const me = (plugins || []).find(p =>
-                    p && (p.Id || '').toLowerCase() === pluginId.toLowerCase());
+                const me = findPlugin(plugins);
                 finish(me ? me.Version : null);
-            }, () => finish(null));
+            }, err => { console.log('[YT] getInstalledPlugins failed', err); finish(null); });
         } else {
             finish(null);
         }

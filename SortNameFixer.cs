@@ -25,7 +25,7 @@ namespace Emby.YouTubePlugin
         private const string LibName = "yt_sqlite_native";
 
         // SQLite expects UTF-8 strings. Marshal explicitly so non-ASCII paths
-        // and SQL literals work the same on every platform.
+        // and SQL literals behave the same on every platform.
         [DllImport(LibName, EntryPoint = "sqlite3_open", CharSet = CharSet.Ansi, ExactSpelling = true)]
         private static extern int sqlite3_open(
             [MarshalAs(UnmanagedType.LPUTF8Str)] string filename, out IntPtr db);
@@ -72,8 +72,8 @@ namespace Emby.YouTubePlugin
             if (libraryName != LibName)
                 return IntPtr.Zero;
 
-            // Order matters: prefer system sqlite, then Emby's bundled SQLitePCL
-            // raw library (e_sqlite3), and finally a few platform-specific names.
+            // Order matters: try the system sqlite first, then Emby's bundled
+            // SQLitePCL raw lib (e_sqlite3), then a handful of platform names.
             string[] candidates;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -95,7 +95,7 @@ namespace Emby.YouTubePlugin
             }
             else
             {
-                // Linux + Synology + Docker (Debian, Alpine, LSIO).
+                // Linux / Synology / Docker (Debian, Alpine, LSIO).
                 candidates = new[]
                 {
                     "libsqlite3.so.0", "libsqlite3.so", "libsqlite3.so.3",
@@ -119,9 +119,9 @@ namespace Emby.YouTubePlugin
                 }
             }
 
-            // Last resort: scan common library directories for any sqlite3
-            // shared object. This catches odd builds like libsqlite3.so.3.49.2
-            // shipped by some Emby docker images.
+            // Last resort: scan a few common lib directories for any sqlite3
+            // shared object. Catches odd builds like libsqlite3.so.3.49.2 that
+            // some Emby docker images ship.
             string[] dirs =
             {
                 "/lib", "/lib64",
@@ -173,9 +173,9 @@ namespace Emby.YouTubePlugin
 
         private static void Apply(string passLabel)
         {
-            // If we already learned that no sqlite library is available, do not
-            // keep retrying. The plugin still works, Emby just uses its default
-            // sort order until a future restart can find sqlite again.
+            // If we already know there's no sqlite available, don't keep
+            // retrying. The plugin still works — Emby just falls back to its
+            // default sort order until a future restart can find sqlite.
             if (Volatile.Read(ref _nativeAvailable) == 0)
             {
                 YouTubeChannel.LogPublic($"[YT] SortNameFixer({passLabel}): skipped, no sqlite native lib found earlier");
@@ -215,22 +215,20 @@ namespace Emby.YouTubePlugin
             {
                 Run(db, "PRAGMA busy_timeout = 5000;");
 
-                // PremiereDate/DateCreated may be stored either as .NET ticks
-                // (≈6e17 for "now") or as Unix epoch seconds (≈1.7e9 for "now"),
-                // depending on the Emby build. We detect via threshold 1e12:
-                // anything below is seconds, anything above is ticks. Convert
-                // to days-since-epoch and subtract from a large constant so
-                // that newer videos sort first.
+                // PremiereDate/DateCreated can be stored as .NET ticks
+                // (~6e17 for "now") or as Unix epoch seconds (~1.7e9), depending
+                // on the Emby build. We pick via threshold 1e12: below = seconds,
+                // above = ticks. Convert to days-since-epoch and subtract from
+                // a big constant so newer videos sort first.
                 //
                 // We strip any existing 10-digit prefix from SortName before
-                // re-applying so previous incorrect prefixes get overwritten.
-                // The condition at the end makes the update self-healing: it
-                // re-processes any row whose current prefix does not match
-                // the value we would compute now.
+                // re-applying so old wrong prefixes get overwritten. The WHERE
+                // makes the whole update self-healing: every row whose current
+                // prefix doesn't match what we'd compute now gets re-processed.
                 //
-                // This sort runs across every YouTube item in the library
-                // regardless of the per-channel ChannelSortBy setting, so the
-                // user does not have to pick a sort order per folder.
+                // Runs across every YouTube item regardless of the per-channel
+                // ChannelSortBy setting, so the user doesn't have to pick a
+                // sort order per folder.
                 const string sql = @"
                     UPDATE MediaItems
                     SET SortName = printf('%010d',

@@ -41,9 +41,9 @@ namespace Emby.YouTubePlugin
             TryInitLogger(applicationHost);
         }
 
-        // Resolves a service from Emby's IoC container via reflection.
-        // Emby does not expose a typed Resolve<T> on IApplicationHost directly,
-        // so we call it through the concrete type at runtime.
+        // Pulls a service out of Emby's IoC container via reflection. Emby
+        // doesn't give us a typed Resolve<T> on IApplicationHost directly, so
+        // we call it through the concrete type at runtime.
         internal static T? ResolveService<T>(IApplicationHost? host = null) where T : class
         {
             host ??= AppHost;
@@ -105,14 +105,14 @@ namespace Emby.YouTubePlugin
             try { YouTubeChannel.ResetCrossFolderSeen(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset after settings save failed: {ex.Message}"); }
 
-            // Update the shared config hash so the polling loop won't re-detect
-            // this same change and trigger a duplicate refresh.
+            // Update the shared config hash so the polling loop doesn't
+            // re-detect this same change and fire a duplicate refresh.
             try { PluginEntryPoint.MarkConfigSaved(Configuration); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
 
             // Kick off a channel refresh right away so users see their changes
-            // immediately. Serialized through ChannelRefreshInvoker so multiple
-            // rapid saves don't fan out into parallel scans.
+            // immediately. Serialized via ChannelRefreshInvoker so a flurry of
+            // saves doesn't fan out into parallel scans.
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
                 try { await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false); }

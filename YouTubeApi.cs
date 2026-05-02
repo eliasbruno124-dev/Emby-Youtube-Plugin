@@ -18,13 +18,14 @@ namespace Emby.YouTubePlugin
     {
         private const string ApiBase = "https://www.googleapis.com/youtube/v3";
 
-        // Keep recent API responses around so the plugin does not ask YouTube
-        // for the same data more often than needed.
+        // Hold onto recent API responses so we don't ask YouTube for the same
+        // data more often than needed.
         private record CachedResponse(string Json, long CachedAtMs);
         private static readonly ConcurrentDictionary<string, CachedResponse> ResponseCache = new();
         private const int MaxCacheEntries = 200;
 
-        // Memory cache lifetimes. Disk uses the same value per request, capped below.
+        // Memory cache lifetimes. Disk uses the same value per request,
+        // capped by the global limit below.
         private const long CacheTtlMs = 15 * 60 * 1000;            // Default: 15 minutes.
         private const long FreshListTtlMs = 6 * 60 * 60 * 1000;       // Trending, uploads, and playlists: 6 hours.
         private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000;       // Channel names and thumbnails: 6 hours.
@@ -32,8 +33,8 @@ namespace Emby.YouTubePlugin
         private const long CategoriesTtlMs = 30L * 24 * 60 * 60 * 1000; // Categories rarely change.
         private const long VideoDetailTtlMs = 365L * 24 * 60 * 60 * 1000; // Video details are mostly stable.
 
-        // YouTube's API terms cap persisted API data at 30 days. Each call gets
-        // the shorter value between its own TTL and this disk limit.
+        // YouTube's API terms cap persisted API data at 30 days. Each call
+        // gets the smaller of its own TTL and this disk limit.
         private const long DiskCacheTtlMs = 30L * 24 * 60 * 60 * 1000;
         private static int _diskCleanupDone = 0;
 
@@ -55,23 +56,23 @@ namespace Emby.YouTubePlugin
 
         private static readonly int[] RetryDelaysMs = { 1500, 4000 };
 
-        // Keep bursts gentle enough that YouTube is less likely to answer with 429s.
-        // The gate must be held for the full request duration, not just the
-        // bookkeeping below, otherwise we have no real concurrency limit.
+        // Keep bursts gentle so YouTube is less likely to answer with 429s.
+        // The gate has to be held for the whole request, not just the
+        // bookkeeping below — otherwise we have no real concurrency limit.
         private static readonly SemaphoreSlim ApiGate = new(6, 6);
         private static long _lastCallTicks = 0;
         private const int MinCallIntervalMs = 100;
 
         private static readonly Queue<long> _requestTimestamps = new();
         private static readonly object _budgetLock = new();
-        // Hard local cap: 240 requests per minute. Staying below roughly four
-        // requests per second keeps refreshes polite and predictable.
+        // Hard local cap: 240 requests per minute. Below ~4 req/s keeps
+        // refreshes polite and predictable.
         private const int MaxRequestsPerWindow = 240;
         private const int BudgetWindowMs = 60_000;
 
         // Acquires the gate and applies the per-call spacing rules. The caller
-        // must Release the gate when the HTTP request completes; using
-        // statement style is enforced via the returned IDisposable.
+        // must Release the gate when the HTTP request finishes — enforced via
+        // the IDisposable returned (use it with a using statement).
         private static async Task<IDisposable> AcquireGateAsync(CancellationToken ct)
         {
             await ApiGate.WaitAsync(ct).ConfigureAwait(false);
@@ -158,7 +159,7 @@ namespace Emby.YouTubePlugin
                     if (lastStatus == HttpStatusCode.TooManyRequests)
                     {
                         // Honor Retry-After when present, otherwise back off
-                        // exponentially. Cap at 60s.
+                        // exponentially. Capped at 60s.
                         var ra = resp.Headers.RetryAfter;
                         int delay;
                         if (ra?.Delta is TimeSpan delta && delta > TimeSpan.Zero)
@@ -203,12 +204,13 @@ namespace Emby.YouTubePlugin
             string url, CancellationToken ct, long? customTtlMs = null)
         {
             var memTtl = customTtlMs ?? CacheTtlMs;
-            // Disk follows the same freshness window as memory, with the global
+            // Disk follows the same freshness window as memory, capped by the
+            // global limit below.
             // 30-day cap applied.
             var diskTtl = Math.Min(memTtl, DiskCacheTtlMs);
             var now = Environment.TickCount64;
 
-            // First stop: memory cache.
+            // First stop: in-memory cache.
             if (ResponseCache.TryGetValue(url, out var cached)
                 && (now - cached.CachedAtMs) < memTtl)
             {
@@ -220,7 +222,7 @@ namespace Emby.YouTubePlugin
                 }
             }
 
-            // Next stop: disk cache.
+            // Next stop: on-disk cache.
             var diskJson = TryReadDiskCache(url, diskTtl);
             if (diskJson != null)
             {
@@ -230,7 +232,8 @@ namespace Emby.YouTubePlugin
                 return JsonDocument.Parse(diskJson);
             }
 
-            // Last normal option: call YouTube. This is the point that costs quota.
+            // Last normal option: actually call YouTube. This is where we
+            // spend quota.
             var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
             if (doc != null)
             {
@@ -243,15 +246,15 @@ namespace Emby.YouTubePlugin
                 return JsonDocument.Parse(json);
             }
 
-            // If YouTube is unavailable, fall back to the newest disk copy we
-            // have. Stale content is better than an empty channel during an
-            // outage or after quota is exhausted.
+            // If YouTube is unreachable, fall back to the freshest disk copy
+            // we have. Stale content beats an empty channel during an outage
+            // or after quota is blown.
             var staleJson = TryReadDiskCache(url, long.MaxValue);
             if (staleJson != null)
             {
                 Debug.WriteLine("[YouTubeApi] API unavailable, serving stale cache");
-                // Keep the stale copy in memory briefly so we retry soon without
-                // hitting the disk on every request during an outage.
+                // Keep the stale copy in memory briefly so we retry soon
+                // without hitting the disk on every request during an outage.
                 var shortTtlAnchor = now - memTtl + (5 * 60 * 1000);
                 ResponseCache[url] = new CachedResponse(staleJson, shortTtlAnchor);
                 EvictCacheIfNeeded();
@@ -261,7 +264,7 @@ namespace Emby.YouTubePlugin
             return null;
         }
 
-        // Disk cache helpers.
+        // ---- disk cache helpers ----
 
         private static string GetDiskCacheKey(string url)
         {
@@ -281,8 +284,8 @@ namespace Emby.YouTubePlugin
                 var key = GetDiskCacheKey(url);
                 var file = Path.Combine(cacheDir, key + ".json");
 
-                // Older versions used a 32-character cache key. Pick it up once
-                // and move it to the current 64-character key when possible.
+                // Older versions used a 32-character cache key. Pick it up
+                // once and move it over to the current 64-char key.
                 if (!File.Exists(file))
                 {
                     var legacyKey = key.Substring(0, 32);
@@ -304,8 +307,8 @@ namespace Emby.YouTubePlugin
 
                 var lastWrite = File.GetLastWriteTimeUtc(file);
                 var ageMs = (long)(DateTime.UtcNow - lastWrite).TotalMilliseconds;
-                // This call may need fresher data, but the file can still be
-                // useful as a stale fallback until the 30-day cleanup removes it.
+                // This call may need fresher data, but the file can still
+                // serve as a stale fallback until the 30-day cleanup wipes it.
                 if (ageMs > ttlMs) return null;
 
                 return File.ReadAllText(file, Encoding.UTF8);
@@ -367,15 +370,15 @@ namespace Emby.YouTubePlugin
             if (ResponseCache.Count <= MaxCacheEntries) return;
             var now = Environment.TickCount64;
 
-            // First pass: drop any expired entries.
+            // First pass: drop expired entries.
             foreach (var kvp in ResponseCache)
             {
                 if ((now - kvp.Value.CachedAtMs) > CacheTtlMs)
                     ResponseCache.TryRemove(kvp.Key, out _);
             }
 
-            // Still over the cap (everything fresh): drop the oldest entries
-            // by CachedAtMs so memory does not grow without bound.
+            // Still over the cap (everything fresh): drop the oldest by
+            // CachedAtMs so memory doesn't grow forever.
             if (ResponseCache.Count > MaxCacheEntries)
             {
                 var overflow = ResponseCache.Count - MaxCacheEntries;
@@ -446,8 +449,8 @@ namespace Emby.YouTubePlugin
             {
                 if (isHandle)
                 {
-                    // Resolve handles through channels?forHandle instead of
-                    // search.list. It is cheaper and more exact.
+                    // Resolve handles via channels?forHandle instead of
+                    // search.list — cheaper and more exact.
                     var handle = query.TrimStart('@');
                     var url = $"{ApiBase}/channels?part=snippet,contentDetails&forHandle={Uri.EscapeDataString(handle)}&key={Uri.EscapeDataString(apiKey)}";
                     using var doc = await TryGetCachedJsonAsync(url, ct, ChannelDetailsCacheTtlMs).ConfigureAwait(false);
@@ -556,15 +559,15 @@ namespace Emby.YouTubePlugin
             return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
         }
 
-        // Channel uploads are read through the uploads playlist, which costs 1
-        // quota unit instead of using search.list.
+        // Channel uploads come from the uploads playlist (1 quota unit) instead
+        // of search.list.
 
         public static async Task<JsonDocument?> GetChannelVideosAsync(
             string apiKey, string channelId, string? pageToken, CancellationToken ct,
             string sortBy = "date")
         {
             // "date" is the default and uses the cheap uploads playlist (1 unit).
-            // Anything else needs search.list with an order parameter (100 units).
+            // Anything else needs search.list with an order param (100 units).
             var normalized = (sortBy ?? "date").Trim().ToLowerInvariant();
             if (normalized == "date" || string.IsNullOrEmpty(normalized))
             {
@@ -590,8 +593,8 @@ namespace Emby.YouTubePlugin
                       $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Uploads and playlists are cheap but noisy, so six hours is a good
-            // balance for normal browsing.
+            // Uploads/playlists are cheap but noisy, so 6h hits a good middle
+            // ground for normal browsing.
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
         }
 
@@ -605,7 +608,7 @@ namespace Emby.YouTubePlugin
         {
             var ids = new List<string>();
             string? pageToken = null;
-            // Five pages * 50 items = 250 IDs is plenty for change detection.
+            // 5 pages * 50 = 250 IDs is plenty for change detection.
             for (int page = 0; page < 5 && ids.Count < maxItems; page++)
             {
                 var url = $"{ApiBase}/playlistItems?part=contentDetails&playlistId={Uri.EscapeDataString(playlistId)}" +
@@ -647,7 +650,7 @@ namespace Emby.YouTubePlugin
                 url += $"&regionCode={Uri.EscapeDataString(regionCode)}";
             if (!string.IsNullOrEmpty(categoryId) && categoryId != "0")
                 url += $"&videoCategoryId={Uri.EscapeDataString(categoryId)}";
-            // Trending changes regularly, but a six-hour cache keeps quota usage calm.
+            // Trending shifts often, but a 6h cache keeps quota usage calm.
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
         }
 
@@ -658,7 +661,8 @@ namespace Emby.YouTubePlugin
         {
             var url = $"{ApiBase}/videoCategories?part=snippet&regionCode={Uri.EscapeDataString(regionCode)}" +
                       $"&key={Uri.EscapeDataString(apiKey)}";
-            // Categories almost never change, so keep them for the full disk window.
+            // Categories almost never change, so we keep them for the full
+            // disk window.
             return await TryGetCachedJsonAsync(url, ct, CategoriesTtlMs).ConfigureAwait(false);
         }
 
@@ -668,11 +672,11 @@ namespace Emby.YouTubePlugin
             string apiKey, IEnumerable<string> videoIds, CancellationToken ct)
         {
             var ids = string.Join(",", videoIds);
-            // The status part lets us remove private, rejected, and
+            // The status part lets us drop private, rejected and
             // non-embeddable videos before they show up as broken items.
             var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails,status" +
                       $"&id={Uri.EscapeDataString(ids)}&key={Uri.EscapeDataString(apiKey)}";
-            // Metadata is stable, while disk persistence is still capped at 30 days.
+            // Metadata is stable; disk persistence is still capped at 30 days.
             return await TryGetCachedJsonAsync(url, ct, VideoDetailTtlMs).ConfigureAwait(false);
         }
 
@@ -698,7 +702,7 @@ namespace Emby.YouTubePlugin
             if (!snippet.TryGetProperty("thumbnails", out var thumbs)) return null;
             if (thumbs.ValueKind != JsonValueKind.Object) return null;
 
-            // Prefer the sharpest thumbnail YouTube reports.
+            // Pick the sharpest thumbnail YouTube hands us.
             foreach (var quality in new[] { "maxres", "high", "medium", "default" })
             {
                 if (thumbs.TryGetProperty(quality, out var t))
@@ -712,8 +716,9 @@ namespace Emby.YouTubePlugin
 
         public static string GetStableVideoThumbnailUrl(string videoId, string? preferredUrl)
         {
-            // mqdefault.jpg is the safest direct thumbnail URL. Larger variants
-            // often return 404 for fresh uploads, upcoming streams, or older videos.
+            // mqdefault.jpg is the safest direct thumbnail URL. Larger
+            // variants 404 a lot for fresh uploads, upcoming streams or
+            // older videos.
             if (string.IsNullOrWhiteSpace(videoId))
                 return preferredUrl ?? string.Empty;
             return $"https://i.ytimg.com/vi/{videoId}/mqdefault.jpg";

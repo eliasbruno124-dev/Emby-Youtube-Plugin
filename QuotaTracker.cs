@@ -43,9 +43,8 @@ namespace Emby.YouTubePlugin
             if (zone != null)
                 return (zone, false);
 
-            // If tzdata is missing, fall back to fixed UTC-8. It is not perfect
-            // during daylight saving time, but it is much closer to YouTube's
-            // reset window than using UTC.
+            // If tzdata is missing, fall back to a fixed UTC-8. Not perfect
+            // during DST but way closer to YouTube's reset window than UTC.
             return (
                 TimeZoneInfo.CreateCustomTimeZone(
                     "Pacific-Approx", TimeSpan.FromHours(-8), "Pacific (approx)", "Pacific (approx)"),
@@ -83,7 +82,7 @@ namespace Emby.YouTubePlugin
         public static int EstimateCost(string url)
         {
             if (string.IsNullOrEmpty(url)) return 0;
-            // Only a few endpoints have special costs; the rest are 1 unit.
+            // Only a few endpoints have special costs — the rest are 1 unit.
             if (url.Contains("/search?", StringComparison.Ordinal)) return 100;
             if (url.Contains("/captions?", StringComparison.Ordinal)) return 50;
             return 1;
@@ -156,13 +155,13 @@ namespace Emby.YouTubePlugin
             return s.usedToday >= s.dailyQuota;
         }
 
-        // Persistence.
+        // ---- persistence ----
         private static string? FilePath()
         {
             var dir = Plugin.CachePath;
             if (string.IsNullOrEmpty(dir)) return null;
-            // Keep quota state outside the cache folder so clearing cached API
-            // responses does not erase the usage history.
+            // Keep quota state outside the cache folder so clearing cached
+            // API responses doesn't wipe the usage history.
             var parent = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
             if (string.IsNullOrEmpty(parent)) parent = dir;
             return Path.Combine(parent, StateFile);
@@ -179,8 +178,8 @@ namespace Emby.YouTubePlugin
                     _quotaDate = CurrentQuotaDay();
                     return;
                 }
-                // Older builds stored this inside the cache folder. Move it out
-                // once so future cache cleanup leaves it alone.
+                // Older builds stored this inside the cache folder. Move it
+                // out once so future cache cleanup leaves it alone.
                 if (!File.Exists(path))
                 {
                     var legacy = Path.Combine(Plugin.CachePath ?? "", StateFile);
@@ -223,7 +222,7 @@ namespace Emby.YouTubePlugin
         private static void SaveAsync()
         {
             var now = Environment.TickCount64;
-            // Save at most once every five seconds to avoid unnecessary writes.
+            // Save at most every 5s to keep file writes down.
             if (now - Interlocked.Read(ref _lastSaveTicks) < 5000) return;
             Interlocked.Exchange(ref _lastSaveTicks, now);
 
