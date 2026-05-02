@@ -259,7 +259,22 @@ namespace Emby.YouTubePlugin
                 {
                     using var doc = await YouTubeApi.GetTrendingAsync(apiKey, region, category.id, ct)
                         .ConfigureAwait(false);
-                    if (doc != null && AnyTrendingVideoSurvives(doc, showShorts))
+                    if (doc == null) return;
+
+                    var videos = ExtractTrendingVideos(doc);
+                    if (videos.Count == 0) return;
+
+                    // When Shorts are off, run the same local URL probe we use
+                    // when actually opening the folder. Otherwise a category
+                    // that's all Shorts would show up here but be empty inside.
+                    if (!showShorts)
+                    {
+                        try { await ApplyShortsProbeUpgradeAsync(videos, ct).ConfigureAwait(false); }
+                        catch { /* probe can fail, no big deal */ }
+                        videos.RemoveAll(v => v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
+                    }
+
+                    if (videos.Count > 0)
                         nonEmpty.TryAdd(category.id, 1);
                 }
                 catch (Exception ex)

@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.8.1</Version>
-    <AssemblyVersion>2.0.8.1</AssemblyVersion>
-    <FileVersion>2.0.8.1</FileVersion>
+    <Version>2.0.8.2</Version>
+    <AssemblyVersion>2.0.8.2</AssemblyVersion>
+    <FileVersion>2.0.8.2</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="MediaBrowser.Common" Version="4.9.1.90" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.9.1.90" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

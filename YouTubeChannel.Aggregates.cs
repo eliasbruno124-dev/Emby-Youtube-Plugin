@@ -21,10 +21,6 @@ namespace Emby.YouTubePlugin
         private static async Task<ChannelItemResult> LoadRecentlyAdded(
             string apiKey, PluginConfiguration config, CancellationToken ct)
         {
-            // Prime the seen set so deduplication works even if Emby asks for
-            // aggregator folders before the channel folders.
-            await PreSeedChannelSeenAsync(apiKey, config, ct).ConfigureAwait(false);
-
             var perChannel = Math.Clamp(config.RecentlyAddedPerChannel, 1, 25);
             var savedItems = (config.SavedItems ?? "")
                 .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -48,6 +44,11 @@ namespace Emby.YouTubePlugin
 
             var allItems = new List<ChannelItemInfo>();
             var seen = new HashSet<string>();
+            // Union of all channels' /shorts and /streams page lists, used to
+            // short-circuit the per-video URL probe and the API liveStreamingDetails
+            // signal inside EnrichBatch.
+            var allShortsIds = new HashSet<string>(StringComparer.Ordinal);
+            var allLiveIds = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (var channelId in channelIds)
             {
@@ -57,6 +58,13 @@ namespace Emby.YouTubePlugin
                 if (doc == null) continue;
 
                 var items = ExtractVideos(doc, isPlaylist: true);
+                var shortsVideoIds = await GetChannelShortVideoIdsAsync(channelId, ct).ConfigureAwait(false);
+                ApplyShortsPageMatches(items, shortsVideoIds);
+                foreach (var sid in shortsVideoIds) allShortsIds.Add(sid);
+
+                var liveVideoIds = await GetChannelLiveAndUpcomingIdsAsync(channelId, ct).ConfigureAwait(false);
+                foreach (var lid in liveVideoIds) allLiveIds.Add(lid);
+
                 int taken = 0;
                 foreach (var v in items)
                 {
@@ -82,7 +90,7 @@ namespace Emby.YouTubePlugin
                     if (r.StartsWith(ReelPrefix)) return r.Substring(ReelPrefix.Length);
                     return r;
                 }).ToList();
-                await EnrichBatch(apiKey, allItems, ids, ct).ConfigureAwait(false);
+                await EnrichBatch(apiKey, allItems, ids, ct, allShortsIds, allLiveIds).ConfigureAwait(false);
                 ApplyCachedMeta(allItems);
             }
 
@@ -97,11 +105,6 @@ namespace Emby.YouTubePlugin
             if (sorted.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No videos yet.");
 
-            // Recently Added is expected to overlap with saved channels. Keep
-            // its items visible, then mark them as seen so other aggregators can
-            // avoid repeating them.
-            MarkAsSeen(sorted);
-
             return new ChannelItemResult
             {
                 Items = sorted,
@@ -109,7 +112,7 @@ namespace Emby.YouTubePlugin
             };
         }
 
-        // Popular videos, optionally narrowed to a region or category.
+        // Popular videos, optionally narrowed down by region or category.
         private static async Task<ChannelItemResult> LoadTrending(
             string apiKey, CancellationToken ct, string region = "", string category = "")
         {
@@ -133,7 +136,7 @@ namespace Emby.YouTubePlugin
             {
                 if (!isCategoryChild)
                 {
-                    // Each bucket is a cheap videos.list call, not search.list.
+                    // Each bucket is one cheap videos.list call (not search.list).
                     string?[] buckets = new string?[] { null, "10", "20", "24", "17", "22", "23", "28", "1" };
                     foreach (var cat in buckets)
                     {
@@ -170,6 +173,27 @@ namespace Emby.YouTubePlugin
             {
                 return Msg(new List<ChannelItemInfo>(), $"ERROR: {ex.Message}");
             }
+
+            if (allVideos.Count == 0)
+                return Msg(new List<ChannelItemInfo>(), "No results.");
+
+            // Local Shorts upgrade via URL probe (no extra API quota).
+            // ExtractTrendingVideos only catches Shorts via tag/hashtag, so this
+            // flips the rest so the Shorts folder filter (and the user's
+            // ShortsEnabled toggle) actually work in here too.
+            try
+            {
+                await ApplyShortsProbeUpgradeAsync(allVideos, ct).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log($"[YT] Trending Shorts upgrade failed: {ex.Message}");
+            }
+
+            // Re-apply the ShortsEnabled filter in case the probe just promoted
+            // something to a Short while the user has Shorts off.
+            if (!showShorts)
+                allVideos.RemoveAll(v => v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
 
             if (allVideos.Count == 0)
                 return Msg(new List<ChannelItemInfo>(), "No results.");

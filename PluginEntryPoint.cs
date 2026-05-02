@@ -1,5 +1,10 @@
 using MediaBrowser.Controller.Plugins;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Entities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,9 +18,9 @@ namespace Emby.YouTubePlugin
 {
     public class PluginEntryPoint : IServerEntryPoint
     {
-        private static readonly HttpClient PollHttp = new() { Timeout = TimeSpan.FromSeconds(10) };
-
+        private readonly ConcurrentDictionary<long, byte> _imageRepairsInFlight = new();
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
+        private ILibraryManager? _libraryManager;
         private Timer? _pollTimer;
         private Timer? _switchTimer;
         private int _pollRunning;
@@ -27,11 +32,24 @@ namespace Emby.YouTubePlugin
         internal static string LastConfigHash = "";
 
         private static string ConfigHashPath =>
-            Path.Combine(Plugin.CachePath ?? Path.GetTempPath(), "..", "youtube-config-hash.txt");
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-config-hash.txt");
+
+        public PluginEntryPoint()
+        {
+        }
 
         public void Run()
         {
+            // If the plugin DLL was updated, wipe transient caches automatically
+            // so users do not have to clear them by hand. Library items stay
+            // intact; only HTTP/JSON/probe caches under the plugin's cache dir
+            // get removed. Runs BEFORE LoadShortsProbeCache so a stale cache
+            // from a previous version cannot be re-loaded into memory.
+            WipeCachesIfPluginUpgraded();
+
             YouTubeChannel.ScheduleSortNameFix();
+            YouTubeChannel.LoadShortsProbeCache();
+            AttachImageRepairHook();
 
             try
             {
@@ -55,6 +73,149 @@ namespace Emby.YouTubePlugin
                 catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to switch poll interval: {ex.Message}"); }
                 _switchTimer?.Dispose();
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
+        }
+
+        private static string PluginVersionStampPath =>
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
+
+        // Wipes transient caches when the installed plugin version differs from
+        // the one recorded last time. This avoids users having to manually
+        // clear caches after each upgrade. Library items are NOT touched.
+        private void WipeCachesIfPluginUpgraded()
+        {
+            try
+            {
+                var current = typeof(PluginEntryPoint).Assembly.GetName().Version?.ToString() ?? "0";
+                string? previous = null;
+                var stampPath = PluginVersionStampPath;
+                try
+                {
+                    if (File.Exists(stampPath))
+                        previous = File.ReadAllText(stampPath).Trim();
+                }
+                catch { }
+
+                if (string.Equals(previous, current, StringComparison.Ordinal))
+                    return;
+
+                YouTubeChannel.LogPublic($"[YT] Plugin version changed ({previous ?? "<none>"} -> {current}); wiping caches.");
+
+                var cacheDir = Plugin.CachePath;
+                if (!string.IsNullOrEmpty(cacheDir) && Directory.Exists(cacheDir))
+                {
+                    try { Directory.Delete(cacheDir, recursive: true); }
+                    catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to delete cache dir: {ex.Message}"); }
+                    try { Directory.CreateDirectory(cacheDir); } catch { }
+                }
+
+                var dataDir = Plugin.DataPath;
+                if (!string.IsNullOrEmpty(dataDir) && Directory.Exists(dataDir))
+                {
+                    // Wipe every file the plugin has ever written into the
+                    // Emby data dir. Naming pattern is consistent ("youtube-*"
+                    // and "shorts-probe-cache.json"), so this catches legacy
+                    // names from older plugin versions too without listing
+                    // them by hand.
+                    foreach (var file in Directory.EnumerateFiles(dataDir, "youtube-*"))
+                    {
+                        var name = Path.GetFileName(file);
+                        // Keep the version stamp itself; it is rewritten below.
+                        if (name == "youtube-plugin-version.txt") continue;
+                        // Preserve the API quota counter so the daily limit
+                        // tracking stays accurate across plugin upgrades.
+                        if (name == "youtube-quota.json") continue;
+                        try { File.Delete(file); } catch { }
+                    }
+                    var legacyShortsProbe = Path.Combine(dataDir, "shorts-probe-cache.json");
+                    try { if (File.Exists(legacyShortsProbe)) File.Delete(legacyShortsProbe); } catch { }
+                }
+
+                try { File.WriteAllText(stampPath, current); }
+                catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to write plugin version stamp: {ex.Message}"); }
+
+                // Trigger a channel refresh in the background so items get
+                // re-classified (Shorts/Live tags) without the user having to
+                // poke it manually after every upgrade. Wait a bit first so
+                // Emby is done registering the channel.
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+                        YouTubeChannel.LogPublic("[YT] Triggering post-upgrade channel refresh");
+                        await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        YouTubeChannel.LogPublic($"[YT] Post-upgrade refresh failed: {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] WipeCachesIfPluginUpgraded failed: {ex.Message}");
+            }
+        }
+
+        private void AttachImageRepairHook()
+        {
+            try
+            {
+                _libraryManager ??= ResolveLibraryManager();
+                if (_libraryManager == null)
+                {
+                    YouTubeChannel.LogPublic("[YTIMG] LibraryManager not available; post-refresh image repair disabled.");
+                    return;
+                }
+
+                _libraryManager.ItemUpdated += OnItemUpdated;
+                YouTubeChannel.LogPublic("[YTIMG] Post-refresh image repair hook attached.");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YTIMG] Failed to attach image repair hook: {ex.Message}");
+            }
+        }
+
+        private static ILibraryManager? ResolveLibraryManager() =>
+            Plugin.ResolveService<ILibraryManager>();
+
+        private void OnItemUpdated(object? sender, ItemChangeEventArgs e)
+        {
+            var item = e.Item;
+            if (item == null)
+                return;
+
+            if (string.IsNullOrEmpty(YouTubeImageProvider.TryGetVideoId(item)))
+                return;
+
+            var itemId = item.InternalId;
+            if (!_imageRepairsInFlight.TryAdd(itemId, 0))
+                return;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(250)).ConfigureAwait(false);
+
+                    if (item.HasImage(ImageType.Primary))
+                        return;
+
+                    if (!YouTubeImageProvider.EnsurePrimaryImage(item, "item updated"))
+                        return;
+
+                    item.UpdateToRepository(ItemUpdateType.ImageUpdate);
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YTIMG] Post-refresh image repair failed for item {itemId}: {ex.Message}");
+                }
+                finally
+                {
+                    _imageRepairsInFlight.TryRemove(itemId, out _);
+                }
+            });
         }
 
         // Called from Plugin.SaveConfiguration so a settings save updates the
@@ -86,7 +247,14 @@ namespace Emby.YouTubePlugin
                 var watchLaterRaw = (config.WatchLaterPlaylist ?? "").Trim();
 
                 AdjustPollIntervalToConfig(config);
-                await RefreshOnConfigChange(apiKey, config).ConfigureAwait(false);
+
+                // Catch the case where the plugin was redeployed without going
+                // through SaveConfiguration (e.g. user edited the XML on disk).
+                // We only do this once per process so the poll loop stays
+                // dedicated to playlist change detection.
+                if (Interlocked.CompareExchange(ref _bootstrapHashChecked, 1, 0) == 0)
+                    await RefreshOnConfigChange(apiKey, config).ConfigureAwait(false);
+
                 await PollWatchLaterPlaylists(apiKey, watchLaterRaw).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -98,6 +266,8 @@ namespace Emby.YouTubePlugin
                 Interlocked.Exchange(ref _pollRunning, 0);
             }
         }
+
+        private static int _bootstrapHashChecked;
 
         private void AdjustPollIntervalToConfig(PluginConfiguration config)
         {
@@ -136,15 +306,6 @@ namespace Emby.YouTubePlugin
             try { YouTubeApi.InvalidateAllCache(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation failed: {ex.Message}"); }
 
-            try { YouTubeChannel.ResetCrossFolderSeen(); }
-            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset failed: {ex.Message}"); }
-
-            await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
-            await Task.Delay(TimeSpan.FromSeconds(12)).ConfigureAwait(false);
-
-            try { YouTubeChannel.ResetCrossFolderSeen(); }
-            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset before second refresh failed: {ex.Message}"); }
-
             await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
         }
 
@@ -168,7 +329,14 @@ namespace Emby.YouTubePlugin
             {
                 try
                 {
-                    var current = await GetPlaylistVideoIdSnapshot(apiKey, playlist).ConfigureAwait(false);
+                    // Up to 250 IDs gives us solid change detection without
+                    // burning excessive quota every poll. The call goes through
+                    // the cache-bypass helper so we always see the live state.
+                    var ids = await YouTubeApi.GetPlaylistVideoIdsFreshAsync(
+                            apiKey, playlist, 250, CancellationToken.None)
+                        .ConfigureAwait(false);
+                    var current = string.Join(",", ids);
+
                     _lastVideoIdsByPlaylist.TryGetValue(playlist, out var previous);
                     if (!string.IsNullOrEmpty(previous) && current != previous)
                     {
@@ -186,35 +354,6 @@ namespace Emby.YouTubePlugin
 
             if (anyChanged)
                 await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
-        }
-
-        private static async Task<string> GetPlaylistVideoIdSnapshot(string apiKey, string playlist)
-        {
-            var url = $"https://www.googleapis.com/youtube/v3/playlistItems" +
-                      $"?part=contentDetails&playlistId={Uri.EscapeDataString(playlist)}" +
-                      $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-
-            var json = await PollHttp.GetStringAsync(url).ConfigureAwait(false);
-            QuotaTracker.Record(1);
-
-            var ids = new List<string>();
-            using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("items", out var items)
-                && items.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var item in items.EnumerateArray())
-                {
-                    if (item.TryGetProperty("contentDetails", out var cd)
-                        && cd.TryGetProperty("videoId", out var vid))
-                    {
-                        var videoId = vid.GetString();
-                        if (!string.IsNullOrEmpty(videoId))
-                            ids.Add(videoId);
-                    }
-                }
-            }
-
-            return string.Join(",", ids);
         }
 
         private static void TrySaveConfigHash(string currentHash)
@@ -235,7 +374,7 @@ namespace Emby.YouTubePlugin
 
         internal static string ComputeConfigHash(PluginConfiguration c)
         {
-            using var sha = System.Security.Cryptography.SHA1.Create();
+            using var sha = System.Security.Cryptography.SHA256.Create();
             var blob = string.Join("|", new[]
             {
                 (c.ApiKey ?? "").Trim(),
@@ -260,6 +399,9 @@ namespace Emby.YouTubePlugin
 
         public void Dispose()
         {
+            if (_libraryManager != null)
+                _libraryManager.ItemUpdated -= OnItemUpdated;
+
             _pollTimer?.Dispose();
             _switchTimer?.Dispose();
         }
@@ -271,7 +413,33 @@ namespace Emby.YouTubePlugin
         private static object? _registeredChannel;
         private static MethodInfo? _refreshContentMethod;
 
+        // Serializes channel refreshes. Save-triggered refreshes, watch-later
+        // changes, and bootstrap config-hash mismatches all funnel through the
+        // same lock so we never run two YouTube scans at the same time.
+        private static readonly SemaphoreSlim RefreshGate = new(1, 1);
+
         public static async Task TriggerRefreshAsync()
+        {
+            if (!await RefreshGate.WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false))
+            {
+                // A refresh is already running. Coalesce: the in-flight refresh
+                // will pick up whatever the latest config says, so this caller
+                // does not need to wait its turn.
+                YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped (refresh already in progress)");
+                return;
+            }
+
+            try
+            {
+                await TriggerRefreshCoreAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                RefreshGate.Release();
+            }
+        }
+
+        private static async Task TriggerRefreshCoreAsync()
         {
             try
             {

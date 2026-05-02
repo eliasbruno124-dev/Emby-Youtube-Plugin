@@ -57,11 +57,28 @@ namespace Emby.YouTubePlugin
                 }
 
                 var videoIds = AddUniqueItemsForPage(items, batch, seenIds, limit);
+
+                // Fetch the channel's /shorts list before enrichment so we can
+                // pass it into EnrichBatch and skip per-video URL probes
+                // entirely. The list is cached, so the second batch reuses it.
+                HashSet<string>? knownShortsIds = null;
+                HashSet<string>? knownLiveIds = null;
+                if ((type == "channelvideos" || type == "channelshorts" || type == "channellive")
+                    && IsChannelId(term))
+                {
+                    if (type != "channellive")
+                        knownShortsIds = await GetChannelShortVideoIdsAsync(term, ct).ConfigureAwait(false);
+                    knownLiveIds = await GetChannelLiveAndUpcomingIdsAsync(term, ct).ConfigureAwait(false);
+                }
+
                 if (videoIds.Count > 0)
-                    await EnrichBatch(apiKey, batch, videoIds, ct).ConfigureAwait(false);
+                    await EnrichBatch(apiKey, batch, videoIds, ct, knownShortsIds, knownLiveIds).ConfigureAwait(false);
 
                 CacheInitialThumbnails(batch);
                 ApplyCachedMeta(batch);
+
+                if (knownShortsIds != null)
+                    ApplyShortsPageMatches(batch, knownShortsIds);
 
                 observedShorts |= batch.Any(item => item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
                 observedLive |= batch.Any(item => item.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
@@ -78,7 +95,6 @@ namespace Emby.YouTubePlugin
             if (items.Count == 0)
                 return Msg(items, "No results found.");
 
-            MarkAsSeen(items);
             ScheduleSortNameFix();
             return ToResult(items);
         }
@@ -211,55 +227,23 @@ namespace Emby.YouTubePlugin
                 return false;
 
             var cached = ChannelContentFlags.Get(channelId);
-            string? pageToken = null;
 
             try
             {
-                for (var page = 0; page < ChannelContentProbePageLimit; page++)
-                {
-                    using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, channelId, pageToken, ct, "date")
-                        .ConfigureAwait(false);
-                    if (doc == null)
-                        return cached?.HasShorts ?? false;
-
-                    var probeItems = ExtractVideos(doc, isPlaylist: true);
-                    pageToken = GetNextPageToken(doc);
-                    if (probeItems.Count == 0)
-                    {
-                        ChannelContentFlags.SetHasShorts(channelId, false);
-                        return false;
-                    }
-
-                    var videoIds = probeItems
-                        .Select(i => StripPrefix(i.Id))
-                        .Distinct(StringComparer.Ordinal)
-                        .Take(50)
-                        .ToList();
-
-                    await EnrichBatch(apiKey, probeItems, videoIds, ct).ConfigureAwait(false);
-                    ApplyCachedMeta(probeItems);
-
-                    if (probeItems.Any(i => i.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)))
-                    {
-                        ChannelContentFlags.SetHasShorts(channelId, true);
-                        return true;
-                    }
-
-                    if (string.IsNullOrEmpty(pageToken))
-                    {
-                        ChannelContentFlags.SetHasShorts(channelId, false);
-                        return false;
-                    }
-                }
+                // The channel's /shorts page is the cheapest authoritative
+                // signal: zero quota cost and reflects what YouTube itself
+                // marks as a Short. Heavy enrichment used to live here and
+                // burned quota on every root refresh.
+                var shortsVideoIds = await GetChannelShortVideoIdsAsync(channelId, ct).ConfigureAwait(false);
+                var hasShorts = shortsVideoIds.Count > 0;
+                ChannelContentFlags.SetHasShorts(channelId, hasShorts);
+                return hasShorts;
             }
             catch (Exception ex)
             {
                 Log($"[YT] Shorts folder probe failed for {channelId}: {ex.Message}");
                 return cached?.HasShorts ?? false;
             }
-
-            ChannelContentFlags.SetHasShorts(channelId, false);
-            return false;
         }
 
         private static async Task<bool> ChannelHasLiveAsync(
@@ -272,27 +256,11 @@ namespace Emby.YouTubePlugin
 
             try
             {
-                using var doc = await YouTubeApi.GetChannelVideosAsync(apiKey, channelId, null, ct, "date")
+                // Local detection: scrape the channel's /streams page and
+                // look for LIVE/UPCOMING badge markers. Zero API quota.
+                var liveIds = await GetChannelLiveAndUpcomingIdsAsync(channelId, ct)
                     .ConfigureAwait(false);
-                if (doc == null) return cached?.HasLive ?? false;
-
-                var probeItems = ExtractVideos(doc, isPlaylist: true);
-                if (probeItems.Count == 0)
-                {
-                    ChannelContentFlags.SetHasLive(channelId, false);
-                    return false;
-                }
-
-                var videoIds = probeItems
-                    .Select(i => StripPrefix(i.Id))
-                    .Distinct(StringComparer.Ordinal)
-                    .Take(50)
-                    .ToList();
-
-                await EnrichBatch(apiKey, probeItems, videoIds, ct).ConfigureAwait(false);
-                ApplyCachedMeta(probeItems);
-
-                var hasLive = probeItems.Any(i => i.Id.StartsWith(LivePrefix, StringComparison.Ordinal));
+                var hasLive = liveIds.Count > 0;
                 ChannelContentFlags.SetHasLive(channelId, hasLive);
                 return hasLive;
             }

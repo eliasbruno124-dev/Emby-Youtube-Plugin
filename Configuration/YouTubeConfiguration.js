@@ -283,6 +283,93 @@ define([
         }
     }
 
+    // Compares two version strings ("2.0.9.8") numerically. Returns >0 if
+    // a > b, <0 if a < b, 0 if equal. Tolerates a leading "v" and missing
+    // tail components.
+    function compareVersions(a, b) {
+        const norm = v => String(v || '').replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+        const av = norm(a);
+        const bv = norm(b);
+        const len = Math.max(av.length, bv.length);
+        for (let i = 0; i < len; i++) {
+            const d = (av[i] || 0) - (bv[i] || 0);
+            if (d !== 0) return d;
+        }
+        return 0;
+    }
+
+    // Cache the latest-release lookup for 5 minutes in sessionStorage so
+    // re-opening the settings page doesn't hammer GitHub on every visit, but
+    // we still pick up new releases reasonably quickly.
+    function fetchLatestGithubVersion() {
+        const cacheKey = 'ytPluginLatestRelease';
+        try {
+            const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
+            if (cached && (Date.now() - cached.t) < 5 * 60 * 1000 && cached.v) {
+                return Promise.resolve(cached.v);
+            }
+        } catch (e) { /* ignore */ }
+
+        const repo = 'eliasbruno124-dev/Emby-Youtube-Plugin';
+        const headers = { 'Accept': 'application/vnd.github+json' };
+
+        // Primary endpoint: /releases/latest (only returns releases marked
+        // as "latest"). Fallback: /releases?per_page=1 catches a tag that was
+        // published without the "Set as the latest release" flag.
+        return fetch('https://api.github.com/repos/' + repo + '/releases/latest', { headers })
+            .then(r => r.ok ? r.json() : null)
+            .then(json => json && (json.tag_name || json.name))
+            .catch(() => null)
+            .then(tag => {
+                if (tag) return tag;
+                return fetch('https://api.github.com/repos/' + repo + '/releases?per_page=1', { headers })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(arr => Array.isArray(arr) && arr.length > 0
+                        ? (arr[0].tag_name || arr[0].name)
+                        : null)
+                    .catch(() => null);
+            })
+            .then(tag => {
+                if (!tag) {
+                    console.log('[YT] No GitHub release found for update check');
+                    return null;
+                }
+                console.log('[YT] Latest GitHub tag:', tag);
+                try { sessionStorage.setItem(cacheKey, JSON.stringify({ v: tag, t: Date.now() })); } catch (e) { }
+                return tag;
+            });
+    }
+
+    function renderPluginCredits(view, apiClient) {
+        const versionEl = view.querySelector('#ytPluginVersion');
+        const badgeEl = view.querySelector('#ytUpdateBadge');
+        if (!versionEl) return;
+
+        const finish = (currentVersion) => {
+            versionEl.textContent = currentVersion || 'unknown';
+            if (!currentVersion || !badgeEl) return;
+            fetchLatestGithubVersion().then(latest => {
+                if (!latest) return;
+                const cmp = compareVersions(latest, currentVersion);
+                console.log('[YT] Version check installed=' + currentVersion + ' latest=' + latest + ' cmp=' + cmp);
+                if (cmp > 0) {
+                    badgeEl.textContent = 'Update available: ' + String(latest).replace(/^v/i, '');
+                    badgeEl.style.display = '';
+                }
+            });
+        };
+
+        if (apiClient && typeof apiClient.getInstalledPlugins === 'function') {
+            apiClient.getInstalledPlugins().then(plugins => {
+                const me = (plugins || []).find(p =>
+                    p && (p.Id || '').toLowerCase() === pluginId.toLowerCase());
+                finish(me ? me.Version : null);
+            }, () => finish(null));
+        } else {
+            finish(null);
+        }
+    }
+
     return class extends BaseView {
         constructor(view, params) {
             super(view, params);
@@ -475,6 +562,7 @@ define([
                 setDonateButton(view);
                 setStatus(view, '');
                 loading.hide();
+                renderPluginCredits(view, apiClient);
             }, error => {
                 loading.hide();
                 console.error('Error loading YouTube configuration:', error);

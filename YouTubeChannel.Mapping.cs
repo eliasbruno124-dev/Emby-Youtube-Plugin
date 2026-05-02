@@ -18,12 +18,11 @@ namespace Emby.YouTubePlugin
 {
     public partial class YouTubeChannel
     {
-        private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false, long? runTimeTicks = null, string? originalLang = null)
+        private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
         {
-            // Keep runTimeTicks and originalLang in the signature for callers,
-            // but do not push them into MediaSourceInfo. Setting RunTimeTicks
-            // makes Emby Web treat the watch page like a raw stream and it can
-            // hang. Leaving it unset lets the client use YouTube's embed player.
+            // Do not set RunTimeTicks here. Setting it makes Emby Web treat the
+            // watch page like a raw stream and the player can hang. Leaving it
+            // unset lets the client use YouTube's embed player.
             string url = $"https://www.youtube.com/watch?v={videoId}";
             return new List<MediaSourceInfo>
             {
@@ -141,56 +140,7 @@ namespace Emby.YouTubePlugin
                 }
 
                 // Detect Shorts with the same explicit signals used during enrichment.
-                // Duration alone is unreliable — many normal videos are under three
-                // minutes, so we only mark a video as a Short when YouTube tags it
-                // or the creator added a #shorts hashtag.
-                bool isReel = false;
-                if (!isLive && el.TryGetProperty("snippet", out var snipForReel))
-                {
-                    if (snipForReel.TryGetProperty("tags", out var tagsEl)
-                        && tagsEl.ValueKind == JsonValueKind.Array)
-                    {
-                        foreach (var tag in tagsEl.EnumerateArray())
-                        {
-                            var t = tag.GetString();
-                            if (t != null && string.Equals(t.Trim(), "shorts", StringComparison.OrdinalIgnoreCase))
-                            {
-                                isReel = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!isReel)
-                    {
-                        var sTitle = YouTubeApi.GetString(snipForReel, "title") ?? "";
-                        var sDesc = YouTubeApi.GetString(snipForReel, "description") ?? "";
-                        if (sTitle.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0
-                         || sDesc.IndexOf("#shorts", StringComparison.OrdinalIgnoreCase) >= 0)
-                            isReel = true;
-                    }
-
-                    // Portrait thumbnail + duration ≤ 60 s — same combined heuristic
-                    // as the enrichment pass. Trending items already carry full snippet
-                    // data including thumbnail dimensions, so the check is free.
-                    if (!isReel
-                        && ts.HasValue && ts.Value.TotalSeconds > 0 && ts.Value.TotalSeconds <= 60
-                        && snipForReel.TryGetProperty("thumbnails", out var thumbsElR)
-                        && thumbsElR.ValueKind == JsonValueKind.Object)
-                    {
-                        foreach (var thumbEntry in thumbsElR.EnumerateObject())
-                        {
-                            if (thumbEntry.Value.ValueKind != JsonValueKind.Object) continue;
-                            if (thumbEntry.Value.TryGetProperty("width", out var wEl)
-                                && thumbEntry.Value.TryGetProperty("height", out var hEl)
-                                && wEl.TryGetInt32(out var tw) && hEl.TryGetInt32(out var th)
-                                && th > tw)
-                            {
-                                isReel = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+                bool isReel = !isLive && HasShortsTagOrHashtag(el);
 
                 string itemId = isLive ? LivePrefix + videoId
                     : isReel ? ReelPrefix + videoId
@@ -217,7 +167,7 @@ namespace Emby.YouTubePlugin
                     // Use the YouTube video ID as the external ID so Emby can
                     // recognize the same video across multiple folders.
                     ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
-                    MediaSources = MakeMediaSources(videoId, isLive, isLive ? null : ts?.Ticks, origLang)
+                    MediaSources = MakeMediaSources(videoId, isLive)
                 };
 
                 MetaCache[itemId] = new VideoMeta(overview, premiere, premiere?.Year, ts?.Ticks, thumb, DateTime.UtcNow, origLang);
@@ -240,8 +190,7 @@ namespace Emby.YouTubePlugin
 
                 if (isPlaylist)
                 {
-                    videoId = YouTubeApi.GetNestedString(el, "contentDetails", "videoId")
-                              ?? YouTubeApi.GetNestedString(el, "snippet", "resourceId.videoId");
+                    videoId = YouTubeApi.GetNestedString(el, "contentDetails", "videoId");
 
                     // playlistItems keeps the video ID under snippet.resourceId.
                     if (string.IsNullOrEmpty(videoId)
@@ -251,16 +200,16 @@ namespace Emby.YouTubePlugin
                         videoId = YouTubeApi.GetString(rid, "videoId");
                     }
                 }
-                else
+
+                // Fall back to search.list-style id when the playlist/uploads
+                // shape is missing. Channel listings switch to search.list
+                // when the user picks a non-default sort order.
+                if (string.IsNullOrEmpty(videoId) && el.TryGetProperty("id", out var idProp))
                 {
-                    // search.list keeps the video ID under id.videoId.
-                    if (el.TryGetProperty("id", out var idProp))
-                    {
-                        if (idProp.ValueKind == JsonValueKind.Object)
-                            videoId = YouTubeApi.GetString(idProp, "videoId");
-                        else if (idProp.ValueKind == JsonValueKind.String)
-                            videoId = idProp.GetString();
-                    }
+                    if (idProp.ValueKind == JsonValueKind.Object)
+                        videoId = YouTubeApi.GetString(idProp, "videoId");
+                    else if (idProp.ValueKind == JsonValueKind.String)
+                        videoId = idProp.GetString();
                 }
 
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
@@ -283,6 +232,7 @@ namespace Emby.YouTubePlugin
                 string itemId = isLive ? LivePrefix + videoId : videoId;
                 string displayTitle = isLive ? $"🔴 LIVE: {title}" : title;
 
+                MetaCache.TryGetValue(itemId, out var cachedMeta);
                 var info = new ChannelItemInfo
                 {
                     Name = displayTitle,
@@ -298,9 +248,7 @@ namespace Emby.YouTubePlugin
                     MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
                     ImageUrl = thumb,
                     ProviderIds = new MediaBrowser.Model.Entities.ProviderIdDictionary { ["YouTube"] = videoId },
-                    MediaSources = MakeMediaSources(videoId, isLive,
-                        MetaCache.TryGetValue(itemId, out var __m) ? __m.RuntimeTicks : null,
-                        __m?.OriginalLang)
+                    MediaSources = MakeMediaSources(videoId, isLive)
                 };
 
                 list.Add(info);
@@ -310,6 +258,6 @@ namespace Emby.YouTubePlugin
 
         private static int ClampVideos(int val) => Math.Clamp(val, 1, 150);
 
-        private static int ClampSearchVideos(int val) => Math.Clamp(val, 1, 50);
+        private static int ClampSearchVideos(int val) => Math.Clamp(val, 1, 150);
     }
 }

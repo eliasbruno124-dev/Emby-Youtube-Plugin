@@ -5,6 +5,7 @@ using MediaBrowser.Controller;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,7 +26,9 @@ namespace Emby.YouTubePlugin
         public static Plugin? Instance { get; private set; }
         public static string? LibraryDbPath { get; private set; }
         public static string? CachePath { get; private set; }
+        public static string? DataPath { get; private set; }
         public static IApplicationHost? AppHost { get; private set; }
+        internal static ILogger? PluginLogger { get; private set; }
 
         public Plugin(
             IApplicationHost applicationHost,
@@ -35,6 +38,36 @@ namespace Emby.YouTubePlugin
             Instance = this;
             AppHost = applicationHost;
             InitializePaths(applicationPaths);
+            TryInitLogger(applicationHost);
+        }
+
+        // Resolves a service from Emby's IoC container via reflection.
+        // Emby does not expose a typed Resolve<T> on IApplicationHost directly,
+        // so we call it through the concrete type at runtime.
+        internal static T? ResolveService<T>(IApplicationHost? host = null) where T : class
+        {
+            host ??= AppHost;
+            if (host == null) return null;
+            try
+            {
+                var resolve = host.GetType()
+                    .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .FirstOrDefault(m => m.Name == "Resolve" && m.IsGenericMethodDefinition && m.GetParameters().Length == 0);
+                return resolve?.MakeGenericMethod(typeof(T)).Invoke(host, null) as T;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[YT] ResolveService<{typeof(T).Name}> failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private static void TryInitLogger(IApplicationHost applicationHost)
+        {
+            var factory = ResolveService<ILoggerFactory>(applicationHost);
+            PluginLogger = factory?.CreateLogger("YouTubePlugin");
+            if (PluginLogger == null)
+                System.Diagnostics.Debug.WriteLine("[YT] ILoggerFactory not available; falling back to Debug.WriteLine");
         }
 
         public PluginConfiguration Options => Configuration;
@@ -78,8 +111,8 @@ namespace Emby.YouTubePlugin
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
 
             // Kick off a channel refresh right away so users see their changes
-            // immediately instead of waiting up to 15s for the next config-hash poll.
-            // Fire-and-forget — SaveConfiguration must stay synchronous for Emby.
+            // immediately. Serialized through ChannelRefreshInvoker so multiple
+            // rapid saves don't fan out into parallel scans.
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
                 try { await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false); }
@@ -120,6 +153,7 @@ namespace Emby.YouTubePlugin
         {
             try
             {
+                DataPath = applicationPaths.DataPath;
                 var candidate = Path.Combine(applicationPaths.DataPath, "library.db");
                 if (File.Exists(candidate))
                     LibraryDbPath = candidate;

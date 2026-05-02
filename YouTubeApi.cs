@@ -56,6 +56,8 @@ namespace Emby.YouTubePlugin
         private static readonly int[] RetryDelaysMs = { 1500, 4000 };
 
         // Keep bursts gentle enough that YouTube is less likely to answer with 429s.
+        // The gate must be held for the full request duration, not just the
+        // bookkeeping below, otherwise we have no real concurrency limit.
         private static readonly SemaphoreSlim ApiGate = new(6, 6);
         private static long _lastCallTicks = 0;
         private const int MinCallIntervalMs = 100;
@@ -67,7 +69,10 @@ namespace Emby.YouTubePlugin
         private const int MaxRequestsPerWindow = 240;
         private const int BudgetWindowMs = 60_000;
 
-        private static async Task ThrottleAsync(CancellationToken ct)
+        // Acquires the gate and applies the per-call spacing rules. The caller
+        // must Release the gate when the HTTP request completes; using
+        // statement style is enforced via the returned IDisposable.
+        private static async Task<IDisposable> AcquireGateAsync(CancellationToken ct)
         {
             await ApiGate.WaitAsync(ct).ConfigureAwait(false);
             try
@@ -78,18 +83,27 @@ namespace Emby.YouTubePlugin
                 var last = Interlocked.Read(ref _lastCallTicks);
                 var elapsed = now - last;
                 if (elapsed < MinCallIntervalMs)
-                {
-                    await Task.Delay((int)(MinCallIntervalMs - elapsed), ct)
-                        .ConfigureAwait(false);
-                }
+                    await Task.Delay((int)(MinCallIntervalMs - elapsed), ct).ConfigureAwait(false);
                 Interlocked.Exchange(ref _lastCallTicks, Environment.TickCount64);
 
                 lock (_budgetLock)
                     _requestTimestamps.Enqueue(Environment.TickCount64);
             }
-            finally
+            catch
             {
                 ApiGate.Release();
+                throw;
+            }
+            return new GateLease();
+        }
+
+        private sealed class GateLease : IDisposable
+        {
+            private int _disposed;
+            public void Dispose()
+            {
+                if (Interlocked.Exchange(ref _disposed, 1) == 0)
+                    ApiGate.Release();
             }
         }
 
@@ -126,35 +140,47 @@ namespace Emby.YouTubePlugin
 
             for (int attempt = 0; attempt <= RetryDelaysMs.Length; attempt++)
             {
-                if (attempt > 0)
-                    await Task.Delay(RetryDelaysMs[attempt - 1], ct).ConfigureAwait(false);
+                int? overrideDelayMs = null;
 
-                await ThrottleAsync(ct).ConfigureAwait(false);
-
-                using var resp = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct)
-                    .ConfigureAwait(false);
-
-                if (resp.IsSuccessStatusCode)
+                using (await AcquireGateAsync(ct).ConfigureAwait(false))
+                using (var resp = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false))
                 {
-                    await using var stream = await resp.Content
-                        .ReadAsStreamAsync(ct).ConfigureAwait(false);
-                    return await JsonDocument.ParseAsync(stream, cancellationToken: ct)
-                        .ConfigureAwait(false);
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        await using var stream = await resp.Content
+                            .ReadAsStreamAsync(ct).ConfigureAwait(false);
+                        return await JsonDocument.ParseAsync(stream, cancellationToken: ct)
+                            .ConfigureAwait(false);
+                    }
+
+                    lastStatus = resp.StatusCode;
+
+                    if (lastStatus == HttpStatusCode.TooManyRequests)
+                    {
+                        // Honor Retry-After when present, otherwise back off
+                        // exponentially. Cap at 60s.
+                        var ra = resp.Headers.RetryAfter;
+                        int delay;
+                        if (ra?.Delta is TimeSpan delta && delta > TimeSpan.Zero)
+                            delay = (int)Math.Min(delta.TotalMilliseconds, 60_000);
+                        else if (ra?.Date is DateTimeOffset when)
+                            delay = (int)Math.Min(Math.Max((when - DateTimeOffset.UtcNow).TotalMilliseconds, 0), 60_000);
+                        else
+                            delay = Math.Min(10_000 * (1 << attempt), 60_000);
+                        overrideDelayMs = delay;
+                        Debug.WriteLine($"[YouTubeApi] Rate limited (429), attempt {attempt}, waiting {delay}ms...");
+                    }
+                    else if (!IsTransientError(lastStatus))
+                    {
+                        break;
+                    }
                 }
 
-                lastStatus = resp.StatusCode;
+                if (attempt == RetryDelaysMs.Length) break;
 
-                if (lastStatus == HttpStatusCode.TooManyRequests)
-                {
-                    int baseDelay = 10_000 * (1 << attempt);
-                    var retryAfter = Math.Min(baseDelay, 60_000);
-                    Debug.WriteLine($"[YouTubeApi] Rate limited (429), attempt {attempt}, waiting {retryAfter}ms...");
-                    await Task.Delay(retryAfter, ct).ConfigureAwait(false);
-                    continue;
-                }
-
-                if (!IsTransientError(lastStatus))
-                    break;
+                var nextDelay = overrideDelayMs ?? RetryDelaysMs[attempt];
+                if (nextDelay > 0)
+                    await Task.Delay(nextDelay, ct).ConfigureAwait(false);
             }
 
             throw new HttpRequestException($"YouTube API returned HTTP {(int)lastStatus}");
@@ -339,15 +365,28 @@ namespace Emby.YouTubePlugin
         private static void EvictCacheIfNeeded()
         {
             if (ResponseCache.Count <= MaxCacheEntries) return;
-            var oldest = new List<string>();
             var now = Environment.TickCount64;
+
+            // First pass: drop any expired entries.
             foreach (var kvp in ResponseCache)
             {
                 if ((now - kvp.Value.CachedAtMs) > CacheTtlMs)
-                    oldest.Add(kvp.Key);
+                    ResponseCache.TryRemove(kvp.Key, out _);
             }
-            foreach (var key in oldest)
-                ResponseCache.TryRemove(key, out _);
+
+            // Still over the cap (everything fresh): drop the oldest entries
+            // by CachedAtMs so memory does not grow without bound.
+            if (ResponseCache.Count > MaxCacheEntries)
+            {
+                var overflow = ResponseCache.Count - MaxCacheEntries;
+                var oldest = ResponseCache
+                    .OrderBy(kvp => kvp.Value.CachedAtMs)
+                    .Take(overflow)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+                foreach (var key in oldest)
+                    ResponseCache.TryRemove(key, out _);
+            }
         }
 
         /// <summary>
@@ -524,10 +563,22 @@ namespace Emby.YouTubePlugin
             string apiKey, string channelId, string? pageToken, CancellationToken ct,
             string sortBy = "date")
         {
-            // YouTube upload playlists mirror channel IDs: UC... becomes UU...
-            var uploadsPlaylistId = "UU" + channelId.Substring(2);
-            return await GetPlaylistVideosAsync(apiKey, uploadsPlaylistId, pageToken, ct)
-                .ConfigureAwait(false);
+            // "date" is the default and uses the cheap uploads playlist (1 unit).
+            // Anything else needs search.list with an order parameter (100 units).
+            var normalized = (sortBy ?? "date").Trim().ToLowerInvariant();
+            if (normalized == "date" || string.IsNullOrEmpty(normalized))
+            {
+                var uploadsPlaylistId = "UU" + channelId.Substring(2);
+                return await GetPlaylistVideosAsync(apiKey, uploadsPlaylistId, pageToken, ct)
+                    .ConfigureAwait(false);
+            }
+
+            var url = $"{ApiBase}/search?part=snippet&channelId={Uri.EscapeDataString(channelId)}" +
+                      $"&type=video&maxResults=50&order={Uri.EscapeDataString(normalized)}" +
+                      $"&key={Uri.EscapeDataString(apiKey)}";
+            if (!string.IsNullOrEmpty(pageToken))
+                url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+            return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
         }
 
         // Playlist videos.
@@ -542,6 +593,47 @@ namespace Emby.YouTubePlugin
             // Uploads and playlists are cheap but noisy, so six hours is a good
             // balance for normal browsing.
             return await TryGetCachedJsonAsync(url, ct, FreshListTtlMs).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Reads the first up-to-N video IDs from a playlist while bypassing
+        /// every cache. Used by the watch-later poll so we always see the live
+        /// state of the playlist, not the cached six-hour snapshot.
+        /// </summary>
+        public static async Task<List<string>> GetPlaylistVideoIdsFreshAsync(
+            string apiKey, string playlistId, int maxItems, CancellationToken ct)
+        {
+            var ids = new List<string>();
+            string? pageToken = null;
+            // Five pages * 50 items = 250 IDs is plenty for change detection.
+            for (int page = 0; page < 5 && ids.Count < maxItems; page++)
+            {
+                var url = $"{ApiBase}/playlistItems?part=contentDetails&playlistId={Uri.EscapeDataString(playlistId)}" +
+                          $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+                if (!string.IsNullOrEmpty(pageToken))
+                    url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
+
+                using var doc = await TryGetJsonAsync(url, ct).ConfigureAwait(false);
+                if (doc == null) break;
+                QuotaTracker.RecordCall(url);
+
+                if (doc.RootElement.TryGetProperty("items", out var items)
+                    && items.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in items.EnumerateArray())
+                    {
+                        var vid = GetNestedString(item, "contentDetails", "videoId");
+                        if (!string.IsNullOrEmpty(vid)) ids.Add(vid!);
+                        if (ids.Count >= maxItems) break;
+                    }
+                }
+
+                pageToken = doc.RootElement.TryGetProperty("nextPageToken", out var ptEl)
+                    ? ptEl.GetString()
+                    : null;
+                if (string.IsNullOrEmpty(pageToken)) break;
+            }
+            return ids;
         }
 
         // Trending videos.

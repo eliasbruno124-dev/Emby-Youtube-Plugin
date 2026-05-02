@@ -25,7 +25,7 @@ namespace Emby.YouTubePlugin
     // that, an image provider has to claim the item again. We rebuild the
     // thumbnail URL from the video ID in the item path, so this does not spend
     // any YouTube Data API quota.
-    public class YouTubeImageProvider : IDynamicImageProvider, IRemoteImageProvider, IHasItemChangeMonitor
+    public class YouTubeImageProvider : IDynamicImageProvider, IRemoteImageProvider, IHasItemChangeMonitor, IHasItemChangeWithItemResultMonitor
     {
         public string Name => "YouTube";
 
@@ -42,9 +42,22 @@ namespace Emby.YouTubePlugin
             @"(?:youtube\.com/watch\?v=|youtu\.be/|/vi/)([A-Za-z0-9_-]{6,})",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
+        private static readonly HttpClient Http = CreateImageHttp();
 
-        private static string? TryGetVideoId(BaseItem? item)
+        private static HttpClient CreateImageHttp()
+        {
+            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            // i.ytimg.com sometimes serves a tiny placeholder when the request
+            // does not look like a browser. A real User-Agent prevents that.
+            client.DefaultRequestHeaders.TryAddWithoutValidation(
+                "User-Agent",
+                "Mozilla/5.0 (compatible; EmbyYouTubePlugin/1.0)");
+            return client;
+        }
+
+        private const int MaxFailedFetches = 5000;
+
+        internal static string? TryGetVideoId(BaseItem? item)
         {
             if (item == null) return null;
             try
@@ -126,9 +139,34 @@ namespace Emby.YouTubePlugin
             // Nothing worked. The video may be gone, unavailable, or still
             // waiting for YouTube to generate its thumbnails.
             if (result?.BaseItem != null)
+            {
                 _failedFetches[result.BaseItem.InternalId] = DateTime.UtcNow;
+                EvictFailedFetches();
+            }
 
             return response;
+        }
+
+        private static void EvictFailedFetches()
+        {
+            if (_failedFetches.Count <= MaxFailedFetches) return;
+            var cutoff = DateTime.UtcNow - FailedFetchCooldown;
+            foreach (var kvp in _failedFetches)
+            {
+                if (kvp.Value < cutoff)
+                    _failedFetches.TryRemove(kvp.Key, out _);
+            }
+            if (_failedFetches.Count > MaxFailedFetches)
+            {
+                var overflow = _failedFetches.Count - MaxFailedFetches;
+                var oldest = _failedFetches
+                    .OrderBy(kvp => kvp.Value)
+                    .Take(overflow)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+                foreach (var key in oldest)
+                    _failedFetches.TryRemove(key, out _);
+            }
         }
 
         public Task<IEnumerable<RemoteImageInfo>> GetImages(
@@ -210,8 +248,59 @@ namespace Emby.YouTubePlugin
             return false;
         }
 
-        private static string GetStableThumbnailUrl(string videoId) =>
+        public bool HasChanged(
+            BaseMetadataResult itemResult,
+            LibraryOptions libraryOptions,
+            MetadataRefreshOptions options,
+            IDirectoryService directoryService)
+        {
+            try
+            {
+                var item = itemResult?.BaseItem;
+                if (string.IsNullOrEmpty(TryGetVideoId(item)))
+                    return false;
+
+                if (options.ReplaceAllImages || options.ReplaceThumbnailImages)
+                {
+                    YouTubeChannel.LogPublic($"[YTIMG] Forcing image refresh for item {item!.InternalId} after replace-images request.");
+                    return true;
+                }
+
+                return item != null && HasChanged(item, libraryOptions, directoryService);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[YouTubeImageProvider] Result change check failed: {ex.Message}");
+            }
+
+            return false;
+        }
+
+        internal static string GetStableThumbnailUrl(string videoId) =>
             $"https://i.ytimg.com/vi/{videoId}/mqdefault.jpg";
+
+        internal static bool EnsurePrimaryImage(BaseItem? item, string reason)
+        {
+            var videoId = TryGetVideoId(item);
+            if (item == null || string.IsNullOrEmpty(videoId))
+                return false;
+
+            if (item.HasImage(ImageType.Primary))
+                return false;
+
+            var url = GetStableThumbnailUrl(videoId);
+            item.SetImage(new ItemImageInfo
+            {
+                Path = url,
+                Type = ImageType.Primary,
+                DateModified = DateTimeOffset.UtcNow,
+                Width = 320,
+                Height = 180
+            }, 0, true);
+
+            YouTubeChannel.LogPublic($"[YTIMG] Restored primary image for YouTube item {item.InternalId} after {reason}: {url}");
+            return true;
+        }
 
         private static IEnumerable<string> GetThumbnailCandidates(string videoId)
         {

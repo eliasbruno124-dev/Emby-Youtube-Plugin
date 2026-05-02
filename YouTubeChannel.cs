@@ -5,6 +5,7 @@ using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,9 +22,11 @@ namespace Emby.YouTubePlugin
         private static void Log(string msg) => LogPublic(msg);
         public static void LogPublic(string msg)
         {
-            System.Diagnostics.Debug.WriteLine(msg);
-            try { File.AppendAllText("/config/data/youtube-debug.log", DateTime.UtcNow.ToString("o") + " " + msg + "\n"); }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[YouTubeChannel] Debug file write failed: {ex.Message}"); }
+            var logger = Plugin.PluginLogger;
+            if (logger != null)
+                logger.Log(LogLevel.Information, 0, msg, null, (s, _) => s);
+            else
+                System.Diagnostics.Debug.WriteLine(msg);
         }
 
         public string Name => "YouTube";
