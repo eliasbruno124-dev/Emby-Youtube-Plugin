@@ -2,10 +2,13 @@ using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Session;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,12 +22,27 @@ namespace Emby.YouTubePlugin
     public class PluginEntryPoint : IServerEntryPoint
     {
         private readonly ConcurrentDictionary<long, byte> _imageRepairsInFlight = new();
+        private readonly ConcurrentDictionary<string, DateTime> _resumeSeeksInFlight = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private ILibraryManager? _libraryManager;
+        private ISessionManager? _sessionManager;
         private Timer? _pollTimer;
         private Timer? _switchTimer;
         private int _pollRunning;
         private int _currentPollMinutes;
+        private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
+        private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
+        private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
+
+        private sealed record PendingResumeSeek(
+            string Key,
+            string SessionId,
+            string? UserId,
+            string VideoId,
+            long ItemId,
+            long PositionTicks,
+            long RuntimeTicks);
 
         // Static so Plugin.SaveConfiguration can update the hash directly when
         // settings are saved through the UI. Otherwise the next poll would
@@ -47,9 +65,14 @@ namespace Emby.YouTubePlugin
             // cache from a previous version can't sneak back into memory.
             WipeCachesIfPluginUpgraded();
 
+            // Capture PlaybackInfo before PlaybackStart so resume and
+            // "play from beginning" can be told apart reliably.
+            EmbeddedDependencyLoader.Register();
+            PlaybackIntentInterceptor.Install();
             YouTubeChannel.ScheduleSortNameFix();
             YouTubeChannel.LoadShortsProbeCache();
             AttachImageRepairHook();
+            AttachResumeSeekHook();
 
             try
             {
@@ -73,6 +96,222 @@ namespace Emby.YouTubePlugin
                 catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to switch poll interval: {ex.Message}"); }
                 _switchTimer?.Dispose();
             }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
+        }
+
+        private void AttachResumeSeekHook()
+        {
+            try
+            {
+                _sessionManager ??= Plugin.ResolveService<ISessionManager>();
+
+                if (_sessionManager == null)
+                {
+                    YouTubeChannel.LogPublic("[YT] Resume seek hook disabled; session manager not available.");
+                    return;
+                }
+
+                _sessionManager.PlaybackStart += OnPlaybackStart;
+                _sessionManager.PlaybackProgress += OnPlaybackProgress;
+                _sessionManager.PlaybackStopped += OnPlaybackStopped;
+                YouTubeChannel.LogPublic("[YT] Resume seek hooks attached.");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Failed to attach resume seek hook: {ex.Message}");
+            }
+        }
+
+        private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e)
+        {
+            try
+            {
+                if (_sessionManager == null)
+                    return;
+
+                var item = e.Item;
+                var session = e.Session;
+                if (item == null || session == null || string.IsNullOrEmpty(session.Id))
+                    return;
+
+                CancelPendingResumeSeeksForSession(session.Id);
+
+                var videoId = YouTubeImageProvider.TryGetVideoId(item);
+                if (string.IsNullOrEmpty(videoId))
+                    return;
+
+                // The captured intent is the source of truth. Without it we do
+                // not force a seek, because that would break explicit restarts.
+                if (!PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
+                {
+                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; playback intent was not captured.");
+                    return;
+                }
+
+                var positionTicks = intent.StartTimeTicks;
+                if (positionTicks < ResumeSeekMinimumTicks)
+                {
+                    // Emby sends StartTimeTicks=0 for "play from beginning".
+                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; play from beginning was requested.");
+                    return;
+                }
+
+                var runtimeTicks = item.RunTimeTicks.GetValueOrDefault();
+                if (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks)
+                    return;
+
+                var key = GetResumeSeekKey(e, item);
+                var pending = new PendingResumeSeek(
+                    key,
+                    session.Id,
+                    session.UserId,
+                    videoId,
+                    item.InternalId,
+                    positionTicks,
+                    runtimeTicks);
+
+                _pendingResumeSeeks[key] = pending;
+
+                // YouTube iframe playback needs a moment to exist before all
+                // clients accept the seek command reliably.
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
+                    await TrySendPendingResumeSeekAsync(key, "delayed start").ConfigureAwait(false);
+                });
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackStart resume hook failed: {ex.Message}");
+            }
+        }
+
+        private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e)
+        {
+            var sessionId = e.Session?.Id;
+            if (!string.IsNullOrEmpty(sessionId))
+                CancelPendingResumeSeeksForSession(sessionId);
+        }
+
+        private void CancelPendingResumeSeeksForSession(string sessionId)
+        {
+            foreach (var kvp in _pendingResumeSeeks)
+            {
+                if (string.Equals(kvp.Value.SessionId, sessionId, StringComparison.Ordinal))
+                    _pendingResumeSeeks.TryRemove(kvp.Key, out _);
+            }
+        }
+
+        private void OnPlaybackProgress(object? sender, PlaybackProgressEventArgs e)
+        {
+            try
+            {
+                var item = e.Item;
+                if (item == null)
+                    return;
+
+                var key = GetResumeSeekKey(e, item);
+                if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
+                    return;
+
+                var currentTicks = e.PlaybackPositionTicks.GetValueOrDefault();
+                if (currentTicks >= ResumeSeekMinimumTicks
+                    && Math.Abs(currentTicks - pending.PositionTicks) <= ResumeSeekEndGuardTicks)
+                {
+                    // The client is already in the requested area, so the
+                    // pending retry is no longer needed.
+                    _pendingResumeSeeks.TryRemove(key, out _);
+                    return;
+                }
+
+                // Progress can arrive before the delayed task fires. Treat it
+                // as an early retry point while the player is definitely alive.
+                _ = Task.Run(async () =>
+                    await TrySendPendingResumeSeekAsync(key, "progress").ConfigureAwait(false));
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackProgress resume hook failed: {ex.Message}");
+            }
+        }
+
+        private static string GetResumeSeekKey(PlaybackProgressEventArgs e, BaseItem item)
+        {
+            var sessionId = e.Session?.Id ?? string.Empty;
+            var playSessionId = e.PlaySessionId ?? string.Empty;
+            return $"{sessionId}|{playSessionId}|{item.InternalId}";
+        }
+
+        private async Task TrySendPendingResumeSeekAsync(string key, string reason)
+        {
+            if (_sessionManager == null)
+                return;
+
+            if (!_pendingResumeSeeks.TryRemove(key, out var pending))
+                return;
+
+            // The user may have switched videos during the delay. Never seek a
+            // session that has already moved on to another item.
+            if (!IsPendingSeekStillCurrent(pending))
+            {
+                YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
+                return;
+            }
+
+            var inFlightKey = $"{key}|{pending.PositionTicks}";
+            if (!_resumeSeeksInFlight.TryAdd(inFlightKey, DateTime.UtcNow))
+                return;
+
+            try
+            {
+                var request = new PlaystateRequest
+                {
+                    Command = PlaystateCommand.Seek,
+                    SeekPositionTicks = pending.PositionTicks,
+                    ControllingUserId = pending.UserId
+                };
+
+                await _sessionManager.SendPlaystateCommand(
+                        pending.SessionId,
+                        pending.SessionId,
+                        request,
+                        CancellationToken.None)
+                    .ConfigureAwait(false);
+
+                YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
+            }
+            finally
+            {
+                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+            }
+        }
+
+        private bool IsPendingSeekStillCurrent(PendingResumeSeek pending)
+        {
+            try
+            {
+                var session = _sessionManager?.Sessions
+                    .FirstOrDefault(s => string.Equals(s.Id, pending.SessionId, StringComparison.Ordinal));
+
+                if (session == null)
+                    return false;
+
+                var nowPlaying = session.FullNowPlayingItem;
+                if (nowPlaying != null)
+                    return nowPlaying.InternalId == pending.ItemId;
+
+                // Some session DTOs only expose the public item id.
+                var dtoId = session.NowPlayingItem?.Id;
+                return long.TryParse(dtoId, out var parsedId) && parsedId == pending.ItemId;
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Resume seek current-item check failed: {ex.Message}");
+                return false;
+            }
         }
 
         private static string PluginVersionStampPath =>
@@ -403,8 +642,16 @@ namespace Emby.YouTubePlugin
             if (_libraryManager != null)
                 _libraryManager.ItemUpdated -= OnItemUpdated;
 
+            if (_sessionManager != null)
+            {
+                _sessionManager.PlaybackStart -= OnPlaybackStart;
+                _sessionManager.PlaybackProgress -= OnPlaybackProgress;
+                _sessionManager.PlaybackStopped -= OnPlaybackStopped;
+            }
+
             _pollTimer?.Dispose();
             _switchTimer?.Dispose();
+            PlaybackIntentInterceptor.Uninstall();
         }
     }
 
@@ -413,6 +660,7 @@ namespace Emby.YouTubePlugin
         private static object? _channelMgr;
         private static object? _registeredChannel;
         private static MethodInfo? _refreshContentMethod;
+        private static int _refreshAgainRequested;
 
         // Serializes channel refreshes. Save-triggered refreshes, watch-later
         // changes and bootstrap config-hash mismatches all funnel through the
@@ -423,20 +671,31 @@ namespace Emby.YouTubePlugin
         {
             if (!await RefreshGate.WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false))
             {
-                // A refresh is already in flight. Just bail out — the running
-                // refresh will pick up whatever the latest config says, so this
-                // caller doesn't need to wait its turn.
-                YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped (refresh already in progress)");
+                // A refresh is already in flight. Queue one follow-up pass so
+                // settings saved mid-refresh are still picked up afterwards.
+                Interlocked.Exchange(ref _refreshAgainRequested, 1);
+                YouTubeChannel.LogPublic("[YT] TriggerRefresh: queued follow-up (refresh already in progress)");
                 return;
             }
 
             try
             {
-                await TriggerRefreshCoreAsync().ConfigureAwait(false);
+                while (true)
+                {
+                    await TriggerRefreshCoreAsync().ConfigureAwait(false);
+
+                    if (Interlocked.Exchange(ref _refreshAgainRequested, 0) != 1)
+                        break;
+
+                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: running queued follow-up");
+                }
             }
             finally
             {
                 RefreshGate.Release();
+
+                if (Volatile.Read(ref _refreshAgainRequested) == 1)
+                    _ = Task.Run(TriggerRefreshAsync);
             }
         }
 
@@ -544,6 +803,24 @@ namespace Emby.YouTubePlugin
 
         private static object? FindRegisteredYouTubeChannel(object channelManager)
         {
+            var getChannel = channelManager.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m => m.Name == "GetChannel"
+                                     && m.IsGenericMethodDefinition
+                                     && m.GetParameters().Length == 0);
+            if (getChannel != null)
+            {
+                try
+                {
+                    var channel = getChannel.MakeGenericMethod(typeof(YouTubeChannel)).Invoke(channelManager, null);
+                    if (channel != null)
+                        return channel;
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YT] TriggerRefresh: GetChannel<YouTubeChannel> failed: {ex.Message}");
+                }
+            }
+
             var channelsProp = channelManager.GetType().GetProperty("Channels",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (channelsProp == null)
