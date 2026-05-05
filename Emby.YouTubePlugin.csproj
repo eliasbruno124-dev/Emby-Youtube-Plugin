@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.8.3</Version>
-    <AssemblyVersion>2.0.8.3</AssemblyVersion>
-    <FileVersion>2.0.8.3</FileVersion>
+    <Version>2.0.8.4</Version>
+    <AssemblyVersion>2.0.8.4</AssemblyVersion>
+    <FileVersion>2.0.8.4</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <HarmonyPackageVersion>2.4.2</HarmonyPackageVersion>
   </PropertyGroup>
