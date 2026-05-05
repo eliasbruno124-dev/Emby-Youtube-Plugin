@@ -27,6 +27,12 @@ namespace Emby.YouTubePlugin
                 logger.Log(LogLevel.Information, 0, msg, null, (s, _) => s);
             else
                 System.Diagnostics.Debug.WriteLine(msg);
+
+            // Always tee to a plugin-owned file. Emby's ILoggerFactory does
+            // not always surface plugin categories in embyserver.txt, and
+            // without local logs we cannot diagnose client-specific issues
+            // such as resume seeks misbehaving on the LG TV app.
+            PluginFileLog.Write(msg);
         }
 
         public string Name => "YouTube";

@@ -154,6 +154,14 @@ namespace Emby.YouTubePlugin
                 if (string.IsNullOrEmpty(videoId))
                     return;
 
+                // Diagnostics so client-specific failures (LG, Theater, etc.)
+                // can be identified without a debugger attached.
+                YouTubeChannel.LogPublic(
+                    $"[YT] PlaybackStart fired: video={videoId} item={item.InternalId} "
+                    + $"client={session.Client ?? "?"} device={session.DeviceName ?? "?"} "
+                    + $"deviceId={session.DeviceId ?? "?"} userId={session.UserId ?? "?"} "
+                    + $"position={e.PlaybackPositionTicks.GetValueOrDefault()}");
+
                 // The captured intent is the source of truth. Without it we do
                 // not force a seek, because that would break explicit restarts.
                 if (!PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
@@ -161,6 +169,9 @@ namespace Emby.YouTubePlugin
                     YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; playback intent was not captured.");
                     return;
                 }
+
+                YouTubeChannel.LogPublic(
+                    $"[YT] Intent consumed for {videoId}: StartTimeTicks={intent.StartTimeTicks} capturedAt={intent.CapturedUtc:O}");
 
                 var positionTicks = intent.StartTimeTicks;
                 if (positionTicks < ResumeSeekMinimumTicks)
