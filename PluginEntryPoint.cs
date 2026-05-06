@@ -37,6 +37,8 @@ namespace Emby.YouTubePlugin
         private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
         private const long UserDataProgressSaveDeltaTicks = TimeSpan.TicksPerSecond * 15;
         private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
+        private static readonly TimeSpan ResumeSeekRetryDelay = TimeSpan.FromMilliseconds(2500);
+        private const int ResumeSeekMaxAttempts = 4;
         private static readonly TimeSpan UserDataProgressSaveInterval = TimeSpan.FromSeconds(20);
 
         private sealed record PendingResumeSeek(
@@ -46,7 +48,9 @@ namespace Emby.YouTubePlugin
             string VideoId,
             long ItemId,
             long PositionTicks,
-            long RuntimeTicks);
+            long RuntimeTicks,
+            DateTime CreatedUtc,
+            int AttemptCount);
 
         private sealed record PlaybackProgressSnapshot(
             string Key,
@@ -186,6 +190,7 @@ namespace Emby.YouTubePlugin
                     return;
 
                 var key = GetResumeSeekKey(e, item);
+                var now = DateTime.UtcNow;
                 var pending = new PendingResumeSeek(
                     key,
                     session.Id,
@@ -193,17 +198,17 @@ namespace Emby.YouTubePlugin
                     videoId,
                     item.InternalId,
                     positionTicks,
-                    runtimeTicks);
+                    runtimeTicks,
+                    now,
+                    0);
 
                 _pendingResumeSeeks[key] = pending;
 
-                // YouTube iframe playback needs a moment to exist before all
-                // clients accept the seek command reliably.
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
-                    await TrySendPendingResumeSeekAsync(key, "delayed start").ConfigureAwait(false);
-                });
+                // Some TV clients report the first progress event before the
+                // embedded YouTube player accepts remote seek commands. Keep
+                // retrying for a short window instead of spending the intent on
+                // that first 0 ms progress packet.
+                _ = Task.Run(() => RunPendingResumeSeekRetriesAsync(key));
             }
             catch (Exception ex)
             {
@@ -264,11 +269,6 @@ namespace Emby.YouTubePlugin
                     _pendingResumeSeeks.TryRemove(key, out _);
                     return;
                 }
-
-                // Progress can arrive before the delayed task fires. Treat it
-                // as an early retry point while the player is definitely alive.
-                _ = Task.Run(async () =>
-                    await TrySendPendingResumeSeekAsync(key, "progress").ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -419,25 +419,44 @@ namespace Emby.YouTubePlugin
                    ?? 0;
         }
 
-        private async Task TrySendPendingResumeSeekAsync(string key, string reason)
+        private async Task RunPendingResumeSeekRetriesAsync(string key)
+        {
+            await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
+
+            for (var attempt = 1; attempt <= ResumeSeekMaxAttempts; attempt++)
+            {
+                if (!await TrySendPendingResumeSeekAsync(key, $"attempt {attempt}").ConfigureAwait(false))
+                    return;
+
+                await Task.Delay(ResumeSeekRetryDelay).ConfigureAwait(false);
+            }
+
+            _pendingResumeSeeks.TryRemove(key, out _);
+        }
+
+        private async Task<bool> TrySendPendingResumeSeekAsync(string key, string reason)
         {
             if (_sessionManager == null)
-                return;
+                return false;
 
-            if (!_pendingResumeSeeks.TryRemove(key, out var pending))
-                return;
+            if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
+                return false;
 
             // The user may have switched videos during the delay. Never seek a
             // session that has already moved on to another item.
             if (!IsPendingSeekStillCurrent(pending))
             {
+                _pendingResumeSeeks.TryRemove(key, out _);
                 YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
-                return;
+                return false;
             }
 
-            var inFlightKey = $"{key}|{pending.PositionTicks}";
+            var nextPending = pending with { AttemptCount = pending.AttemptCount + 1 };
+            _pendingResumeSeeks.TryUpdate(key, nextPending, pending);
+
+            var inFlightKey = $"{key}|{pending.PositionTicks}|{nextPending.AttemptCount}";
             if (!_resumeSeeksInFlight.TryAdd(inFlightKey, DateTime.UtcNow))
-                return;
+                return true;
 
             try
             {
@@ -456,10 +475,12 @@ namespace Emby.YouTubePlugin
                     .ConfigureAwait(false);
 
                 YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
+                return true;
             }
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
+                return true;
             }
             finally
             {
