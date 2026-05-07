@@ -315,10 +315,6 @@ namespace Emby.YouTubePlugin
 
             if (!string.IsNullOrEmpty(deviceId))
                 Intents[MakeKey(userId, itemId, string.Empty)] = intent;
-
-            YouTubeChannel.LogPublic(
-                $"[YT] Intent captured: item={itemId} user={userId} deviceId={deviceId} "
-                + $"StartTimeTicks={startTimeTicks.Value} via={serviceRequest?.Verb ?? "?"}");
         }
 
         private static IRequest? GetServiceRequest(object service)

@@ -24,22 +24,16 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<long, byte> _imageRepairsInFlight = new();
         private readonly ConcurrentDictionary<string, DateTime> _resumeSeeksInFlight = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
-        private readonly ConcurrentDictionary<string, PlaybackProgressSnapshot> _youtubePlaybackProgress = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private ILibraryManager? _libraryManager;
         private ISessionManager? _sessionManager;
-        private IUserDataManager? _userDataManager;
         private Timer? _pollTimer;
         private Timer? _switchTimer;
         private int _pollRunning;
         private int _currentPollMinutes;
         private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
         private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
-        private const long UserDataProgressSaveDeltaTicks = TimeSpan.TicksPerSecond * 15;
         private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
-        private static readonly TimeSpan ResumeSeekRetryDelay = TimeSpan.FromMilliseconds(2500);
-        private const int ResumeSeekMaxAttempts = 4;
-        private static readonly TimeSpan UserDataProgressSaveInterval = TimeSpan.FromSeconds(20);
 
         private sealed record PendingResumeSeek(
             string Key,
@@ -48,19 +42,7 @@ namespace Emby.YouTubePlugin
             string VideoId,
             long ItemId,
             long PositionTicks,
-            long RuntimeTicks,
-            DateTime CreatedUtc,
-            int AttemptCount);
-
-        private sealed record PlaybackProgressSnapshot(
-            string Key,
-            long UserInternalId,
-            string VideoId,
-            long ItemId,
-            long PositionTicks,
-            long SavedPositionTicks,
-            DateTime LastSeenUtc,
-            DateTime LastSavedUtc);
+            long RuntimeTicks);
 
         // Static so Plugin.SaveConfiguration can update the hash directly when
         // settings are saved through the UI. Otherwise the next poll would
@@ -121,11 +103,10 @@ namespace Emby.YouTubePlugin
             try
             {
                 _sessionManager ??= Plugin.ResolveService<ISessionManager>();
-                _userDataManager ??= Plugin.ResolveService<IUserDataManager>();
 
-                if (_sessionManager == null || _userDataManager == null)
+                if (_sessionManager == null)
                 {
-                    YouTubeChannel.LogPublic("[YT] Resume seek hook disabled; playback services not available.");
+                    YouTubeChannel.LogPublic("[YT] Resume seek hook disabled; session manager not available.");
                     return;
                 }
 
@@ -158,14 +139,6 @@ namespace Emby.YouTubePlugin
                 if (string.IsNullOrEmpty(videoId))
                     return;
 
-                // Diagnostics so client-specific failures (LG, Theater, etc.)
-                // can be identified without a debugger attached.
-                YouTubeChannel.LogPublic(
-                    $"[YT] PlaybackStart fired: video={videoId} item={item.InternalId} "
-                    + $"client={session.Client ?? "?"} device={session.DeviceName ?? "?"} "
-                    + $"deviceId={session.DeviceId ?? "?"} userId={session.UserId ?? "?"} "
-                    + $"position={e.PlaybackPositionTicks.GetValueOrDefault()}");
-
                 // The captured intent is the source of truth. Without it we do
                 // not force a seek, because that would break explicit restarts.
                 if (!PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
@@ -173,9 +146,6 @@ namespace Emby.YouTubePlugin
                     YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; playback intent was not captured.");
                     return;
                 }
-
-                YouTubeChannel.LogPublic(
-                    $"[YT] Intent consumed for {videoId}: StartTimeTicks={intent.StartTimeTicks} capturedAt={intent.CapturedUtc:O}");
 
                 var positionTicks = intent.StartTimeTicks;
                 if (positionTicks < ResumeSeekMinimumTicks)
@@ -190,7 +160,6 @@ namespace Emby.YouTubePlugin
                     return;
 
                 var key = GetResumeSeekKey(e, item);
-                var now = DateTime.UtcNow;
                 var pending = new PendingResumeSeek(
                     key,
                     session.Id,
@@ -198,17 +167,17 @@ namespace Emby.YouTubePlugin
                     videoId,
                     item.InternalId,
                     positionTicks,
-                    runtimeTicks,
-                    now,
-                    0);
+                    runtimeTicks);
 
                 _pendingResumeSeeks[key] = pending;
 
-                // Some TV clients report the first progress event before the
-                // embedded YouTube player accepts remote seek commands. Keep
-                // retrying for a short window instead of spending the intent on
-                // that first 0 ms progress packet.
-                _ = Task.Run(() => RunPendingResumeSeekRetriesAsync(key));
+                // YouTube iframe playback needs a moment to exist before all
+                // clients accept the seek command reliably.
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
+                    await TrySendPendingResumeSeekAsync(key, "delayed start").ConfigureAwait(false);
+                });
             }
             catch (Exception ex)
             {
@@ -218,23 +187,9 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e)
         {
-            try
-            {
-                TrackYouTubePlaybackProgress(e, forceSave: true, playedToCompletion: e.PlayedToCompletion);
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] PlaybackStopped user data save failed: {ex.Message}");
-            }
-            finally
-            {
-                var sessionId = e.Session?.Id;
-                if (!string.IsNullOrEmpty(sessionId))
-                    CancelPendingResumeSeeksForSession(sessionId);
-
-                if (e.Item != null)
-                    _youtubePlaybackProgress.TryRemove(GetResumeSeekKey(e, e.Item), out _);
-            }
+            var sessionId = e.Session?.Id;
+            if (!string.IsNullOrEmpty(sessionId))
+                CancelPendingResumeSeeksForSession(sessionId);
         }
 
         private void CancelPendingResumeSeeksForSession(string sessionId)
@@ -254,8 +209,6 @@ namespace Emby.YouTubePlugin
                 if (item == null)
                     return;
 
-                TrackYouTubePlaybackProgress(e, forceSave: false, playedToCompletion: false);
-
                 var key = GetResumeSeekKey(e, item);
                 if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
                     return;
@@ -269,6 +222,11 @@ namespace Emby.YouTubePlugin
                     _pendingResumeSeeks.TryRemove(key, out _);
                     return;
                 }
+
+                // Progress can arrive before the delayed task fires. Treat it
+                // as an early retry point while the player is definitely alive.
+                _ = Task.Run(async () =>
+                    await TrySendPendingResumeSeekAsync(key, "progress").ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -283,180 +241,25 @@ namespace Emby.YouTubePlugin
             return $"{sessionId}|{playSessionId}|{item.InternalId}";
         }
 
-        private void TrackYouTubePlaybackProgress(
-            PlaybackProgressEventArgs e,
-            bool forceSave,
-            bool playedToCompletion)
-        {
-            if (_userDataManager == null)
-                return;
-
-            var item = e.Item;
-            if (item == null)
-                return;
-
-            var videoId = YouTubeImageProvider.TryGetVideoId(item);
-            if (string.IsNullOrEmpty(videoId))
-                return;
-
-            var userInternalId = GetPlaybackUserInternalId(e);
-            if (userInternalId <= 0)
-                return;
-
-            var key = GetResumeSeekKey(e, item);
-            _youtubePlaybackProgress.TryGetValue(key, out var previous);
-
-            var positionTicks = GetPlaybackPositionTicks(e);
-            if (positionTicks <= 0 && previous != null)
-                positionTicks = previous.PositionTicks;
-
-            if (!playedToCompletion && positionTicks < ResumeSeekMinimumTicks)
-                return;
-
-            var now = DateTime.UtcNow;
-            var lastSavedUtc = previous?.LastSavedUtc ?? DateTime.MinValue;
-            var savedPositionTicks = previous?.SavedPositionTicks ?? 0;
-            var shouldSave = forceSave
-                             || previous == null
-                             || now - lastSavedUtc >= UserDataProgressSaveInterval
-                             || Math.Abs(positionTicks - savedPositionTicks) >= UserDataProgressSaveDeltaTicks;
-
-            _youtubePlaybackProgress[key] = new PlaybackProgressSnapshot(
-                key,
-                userInternalId,
-                videoId,
-                item.InternalId,
-                positionTicks,
-                savedPositionTicks,
-                now,
-                lastSavedUtc);
-
-            if (!shouldSave)
-                return;
-
-            var reason = playedToCompletion
-                ? UserDataSaveReason.PlaybackFinished
-                : UserDataSaveReason.PlaybackProgress;
-
-            if (!SaveYouTubePlaybackPosition(item, userInternalId, videoId, positionTicks, playedToCompletion, reason))
-                return;
-
-            _youtubePlaybackProgress[key] = new PlaybackProgressSnapshot(
-                key,
-                userInternalId,
-                videoId,
-                item.InternalId,
-                positionTicks,
-                positionTicks,
-                now,
-                now);
-        }
-
-        private bool SaveYouTubePlaybackPosition(
-            BaseItem item,
-            long userInternalId,
-            string videoId,
-            long positionTicks,
-            bool playedToCompletion,
-            UserDataSaveReason reason)
-        {
-            if (_userDataManager == null)
-                return false;
-
-            var runtimeTicks = item.RunTimeTicks.GetValueOrDefault();
-            var completed = playedToCompletion
-                            || (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks);
-
-            if (!completed && positionTicks < ResumeSeekMinimumTicks)
-                return false;
-
-            try
-            {
-                var userData = _userDataManager.GetUserData(userInternalId, item);
-                if (userData == null)
-                    return false;
-
-                _userDataManager.UpdatePlayState(item, userData, completed && runtimeTicks > 0 ? runtimeTicks : positionTicks);
-
-                if (completed)
-                {
-                    userData.Played = true;
-                    userData.PlaybackPositionTicks = 0;
-                    userData.HideFromResume = true;
-                    userData.LastPlayedDate ??= DateTimeOffset.UtcNow;
-                    if (userData.PlayCount <= 0)
-                        userData.PlayCount = 1;
-                }
-                else
-                {
-                    userData.PlaybackPositionTicks = positionTicks;
-                    userData.HideFromResume = false;
-                }
-
-                _userDataManager.SaveUserData(userInternalId, item, userData, reason, CancellationToken.None);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] Failed to save YouTube progress for {videoId}: {ex.Message}");
-                return false;
-            }
-        }
-
-        private static long GetPlaybackUserInternalId(PlaybackProgressEventArgs e)
-        {
-            var sessionUserId = e.Session?.UserInternalId ?? 0;
-            if (sessionUserId > 0)
-                return sessionUserId;
-
-            return e.Users?.FirstOrDefault()?.InternalId ?? 0;
-        }
-
-        private static long GetPlaybackPositionTicks(PlaybackProgressEventArgs e)
-        {
-            return e.PlaybackPositionTicks
-                   ?? e.Session?.PlayState?.PositionTicks
-                   ?? 0;
-        }
-
-        private async Task RunPendingResumeSeekRetriesAsync(string key)
-        {
-            await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
-
-            for (var attempt = 1; attempt <= ResumeSeekMaxAttempts; attempt++)
-            {
-                if (!await TrySendPendingResumeSeekAsync(key, $"attempt {attempt}").ConfigureAwait(false))
-                    return;
-
-                await Task.Delay(ResumeSeekRetryDelay).ConfigureAwait(false);
-            }
-
-            _pendingResumeSeeks.TryRemove(key, out _);
-        }
-
-        private async Task<bool> TrySendPendingResumeSeekAsync(string key, string reason)
+        private async Task TrySendPendingResumeSeekAsync(string key, string reason)
         {
             if (_sessionManager == null)
-                return false;
+                return;
 
-            if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
-                return false;
+            if (!_pendingResumeSeeks.TryRemove(key, out var pending))
+                return;
 
             // The user may have switched videos during the delay. Never seek a
             // session that has already moved on to another item.
             if (!IsPendingSeekStillCurrent(pending))
             {
-                _pendingResumeSeeks.TryRemove(key, out _);
                 YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
-                return false;
+                return;
             }
 
-            var nextPending = pending with { AttemptCount = pending.AttemptCount + 1 };
-            _pendingResumeSeeks.TryUpdate(key, nextPending, pending);
-
-            var inFlightKey = $"{key}|{pending.PositionTicks}|{nextPending.AttemptCount}";
+            var inFlightKey = $"{key}|{pending.PositionTicks}";
             if (!_resumeSeeksInFlight.TryAdd(inFlightKey, DateTime.UtcNow))
-                return true;
+                return;
 
             try
             {
@@ -475,12 +278,10 @@ namespace Emby.YouTubePlugin
                     .ConfigureAwait(false);
 
                 YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
-                return true;
             }
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
-                return true;
             }
             finally
             {
