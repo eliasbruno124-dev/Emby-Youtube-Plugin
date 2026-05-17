@@ -24,16 +24,34 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<long, byte> _imageRepairsInFlight = new();
         private readonly ConcurrentDictionary<string, DateTime> _resumeSeeksInFlight = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, ResumeCheckpoint> _resumeCheckpoints = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, ResumeCheckpoint> _lastResumeProgressBySession = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, DateTime> _lastResumeCheckpointFlushByKey = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
+        private readonly object _resumeCheckpointFileLock = new();
         private ILibraryManager? _libraryManager;
         private ISessionManager? _sessionManager;
         private Timer? _pollTimer;
         private Timer? _switchTimer;
+        private Timer? _resumeCheckpointSaveTimer;
         private int _pollRunning;
         private int _currentPollMinutes;
+        private int _resumeCheckpointsDirty;
         private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
         private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
         private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
+        private static readonly TimeSpan ResumeSeekRetryDelay = TimeSpan.FromMilliseconds(1400);
+        // Grace window after a sent seek during which we wait for the client to
+        // actually process it. Without this, a Progress event that was emitted
+        // BEFORE the seek landed would falsely trigger another jump.
+        private static readonly TimeSpan ResumeSeekPostSendGrace = TimeSpan.FromSeconds(3);
+        private static readonly TimeSpan ResumeCheckpointFlushDelay = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan ResumeCheckpointFlushInterval = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan ResumeCheckpointTtl = TimeSpan.FromDays(180);
+        private static readonly TimeSpan RecentSessionRestartWindow = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan RecentSessionCleanupInterval = TimeSpan.FromSeconds(30);
+        private const int ResumeSeekMaxAttempts = 5;
+        private DateTime _lastRecentSessionCleanupUtc = DateTime.MinValue;
 
         private sealed record PendingResumeSeek(
             string Key,
@@ -42,7 +60,16 @@ namespace Emby.YouTubePlugin
             string VideoId,
             long ItemId,
             long PositionTicks,
-            long RuntimeTicks);
+            long RuntimeTicks,
+            int AttemptsSent,
+            DateTime? LastSeekUtc);
+
+        private sealed record ResumeCheckpoint(
+            string UserId,
+            string VideoId,
+            long PositionTicks,
+            long RuntimeTicks,
+            DateTime UpdatedUtc);
 
         // Static so Plugin.SaveConfiguration can update the hash directly when
         // settings are saved through the UI. Otherwise the next poll would
@@ -51,6 +78,9 @@ namespace Emby.YouTubePlugin
 
         private static string ConfigHashPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-config-hash.txt");
+
+        private static string ResumeCheckpointPath =>
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-resume-checkpoints.json");
 
         public PluginEntryPoint()
         {
@@ -71,6 +101,7 @@ namespace Emby.YouTubePlugin
             PlaybackIntentInterceptor.Install();
             YouTubeChannel.ScheduleSortNameFix();
             YouTubeChannel.LoadShortsProbeCache();
+            LoadResumeCheckpoints();
             AttachImageRepairHook();
             AttachResumeSeekHook();
 
@@ -139,25 +170,47 @@ namespace Emby.YouTubePlugin
                 if (string.IsNullOrEmpty(videoId))
                     return;
 
-                // The captured intent is the source of truth. Without it we do
-                // not force a seek, because that would break explicit restarts.
-                if (!PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
-                {
-                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; playback intent was not captured.");
-                    return;
-                }
-
-                var positionTicks = intent.StartTimeTicks;
-                if (positionTicks < ResumeSeekMinimumTicks)
-                {
-                    // Emby sends StartTimeTicks=0 for "play from beginning".
-                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; play from beginning was requested.");
-                    return;
-                }
-
                 var runtimeTicks = item.RunTimeTicks.GetValueOrDefault();
-                if (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks)
+                long positionTicks;
+
+                if (PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
+                {
+                    positionTicks = intent.StartTimeTicks;
+
+                    if (positionTicks < ResumeSeekMinimumTicks)
+                    {
+                        if (TryGetRecentSessionCheckpoint(session.Id, videoId, out var restartCheckpoint))
+                        {
+                            positionTicks = restartCheckpoint.PositionTicks;
+                            runtimeTicks = runtimeTicks > 0 ? runtimeTicks : restartCheckpoint.RuntimeTicks;
+                            YouTubeChannel.LogPublic($"[YT] Resume seek using recent session checkpoint for {videoId} after player restart.");
+                        }
+                        else
+                        {
+                            // Emby sends StartTimeTicks=0 for an explicit "play from beginning".
+                            RemoveResumeCheckpoint(session.UserId, videoId);
+                            YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; play from beginning was requested.");
+                            return;
+                        }
+                    }
+                }
+                else if (TryGetResumeCheckpoint(session.UserId, videoId, out var checkpoint))
+                {
+                    positionTicks = checkpoint.PositionTicks;
+                    runtimeTicks = runtimeTicks > 0 ? runtimeTicks : checkpoint.RuntimeTicks;
+                    YouTubeChannel.LogPublic($"[YT] Resume seek using plugin checkpoint for {videoId}; playback intent was not captured.");
+                }
+                else
+                {
+                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; no playback intent or checkpoint was available.");
                     return;
+                }
+
+                if (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks)
+                {
+                    RemoveResumeCheckpoint(session.UserId, videoId);
+                    return;
+                }
 
                 var key = GetResumeSeekKey(e, item);
                 var pending = new PendingResumeSeek(
@@ -167,17 +220,13 @@ namespace Emby.YouTubePlugin
                     videoId,
                     item.InternalId,
                     positionTicks,
-                    runtimeTicks);
+                    runtimeTicks,
+                    0,
+                    null);
 
                 _pendingResumeSeeks[key] = pending;
 
-                // YouTube iframe playback needs a moment to exist before all
-                // clients accept the seek command reliably.
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(ResumeSeekDelay).ConfigureAwait(false);
-                    await TrySendPendingResumeSeekAsync(key, "delayed start").ConfigureAwait(false);
-                });
+                SchedulePendingResumeSeek(key, ResumeSeekDelay, "delayed start");
             }
             catch (Exception ex)
             {
@@ -189,7 +238,14 @@ namespace Emby.YouTubePlugin
         {
             var sessionId = e.Session?.Id;
             if (!string.IsNullOrEmpty(sessionId))
+            {
                 CancelPendingResumeSeeksForSession(sessionId);
+                // A clean Stop ends the "is this a network restart?" window.
+                // Without this, an explicit replay within RecentSessionRestartWindow
+                // would be misinterpreted as a reconnect and skip back.
+                _lastResumeProgressBySession.TryRemove(sessionId, out _);
+                CleanupRecentSessionCheckpoints();
+            }
         }
 
         private void CancelPendingResumeSeeksForSession(string sessionId)
@@ -206,8 +262,22 @@ namespace Emby.YouTubePlugin
             try
             {
                 var item = e.Item;
+                var session = e.Session;
                 if (item == null)
                     return;
+
+                var videoId = YouTubeImageProvider.TryGetVideoId(item);
+                if (!string.IsNullOrEmpty(videoId))
+                {
+                    var currentTicksForCheckpoint = e.PlaybackPositionTicks.GetValueOrDefault();
+                    var runtimeTicksForCheckpoint = item.RunTimeTicks.GetValueOrDefault();
+                    TrackResumeCheckpoint(
+                        session?.Id,
+                        session?.UserId,
+                        videoId,
+                        currentTicksForCheckpoint,
+                        runtimeTicksForCheckpoint);
+                }
 
                 var key = GetResumeSeekKey(e, item);
                 if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
@@ -215,18 +285,27 @@ namespace Emby.YouTubePlugin
 
                 var currentTicks = e.PlaybackPositionTicks.GetValueOrDefault();
                 if (currentTicks >= ResumeSeekMinimumTicks
-                    && Math.Abs(currentTicks - pending.PositionTicks) <= ResumeSeekEndGuardTicks)
+                    && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
                 {
                     // The client is already in the requested area, so the
                     // pending retry is no longer needed.
                     _pendingResumeSeeks.TryRemove(key, out _);
+                    _resumeSeeksInFlight.TryRemove($"{key}|{pending.PositionTicks}", out _);
+                    return;
+                }
+
+                // Don't re-issue a seek while the client may still be processing
+                // the previous one — that Progress was likely emitted before our
+                // seek landed and would cause a visible double jump.
+                if (pending.LastSeekUtc is { } lastSeek
+                    && DateTime.UtcNow - lastSeek < ResumeSeekPostSendGrace)
+                {
                     return;
                 }
 
                 // Progress can arrive before the delayed task fires. Treat it
                 // as an early retry point while the player is definitely alive.
-                _ = Task.Run(async () =>
-                    await TrySendPendingResumeSeekAsync(key, "progress").ConfigureAwait(false));
+                SchedulePendingResumeSeek(key, TimeSpan.Zero, "progress");
             }
             catch (Exception ex)
             {
@@ -241,12 +320,30 @@ namespace Emby.YouTubePlugin
             return $"{sessionId}|{playSessionId}|{item.InternalId}";
         }
 
+        private void SchedulePendingResumeSeek(string key, TimeSpan delay, string reason)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (delay > TimeSpan.Zero)
+                        await Task.Delay(delay).ConfigureAwait(false);
+
+                    await TrySendPendingResumeSeekAsync(key, reason).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YT] Resume seek retry task failed: {ex.Message}");
+                }
+            });
+        }
+
         private async Task TrySendPendingResumeSeekAsync(string key, string reason)
         {
             if (_sessionManager == null)
                 return;
 
-            if (!_pendingResumeSeeks.TryRemove(key, out var pending))
+            if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
                 return;
 
             // The user may have switched videos during the delay. Never seek a
@@ -254,12 +351,36 @@ namespace Emby.YouTubePlugin
             if (!IsPendingSeekStillCurrent(pending))
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
+                _pendingResumeSeeks.TryRemove(key, out _);
                 return;
             }
 
             var inFlightKey = $"{key}|{pending.PositionTicks}";
-            if (!_resumeSeeksInFlight.TryAdd(inFlightKey, DateTime.UtcNow))
+            var now = DateTime.UtcNow;
+            if (_resumeSeeksInFlight.TryGetValue(inFlightKey, out var lastAttempt)
+                && now - lastAttempt < ResumeSeekRetryDelay)
+            {
                 return;
+            }
+
+            if (TryGetSessionPositionTicks(pending.SessionId, out var currentTicks)
+                && currentTicks >= ResumeSeekMinimumTicks
+                && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
+            {
+                _pendingResumeSeeks.TryRemove(key, out _);
+                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                return;
+            }
+
+            if (pending.AttemptsSent >= ResumeSeekMaxAttempts)
+            {
+                _pendingResumeSeeks.TryRemove(key, out _);
+                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                YouTubeChannel.LogPublic($"[YT] Resume seek gave up for {pending.VideoId}; player stayed before the resume point after {pending.AttemptsSent} attempts.");
+                return;
+            }
+
+            _resumeSeeksInFlight[inFlightKey] = now;
 
             try
             {
@@ -277,16 +398,54 @@ namespace Emby.YouTubePlugin
                         CancellationToken.None)
                     .ConfigureAwait(false);
 
-                YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
+                // TryUpdate avoids resurrecting a pending entry that was just
+                // removed (e.g. by PlaybackStopped) — if the slot moved on, the
+                // increment is simply skipped.
+                var updated = pending with
+                {
+                    AttemptsSent = pending.AttemptsSent + 1,
+                    LastSeekUtc = DateTime.UtcNow
+                };
+                _pendingResumeSeeks.TryUpdate(key, updated, pending);
+                YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}, attempt {updated.AttemptsSent}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
             }
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
             }
-            finally
+        }
+
+        // Cache the PropertyInfo per session type so we don't pay reflection
+        // cost on every retry. Some Emby builds expose the property on a
+        // derived type, so keyed by runtime Type is safest.
+        private static readonly ConcurrentDictionary<Type, PropertyInfo?> _sessionPositionPropertyCache = new();
+
+        private bool TryGetSessionPositionTicks(string sessionId, out long positionTicks)
+        {
+            positionTicks = 0;
+
+            try
             {
-                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                var session = _sessionManager?.Sessions
+                    .FirstOrDefault(s => string.Equals(s.Id, sessionId, StringComparison.Ordinal));
+                if (session == null)
+                    return false;
+
+                var prop = _sessionPositionPropertyCache.GetOrAdd(
+                    session.GetType(),
+                    t => t.GetProperty("PlaybackPositionTicks", BindingFlags.Instance | BindingFlags.Public));
+                if (prop?.GetValue(session) is long longValue)
+                {
+                    positionTicks = longValue;
+                    return true;
+                }
             }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Resume seek session-position check failed: {ex.Message}");
+            }
+
+            return false;
         }
 
         private bool IsPendingSeekStillCurrent(PendingResumeSeek pending)
@@ -313,6 +472,264 @@ namespace Emby.YouTubePlugin
                 return false;
             }
         }
+
+        private void TrackResumeCheckpoint(
+            string? sessionId,
+            string? userId,
+            string videoId,
+            long positionTicks,
+            long runtimeTicks)
+        {
+            if (string.IsNullOrWhiteSpace(videoId))
+                return;
+
+            CleanupRecentSessionCheckpoints();
+
+            var normalizedUserId = NormalizeResumeComponent(userId);
+            var normalizedVideoId = NormalizeResumeComponent(videoId);
+            if (string.IsNullOrEmpty(normalizedVideoId))
+                return;
+
+            if (positionTicks < ResumeSeekMinimumTicks)
+                return;
+
+            if (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks)
+            {
+                RemoveResumeCheckpoint(normalizedUserId, normalizedVideoId);
+                if (!string.IsNullOrEmpty(sessionId))
+                    _lastResumeProgressBySession.TryRemove(sessionId, out _);
+                return;
+            }
+
+            var checkpoint = new ResumeCheckpoint(
+                normalizedUserId,
+                normalizedVideoId,
+                positionTicks,
+                runtimeTicks,
+                DateTime.UtcNow);
+
+            if (!string.IsNullOrEmpty(sessionId))
+                _lastResumeProgressBySession[sessionId] = checkpoint;
+
+            if (string.IsNullOrEmpty(normalizedUserId))
+                return;
+
+            var key = MakeResumeCheckpointKey(normalizedUserId, normalizedVideoId);
+            if (_resumeCheckpoints.TryGetValue(key, out var existing)
+                && Math.Abs(existing.PositionTicks - positionTicks) < TimeSpan.TicksPerSecond * 3
+                && DateTime.UtcNow - existing.UpdatedUtc < ResumeCheckpointFlushInterval)
+            {
+                return;
+            }
+
+            _resumeCheckpoints[key] = checkpoint;
+
+            if (!_lastResumeCheckpointFlushByKey.TryGetValue(key, out var lastFlush)
+                || DateTime.UtcNow - lastFlush >= ResumeCheckpointFlushInterval)
+            {
+                _lastResumeCheckpointFlushByKey[key] = DateTime.UtcNow;
+                MarkResumeCheckpointsDirty();
+            }
+        }
+
+        private bool TryGetResumeCheckpoint(string? userId, string videoId, out ResumeCheckpoint checkpoint)
+        {
+            checkpoint = default!;
+            var normalizedUserId = NormalizeResumeComponent(userId);
+            var normalizedVideoId = NormalizeResumeComponent(videoId);
+            if (string.IsNullOrEmpty(normalizedUserId) || string.IsNullOrEmpty(normalizedVideoId))
+                return false;
+
+            var key = MakeResumeCheckpointKey(normalizedUserId, normalizedVideoId);
+            if (!_resumeCheckpoints.TryGetValue(key, out var candidate))
+                return false;
+
+            if (DateTime.UtcNow - candidate.UpdatedUtc > ResumeCheckpointTtl
+                || candidate.PositionTicks < ResumeSeekMinimumTicks
+                || candidate.RuntimeTicks > 0 && candidate.RuntimeTicks - candidate.PositionTicks < ResumeSeekEndGuardTicks)
+            {
+                RemoveResumeCheckpoint(normalizedUserId, normalizedVideoId);
+                return false;
+            }
+
+            checkpoint = candidate;
+            return true;
+        }
+
+        private bool TryGetRecentSessionCheckpoint(string? sessionId, string videoId, out ResumeCheckpoint checkpoint)
+        {
+            checkpoint = default!;
+            if (string.IsNullOrEmpty(sessionId))
+                return false;
+
+            if (!_lastResumeProgressBySession.TryGetValue(sessionId, out var candidate))
+                return false;
+
+            if (!string.Equals(candidate.VideoId, NormalizeResumeComponent(videoId), StringComparison.OrdinalIgnoreCase)
+                || DateTime.UtcNow - candidate.UpdatedUtc > RecentSessionRestartWindow
+                || candidate.PositionTicks < ResumeSeekMinimumTicks
+                || candidate.RuntimeTicks > 0 && candidate.RuntimeTicks - candidate.PositionTicks < ResumeSeekEndGuardTicks)
+            {
+                return false;
+            }
+
+            checkpoint = candidate;
+            return true;
+        }
+
+        private void CleanupRecentSessionCheckpoints()
+        {
+            // Called from every PlaybackProgress, so cheap-out unless enough
+            // time has passed since the last scan. Lock-free single-writer is
+            // fine; an occasional concurrent scan just does duplicate work.
+            var now = DateTime.UtcNow;
+            if (now - _lastRecentSessionCleanupUtc < RecentSessionCleanupInterval)
+                return;
+            _lastRecentSessionCleanupUtc = now;
+
+            var cutoff = now - RecentSessionRestartWindow;
+            foreach (var kvp in _lastResumeProgressBySession)
+            {
+                if (kvp.Value.UpdatedUtc < cutoff)
+                    _lastResumeProgressBySession.TryRemove(kvp.Key, out _);
+            }
+        }
+
+        private void RemoveResumeCheckpoint(string? userId, string? videoId)
+        {
+            var normalizedUserId = NormalizeResumeComponent(userId);
+            var normalizedVideoId = NormalizeResumeComponent(videoId);
+            if (string.IsNullOrEmpty(normalizedUserId) || string.IsNullOrEmpty(normalizedVideoId))
+                return;
+
+            var key = MakeResumeCheckpointKey(normalizedUserId, normalizedVideoId);
+            if (_resumeCheckpoints.TryRemove(key, out _))
+            {
+                _lastResumeCheckpointFlushByKey.TryRemove(key, out _);
+                MarkResumeCheckpointsDirty();
+            }
+        }
+
+        private void LoadResumeCheckpoints()
+        {
+            try
+            {
+                var path = ResumeCheckpointPath;
+                if (!File.Exists(path))
+                    return;
+
+                var json = File.ReadAllText(path);
+                var loaded = JsonSerializer.Deserialize<Dictionary<string, ResumeCheckpoint>>(json);
+                if (loaded == null)
+                    return;
+
+                var cutoff = DateTime.UtcNow - ResumeCheckpointTtl;
+                foreach (var kvp in loaded)
+                {
+                    var checkpoint = kvp.Value;
+                    if (checkpoint.UpdatedUtc < cutoff
+                        || checkpoint.PositionTicks < ResumeSeekMinimumTicks
+                        || string.IsNullOrEmpty(checkpoint.UserId)
+                        || string.IsNullOrEmpty(checkpoint.VideoId))
+                    {
+                        continue;
+                    }
+
+                    // Rebuild the key from the value so the in-memory dictionary's
+                    // OrdinalIgnoreCase contract holds regardless of how the JSON
+                    // was serialized.
+                    var key = MakeResumeCheckpointKey(checkpoint.UserId, checkpoint.VideoId);
+                    _resumeCheckpoints[key] = checkpoint;
+                }
+
+                YouTubeChannel.LogPublic($"[YT] Loaded {_resumeCheckpoints.Count} YouTube resume checkpoints.");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Failed to load YouTube resume checkpoints: {ex.Message}");
+            }
+        }
+
+        private void MarkResumeCheckpointsDirty()
+        {
+            Interlocked.Exchange(ref _resumeCheckpointsDirty, 1);
+
+            lock (_resumeCheckpointFileLock)
+            {
+                _resumeCheckpointSaveTimer ??= new Timer(_ => SaveResumeCheckpoints(), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                _resumeCheckpointSaveTimer.Change(ResumeCheckpointFlushDelay, Timeout.InfiniteTimeSpan);
+            }
+        }
+
+        private void SaveResumeCheckpoints()
+        {
+            if (Interlocked.Exchange(ref _resumeCheckpointsDirty, 0) == 0)
+                return;
+
+            try
+            {
+                var cutoff = DateTime.UtcNow - ResumeCheckpointTtl;
+                foreach (var kvp in _resumeCheckpoints)
+                {
+                    if (kvp.Value.UpdatedUtc < cutoff
+                        && _resumeCheckpoints.TryRemove(new KeyValuePair<string, ResumeCheckpoint>(kvp.Key, kvp.Value)))
+                    {
+                        _lastResumeCheckpointFlushByKey.TryRemove(kvp.Key, out _);
+                    }
+                }
+
+                // Trim the flush-tracker for keys that no longer exist so this
+                // dictionary does not grow unbounded over the plugin lifetime.
+                foreach (var flushKey in _lastResumeCheckpointFlushByKey.Keys)
+                {
+                    if (!_resumeCheckpoints.ContainsKey(flushKey))
+                        _lastResumeCheckpointFlushByKey.TryRemove(flushKey, out _);
+                }
+
+                var snapshot = _resumeCheckpoints.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
+                var path = ResumeCheckpointPath;
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir))
+                    Directory.CreateDirectory(dir);
+
+                var json = JsonSerializer.Serialize(snapshot);
+                lock (_resumeCheckpointFileLock)
+                {
+                    // Write to a sibling temp file and replace atomically so a
+                    // crash mid-write never leaves a truncated/corrupt JSON.
+                    var tempPath = path + ".tmp";
+                    File.WriteAllText(tempPath, json);
+                    if (File.Exists(path))
+                        File.Replace(tempPath, path, null);
+                    else
+                        File.Move(tempPath, path);
+                }
+            }
+            catch (Exception ex)
+            {
+                Interlocked.Exchange(ref _resumeCheckpointsDirty, 1);
+                // Re-arm the timer so we keep retrying even if no further
+                // playback progress arrives to trigger another mark-dirty.
+                try
+                {
+                    lock (_resumeCheckpointFileLock)
+                    {
+                        _resumeCheckpointSaveTimer?.Change(ResumeCheckpointFlushDelay, Timeout.InfiniteTimeSpan);
+                    }
+                }
+                catch
+                {
+                }
+
+                YouTubeChannel.LogPublic($"[YT] Failed to save YouTube resume checkpoints: {ex.Message}");
+            }
+        }
+
+        private static string MakeResumeCheckpointKey(string userId, string videoId) =>
+            $"{NormalizeResumeComponent(userId)}|{NormalizeResumeComponent(videoId)}";
+
+        private static string NormalizeResumeComponent(string? value) =>
+            (value ?? string.Empty).Trim();
 
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
@@ -651,6 +1068,8 @@ namespace Emby.YouTubePlugin
 
             _pollTimer?.Dispose();
             _switchTimer?.Dispose();
+            _resumeCheckpointSaveTimer?.Dispose();
+            SaveResumeCheckpoints();
             PlaybackIntentInterceptor.Uninstall();
         }
     }
