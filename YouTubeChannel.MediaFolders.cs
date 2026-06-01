@@ -96,7 +96,6 @@ namespace Emby.YouTubePlugin
             if (items.Count == 0)
                 return Msg(items, "No results found.");
 
-            ScheduleSortNameFix();
             return ToResult(items);
         }
 

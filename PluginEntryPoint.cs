@@ -23,6 +23,7 @@ namespace Emby.YouTubePlugin
 {
     public class PluginEntryPoint : IServerEntryPoint
     {
+        private readonly YouTubeSortNameRepairer _sortNameRepairer = new();
         private readonly ConcurrentDictionary<long, byte> _imageRepairsInFlight = new();
         private readonly ConcurrentDictionary<string, DateTime> _resumeSeeksInFlight = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
@@ -113,10 +114,10 @@ namespace Emby.YouTubePlugin
         public void Run()
         {
             // If the plugin DLL was updated, wipe transient caches automatically
-            // so users don't have to clear them by hand. Library items are
-            // left alone — only HTTP/JSON/probe caches under the plugin's
-            // cache dir get nuked. Runs BEFORE LoadShortsProbeCache so a stale
-            // cache from a previous version can't sneak back into memory.
+            // so users don't have to clear them by hand. Persistent plugin
+            // state stays intact: config hash, quota, logs and resume
+            // checkpoints are not cache files. Runs BEFORE LoadShortsProbeCache
+            // so stale probe cache entries can't sneak back into memory.
             WipeCachesIfPluginUpgraded();
 
             // Capture PlaybackInfo before PlaybackStart so resume and
@@ -124,9 +125,9 @@ namespace Emby.YouTubePlugin
             EmbeddedDependencyLoader.Register();
             PlaybackIntentInterceptor.Install();
             DashboardYouTubePlayerInterceptor.Install();
-            YouTubeChannel.ScheduleSortNameFix();
             YouTubeChannel.LoadShortsProbeCache();
             LoadResumeCheckpoints();
+            _sortNameRepairer.Start();
             AttachImageRepairHook();
             AttachResumeSeekHook();
 
@@ -1038,21 +1039,6 @@ namespace Emby.YouTubePlugin
                 var dataDir = Plugin.DataPath;
                 if (!string.IsNullOrEmpty(dataDir) && Directory.Exists(dataDir))
                 {
-                    // Wipe every file the plugin has ever written into the
-                    // Emby data dir. The naming pattern is consistent
-                    // ("youtube-*" and "shorts-probe-cache.json"), so this
-                    // also catches legacy names from older plugin versions
-                    // without having to list each one by hand.
-                    foreach (var file in Directory.EnumerateFiles(dataDir, "youtube-*"))
-                    {
-                        var name = Path.GetFileName(file);
-                        // Keep the version stamp itself — we rewrite it below.
-                        if (name == "youtube-plugin-version.txt") continue;
-                        // Keep the API quota counter so daily-limit tracking
-                        // stays accurate across plugin upgrades.
-                        if (name == "youtube-quota.json") continue;
-                        try { File.Delete(file); } catch { }
-                    }
                     var legacyShortsProbe = Path.Combine(dataDir, "shorts-probe-cache.json");
                     try { if (File.Exists(legacyShortsProbe)) File.Delete(legacyShortsProbe); } catch { }
                 }
@@ -1060,15 +1046,20 @@ namespace Emby.YouTubePlugin
                 try { File.WriteAllText(stampPath, current); }
                 catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to write plugin version stamp: {ex.Message}"); }
 
-                // Trigger a channel refresh in the background so items get
-                // re-classified (Shorts/Live tags) without the user having to
-                // poke it manually after every upgrade. Wait a bit first so
-                // Emby is done registering the channel.
+                // Trigger a shallow channel refresh in the background so the
+                // channel root updates after an upgrade. Wait long enough that
+                // Emby's startup metadata queue has had a chance to settle.
                 _ = Task.Run(async () =>
                 {
                     try
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromMinutes(2)).ConfigureAwait(false);
+                        if (string.IsNullOrWhiteSpace(Plugin.Instance?.Options.ApiKey))
+                        {
+                            YouTubeChannel.LogPublic("[YT] Skipping post-upgrade channel refresh; API key is not configured.");
+                            return;
+                        }
+
                         YouTubeChannel.LogPublic("[YT] Triggering post-upgrade channel refresh");
                         await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
                     }
@@ -1111,6 +1102,8 @@ namespace Emby.YouTubePlugin
 
             if (string.IsNullOrEmpty(YouTubeImageProvider.TryGetVideoId(item)))
                 return;
+
+            _sortNameRepairer.Enqueue(item);
 
             var itemId = item.InternalId;
             if (!_imageRepairsInFlight.TryAdd(itemId, 0))
@@ -1229,7 +1222,7 @@ namespace Emby.YouTubePlugin
             try { YouTubeApi.InvalidateAllCache(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation failed: {ex.Message}"); }
 
-            await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
+            await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
         }
 
         private async Task PollWatchLaterPlaylists(string apiKey, string watchLaterRaw)
@@ -1276,7 +1269,7 @@ namespace Emby.YouTubePlugin
             }
 
             if (anyChanged)
-                await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
+                await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
         }
 
         private static void TrySaveConfigHash(string currentHash)
@@ -1335,6 +1328,7 @@ namespace Emby.YouTubePlugin
             _pollTimer?.Dispose();
             _switchTimer?.Dispose();
             _resumeCheckpointSaveTimer?.Dispose();
+            _sortNameRepairer.Dispose();
             SaveResumeCheckpoints();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
@@ -1343,9 +1337,12 @@ namespace Emby.YouTubePlugin
 
     internal static class ChannelRefreshInvoker
     {
+        public const int RootRefreshDepth = 1;
+        public const int ContentRefreshDepth = 3;
         private static IChannelManager? _channelMgr;
         private static IChannel? _registeredChannel;
         private static int _refreshAgainRequested;
+        private static int _nextRefreshDepth = RootRefreshDepth;
 
         // Serializes channel refreshes. Save-triggered refreshes, watch-later
         // changes and bootstrap config-hash mismatches all funnel through the
@@ -1358,14 +1355,16 @@ namespace Emby.YouTubePlugin
             _registeredChannel = null;
         }
 
-        public static async Task TriggerRefreshAsync()
+        public static async Task TriggerRefreshAsync(int requestedDepth = RootRefreshDepth)
         {
+            RaiseNextRefreshDepth(requestedDepth);
+
             if (!await RefreshGate.WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false))
             {
                 // A refresh is already in flight. Queue one follow-up pass so
                 // settings saved mid-refresh are still picked up afterwards.
                 Interlocked.Exchange(ref _refreshAgainRequested, 1);
-                YouTubeChannel.LogPublic("[YT] TriggerRefresh: queued follow-up (refresh already in progress)");
+                YouTubeChannel.LogPublic($"[YT] TriggerRefresh: queued follow-up depth {NormalizeRefreshDepth(requestedDepth)} (refresh already in progress)");
                 return;
             }
 
@@ -1373,7 +1372,8 @@ namespace Emby.YouTubePlugin
             {
                 while (true)
                 {
-                    await TriggerRefreshCoreAsync().ConfigureAwait(false);
+                    var refreshDepth = ConsumeNextRefreshDepth();
+                    await TriggerRefreshCoreAsync(refreshDepth).ConfigureAwait(false);
 
                     if (Interlocked.Exchange(ref _refreshAgainRequested, 0) != 1)
                         break;
@@ -1386,11 +1386,11 @@ namespace Emby.YouTubePlugin
                 RefreshGate.Release();
 
                 if (Volatile.Read(ref _refreshAgainRequested) == 1)
-                    _ = Task.Run(TriggerRefreshAsync);
+                    _ = Task.Run(() => TriggerRefreshAsync());
             }
         }
 
-        private static async Task TriggerRefreshCoreAsync()
+        private static async Task TriggerRefreshCoreAsync(int refreshDepth)
         {
             try
             {
@@ -1400,11 +1400,11 @@ namespace Emby.YouTubePlugin
                     return;
                 }
 
-                YouTubeChannel.LogPublic("[YT] TriggerRefresh: invoking RefreshChannelContent on registered YouTube channel");
+                YouTubeChannel.LogPublic($"[YT] TriggerRefresh: invoking RefreshChannelContent on registered YouTube channel (depth {refreshDepth})");
 
                 var task = _channelMgr!.RefreshChannelContent(
                     _registeredChannel!,
-                    5,
+                    refreshDepth,
                     null,
                     CancellationToken.None);
 
@@ -1426,6 +1426,35 @@ namespace Emby.YouTubePlugin
             {
                 YouTubeChannel.LogPublic($"[YT] TriggerRefresh failed: {ex.Message}");
             }
+        }
+
+        private static void RaiseNextRefreshDepth(int requestedDepth)
+        {
+            var normalized = NormalizeRefreshDepth(requestedDepth);
+
+            while (true)
+            {
+                var current = Volatile.Read(ref _nextRefreshDepth);
+                if (current >= normalized)
+                    return;
+
+                if (Interlocked.CompareExchange(ref _nextRefreshDepth, normalized, current) == current)
+                    return;
+            }
+        }
+
+        private static int ConsumeNextRefreshDepth()
+        {
+            return NormalizeRefreshDepth(
+                Interlocked.Exchange(ref _nextRefreshDepth, RootRefreshDepth));
+        }
+
+        private static int NormalizeRefreshDepth(int requestedDepth)
+        {
+            if (requestedDepth < RootRefreshDepth)
+                return RootRefreshDepth;
+
+            return Math.Min(requestedDepth, ContentRefreshDepth);
         }
 
         private static bool EnsureChannelManager()

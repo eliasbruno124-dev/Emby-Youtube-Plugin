@@ -87,12 +87,10 @@ namespace Emby.YouTubePlugin
 
                     if (type == "trending")
                     {
-                        var trendingResult = await LoadTrending(apiKey, cancellationToken,
+                        return await LoadTrending(apiKey, cancellationToken,
                             (config.TrendingRegion ?? "").Trim(),
                             (config.TrendingCategory ?? "").Trim())
                             .ConfigureAwait(false);
-                        ScheduleSortNameFix();
-                        return trendingResult;
                     }
 
                     // Root of the categories browser.
@@ -106,18 +104,14 @@ namespace Emby.YouTubePlugin
                     if (type == "category")
                     {
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
-                        var catResult = await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false);
-                        ScheduleSortNameFix();
-                        return catResult;
+                        return await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false);
                     }
 
                     // Newest uploads across every saved channel.
                     if (type == "recent" && term == "all")
                     {
-                        var recentResult = await LoadRecentlyAdded(apiKey, config, cancellationToken)
+                        return await LoadRecentlyAdded(apiKey, config, cancellationToken)
                             .ConfigureAwait(false);
-                        ScheduleSortNameFix();
-                        return recentResult;
                     }
 
                     return await LoadMediaFolderAsync(apiKey, config, type, term, cancellationToken)
@@ -180,7 +174,5 @@ namespace Emby.YouTubePlugin
                 TotalRecordCount = items.Count
             };
 
-        // Keep Emby's stored sort names in sync after channel items are created.
-        internal static void ScheduleSortNameFix() => SortNameFixer.Schedule();
     }
 }

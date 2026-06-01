@@ -122,7 +122,7 @@ namespace Emby.YouTubePlugin
             // saves doesn't fan out into parallel scans.
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
-                try { await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false); }
+                try { await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false); }
                 catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Immediate refresh after save failed: {ex.Message}"); }
             });
         }
