@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/28462285/README.md)
+
 # Emby YouTube Plugin
 
 An Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
@@ -57,7 +57,7 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 
 - An Emby Server.
 - A YouTube Data API v3 key from Google Cloud. The built-in Setup Guide walks you through creating one.
-- .NET 8 SDK, only if you want to build the plugin from source.
+- .NET 6 SDK, only if you want to build the plugin from source.
 
 The API key only needs access to public YouTube data. After installation, open the plugin settings and use the built-in **Setup Guide** to create and restrict the key.
 
