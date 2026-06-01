@@ -6,3 +6,4 @@ obj/
 *.suo
 *.md
 
+local-md-backup/
