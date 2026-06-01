@@ -1,9 +1,9 @@
 bin/
 obj/
 .vs/
-
+scripts/
 *.user
 *.suo
-*.md
 
-local-md-backup/
+
+MD/
