@@ -1379,6 +1379,14 @@ namespace Emby.YouTubePlugin
         // bit longer after the last scan or a UI browse.
         private const long ScanQuietWindowMs = 120000;
 
+        // A change-driven refresh (config save / watch-later) must still be
+        // applied, so instead of skipping it waits for an in-progress scan to go
+        // quiet, then refreshes alone. Bounded so it can never wait forever:
+        // covers Emby's observed ~3.5 min scan plus the quiet-window settle time
+        // with margin, then refreshes anyway as a last resort.
+        private static readonly TimeSpan MaxScanWait = TimeSpan.FromMinutes(7);
+        private static readonly TimeSpan ScanWaitPollDelay = TimeSpan.FromSeconds(3);
+
         public static void NoteChannelScanActivity()
             => Volatile.Write(ref _lastChannelScanTicks, Environment.TickCount64);
 
@@ -1446,19 +1454,41 @@ namespace Emby.YouTubePlugin
                 }
 
                 // Emby serializes refreshes of the same channel, so if its own
-                // "Refresh Internet Channels" task is already walking the YouTube
-                // channel, our RefreshChannelContent would block behind that scan
-                // and trip the 120 s timeout below — and re-run the whole YouTube
-                // API scan a second time. This is exactly what happened on
-                // 2026-06-01 19:46: the post-upgrade refresh fired 33 s into
-                // Emby's scheduled scan and timed out at 120 s while Emby's scan
-                // finished fine on its own. Callers that exist only to repopulate
-                // (post-upgrade) pass skipIfScanActive so they yield to Emby's
-                // scan instead of duplicating it.
-                if (skipIfScanActive && IsRefreshInProgress)
+                // "Refresh Internet Channels" task (or another scan) is already
+                // walking the YouTube channel, launching our RefreshChannelContent
+                // now makes it block behind that scan and trip the 120 s timeout
+                // below — and re-run the whole YouTube API scan a second time.
+                // This is exactly what happened on 2026-06-01 19:46: the
+                // post-upgrade refresh fired 33 s into Emby's scheduled scan and
+                // timed out at 120 s while Emby's scan finished fine on its own.
+                if (IsRefreshInProgress)
                 {
-                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped; a channel scan is already in progress (it will populate the channel)");
-                    return;
+                    if (skipIfScanActive)
+                    {
+                        // Pure repopulation (post-upgrade): Emby's scan already
+                        // does exactly this, so there is nothing to add — yield
+                        // entirely rather than duplicate the scan.
+                        YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped; a channel scan is already in progress (it will populate the channel)");
+                        return;
+                    }
+
+                    // Change-driven refresh (config save / watch-later): the
+                    // user's change must be applied, so don't skip. Wait for the
+                    // in-progress scan to go quiet, then refresh alone — never
+                    // concurrently — so the change still lands without the
+                    // collision/timeout.
+                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: a channel scan is in progress; waiting for it to finish before refreshing");
+                    var waited = TimeSpan.Zero;
+                    while (IsRefreshInProgress && waited < MaxScanWait)
+                    {
+                        await Task.Delay(ScanWaitPollDelay).ConfigureAwait(false);
+                        waited += ScanWaitPollDelay;
+                    }
+
+                    if (IsRefreshInProgress)
+                        YouTubeChannel.LogPublic($"[YT] TriggerRefresh: scan still active after {MaxScanWait.TotalSeconds:0}s; refreshing anyway");
+                    else
+                        YouTubeChannel.LogPublic($"[YT] TriggerRefresh: scan finished after ~{waited.TotalSeconds:0}s; refreshing now");
                 }
 
                 YouTubeChannel.LogPublic($"[YT] TriggerRefresh: invoking RefreshChannelContent on registered YouTube channel (depth {refreshDepth})");
