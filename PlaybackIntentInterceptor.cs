@@ -1,10 +1,12 @@
 using MediaBrowser.Model.Services;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
@@ -271,11 +273,13 @@ namespace Emby.YouTubePlugin
             return Type.GetType(fullName, throwOnError: false);
         }
 
-        private static void CapturePlaybackInfoPostfix(object __instance, object __0)
+        private static void CapturePlaybackInfoPostfix(object __instance, object __0, ref Task<object> __result)
         {
             try
             {
-                CapturePlaybackInfo(__instance, __0);
+                var startTimeTicks = CapturePlaybackInfo(__instance, __0);
+                if (startTimeTicks is { } ticks && ticks >= TimeSpan.TicksPerSecond * 5 && __result != null)
+                    __result = StampYouTubeStartTimeAsync(__result, ticks);
             }
             catch (Exception ex)
             {
@@ -283,7 +287,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static void CapturePlaybackInfo(object service, object requestDto)
+        private static long? CapturePlaybackInfo(object service, object requestDto)
         {
             // In Emby 4.9 GET keeps StartTimeTicks in the query string, while
             // POST can carry it directly on the request DTO. Read both.
@@ -291,18 +295,18 @@ namespace Emby.YouTubePlugin
             var itemId = Normalize(GetStringProperty(requestDto, "Id"));
             var userId = Normalize(GetStringProperty(requestDto, "UserId"));
             if (string.IsNullOrEmpty(itemId) || string.IsNullOrEmpty(userId))
-                return;
+                return null;
 
             var isPlayback = TryReadBoolProperty(requestDto, "IsPlayback")
                 ?? TryReadBool(serviceRequest?.QueryString["IsPlayback"])
                 ?? true;
             if (!isPlayback)
-                return;
+                return null;
 
             var startTimeTicks = TryReadLongProperty(requestDto, "StartTimeTicks")
                 ?? TryReadLong(serviceRequest?.QueryString["StartTimeTicks"]);
             if (!startTimeTicks.HasValue)
-                return;
+                return null;
 
             CleanupExpired();
 
@@ -315,6 +319,106 @@ namespace Emby.YouTubePlugin
 
             if (!string.IsNullOrEmpty(deviceId))
                 Intents[MakeKey(userId, itemId, string.Empty)] = intent;
+
+            return startTimeTicks.Value;
+        }
+
+        private static async Task<object> StampYouTubeStartTimeAsync(Task<object> responseTask, long startTimeTicks)
+        {
+            var response = await responseTask.ConfigureAwait(false);
+            try
+            {
+                StampYouTubeStartTime(response, startTimeTicks);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo start-time stamp failed: {ex.Message}");
+            }
+
+            return response;
+        }
+
+        private static void StampYouTubeStartTime(object? response, long startTimeTicks)
+        {
+            var mediaSources = response?.GetType()
+                .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(response) as IEnumerable;
+            if (mediaSources == null)
+                return;
+
+            var changed = 0;
+            var seconds = Math.Max(0, startTimeTicks / TimeSpan.TicksPerSecond);
+            foreach (var mediaSource in mediaSources)
+            {
+                if (mediaSource == null)
+                    continue;
+
+                var pathProp = mediaSource.GetType()
+                    .GetProperty("Path", BindingFlags.Instance | BindingFlags.Public);
+                if (pathProp?.CanWrite != true)
+                    continue;
+
+                var path = pathProp.GetValue(mediaSource) as string;
+                var stampedPath = StampYouTubeUrl(path, seconds);
+                if (string.IsNullOrEmpty(stampedPath)
+                    || string.Equals(path, stampedPath, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                pathProp.SetValue(mediaSource, stampedPath);
+                SetNullableLongProperty(mediaSource, "ContainerStartTimeTicks", startTimeTicks);
+                changed++;
+            }
+
+            if (changed > 0)
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo media source stamped with YouTube start={seconds}s.");
+        }
+
+        private static string? StampYouTubeUrl(string? path, long seconds)
+        {
+            if (string.IsNullOrWhiteSpace(path)
+                || !Uri.TryCreate(path, UriKind.Absolute, out var uri)
+                || !IsYouTubeHost(uri.Host))
+            {
+                return null;
+            }
+
+            var queryParts = uri.Query.TrimStart('?')
+                .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(p =>
+                {
+                    var keyEnd = p.IndexOf('=');
+                    var key = keyEnd >= 0 ? p.Substring(0, keyEnd) : p;
+                    return !string.Equals(key, "t", StringComparison.OrdinalIgnoreCase)
+                           && !string.Equals(key, "start", StringComparison.OrdinalIgnoreCase);
+                })
+                .ToList();
+
+            queryParts.Add($"t={seconds.ToString(CultureInfo.InvariantCulture)}s");
+            queryParts.Add($"start={seconds.ToString(CultureInfo.InvariantCulture)}");
+
+            var builder = new UriBuilder(uri)
+            {
+                Query = string.Join("&", queryParts),
+                Fragment = string.Empty
+            };
+            return builder.Uri.ToString();
+        }
+
+        private static bool IsYouTubeHost(string host) =>
+            host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase)
+            || host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase)
+            || host.Equals("youtu.be", StringComparison.OrdinalIgnoreCase);
+
+        private static void SetNullableLongProperty(object source, string name, long value)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite == true
+                && (prop.PropertyType == typeof(long) || prop.PropertyType == typeof(long?)))
+            {
+                prop.SetValue(source, value);
+            }
         }
 
         private static IRequest? GetServiceRequest(object service)

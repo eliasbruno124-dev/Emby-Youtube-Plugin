@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- Target net6.0, not net8.0: the Emby Server app on macOS (and other
+         native installs) runs on the .NET 6 runtime, which cannot load a
+         net8.0 assembly (System.Runtime 8.0.0.0 missing) and drops the plugin
+         with a ReflectionTypeLoadException. A net6.0 assembly loads on .NET 6,
+         7 and 8 runtimes alike. -->
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.8.3</Version>
-    <AssemblyVersion>2.0.8.3</AssemblyVersion>
-    <FileVersion>2.0.8.3</FileVersion>
+    <Version>2.0.8.4</Version>
+    <AssemblyVersion>2.0.8.4</AssemblyVersion>
+    <FileVersion>2.0.8.4</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <HarmonyPackageVersion>2.4.2</HarmonyPackageVersion>
   </PropertyGroup>
@@ -15,7 +20,7 @@
     <EmbeddedResource Include="Configuration\*.html" />
     <EmbeddedResource Include="Configuration\*.js" />
     <EmbeddedResource Include="Configuration\guide\*.png" />
-    <EmbeddedResource Include="$(PkgLib_Harmony)\lib\net8.0\0Harmony.dll" LogicalName="Emby.YouTubePlugin.Embedded.0Harmony.dll" />
+    <EmbeddedResource Include="$(PkgLib_Harmony)\lib\net6.0\0Harmony.dll" LogicalName="Emby.YouTubePlugin.Embedded.0Harmony.dll" />
     <EmbeddedResource Include="thumb.png" />
     <Content Include="thumb.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

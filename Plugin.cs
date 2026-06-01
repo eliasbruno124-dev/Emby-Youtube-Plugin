@@ -27,18 +27,16 @@ namespace Emby.YouTubePlugin
         public static string? LibraryDbPath { get; private set; }
         public static string? CachePath { get; private set; }
         public static string? DataPath { get; private set; }
+        public static string? SystemConfigurationFilePath { get; private set; }
         public static IApplicationHost? AppHost { get; private set; }
         internal static ILogger? PluginLogger { get; private set; }
 
         public Plugin(
-            IApplicationHost applicationHost,
             IApplicationPaths applicationPaths,
             IXmlSerializer xmlSerializer) : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
-            AppHost = applicationHost;
             InitializePaths(applicationPaths);
-            TryInitLogger(applicationHost);
         }
 
         // Pulls a service out of Emby's IoC container via reflection. Emby
@@ -62,8 +60,17 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        internal static void InitializeApplicationHost(IApplicationHost applicationHost)
+        {
+            AppHost = applicationHost;
+            TryInitLogger(applicationHost);
+        }
+
         private static void TryInitLogger(IApplicationHost applicationHost)
         {
+            if (PluginLogger != null)
+                return;
+
             var factory = ResolveService<ILoggerFactory>(applicationHost);
             PluginLogger = factory?.CreateLogger("YouTubePlugin");
             if (PluginLogger == null)
@@ -154,6 +161,7 @@ namespace Emby.YouTubePlugin
             try
             {
                 DataPath = applicationPaths.DataPath;
+                SystemConfigurationFilePath = applicationPaths.SystemConfigurationFilePath;
                 var candidate = Path.Combine(applicationPaths.DataPath, "library.db");
                 if (File.Exists(candidate))
                     LibraryDbPath = candidate;

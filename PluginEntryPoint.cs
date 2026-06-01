@@ -1,8 +1,10 @@
+using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Session;
+using MediaBrowser.Common;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Session;
 using System;
@@ -26,11 +28,14 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, ResumeCheckpoint> _resumeCheckpoints = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, ResumeCheckpoint> _lastResumeProgressBySession = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, ResumePositionEstimate> _resumePositionEstimatesBySession = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, long> _resumeTrackingFloorsBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, DateTime> _lastResumeCheckpointFlushByKey = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private readonly object _resumeCheckpointFileLock = new();
         private ILibraryManager? _libraryManager;
         private ISessionManager? _sessionManager;
+        private IUserDataManager? _userDataManager;
         private Timer? _pollTimer;
         private Timer? _switchTimer;
         private Timer? _resumeCheckpointSaveTimer;
@@ -50,6 +55,7 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan ResumeCheckpointTtl = TimeSpan.FromDays(180);
         private static readonly TimeSpan RecentSessionRestartWindow = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan RecentSessionCleanupInterval = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan ResumePositionEstimateTtl = TimeSpan.FromMinutes(30);
         private const int ResumeSeekMaxAttempts = 5;
         private DateTime _lastRecentSessionCleanupUtc = DateTime.MinValue;
 
@@ -71,6 +77,14 @@ namespace Emby.YouTubePlugin
             long RuntimeTicks,
             DateTime UpdatedUtc);
 
+        private sealed record ResumePositionEstimate(
+            string UserId,
+            string VideoId,
+            long ItemId,
+            long BasePositionTicks,
+            long RuntimeTicks,
+            DateTime BaseUtc);
+
         // Static so Plugin.SaveConfiguration can update the hash directly when
         // settings are saved through the UI. Otherwise the next poll would
         // re-detect the same change and trigger a duplicate refresh.
@@ -82,8 +96,18 @@ namespace Emby.YouTubePlugin
         private static string ResumeCheckpointPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-resume-checkpoints.json");
 
-        public PluginEntryPoint()
+        public PluginEntryPoint(
+            IApplicationHost applicationHost,
+            ISessionManager sessionManager,
+            ILibraryManager libraryManager,
+            IUserDataManager userDataManager,
+            IChannelManager channelManager)
         {
+            Plugin.InitializeApplicationHost(applicationHost);
+            _sessionManager = sessionManager;
+            _libraryManager = libraryManager;
+            _userDataManager = userDataManager;
+            ChannelRefreshInvoker.Initialize(channelManager);
         }
 
         public void Run()
@@ -99,6 +123,7 @@ namespace Emby.YouTubePlugin
             // "play from beginning" can be told apart reliably.
             EmbeddedDependencyLoader.Register();
             PlaybackIntentInterceptor.Install();
+            DashboardYouTubePlayerInterceptor.Install();
             YouTubeChannel.ScheduleSortNameFix();
             YouTubeChannel.LoadShortsProbeCache();
             LoadResumeCheckpoints();
@@ -133,8 +158,6 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                _sessionManager ??= Plugin.ResolveService<ISessionManager>();
-
                 if (_sessionManager == null)
                 {
                     YouTubeChannel.LogPublic("[YT] Resume seek hook disabled; session manager not available.");
@@ -165,6 +188,8 @@ namespace Emby.YouTubePlugin
                     return;
 
                 CancelPendingResumeSeeksForSession(session.Id);
+                _resumePositionEstimatesBySession.TryRemove(session.Id, out _);
+                _resumeTrackingFloorsBySession.TryRemove(session.Id, out _);
 
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
                 if (string.IsNullOrEmpty(videoId))
@@ -225,6 +250,9 @@ namespace Emby.YouTubePlugin
                     null);
 
                 _pendingResumeSeeks[key] = pending;
+                _resumeTrackingFloorsBySession[session.Id] = Math.Max(
+                    ResumeSeekMinimumTicks,
+                    positionTicks - ResumeSeekEndGuardTicks);
 
                 SchedulePendingResumeSeek(key, ResumeSeekDelay, "delayed start");
             }
@@ -236,15 +264,64 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e)
         {
-            var sessionId = e.Session?.Id;
-            if (!string.IsNullOrEmpty(sessionId))
+            try
             {
-                CancelPendingResumeSeeksForSession(sessionId);
-                // A clean Stop ends the "is this a network restart?" window.
-                // Without this, an explicit replay within RecentSessionRestartWindow
-                // would be misinterpreted as a reconnect and skip back.
-                _lastResumeProgressBySession.TryRemove(sessionId, out _);
-                CleanupRecentSessionCheckpoints();
+                var item = e.Item;
+                var session = e.Session;
+                var sessionId = session?.Id;
+
+                if (item != null)
+                {
+                    var videoId = YouTubeImageProvider.TryGetVideoId(item);
+                    if (!string.IsNullOrEmpty(videoId))
+                    {
+                        if (e.PlayedToCompletion)
+                        {
+                            RemoveResumeCheckpoint(session?.UserId, videoId);
+                        }
+                        else
+                        {
+                            var stopPositionTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
+                            if (CanTrackPlaybackPosition(sessionId, stopPositionTicks))
+                            {
+                                TrackResumeCheckpoint(
+                                    sessionId,
+                                    session?.UserId,
+                                    videoId,
+                                    stopPositionTicks,
+                                    item.RunTimeTicks.GetValueOrDefault(),
+                                    forceSave: true);
+                                SaveNativeResumePosition(
+                                    item,
+                                    session,
+                                    stopPositionTicks,
+                                    UserDataSaveReason.PlaybackProgress);
+                            }
+                            else
+                            {
+                                RestoreProtectedNativeResumePosition(item, session, videoId);
+                            }
+                        }
+
+                        SaveResumeCheckpoints();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(sessionId))
+                {
+                    CancelPendingResumeSeeksForSession(sessionId);
+                    // A clean Stop ends the "is this a network restart?" window.
+                    // Without this, an explicit replay within RecentSessionRestartWindow
+                    // would be misinterpreted as a reconnect and skip back.
+                    _lastResumeProgressBySession.TryRemove(sessionId, out _);
+                    _resumePositionEstimatesBySession.TryRemove(sessionId, out _);
+                    _resumeTrackingFloorsBySession.TryRemove(sessionId, out _);
+                    CleanupRecentSessionCheckpoints();
+                }
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackStopped resume tracking failed: {ex.Message}");
             }
         }
 
@@ -267,23 +344,36 @@ namespace Emby.YouTubePlugin
                     return;
 
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
+                var key = GetResumeSeekKey(e, item);
+                var hasPendingSeek = _pendingResumeSeeks.TryGetValue(key, out var pending);
+                var currentTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
+
                 if (!string.IsNullOrEmpty(videoId))
                 {
-                    var currentTicksForCheckpoint = e.PlaybackPositionTicks.GetValueOrDefault();
-                    var runtimeTicksForCheckpoint = item.RunTimeTicks.GetValueOrDefault();
-                    TrackResumeCheckpoint(
-                        session?.Id,
-                        session?.UserId,
-                        videoId,
-                        currentTicksForCheckpoint,
-                        runtimeTicksForCheckpoint);
+                    if (CanTrackPlaybackPosition(session?.Id, currentTicks))
+                    {
+                        var runtimeTicksForCheckpoint = item.RunTimeTicks.GetValueOrDefault();
+                        TrackResumeCheckpoint(
+                            session?.Id,
+                            session?.UserId,
+                            videoId,
+                            currentTicks,
+                            runtimeTicksForCheckpoint);
+                        SaveNativeResumePosition(
+                            item,
+                            session,
+                            currentTicks,
+                            UserDataSaveReason.PlaybackProgress);
+                    }
+                    else
+                    {
+                        RestoreProtectedNativeResumePosition(item, session, videoId);
+                    }
                 }
 
-                var key = GetResumeSeekKey(e, item);
-                if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
+                if (!hasPendingSeek || pending == null)
                     return;
 
-                var currentTicks = e.PlaybackPositionTicks.GetValueOrDefault();
                 if (currentTicks >= ResumeSeekMinimumTicks
                     && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
                 {
@@ -291,6 +381,7 @@ namespace Emby.YouTubePlugin
                     // pending retry is no longer needed.
                     _pendingResumeSeeks.TryRemove(key, out _);
                     _resumeSeeksInFlight.TryRemove($"{key}|{pending.PositionTicks}", out _);
+                    _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
                     return;
                 }
 
@@ -313,11 +404,50 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private bool CanTrackPlaybackPosition(string? sessionId, long positionTicks)
+        {
+            if (positionTicks < ResumeSeekMinimumTicks)
+                return false;
+
+            if (string.IsNullOrEmpty(sessionId)
+                || !_resumeTrackingFloorsBySession.TryGetValue(sessionId, out var floorTicks))
+            {
+                return true;
+            }
+
+            if (positionTicks >= floorTicks)
+            {
+                _resumeTrackingFloorsBySession.TryRemove(sessionId, out _);
+                return true;
+            }
+
+            return false;
+        }
+
         private static string GetResumeSeekKey(PlaybackProgressEventArgs e, BaseItem item)
         {
             var sessionId = e.Session?.Id ?? string.Empty;
             var playSessionId = e.PlaySessionId ?? string.Empty;
             return $"{sessionId}|{playSessionId}|{item.InternalId}";
+        }
+
+        private long GetPlaybackPositionTicks(long? eventPositionTicks, object? session, string? videoId, long itemId)
+        {
+            var positionTicks = eventPositionTicks.GetValueOrDefault();
+            if (positionTicks > 0)
+                return positionTicks;
+
+            var sessionId = GetSessionId(session);
+            if (!string.IsNullOrEmpty(sessionId)
+                && TryGetSessionPositionTicks(sessionId, out var sessionPositionTicks)
+                && sessionPositionTicks > 0)
+            {
+                return sessionPositionTicks;
+            }
+
+            return TryGetEstimatedResumePositionTicks(sessionId, videoId, itemId, out var estimatedTicks)
+                ? estimatedTicks
+                : 0;
         }
 
         private void SchedulePendingResumeSeek(string key, TimeSpan delay, string reason)
@@ -352,6 +482,8 @@ namespace Emby.YouTubePlugin
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
                 _pendingResumeSeeks.TryRemove(key, out _);
+                _resumePositionEstimatesBySession.TryRemove(pending.SessionId, out _);
+                _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
                 return;
             }
 
@@ -369,6 +501,7 @@ namespace Emby.YouTubePlugin
             {
                 _pendingResumeSeeks.TryRemove(key, out _);
                 _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
                 return;
             }
 
@@ -376,6 +509,7 @@ namespace Emby.YouTubePlugin
             {
                 _pendingResumeSeeks.TryRemove(key, out _);
                 _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                _resumePositionEstimatesBySession.TryRemove(pending.SessionId, out _);
                 YouTubeChannel.LogPublic($"[YT] Resume seek gave up for {pending.VideoId}; player stayed before the resume point after {pending.AttemptsSent} attempts.");
                 return;
             }
@@ -397,6 +531,8 @@ namespace Emby.YouTubePlugin
                         request,
                         CancellationToken.None)
                     .ConfigureAwait(false);
+
+                ArmZeroPositionEstimateIfNeeded(pending);
 
                 // TryUpdate avoids resurrecting a pending entry that was just
                 // removed (e.g. by PlaybackStopped) — if the slot moved on, the
@@ -448,6 +584,131 @@ namespace Emby.YouTubePlugin
             return false;
         }
 
+        private void SaveNativeResumePosition(
+            BaseItem item,
+            SessionInfo? session,
+            long positionTicks,
+            UserDataSaveReason reason)
+        {
+            if (_userDataManager == null
+                || session == null
+                || session.UserInternalId <= 0
+                || positionTicks < ResumeSeekMinimumTicks)
+            {
+                return;
+            }
+
+            try
+            {
+                var data = _userDataManager.GetUserData(session.UserInternalId, item);
+                if (data == null)
+                    return;
+
+                var playedToCompletion = _userDataManager.UpdatePlayState(item, data, positionTicks);
+                if (!playedToCompletion && data.PlaybackPositionTicks <= 0)
+                    data.PlaybackPositionTicks = positionTicks;
+
+                _userDataManager.SaveUserData(
+                    session.UserInternalId,
+                    item,
+                    data,
+                    playedToCompletion ? UserDataSaveReason.PlaybackFinished : reason,
+                    CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Native resume position save failed: {ex.Message}");
+            }
+        }
+
+        private void RestoreProtectedNativeResumePosition(BaseItem item, SessionInfo? session, string videoId)
+        {
+            if (session == null || session.UserInternalId <= 0)
+                return;
+
+            var positionTicks = 0L;
+            if (TryGetResumeCheckpoint(session.UserId, videoId, out var checkpoint))
+            {
+                positionTicks = checkpoint.PositionTicks;
+            }
+            else if (_resumeTrackingFloorsBySession.TryGetValue(session.Id, out var floorTicks))
+            {
+                positionTicks = floorTicks + ResumeSeekEndGuardTicks;
+            }
+
+            if (positionTicks >= ResumeSeekMinimumTicks)
+            {
+                SaveNativeResumePosition(
+                    item,
+                    session,
+                    positionTicks,
+                    UserDataSaveReason.PlaybackProgress);
+            }
+        }
+
+        private void ArmZeroPositionEstimateIfNeeded(PendingResumeSeek pending)
+        {
+            var session = _sessionManager?.Sessions
+                .FirstOrDefault(s => string.Equals(s.Id, pending.SessionId, StringComparison.Ordinal));
+            if (!ShouldUseZeroPositionEstimate(session))
+                return;
+
+            _resumePositionEstimatesBySession[pending.SessionId] = new ResumePositionEstimate(
+                NormalizeResumeComponent(pending.UserId),
+                NormalizeResumeComponent(pending.VideoId),
+                pending.ItemId,
+                pending.PositionTicks,
+                pending.RuntimeTicks,
+                DateTime.UtcNow);
+        }
+
+        private static bool ShouldUseZeroPositionEstimate(object? session)
+        {
+            var client = GetStringProperty(session, "Client");
+            return client.IndexOf("Android", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private bool TryGetEstimatedResumePositionTicks(
+            string? sessionId,
+            string? videoId,
+            long itemId,
+            out long positionTicks)
+        {
+            positionTicks = 0;
+            if (string.IsNullOrEmpty(sessionId)
+                || !_resumePositionEstimatesBySession.TryGetValue(sessionId, out var estimate))
+            {
+                return false;
+            }
+
+            if (DateTime.UtcNow - estimate.BaseUtc > ResumePositionEstimateTtl
+                || estimate.ItemId != itemId
+                || !string.Equals(estimate.VideoId, NormalizeResumeComponent(videoId), StringComparison.OrdinalIgnoreCase))
+            {
+                _resumePositionEstimatesBySession.TryRemove(sessionId, out _);
+                return false;
+            }
+
+            var elapsedTicks = Math.Max(0, (DateTime.UtcNow - estimate.BaseUtc).Ticks);
+            var estimatedTicks = estimate.BasePositionTicks + elapsedTicks;
+            if (estimate.RuntimeTicks > 0)
+                estimatedTicks = Math.Min(estimatedTicks, Math.Max(0, estimate.RuntimeTicks - TimeSpan.TicksPerSecond));
+
+            if (estimatedTicks < ResumeSeekMinimumTicks)
+                return false;
+
+            positionTicks = estimatedTicks;
+            return true;
+        }
+
+        private static string? GetSessionId(object? session) =>
+            GetStringProperty(session, "Id");
+
+        private static string GetStringProperty(object? source, string name) =>
+            source?.GetType()
+                .GetProperty(name, BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(source) as string ?? string.Empty;
+
         private bool IsPendingSeekStillCurrent(PendingResumeSeek pending)
         {
             try
@@ -478,7 +739,8 @@ namespace Emby.YouTubePlugin
             string? userId,
             string videoId,
             long positionTicks,
-            long runtimeTicks)
+            long runtimeTicks,
+            bool forceSave = false)
         {
             if (string.IsNullOrWhiteSpace(videoId))
                 return;
@@ -515,7 +777,8 @@ namespace Emby.YouTubePlugin
                 return;
 
             var key = MakeResumeCheckpointKey(normalizedUserId, normalizedVideoId);
-            if (_resumeCheckpoints.TryGetValue(key, out var existing)
+            if (!forceSave
+                && _resumeCheckpoints.TryGetValue(key, out var existing)
                 && Math.Abs(existing.PositionTicks - positionTicks) < TimeSpan.TicksPerSecond * 3
                 && DateTime.UtcNow - existing.UpdatedUtc < ResumeCheckpointFlushInterval)
             {
@@ -524,7 +787,8 @@ namespace Emby.YouTubePlugin
 
             _resumeCheckpoints[key] = checkpoint;
 
-            if (!_lastResumeCheckpointFlushByKey.TryGetValue(key, out var lastFlush)
+            if (forceSave
+                || !_lastResumeCheckpointFlushByKey.TryGetValue(key, out var lastFlush)
                 || DateTime.UtcNow - lastFlush >= ResumeCheckpointFlushInterval)
             {
                 _lastResumeCheckpointFlushByKey[key] = DateTime.UtcNow;
@@ -592,6 +856,12 @@ namespace Emby.YouTubePlugin
             {
                 if (kvp.Value.UpdatedUtc < cutoff)
                     _lastResumeProgressBySession.TryRemove(kvp.Key, out _);
+            }
+
+            foreach (var kvp in _resumePositionEstimatesBySession)
+            {
+                if (now - kvp.Value.BaseUtc > ResumePositionEstimateTtl)
+                    _resumePositionEstimatesBySession.TryRemove(kvp.Key, out _);
             }
         }
 
@@ -818,7 +1088,6 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                _libraryManager ??= ResolveLibraryManager();
                 if (_libraryManager == null)
                 {
                     YouTubeChannel.LogPublic("[YTIMG] LibraryManager not available; post-refresh image repair disabled.");
@@ -833,9 +1102,6 @@ namespace Emby.YouTubePlugin
                 YouTubeChannel.LogPublic($"[YTIMG] Failed to attach image repair hook: {ex.Message}");
             }
         }
-
-        private static ILibraryManager? ResolveLibraryManager() =>
-            Plugin.ResolveService<ILibraryManager>();
 
         private void OnItemUpdated(object? sender, ItemChangeEventArgs e)
         {
@@ -1070,21 +1336,27 @@ namespace Emby.YouTubePlugin
             _switchTimer?.Dispose();
             _resumeCheckpointSaveTimer?.Dispose();
             SaveResumeCheckpoints();
+            DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
         }
     }
 
     internal static class ChannelRefreshInvoker
     {
-        private static object? _channelMgr;
-        private static object? _registeredChannel;
-        private static MethodInfo? _refreshContentMethod;
+        private static IChannelManager? _channelMgr;
+        private static IChannel? _registeredChannel;
         private static int _refreshAgainRequested;
 
         // Serializes channel refreshes. Save-triggered refreshes, watch-later
         // changes and bootstrap config-hash mismatches all funnel through the
         // same lock so we never run two YouTube scans at the same time.
         private static readonly SemaphoreSlim RefreshGate = new(1, 1);
+
+        public static void Initialize(IChannelManager channelManager)
+        {
+            _channelMgr = channelManager;
+            _registeredChannel = null;
+        }
 
         public static async Task TriggerRefreshAsync()
         {
@@ -1128,10 +1400,15 @@ namespace Emby.YouTubePlugin
                     return;
                 }
 
-                YouTubeChannel.LogPublic($"[YT] TriggerRefresh: invoking {_refreshContentMethod!.Name} on registered YouTube channel");
+                YouTubeChannel.LogPublic("[YT] TriggerRefresh: invoking RefreshChannelContent on registered YouTube channel");
 
-                var result = _refreshContentMethod.Invoke(_channelMgr, BuildRefreshArgs());
-                if (result is Task task)
+                var task = _channelMgr!.RefreshChannelContent(
+                    _registeredChannel!,
+                    5,
+                    null,
+                    CancellationToken.None);
+
+                if (task != null)
                 {
                     var completed = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120))).ConfigureAwait(false);
                     if (completed != task)
@@ -1151,111 +1428,31 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static object?[] BuildRefreshArgs()
-        {
-            var pars = _refreshContentMethod!.GetParameters();
-            var args = new object?[pars.Length];
-            for (var i = 0; i < pars.Length; i++)
-            {
-                var pt = pars[i].ParameterType;
-                var name = pars[i].Name ?? "";
-                if (pt.Name == "IChannel" || name == "channel")
-                    args[i] = _registeredChannel;
-                else if (pt == typeof(CancellationToken))
-                    args[i] = CancellationToken.None;
-                else if (name.Contains("maxRefresh", StringComparison.OrdinalIgnoreCase))
-                    args[i] = 5;
-                else if (pt == typeof(string))
-                    args[i] = null;
-                else if (pars[i].HasDefaultValue)
-                    args[i] = pars[i].DefaultValue;
-                else
-                    args[i] = pt.IsValueType ? Activator.CreateInstance(pt) : null;
-            }
-
-            return args;
-        }
-
         private static bool EnsureChannelManager()
         {
-            if (_channelMgr != null && _registeredChannel != null && _refreshContentMethod != null)
+            if (_channelMgr != null && _registeredChannel != null)
                 return true;
 
-            var appHost = Plugin.AppHost;
-            if (appHost == null) return false;
-
-            var iface = FindChannelManagerInterface();
-            if (iface == null) return false;
-
-            var resolve = appHost.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == "Resolve" && m.IsGenericMethodDefinition && m.GetParameters().Length == 0);
-            if (resolve == null) return false;
-
-            _channelMgr = resolve.MakeGenericMethod(iface).Invoke(appHost, null);
             if (_channelMgr == null) return false;
 
-            _refreshContentMethod = _channelMgr.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == "RefreshChannelContent");
-            if (_refreshContentMethod == null) return false;
-
-            _registeredChannel = FindRegisteredYouTubeChannel(_channelMgr);
+            _registeredChannel = FindRegisteredYouTubeChannel();
             return _registeredChannel != null;
         }
 
-        private static Type? FindChannelManagerInterface()
+        private static IChannel? FindRegisteredYouTubeChannel()
         {
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                try
-                {
-                    var iface = asm.GetTypes().FirstOrDefault(t => t.IsInterface && t.Name == "IChannelManager");
-                    if (iface != null) return iface;
-                }
-                catch (Exception ex)
-                {
-                    YouTubeChannel.LogPublic($"[YT] Failed scanning assembly for IChannelManager: {ex.Message}");
-                }
-            }
-
-            return null;
-        }
-
-        private static object? FindRegisteredYouTubeChannel(object channelManager)
-        {
-            var getChannel = channelManager.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m.Name == "GetChannel"
-                                     && m.IsGenericMethodDefinition
-                                     && m.GetParameters().Length == 0);
-            if (getChannel != null)
-            {
-                try
-                {
-                    var channel = getChannel.MakeGenericMethod(typeof(YouTubeChannel)).Invoke(channelManager, null);
-                    if (channel != null)
-                        return channel;
-                }
-                catch (Exception ex)
-                {
-                    YouTubeChannel.LogPublic($"[YT] TriggerRefresh: GetChannel<YouTubeChannel> failed: {ex.Message}");
-                }
-            }
-
-            var channelsProp = channelManager.GetType().GetProperty("Channels",
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (channelsProp == null)
+            if (_channelMgr == null)
                 return null;
 
-            var channels = channelsProp.GetValue(channelManager);
-            if (channels is not System.Collections.IEnumerable enumerable)
-                return null;
-
-            foreach (var ch in enumerable)
+            try
             {
-                if (ch?.GetType().Name == "YouTubeChannel")
-                    return ch;
+                return _channelMgr.GetChannel<YouTubeChannel>();
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] TriggerRefresh: GetChannel<YouTubeChannel> failed: {ex.Message}");
+                return null;
+            }
         }
     }
 }

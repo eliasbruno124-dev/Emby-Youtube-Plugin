@@ -427,8 +427,11 @@ namespace Emby.YouTubePlugin
             if (process == null)
                 return null;
 
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
+            // net6.0 has no CancellationToken overload of ReadToEndAsync; the
+            // WaitForExitAsync below carries the cancellation, and the reads
+            // complete when the process exits.
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
 
             await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
             var stdout = await stdoutTask.ConfigureAwait(false);
