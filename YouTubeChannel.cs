@@ -58,6 +58,11 @@ namespace Emby.YouTubePlugin
 
             Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
 
+            // Mark the channel pipeline as active so the sort-name / image repair
+            // queues pause their library.db writes. Covers refreshes started by
+            // Emby's own scheduled task as well as plugin-triggered ones.
+            ChannelRefreshInvoker.NoteChannelScanActivity();
+
             if (string.IsNullOrWhiteSpace(apiKey))
                 return Msg(items, "ERROR: Please configure a YouTube API Key in the plugin settings.");
 

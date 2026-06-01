@@ -1061,7 +1061,10 @@ namespace Emby.YouTubePlugin
                         }
 
                         YouTubeChannel.LogPublic("[YT] Triggering post-upgrade channel refresh");
-                        await ChannelRefreshInvoker.TriggerRefreshAsync().ConfigureAwait(false);
+                        // Yield to any channel scan Emby is already running near
+                        // startup: this refresh only needs to repopulate the
+                        // wiped caches, which Emby's own scan does anyway.
+                        await ChannelRefreshInvoker.TriggerRefreshAsync(skipIfScanActive: true).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -1120,6 +1123,12 @@ namespace Emby.YouTubePlugin
 
                     if (!YouTubeImageProvider.EnsurePrimaryImage(item, "item updated"))
                         return;
+
+                    // Don't write to library.db while a channel refresh is
+                    // persisting items; concurrent writers make SQLite fail with
+                    // "Busy: database is locked" on macOS Emby.
+                    while (ChannelRefreshInvoker.IsRefreshInProgress)
+                        await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
 
                     item.UpdateToRepository(ItemUpdateType.ImageUpdate);
                 }
@@ -1349,13 +1358,49 @@ namespace Emby.YouTubePlugin
         // same lock so we never run two YouTube scans at the same time.
         private static readonly SemaphoreSlim RefreshGate = new(1, 1);
 
+        // True while Emby's RefreshChannelContent is actively persisting channel
+        // items. The sort-name and image repair queues check this so they never
+        // write to library.db at the same time as the refresh; concurrent writers
+        // make SQLite fail with "Busy: database is locked" on macOS Emby.
+        private static int _refreshActive;
+
+        // Monotonic stamp of the last GetChannelItems call. RefreshChannelContent
+        // drives that method whether the refresh was started by the plugin or by
+        // Emby's own "Refresh Internet Channels" scheduled task, so it lets the
+        // repair queues also back off during Emby-initiated scans (which never
+        // set _refreshActive). Treated as "scan active" for a short quiet window.
+        private static long _lastChannelScanTicks;
+        // Emby's deep channel scan calls GetChannelItems in bursts with long
+        // quiet stretches between folders — a 78 s gap was observed mid-scan in
+        // the 2026-06-01 19:46 log. The window must out-last those gaps, or the
+        // gate would briefly report "quiet" mid-scan and let the repair queue /
+        // a redundant plugin refresh slip in. 120 s covers the observed gaps
+        // with margin; the only cost is cosmetic sort/image repairs pausing a
+        // bit longer after the last scan or a UI browse.
+        private const long ScanQuietWindowMs = 120000;
+
+        public static void NoteChannelScanActivity()
+            => Volatile.Write(ref _lastChannelScanTicks, Environment.TickCount64);
+
+        public static bool IsRefreshInProgress
+        {
+            get
+            {
+                if (Volatile.Read(ref _refreshActive) != 0)
+                    return true;
+
+                var last = Volatile.Read(ref _lastChannelScanTicks);
+                return last != 0 && Environment.TickCount64 - last < ScanQuietWindowMs;
+            }
+        }
+
         public static void Initialize(IChannelManager channelManager)
         {
             _channelMgr = channelManager;
             _registeredChannel = null;
         }
 
-        public static async Task TriggerRefreshAsync(int requestedDepth = RootRefreshDepth)
+        public static async Task TriggerRefreshAsync(int requestedDepth = RootRefreshDepth, bool skipIfScanActive = false)
         {
             RaiseNextRefreshDepth(requestedDepth);
 
@@ -1373,7 +1418,7 @@ namespace Emby.YouTubePlugin
                 while (true)
                 {
                     var refreshDepth = ConsumeNextRefreshDepth();
-                    await TriggerRefreshCoreAsync(refreshDepth).ConfigureAwait(false);
+                    await TriggerRefreshCoreAsync(refreshDepth, skipIfScanActive).ConfigureAwait(false);
 
                     if (Interlocked.Exchange(ref _refreshAgainRequested, 0) != 1)
                         break;
@@ -1390,7 +1435,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static async Task TriggerRefreshCoreAsync(int refreshDepth)
+        private static async Task TriggerRefreshCoreAsync(int refreshDepth, bool skipIfScanActive = false)
         {
             try
             {
@@ -1400,27 +1445,79 @@ namespace Emby.YouTubePlugin
                     return;
                 }
 
+                // Emby serializes refreshes of the same channel, so if its own
+                // "Refresh Internet Channels" task is already walking the YouTube
+                // channel, our RefreshChannelContent would block behind that scan
+                // and trip the 120 s timeout below — and re-run the whole YouTube
+                // API scan a second time. This is exactly what happened on
+                // 2026-06-01 19:46: the post-upgrade refresh fired 33 s into
+                // Emby's scheduled scan and timed out at 120 s while Emby's scan
+                // finished fine on its own. Callers that exist only to repopulate
+                // (post-upgrade) pass skipIfScanActive so they yield to Emby's
+                // scan instead of duplicating it.
+                if (skipIfScanActive && IsRefreshInProgress)
+                {
+                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: skipped; a channel scan is already in progress (it will populate the channel)");
+                    return;
+                }
+
                 YouTubeChannel.LogPublic($"[YT] TriggerRefresh: invoking RefreshChannelContent on registered YouTube channel (depth {refreshDepth})");
 
-                var task = _channelMgr!.RefreshChannelContent(
-                    _registeredChannel!,
-                    refreshDepth,
-                    null,
-                    CancellationToken.None);
-
-                if (task != null)
+                // Hold the gate up for the whole refresh so the repair queues
+                // never write to library.db while Emby is persisting channel
+                // items. The gate is cleared by a continuation on the REAL task,
+                // so it survives even when the refresh runs past our 120 s
+                // tracking window below. Clearing it early on the timeout would
+                // let the repair queue resume while Emby is still persisting and
+                // re-trigger Emby's own SaveItems "database is locked" (the empty
+                // home-screen symptom) — which retry/backoff cannot rescue
+                // because it is Emby's write, not ours, that fails.
+                Interlocked.Exchange(ref _refreshActive, 1);
+                var gateHandedOff = false;
+                try
                 {
+                    var task = _channelMgr!.RefreshChannelContent(
+                        _registeredChannel!,
+                        refreshDepth,
+                        null,
+                        CancellationToken.None);
+
+                    if (task == null)
+                    {
+                        YouTubeChannel.LogPublic("[YT] TriggerRefresh: completed (no refresh task)");
+                        return;
+                    }
+
+                    // From here the continuation owns dropping the gate, when
+                    // Emby actually finishes (success, fault or cancel).
+                    _ = task.ContinueWith(
+                        _ => Interlocked.Exchange(ref _refreshActive, 0),
+                        CancellationToken.None,
+                        TaskContinuationOptions.ExecuteSynchronously,
+                        TaskScheduler.Default);
+                    gateHandedOff = true;
+
                     var completed = await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(120))).ConfigureAwait(false);
                     if (completed != task)
                     {
-                        YouTubeChannel.LogPublic("[YT] TriggerRefresh timed out after 120 seconds");
+                        // Stop blocking the plugin's refresh loop, but leave the
+                        // gate up; the continuation drops it once Emby finishes,
+                        // keeping the repair queue paused until then.
+                        YouTubeChannel.LogPublic("[YT] TriggerRefresh still running after 120s; gate held until Emby finishes");
                         return;
                     }
 
                     await task.ConfigureAwait(false);
+                    YouTubeChannel.LogPublic("[YT] TriggerRefresh: completed");
                 }
-
-                YouTubeChannel.LogPublic("[YT] TriggerRefresh: completed");
+                finally
+                {
+                    // If the gate was never handed to the continuation (null task
+                    // or a synchronous throw before hand-off), drop it here so it
+                    // can never stick.
+                    if (!gateHandedOff)
+                        Interlocked.Exchange(ref _refreshActive, 0);
+                }
             }
             catch (Exception ex)
             {

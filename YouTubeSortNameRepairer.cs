@@ -12,6 +12,7 @@ namespace Emby.YouTubePlugin
     {
         private static readonly TimeSpan UpdateSpacing = TimeSpan.FromMilliseconds(750);
         private static readonly TimeSpan RetryBaseDelay = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan RefreshPollDelay = TimeSpan.FromMilliseconds(500);
         private const int MaxAttempts = 5;
         private const long SortDescendingFrom = 9_999_999_999L;
 
@@ -47,8 +48,21 @@ namespace Emby.YouTubePlugin
                 {
                     await _signal.WaitAsync(ct).ConfigureAwait(false);
 
-                    while (!ct.IsCancellationRequested && TryTakeNext(out var item))
+                    while (!ct.IsCancellationRequested)
                     {
+                        // Never write to library.db while Emby is persisting a
+                        // channel refresh. Two concurrent writers make SQLite
+                        // fail with "Busy: database is locked" on macOS Emby, so
+                        // the queued items wait here and drain once it finishes.
+                        if (ChannelRefreshInvoker.IsRefreshInProgress)
+                        {
+                            await Task.Delay(RefreshPollDelay, ct).ConfigureAwait(false);
+                            continue;
+                        }
+
+                        if (!TryTakeNext(out var item))
+                            break;
+
                         await RepairWithRetry(item, ct).ConfigureAwait(false);
                         await Task.Delay(UpdateSpacing, ct).ConfigureAwait(false);
                     }
