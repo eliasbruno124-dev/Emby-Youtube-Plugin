@@ -9,9 +9,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.8.5</Version>
-    <AssemblyVersion>2.0.8.5</AssemblyVersion>
-    <FileVersion>2.0.8.5</FileVersion>
+    <Version>2.0.8.6</Version>
+    <AssemblyVersion>2.0.8.6</AssemblyVersion>
+    <FileVersion>2.0.8.6</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <HarmonyPackageVersion>2.4.2</HarmonyPackageVersion>
   </PropertyGroup>
