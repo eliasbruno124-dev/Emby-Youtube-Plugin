@@ -43,7 +43,10 @@ namespace Emby.YouTubePlugin
         public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
         public bool IsEnabledByDefault => true;
 
-        public ChannelFeatures GetChannelFeatures() => new ChannelFeatures();
+        public ChannelFeatures GetChannelFeatures() => new ChannelFeatures
+        {
+            ShowRootFoldersAtTopLevel = true
+        };
 
         public async Task<ChannelItemResult> GetChannelItems(
             InternalChannelItemQuery query, CancellationToken cancellationToken)
