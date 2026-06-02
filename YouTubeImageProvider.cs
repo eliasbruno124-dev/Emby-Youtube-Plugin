@@ -62,16 +62,22 @@ namespace Emby.YouTubePlugin
             if (item == null) return null;
             try
             {
-                var providerId = NormalizeVideoId(item.GetProviderId("YouTube"));
-                if (!string.IsNullOrEmpty(providerId))
-                    return providerId;
-
+                // Identify our channel's videos ONLY by their youtube.com/watch
+                // (or youtu.be / /vi/) URL Path. Do NOT use
+                // item.GetProviderId("YouTube"): regular library items
+                // (movies/shows/anime) carry a "YouTube" provider id for their
+                // *trailer*, and matching on that made the plugin hijack those
+                // items' images and overwrite their sort names — observed on the
+                // anime "To Your Eternity" (id 7214) and "Magilumiere Magical
+                // Girls Inc." (id 7228). Our own channel videos always have a
+                // youtube watch URL as their Path; real library folders/files do
+                // not, so this cannot match them.
                 var path = item.Path;
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var videoId = NormalizeVideoId(path);
-                    if (!string.IsNullOrEmpty(videoId))
-                        return videoId;
+                    var m = VideoIdRegex.Match(path);
+                    if (m.Success)
+                        return m.Groups[1].Value;
                 }
             }
             catch (Exception ex)
@@ -79,21 +85,6 @@ namespace Emby.YouTubePlugin
                 Debug.WriteLine($"[YouTubeImageProvider] Could not inspect item: {ex.Message}");
             }
             return null;
-        }
-
-        private static string? NormalizeVideoId(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-
-            var trimmed = value.Trim();
-            var m = VideoIdRegex.Match(trimmed);
-            if (m.Success)
-                return m.Groups[1].Value;
-
-            return Regex.IsMatch(trimmed, @"^[A-Za-z0-9_-]{6,}$")
-                ? trimmed
-                : null;
         }
 
         public bool Supports(BaseItem item) => TryGetVideoId(item) != null;
