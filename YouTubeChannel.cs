@@ -45,7 +45,7 @@ namespace Emby.YouTubePlugin
 
         public ChannelFeatures Features => new ChannelFeatures
         {
-            ShowRootFoldersAtTopLevel = true
+            ShowRootFoldersAtTopLevel = false
         };
 
         public ChannelFeatures GetChannelFeatures() => Features;

@@ -1011,9 +1011,9 @@ namespace Emby.YouTubePlugin
         // clear caches by hand after every upgrade. Library items are NOT
         // touched.
         private static string ChannelSurfaceStampPath =>
-            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-channel-surface-v2.txt");
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-channel-surface-v3.txt");
 
-        private const string ChannelSurfaceStamp = "ihas-channel-features-root-top-level-video-folders";
+        private const string ChannelSurfaceStamp = "youtube-channel-container-video-folders";
 
         private bool WipeCachesIfPluginUpgraded()
         {
