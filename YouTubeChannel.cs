@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    public partial class YouTubeChannel : IChannel
+    public partial class YouTubeChannel : IChannel, IHasChannelFeatures
     {
         private static void Log(string msg) => LogPublic(msg);
         public static void LogPublic(string msg)
@@ -43,10 +43,12 @@ namespace Emby.YouTubePlugin
         public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
         public bool IsEnabledByDefault => true;
 
-        public ChannelFeatures GetChannelFeatures() => new ChannelFeatures
+        public ChannelFeatures Features => new ChannelFeatures
         {
             ShowRootFoldersAtTopLevel = true
         };
+
+        public ChannelFeatures GetChannelFeatures() => Features;
 
         public async Task<ChannelItemResult> GetChannelItems(
             InternalChannelItemQuery query, CancellationToken cancellationToken)

@@ -118,7 +118,8 @@ namespace Emby.YouTubePlugin
             // state stays intact: config hash, quota, logs and resume
             // checkpoints are not cache files. Runs BEFORE LoadShortsProbeCache
             // so stale probe cache entries can't sneak back into memory.
-            WipeCachesIfPluginUpgraded();
+            var upgradeRefreshQueued = WipeCachesIfPluginUpgraded();
+            EnsureChannelSurfaceMigration(upgradeRefreshQueued);
 
             // Capture PlaybackInfo before PlaybackStart so resume and
             // "play from beginning" can be told apart reliably.
@@ -1009,7 +1010,12 @@ namespace Emby.YouTubePlugin
         // from the one we recorded last time. Saves the user from having to
         // clear caches by hand after every upgrade. Library items are NOT
         // touched.
-        private void WipeCachesIfPluginUpgraded()
+        private static string ChannelSurfaceStampPath =>
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-channel-surface-v1.txt");
+
+        private const string ChannelSurfaceStamp = "ihas-channel-features-root-top-level";
+
+        private bool WipeCachesIfPluginUpgraded()
         {
             try
             {
@@ -1024,7 +1030,7 @@ namespace Emby.YouTubePlugin
                 catch { }
 
                 if (string.Equals(previous, current, StringComparison.Ordinal))
-                    return;
+                    return false;
 
                 YouTubeChannel.LogPublic($"[YT] Plugin version changed ({previous ?? "<none>"} -> {current}); wiping caches.");
 
@@ -1071,11 +1077,66 @@ namespace Emby.YouTubePlugin
                         YouTubeChannel.LogPublic($"[YT] Post-upgrade refresh failed: {ex.Message}");
                     }
                 });
+                return true;
             }
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] WipeCachesIfPluginUpgraded failed: {ex.Message}");
+                return false;
             }
+        }
+
+        private void EnsureChannelSurfaceMigration(bool upgradeRefreshAlreadyQueued)
+        {
+            try
+            {
+                var stampPath = ChannelSurfaceStampPath;
+                try
+                {
+                    if (File.Exists(stampPath)
+                        && string.Equals(File.ReadAllText(stampPath).Trim(), ChannelSurfaceStamp, StringComparison.Ordinal))
+                        return;
+                }
+                catch { }
+
+                if (upgradeRefreshAlreadyQueued)
+                {
+                    TryWriteChannelSurfaceStamp(stampPath);
+                    YouTubeChannel.LogPublic("[YT] Channel surface migration covered by post-upgrade refresh.");
+                    return;
+                }
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(75)).ConfigureAwait(false);
+                        if (string.IsNullOrWhiteSpace(Plugin.Instance?.Options.ApiKey))
+                        {
+                            YouTubeChannel.LogPublic("[YT] Skipping channel surface refresh; API key is not configured.");
+                            return;
+                        }
+
+                        YouTubeChannel.LogPublic("[YT] Triggering channel surface refresh");
+                        await ChannelRefreshInvoker.TriggerRefreshAsync(skipIfScanActive: true).ConfigureAwait(false);
+                        TryWriteChannelSurfaceStamp(stampPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        YouTubeChannel.LogPublic($"[YT] Channel surface refresh failed: {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] EnsureChannelSurfaceMigration failed: {ex.Message}");
+            }
+        }
+
+        private static void TryWriteChannelSurfaceStamp(string stampPath)
+        {
+            try { File.WriteAllText(stampPath, ChannelSurfaceStamp); }
+            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to write channel surface stamp: {ex.Message}"); }
         }
 
         private void AttachImageRepairHook()
