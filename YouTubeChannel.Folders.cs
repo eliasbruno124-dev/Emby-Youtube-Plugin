@@ -135,6 +135,8 @@ namespace Emby.YouTubePlugin
                 Name = name,
                 Id = id,
                 Type = ChannelItemType.Folder,
+                FolderType = ChannelFolderType.Container,
+                MediaType = ChannelMediaType.Video,
                 ImageUrl = imageUrl
             };
 
