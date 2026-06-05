@@ -583,10 +583,9 @@ define([
                 this.watchLaterItems = uniqueEntries(splitEntries(config.WatchLaterPlaylist));
                 this.syncEntryFields(view);
                 this.renderAllEntryLists(view);
+                setChecked(view, 'chkShowRootFoldersAtTopLevel', !!config.ShowRootFoldersAtTopLevel);
                 setChecked(view, 'chkShowTrending', config.ShowTrending !== false);
                 setChecked(view, 'chkShowCategories', config.ShowCategories !== false);
-                setChecked(view, 'chkShowRecentlyAdded', !!config.ShowRecentlyAdded);
-                setChecked(view, 'chkShowLiveFolders', !!config.ShowLiveFolders);
                 setChecked(view, 'chkShowShorts', config.HideShorts === true ? false : config.ShowShorts !== false);
                 setValue(view, 'selectTrendingRegion', config.TrendingRegion);
                 setValue(view, 'selectTrendingCategory', config.TrendingCategory === '0' ? '' : (config.TrendingCategory || ''));
@@ -595,7 +594,6 @@ define([
                 setValue(view, 'selectChannelSortBy', config.ChannelSortBy || 'date');
                 setValue(view, 'numMaxChannelVideos', config.MaxChannelVideos || 50);
                 setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
-                setValue(view, 'numRecentlyAddedPerChannel', config.RecentlyAddedPerChannel || 10);
                 setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
                 renderQuota(view, config);
                 setDonateButton(view);
@@ -622,10 +620,9 @@ define([
             this.syncEntryFields(view);
             config.SavedItems = this.savedItems.join(', ');
             config.WatchLaterPlaylist = this.watchLaterItems.join(', ');
+            config.ShowRootFoldersAtTopLevel = checked(view, 'chkShowRootFoldersAtTopLevel');
             config.ShowTrending = checked(view, 'chkShowTrending');
             config.ShowCategories = checked(view, 'chkShowCategories');
-            config.ShowRecentlyAdded = checked(view, 'chkShowRecentlyAdded');
-            config.ShowLiveFolders = checked(view, 'chkShowLiveFolders');
             config.ShowShorts = checked(view, 'chkShowShorts');
             config.HideShorts = false;
             config.TrendingRegion = value(view, 'selectTrendingRegion').trim().toUpperCase();
@@ -635,9 +632,11 @@ define([
             config.ChannelSortBy = value(view, 'selectChannelSortBy') || 'date';
             config.MaxChannelVideos = numberValue(view, 'numMaxChannelVideos', 50, 1, 150);
             config.MaxSearchVideos = numberValue(view, 'numMaxSearchVideos', 50, 1, 150);
-            config.RecentlyAddedPerChannel = numberValue(view, 'numRecentlyAddedPerChannel', 10, 1, 25);
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
             config.Donate = defaultDonateUrl;
+            delete config.ShowRecentlyAdded;
+            delete config.ShowLiveFolders;
+            delete config.RecentlyAddedPerChannel;
             delete config.QuotaStatus;
             delete config.QuotaUsedToday;
             delete config.QuotaDailyLimit;

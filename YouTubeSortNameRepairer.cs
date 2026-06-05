@@ -2,6 +2,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,11 +11,13 @@ namespace Emby.YouTubePlugin
 {
     internal sealed class YouTubeSortNameRepairer : IDisposable
     {
-        private static readonly TimeSpan UpdateSpacing = TimeSpan.FromMilliseconds(750);
+        private static readonly TimeSpan UpdateSpacing = TimeSpan.FromMilliseconds(200);
         private static readonly TimeSpan RetryBaseDelay = TimeSpan.FromSeconds(2);
         private static readonly TimeSpan RefreshPollDelay = TimeSpan.FromMilliseconds(500);
         private const int MaxAttempts = 5;
         private const long SortDescendingFrom = 9_999_999_999L;
+        private const int DayPrefixLength = 10;
+        private const int TimePrefixLength = 12;
 
         private readonly ConcurrentDictionary<long, BaseItem> _pending = new();
         private readonly SemaphoreSlim _signal = new(0);
@@ -26,16 +29,29 @@ namespace Emby.YouTubePlugin
             _worker ??= Task.Run(ProcessLoop);
         }
 
-        public void Enqueue(BaseItem? item)
+        public bool Enqueue(BaseItem? item)
         {
             if (item == null)
-                return;
+                return false;
 
             if (string.IsNullOrEmpty(YouTubeImageProvider.TryGetVideoId(item)))
-                return;
+                return false;
 
             _pending[item.InternalId] = item;
             try { _signal.Release(); } catch { }
+            return true;
+        }
+
+        public int Enqueue(IEnumerable<BaseItem> items)
+        {
+            var count = 0;
+            foreach (var item in items)
+            {
+                if (Enqueue(item))
+                    count++;
+            }
+
+            return count;
         }
 
         private async Task ProcessLoop()
@@ -63,8 +79,8 @@ namespace Emby.YouTubePlugin
                         if (!TryTakeNext(out var item))
                             break;
 
-                        await RepairWithRetry(item, ct).ConfigureAwait(false);
-                        await Task.Delay(UpdateSpacing, ct).ConfigureAwait(false);
+                        if (await RepairWithRetry(item, ct).ConfigureAwait(false))
+                            await Task.Delay(UpdateSpacing, ct).ConfigureAwait(false);
                     }
                 }
                 catch (OperationCanceledException)
@@ -90,25 +106,25 @@ namespace Emby.YouTubePlugin
             return false;
         }
 
-        private static async Task RepairWithRetry(BaseItem item, CancellationToken ct)
+        private static async Task<bool> RepairWithRetry(BaseItem item, CancellationToken ct)
         {
             for (var attempt = 1; attempt <= MaxAttempts && !ct.IsCancellationRequested; attempt++)
             {
                 try
                 {
                     if (!TryApplySortName(item, out var desiredSortName))
-                        return;
+                        return false;
 
                     item.UpdateToRepository(ItemUpdateType.MetadataEdit);
                     YouTubeChannel.LogPublic($"[YT] SortName repair updated item {item.InternalId} to '{desiredSortName}'.");
-                    return;
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     if (attempt >= MaxAttempts || !LooksLikeTransientDatabaseLock(ex))
                     {
                         YouTubeChannel.LogPublic($"[YT] SortName repair failed for item {item.InternalId}: {ex.Message}");
-                        return;
+                        return false;
                     }
 
                     var delay = TimeSpan.FromTicks(RetryBaseDelay.Ticks * attempt);
@@ -116,6 +132,8 @@ namespace Emby.YouTubePlugin
                     await Task.Delay(delay, ct).ConfigureAwait(false);
                 }
             }
+
+            return false;
         }
 
         private static bool TryApplySortName(BaseItem item, out string desiredSortName)
@@ -139,10 +157,13 @@ namespace Emby.YouTubePlugin
             if (baseSortName.Length == 0)
                 return false;
 
-            var dayNumber = date.UtcDateTime.Ticks / TimeSpan.TicksPerDay;
-            var prefix = Math.Max(0, SortDescendingFrom - dayNumber)
+            var utc = date.UtcDateTime;
+            var dayNumber = utc.Ticks / TimeSpan.TicksPerDay;
+            var dayPrefix = Math.Max(0, SortDescendingFrom - dayNumber)
                 .ToString("D10", CultureInfo.InvariantCulture);
-            desiredSortName = prefix + " " + baseSortName;
+            var timePrefix = Math.Max(0, TimeSpan.TicksPerDay - 1 - utc.TimeOfDay.Ticks)
+                .ToString("D12", CultureInfo.InvariantCulture);
+            desiredSortName = dayPrefix + " " + timePrefix + " " + baseSortName;
 
             if (string.Equals(currentSortName, desiredSortName, StringComparison.Ordinal))
                 return false;
@@ -153,16 +174,32 @@ namespace Emby.YouTubePlugin
 
         private static string StripDatePrefix(string sortName)
         {
-            if (sortName.Length < 11 || sortName[10] != ' ')
+            if (!HasNumericPrefix(sortName, DayPrefixLength) || sortName.Length <= DayPrefixLength || sortName[DayPrefixLength] != ' ')
                 return sortName;
 
-            for (var i = 0; i < 10; i++)
+            var remainder = sortName.Substring(DayPrefixLength + 1);
+            if (HasNumericPrefix(remainder, TimePrefixLength)
+                && remainder.Length > TimePrefixLength
+                && remainder[TimePrefixLength] == ' ')
             {
-                if (!char.IsDigit(sortName[i]))
-                    return sortName;
+                return remainder.Substring(TimePrefixLength + 1);
             }
 
-            return sortName.Substring(11);
+            return remainder;
+        }
+
+        private static bool HasNumericPrefix(string value, int length)
+        {
+            if (value.Length < length)
+                return false;
+
+            for (var i = 0; i < length; i++)
+            {
+                if (!char.IsDigit(value[i]))
+                    return false;
+            }
+
+            return true;
         }
 
         private static bool LooksLikeTransientDatabaseLock(Exception ex)

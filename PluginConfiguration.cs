@@ -16,9 +16,7 @@ namespace Emby.YouTubePlugin
 
         public bool ShowCategories { get; set; } = true;
 
-        public bool ShowRecentlyAdded { get; set; } = false;
-
-        public bool ShowLiveFolders { get; set; } = false;
+        public bool ShowRootFoldersAtTopLevel { get; set; } = false;
 
         public bool ShowShorts { get; set; } = true;
 
@@ -41,8 +39,6 @@ namespace Emby.YouTubePlugin
         public int MaxChannelVideos { get; set; } = 50;
 
         public int MaxSearchVideos { get; set; } = 50;
-
-        public int RecentlyAddedPerChannel { get; set; } = 10;
 
         public int WatchLaterPollMinutes { get; set; } = 3;
 

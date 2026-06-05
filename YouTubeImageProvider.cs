@@ -62,22 +62,26 @@ namespace Emby.YouTubePlugin
             if (item == null) return null;
             try
             {
-                // Identify our channel's videos ONLY by their youtube.com/watch
-                // (or youtu.be / /vi/) URL Path. Do NOT use
-                // item.GetProviderId("YouTube"): regular library items
-                // (movies/shows/anime) carry a "YouTube" provider id for their
-                // *trailer*, and matching on that made the plugin hijack those
-                // items' images and overwrite their sort names — observed on the
-                // anime "To Your Eternity" (id 7214) and "Magilumiere Magical
-                // Girls Inc." (id 7228). Our own channel videos always have a
-                // youtube watch URL as their Path; real library folders/files do
-                // not, so this cannot match them.
+                // Identify our channel videos by the tuple Emby persists for
+                // channel items: watch URL, matching YouTube provider id, and
+                // an ExternalId derived from the raw video id. Trailer/preview
+                // rows can also have YouTube watch paths and channel media
+                // source data, but their ExternalId is usually the URL or
+                // another library id.
                 var path = item.Path;
                 if (!string.IsNullOrEmpty(path))
                 {
                     var m = VideoIdRegex.Match(path);
                     if (m.Success)
-                        return m.Groups[1].Value;
+                    {
+                        var videoId = m.Groups[1].Value;
+                        var providerId = item.GetProviderId("YouTube");
+                        if (string.Equals(providerId, videoId, StringComparison.Ordinal)
+                            && IsPluginExternalId(item.ExternalId, videoId))
+                        {
+                            return videoId;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -85,6 +89,13 @@ namespace Emby.YouTubePlugin
                 Debug.WriteLine($"[YouTubeImageProvider] Could not inspect item: {ex.Message}");
             }
             return null;
+        }
+
+        private static bool IsPluginExternalId(string? externalId, string videoId)
+        {
+            return string.Equals(externalId, videoId, StringComparison.Ordinal)
+                || string.Equals(externalId, "REEL_" + videoId, StringComparison.Ordinal)
+                || string.Equals(externalId, "LIVE_" + videoId, StringComparison.Ordinal);
         }
 
         public bool Supports(BaseItem item) => TryGetVideoId(item) != null;

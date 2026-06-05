@@ -461,6 +461,12 @@
                         </div>
                         <div class="checkboxGroup">
                             <label class="checkboxContainer">
+                                <input is="emby-checkbox" id="chkShowRootFoldersAtTopLevel" type="checkbox" />
+                                <span>Show YouTube root folders at Emby's top level — saved channels, playlists, Watch
+                                    Later, Trending and Categories can appear as separate Emby folders. Leave off to keep
+                                    one YouTube entry with the channel folders inside.</span>
+                            </label>
+                            <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowTrending" type="checkbox" />
                                 <span>Show Trending — a folder with the most-watched videos right now in the selected
                                     region.</span>
@@ -470,17 +476,6 @@
                                 <span>Show Categories Browser — a folder with subfolders per YouTube category (Music,
                                     Gaming, …) showing trending in each. Costs a few extra quota units on first
                                     refresh.</span>
-                            </label>
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowRecentlyAdded" type="checkbox" />
-                                <span>Show Recently Added — a single feed mixing the newest uploads from all your saved
-                                    channels in chronological order.</span>
-                            </label>
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowLiveFolders" type="checkbox" />
-                                <span>Show Live &amp; Upcoming folders — adds a "🔴 Live &amp; Upcoming" subfolder per
-                                    channel. Slows down channel browsing slightly because each channel is checked for
-                                    live streams.</span>
                             </label>
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowShorts" type="checkbox" />
@@ -581,17 +576,6 @@
                                     Cap on results per search-text entry (1–150). Default 50. Each search costs 100
                                     quota units regardless of result count, so prefer @handles or channel IDs when
                                     possible.
-                                </div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="numRecentlyAddedPerChannel">Recently
-                                    Added: Videos per Channel</label>
-                                <input is="emby-input" id="numRecentlyAddedPerChannel" type="number" min="1" max="25"
-                                    step="1" value="10" />
-                                <div class="fieldDescription">
-                                    How many of the newest videos to pull from <em>each</em> saved channel into the
-                                    Recently Added feed (1–25). Default 10. Only relevant if "Show Recently Added" is
-                                    enabled.
                                 </div>
                             </div>
                         </div>

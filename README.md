@@ -2,7 +2,7 @@
 
 An Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
 
-The plugin adds a YouTube entry to Emby and lets you browse saved channels, playlists, Watch Later-style playlists, trending videos, categories, Shorts, live streams, and recently added uploads from one place.
+The plugin adds a YouTube entry to Emby and lets you browse saved channels, playlists, Watch Later-style playlists, trending videos, categories, and Shorts from one place.
 
 ## Highlights
 
@@ -11,10 +11,10 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Add search folders for occasional YouTube searches.
 - Create Watch Later-style folders from playlist IDs.
 - Show Trending and category folders for a selected region.
-- Show Recently Added across all saved channels.
-- Split channels into Videos, Shorts, and Live & Upcoming when those folders have content.
+- Split channels into Videos and Shorts when those folders have content.
 - Hide Shorts globally if you prefer a long-form-only view.
-- Hide empty playlists, categories, Shorts folders, and live folders.
+- Hide empty playlists, categories, and Shorts folders.
+- Optionally show YouTube root folders as top-level Emby folders instead of one YouTube container.
 - Track estimated daily YouTube API quota usage.
 
 
@@ -94,9 +94,11 @@ The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes 
 Saved channels open in the cleanest layout the plugin can provide:
 
 - If a channel only has normal videos, Emby opens the video list directly.
-- If Shorts or live content exist, the channel shows subfolders.
-- Empty Shorts and Live & Upcoming folders are hidden.
+- If Shorts exist, the channel shows subfolders.
+- Empty Shorts folders are hidden.
 - Empty playlists and empty category folders are hidden.
+
+By default, Emby shows one top-level YouTube entry and keeps saved channels inside it. Enable **Show YouTube root folders at Emby's top level** if you want Emby to surface saved channels, playlists, Watch Later, Trending, and Categories as separate top-level folders.
 
 Shorts detection uses YouTube metadata such as tags, `#shorts`, and vertical player dimensions. It does not rely on video length alone, because many normal videos are short without being YouTube Shorts.
 

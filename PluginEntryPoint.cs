@@ -130,6 +130,7 @@ namespace Emby.YouTubePlugin
             LoadResumeCheckpoints();
             _sortNameRepairer.Start();
             AttachImageRepairHook();
+            QueueExistingSortNameRepair("startup");
             AttachResumeSeekHook();
 
             try
@@ -1204,6 +1205,32 @@ namespace Emby.YouTubePlugin
             });
         }
 
+        private void QueueExistingSortNameRepair(string reason)
+        {
+            var libraryManager = _libraryManager;
+            if (libraryManager == null)
+            {
+                YouTubeChannel.LogPublic($"[YT] SortName repair library scan skipped ({reason}); LibraryManager not available.");
+                return;
+            }
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+
+                    var items = libraryManager.GetItemList(new InternalItemsQuery());
+                    var queued = _sortNameRepairer.Enqueue(items);
+                    YouTubeChannel.LogPublic($"[YT] SortName repair queued {queued} existing YouTube items ({reason}).");
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YT] SortName repair library scan failed ({reason}): {ex.Message}");
+                }
+            });
+        }
+
         // Called from Plugin.SaveConfiguration so a settings save updates the
         // hash and the running poll interval in one shot. Returns the new hash.
         internal static string MarkConfigSaved(PluginConfiguration config)
@@ -1366,10 +1393,9 @@ namespace Emby.YouTubePlugin
                 (c.ApiKey ?? "").Trim(),
                 (c.SavedItems ?? "").Trim(),
                 (c.WatchLaterPlaylist ?? "").Trim(),
+                c.ShowRootFoldersAtTopLevel ? "1" : "0",
                 c.ShowTrending ? "1" : "0",
                 c.ShowCategories ? "1" : "0",
-                c.ShowRecentlyAdded ? "1" : "0",
-                c.ShowLiveFolders ? "1" : "0",
                 c.ShortsEnabled ? "1" : "0",
                 (c.TrendingRegion ?? "").Trim(),
                 (c.TrendingCategory ?? "").Trim(),
@@ -1378,7 +1404,6 @@ namespace Emby.YouTubePlugin
                 (c.ChannelSortBy ?? "").Trim(),
                 c.MaxChannelVideos.ToString(),
                 c.MaxSearchVideos.ToString(),
-                c.RecentlyAddedPerChannel.ToString(),
             });
             return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(blob)));
         }

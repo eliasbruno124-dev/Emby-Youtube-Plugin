@@ -31,9 +31,6 @@ namespace Emby.YouTubePlugin
             if (config.ShowCategories)
                 items.Add(Folder("📂 Categories", "categories_x_root", FolderIcons.Categories));
 
-            if (config.ShowRecentlyAdded && !string.IsNullOrWhiteSpace(config.SavedItems))
-                items.Add(Folder("🆕 Recently Added", "recent_x_all", FolderIcons.RecentlyAdded));
-
             await AddSavedContentFoldersAsync(items, apiKey, config, ct).ConfigureAwait(false);
 
             Log($"[YT] Root level: returning {items.Count} items");
@@ -163,13 +160,11 @@ namespace Emby.YouTubePlugin
 
             var includeShorts = config.ShortsEnabled
                 && await ChannelHasShortsAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
-            var includeLive = config.ShowLiveFolders
-                && await ChannelHasLiveAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
 
             // If the channel would only have a single "Videos" subfolder, skip the
             // wrapper level and return the videos directly so users don't have to
             // click through an empty parent folder containing one child.
-            if (!includeShorts && !includeLive)
+            if (!includeShorts)
             {
                 return await LoadMediaFolderAsync(apiKey, config, "channelvideos", resolvedChannelId, ct)
                     .ConfigureAwait(false);
@@ -179,14 +174,6 @@ namespace Emby.YouTubePlugin
 
             if (includeShorts)
                 items.Add(Folder("⚡ Shorts", $"channelshorts{FolderSeparator}{resolvedChannelId}", channelThumb ?? FolderIcons.Shorts));
-
-            if (includeLive)
-            {
-                items.Add(Folder(
-                    "🔴 Live & Upcoming",
-                    $"channellive{FolderSeparator}{resolvedChannelId}",
-                    channelThumb ?? FolderIcons.Live));
-            }
 
             return ToResult(items);
         }

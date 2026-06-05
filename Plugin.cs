@@ -188,7 +188,6 @@ namespace Emby.YouTubePlugin
             config.ChannelSortBy = NormalizeSort(config.ChannelSortBy);
             config.MaxChannelVideos = Math.Clamp(config.MaxChannelVideos, 1, 150);
             config.MaxSearchVideos = Math.Clamp(config.MaxSearchVideos, 1, 150);
-            config.RecentlyAddedPerChannel = Math.Clamp(config.RecentlyAddedPerChannel, 1, 25);
             config.WatchLaterPollMinutes = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
             if (config.HideShorts)
             {

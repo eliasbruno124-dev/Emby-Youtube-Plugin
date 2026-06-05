@@ -45,7 +45,7 @@ namespace Emby.YouTubePlugin
 
         public ChannelFeatures Features => new ChannelFeatures
         {
-            ShowRootFoldersAtTopLevel = false
+            ShowRootFoldersAtTopLevel = Plugin.Instance?.Options.ShowRootFoldersAtTopLevel == true
         };
 
         public ChannelFeatures GetChannelFeatures() => Features;
@@ -115,13 +115,6 @@ namespace Emby.YouTubePlugin
                     {
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
                         return await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false);
-                    }
-
-                    // Newest uploads across every saved channel.
-                    if (type == "recent" && term == "all")
-                    {
-                        return await LoadRecentlyAdded(apiKey, config, cancellationToken)
-                            .ConfigureAwait(false);
                     }
 
                     return await LoadMediaFolderAsync(apiKey, config, type, term, cancellationToken)

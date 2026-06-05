@@ -312,8 +312,8 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "playerVars:Object.assign({},playerVars)}",
-                    "playerVars:Object.assign({},playerVars,startSeconds>0?{start:startSeconds}:null)}",
-                    "iframe playerVars start"))
+                    "playerVars:Object.assign({},playerVars,{playsinline:1},startSeconds>0?{start:startSeconds}:null)}",
+                    "iframe playerVars start/inline"))
             {
                 return source;
             }
