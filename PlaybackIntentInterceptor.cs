@@ -30,6 +30,7 @@ namespace Emby.YouTubePlugin
         private static object? _harmony;
         private static Type? _harmonyType;
         private static DateTime _lastCleanupUtc = DateTime.MinValue;
+        private static int _playbackInfoLogsRemaining = 24;
 
         internal static void Install()
         {
@@ -308,6 +309,7 @@ namespace Emby.YouTubePlugin
             if (!startTimeTicks.HasValue)
                 return null;
 
+            LogPlaybackInfoCapture(serviceRequest, itemId, startTimeTicks.Value);
             CleanupExpired();
 
             var deviceId = Normalize(GetDeviceId(serviceRequest));
@@ -321,6 +323,29 @@ namespace Emby.YouTubePlugin
                 Intents[MakeKey(userId, itemId, string.Empty)] = intent;
 
             return startTimeTicks.Value;
+        }
+
+        private static void LogPlaybackInfoCapture(IRequest? request, string itemId, long startTimeTicks)
+        {
+            if (_playbackInfoLogsRemaining <= 0)
+                return;
+
+            var client = GetRequestValue(request, "X-Emby-Client");
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
+            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"];
+            var isLikelyIos = ContainsIgnoreCase(deviceName, "iOS")
+                              || ContainsIgnoreCase(deviceName, "iPad")
+                              || ContainsIgnoreCase(userAgent, "iPad")
+                              || ContainsIgnoreCase(userAgent, "iPhone")
+                              || ContainsIgnoreCase(userAgent, "Mobile/")
+                              || ContainsIgnoreCase(userAgent, "VivaiOS");
+            if (!isLikelyIos)
+                return;
+
+            _playbackInfoLogsRemaining--;
+            var maxBitrate = GetRequestValue(request, "MaxStreamingBitrate") ?? "unknown";
+            YouTubeChannel.LogPublic(
+                $"[YT] PlaybackInfo captured for iOS-like client. Item={itemId}, StartTimeTicks={startTimeTicks}, MaxStreamingBitrate={maxBitrate}, Client={client ?? "unknown"}, Device={deviceName ?? "unknown"}.");
         }
 
         private static async Task<object> StampYouTubeStartTimeAsync(Task<object> responseTask, long startTimeTicks)
@@ -384,17 +409,28 @@ namespace Emby.YouTubePlugin
                 return null;
             }
 
+            var hasPlaysInline = false;
+            var hasEnableJsApi = false;
             var queryParts = uri.Query.TrimStart('?')
                 .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(p =>
                 {
                     var keyEnd = p.IndexOf('=');
                     var key = keyEnd >= 0 ? p.Substring(0, keyEnd) : p;
+                    if (string.Equals(key, "playsinline", StringComparison.OrdinalIgnoreCase))
+                        hasPlaysInline = true;
+                    else if (string.Equals(key, "enablejsapi", StringComparison.OrdinalIgnoreCase))
+                        hasEnableJsApi = true;
+
                     return !string.Equals(key, "t", StringComparison.OrdinalIgnoreCase)
                            && !string.Equals(key, "start", StringComparison.OrdinalIgnoreCase);
                 })
                 .ToList();
 
+            if (!hasPlaysInline)
+                queryParts.Add("playsinline=1");
+            if (!hasEnableJsApi)
+                queryParts.Add("enablejsapi=1");
             queryParts.Add($"t={seconds.ToString(CultureInfo.InvariantCulture)}s");
             queryParts.Add($"start={seconds.ToString(CultureInfo.InvariantCulture)}");
 
@@ -442,6 +478,18 @@ namespace Emby.YouTubePlugin
                    ?? request.QueryString["DeviceId"]
                    ?? request.Headers["DeviceId"];
         }
+
+        private static string? GetRequestValue(IRequest? request, string name)
+        {
+            if (request == null)
+                return null;
+
+            return request.QueryString[name] ?? request.Headers[name];
+        }
+
+        private static bool ContainsIgnoreCase(string? value, string needle) =>
+            !string.IsNullOrEmpty(value)
+            && value.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
 
         private static string? GetStringProperty(object source, string name)
         {

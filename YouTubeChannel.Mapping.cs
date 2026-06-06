@@ -23,7 +23,7 @@ namespace Emby.YouTubePlugin
             // Don't set RunTimeTicks here. If we do, Emby Web treats the watch
             // page like a raw stream and the player can hang. Leaving it unset
             // lets the client fall back to YouTube's embed player.
-            string url = $"https://www.youtube.com/watch?v={videoId}";
+            string url = $"https://www.youtube.com/watch?v={videoId}&playsinline=1&enablejsapi=1";
             return new List<MediaSourceInfo>
             {
                 new MediaSourceInfo
@@ -31,7 +31,8 @@ namespace Emby.YouTubePlugin
                     Id = videoId,
                     Path = url,
                     Protocol = MediaProtocol.Http,
-                    IsRemote = false,
+                    IsRemote = true,
+                    Bitrate = 1_000_000,
                     SupportsTranscoding = false,
                     SupportsDirectStream = false,
                     SupportsDirectPlay = true,

@@ -16,10 +16,12 @@ namespace Emby.YouTubePlugin
     internal static class DashboardYouTubePlayerInterceptor
     {
         private const string HarmonyId = "emby.youtubeplugin.dashboard-youtube-player";
+        private const string PatchMarker = "ytPluginPatch20260606";
         private static readonly object Sync = new();
         private static object? _harmony;
         private static Type? _harmonyType;
         private static int _patchedResponseLogsRemaining = 24;
+        private static int _optionalPatchLogsRemaining = 12;
 
         internal static void Install()
         {
@@ -279,13 +281,13 @@ namespace Emby.YouTubePlugin
 
         private static string PatchIframePlayer(string source)
         {
-            if (source.Contains("getYoutubeStartSeconds", StringComparison.Ordinal))
+            if (source.Contains(PatchMarker, StringComparison.Ordinal))
                 return source;
 
             var patched = source;
             if (!ReplaceRequired(ref patched,
                     "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}",
-                    "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}" + StartSecondsHelper,
+                    "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}" + PlayerPatchHelpers,
                     "iframe helper"))
             {
                 return source;
@@ -296,7 +298,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "params=new URLSearchParams(options.url.split(\"?\")[1]),window.onYouTubeIframeAPIReady=function(){",
-                    "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=getYoutubeStartSeconds(params),window.onYouTubeIframeAPIReady=function(){",
+                    "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params),window.onYouTubeIframeAPIReady=function(){",
                     "iframe parse start"))
             {
                 return source;
@@ -312,29 +314,33 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "playerVars:Object.assign({},playerVars)}",
-                    "playerVars:Object.assign({},playerVars,{playsinline:1},startSeconds>0?{start:startSeconds}:null)}",
-                    "iframe playerVars start/inline"))
+                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,origin:window.location.origin},startSeconds>0?{start:startSeconds}:null)}",
+                    "iframe playerVars start/inline/jsapi"))
             {
                 return source;
             }
 
-            return ReplaceRequired(ref patched,
+            if (!ReplaceRequired(ref patched,
                 "[\"VolumeUp\",\"VolumeDown\",\"Mute\",\"Unmute\",\"ToggleMute\",\"SetVolume\"]",
                 "[\"VolumeUp\",\"VolumeDown\",\"Mute\",\"Unmute\",\"ToggleMute\",\"SetVolume\",\"Seek\",\"SeekRelative\"]",
-                "iframe seek support")
-                ? patched
-                : source;
+                "iframe seek support"))
+            {
+                return source;
+            }
+
+            PatchCanPlayItem(ref patched, "iframe");
+            return patched;
         }
 
         private static string PatchWebViewPlayer(string source)
         {
-            if (source.Contains("getYoutubeStartSeconds", StringComparison.Ordinal))
+            if (source.Contains(PatchMarker, StringComparison.Ordinal))
                 return source;
 
             var patched = source;
             if (!ReplaceRequired(ref patched,
                     "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}",
-                    "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}" + StartSecondsHelper,
+                    "function getSignalRejectReason(signal){signal=signal.reason;return signal||((signal=new Error(\"Aborted\")).name=\"AbortError\"),signal}" + PlayerPatchHelpers,
                     "webview helper"))
             {
                 return source;
@@ -366,7 +372,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "signal.aborted?reject(getSignalRejectReason(signal)):(instance.playerData={resolve:resolve,reject:reject,signal:signal},function(instance,options){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),new URLSearchParams(options.url.split(\"?\")[1]).get(\"v\"));",
-                    "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:getYoutubeStartSeconds(params)},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
+                    "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
                     "webview parse start"))
             {
                 return source;
@@ -397,7 +403,50 @@ namespace Emby.YouTubePlugin
                     StringComparison.Ordinal);
             }
 
+            ReplaceOptional(ref patched,
+                "src=\"'+(iframeUrl+\"?videoId=\"+instance)+'\"",
+                "src=\"'+(iframeUrl+\"?videoId=\"+instance+\"&playsinline=1&enablejsapi=1\")+'\"");
+
+            PatchCanPlayItem(ref patched, "webview");
             return patched;
+        }
+
+        private static void PatchCanPlayItem(ref string source, string moduleName)
+        {
+            var patched = false;
+            patched |= ReplaceOptional(ref source,
+                "canPlayItem:function(item){return!1}",
+                "canPlayItem:function(item){return ytPluginCanPlayItem20260606(item)}");
+            patched |= ReplaceOptional(ref source,
+                "canPlayItem:function(){return!1}",
+                "canPlayItem:function(item){return ytPluginCanPlayItem20260606(item)}");
+            patched |= ReplaceOptional(ref source,
+                "canPlayItem(item){return!1}",
+                "canPlayItem(item){return ytPluginCanPlayItem20260606(item)}");
+            patched |= ReplaceOptional(ref source,
+                "canPlayItem(){return!1}",
+                "canPlayItem(item){return ytPluginCanPlayItem20260606(item)}");
+            patched |= ReplaceOptional(ref source,
+                "YoutubePlayer.prototype.canPlayItem=function(item){return!1}",
+                "YoutubePlayer.prototype.canPlayItem=function(item){return ytPluginCanPlayItem20260606(item)}");
+            patched |= ReplaceOptional(ref source,
+                "YoutubePlayer.prototype.canPlayItem=function(){return!1}",
+                "YoutubePlayer.prototype.canPlayItem=function(item){return ytPluginCanPlayItem20260606(item)}");
+
+            if (!patched && _optionalPatchLogsRemaining > 0)
+            {
+                _optionalPatchLogsRemaining--;
+                YouTubeChannel.LogPublic($"[YT] Dashboard YouTube player optional canPlayItem patch not applied for {moduleName}; pattern not found.");
+            }
+        }
+
+        private static bool ReplaceOptional(ref string source, string oldValue, string newValue)
+        {
+            if (!source.Contains(oldValue, StringComparison.Ordinal))
+                return false;
+
+            source = source.Replace(oldValue, newValue, StringComparison.Ordinal);
+            return true;
         }
 
         private static bool ReplaceRequired(ref string source, string oldValue, string newValue, string label)
@@ -466,8 +515,10 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private const string StartSecondsHelper =
-            "function getYoutubeStartSeconds(params){var raw=params.get(\"start\")||params.get(\"t\");if(!raw)return 0;if(/^\\d+$/.test(raw))return parseInt(raw,10);var match=/^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$/.exec(raw);return match?3600*parseInt(match[1]||\"0\",10)+60*parseInt(match[2]||\"0\",10)+parseInt(match[3]||\"0\",10):0}";
+        private const string PlayerPatchHelpers =
+            "function ytPluginPatch20260606(){return 1}"
+            + "function ytPluginStartSeconds20260606(params){var raw=params.get(\"start\")||params.get(\"t\");if(!raw)return 0;if(/^\\d+$/.test(raw))return parseInt(raw,10);var match=/^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$/.exec(raw);return match?3600*parseInt(match[1]||\"0\",10)+60*parseInt(match[2]||\"0\",10)+parseInt(match[3]||\"0\",10):0}"
+            + "function ytPluginCanPlayItem20260606(item){try{var yt=/^(https?:\\/\\/)?([^\\/]+\\.)?(youtube\\.com|youtu\\.be)\\//i,sources=item&&(item.MediaSources||item.mediaSources)||[];for(var i=0;i<sources.length;i++){var source=sources[i]||{},path=source.Path||source.path||source.DirectStreamUrl||source.directStreamUrl;if(path&&yt.test(path))return!0}var path=item&&(item.Path||item.path);return!!(path&&yt.test(path))}catch(e){return!1}}";
 
         private static object? GetProperty(object source, string name)
         {
