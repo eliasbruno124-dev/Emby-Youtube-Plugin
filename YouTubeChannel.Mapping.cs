@@ -18,30 +18,39 @@ namespace Emby.YouTubePlugin
 {
     public partial class YouTubeChannel
     {
+        internal static string GetYouTubeWatchUrl(string videoId) =>
+            $"https://www.youtube.com/watch?v={videoId}&playsinline=1&enablejsapi=1";
+
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
         {
             // Don't set RunTimeTicks here. If we do, Emby Web treats the watch
             // page like a raw stream and the player can hang. Leaving it unset
             // lets the client fall back to YouTube's embed player.
-            string url = $"https://www.youtube.com/watch?v={videoId}&playsinline=1&enablejsapi=1";
-            return new List<MediaSourceInfo>
+            string url = GetYouTubeWatchUrl(videoId);
+            var mediaSource = new MediaSourceInfo
             {
-                new MediaSourceInfo
-                {
-                    Id = videoId,
-                    Path = url,
-                    Protocol = MediaProtocol.Http,
-                    IsRemote = true,
-                    Bitrate = 1_000_000,
-                    SupportsTranscoding = false,
-                    SupportsDirectStream = false,
-                    SupportsDirectPlay = true,
-                    IsInfiniteStream = isLive,
-                    RequiresOpening = false,
-                    RequiresClosing = false,
-                    RequiresLooping = false,
-                }
+                Id = videoId,
+                Path = url,
+                Protocol = MediaProtocol.Http,
+                IsRemote = true,
+                Bitrate = 1_000_000,
+                SupportsTranscoding = false,
+                SupportsDirectStream = false,
+                SupportsDirectPlay = true,
+                IsInfiniteStream = isLive,
+                RequiresOpening = false,
+                RequiresClosing = false,
+                RequiresLooping = false,
             };
+            DisableMediaSourceProbing(mediaSource);
+            return new List<MediaSourceInfo> { mediaSource };
+        }
+
+        private static void DisableMediaSourceProbing(MediaSourceInfo mediaSource)
+        {
+            mediaSource.GetType()
+                .GetProperty("SupportsProbing")
+                ?.SetValue(mediaSource, false);
         }
 
         private static List<ChannelItemInfo> ExtractTrendingVideos(JsonDocument doc)

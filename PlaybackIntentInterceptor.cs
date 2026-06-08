@@ -1,3 +1,5 @@
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Services;
 using System;
 using System.Collections;
@@ -5,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,18 +22,39 @@ namespace Emby.YouTubePlugin
         long StartTimeTicks,
         DateTime CapturedUtc);
 
+    internal sealed record PlaybackInfoPatchContext(
+        string ItemId,
+        string Client,
+        string DeviceName,
+        string UserAgent,
+        string IpAddress,
+        string MaxStreamingBitrate,
+        long StartTimeTicks,
+        bool HasStartTimeTicks,
+        bool IsPlayback,
+        bool IsLikelyIos,
+        bool IsLikelyNativeTheater);
+
+    internal sealed record PlaybackInfoNormalizationResult(
+        int Changed,
+        int NativeDirectPlayDisabled);
+
     // Captures PlaybackInfo requests server-side. Every normal Emby client goes
     // through this endpoint before playback, so this avoids client JS and log parsing.
     internal static class PlaybackIntentInterceptor
     {
         private const string HarmonyId = "emby.youtubeplugin.playback-intent";
         private static readonly TimeSpan IntentTtl = TimeSpan.FromSeconds(30);
+        private static readonly Regex YouTubeVideoIdRegex = new(
+            @"(?:youtube\.com/watch\?v=|youtu\.be/|/vi/|[?&]v=)([A-Za-z0-9_-]{6,})",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly ConcurrentDictionary<string, PlaybackIntent> Intents = new(StringComparer.OrdinalIgnoreCase);
         private static readonly object Sync = new();
         private static object? _harmony;
         private static Type? _harmonyType;
         private static DateTime _lastCleanupUtc = DateTime.MinValue;
         private static int _playbackInfoLogsRemaining = 24;
+        private static int _mediaSourceNormalizeLogsRemaining = 24;
 
         internal static void Install()
         {
@@ -278,9 +302,9 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                var startTimeTicks = CapturePlaybackInfo(__instance, __0);
-                if (startTimeTicks is { } ticks && ticks >= TimeSpan.TicksPerSecond * 5 && __result != null)
-                    __result = StampYouTubeStartTimeAsync(__result, ticks);
+                var context = CapturePlaybackInfo(__instance, __0);
+                if (context != null && __result != null)
+                    __result = PatchYouTubePlaybackInfoAsync(__result, context);
             }
             catch (Exception ex)
             {
@@ -288,7 +312,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static long? CapturePlaybackInfo(object service, object requestDto)
+        private static PlaybackInfoPatchContext? CapturePlaybackInfo(object service, object requestDto)
         {
             // In Emby 4.9 GET keeps StartTimeTicks in the query string, while
             // POST can carry it directly on the request DTO. Read both.
@@ -301,28 +325,49 @@ namespace Emby.YouTubePlugin
             var isPlayback = TryReadBoolProperty(requestDto, "IsPlayback")
                 ?? TryReadBool(serviceRequest?.QueryString["IsPlayback"])
                 ?? true;
-            if (!isPlayback)
-                return null;
 
             var startTimeTicks = TryReadLongProperty(requestDto, "StartTimeTicks")
                 ?? TryReadLong(serviceRequest?.QueryString["StartTimeTicks"]);
-            if (!startTimeTicks.HasValue)
-                return null;
+            var hasStartTimeTicks = startTimeTicks.HasValue;
+            var effectiveStartTimeTicks = startTimeTicks ?? 0;
 
-            LogPlaybackInfoCapture(serviceRequest, itemId, startTimeTicks.Value);
-            CleanupExpired();
+            if (isPlayback && hasStartTimeTicks)
+            {
+                LogPlaybackInfoCapture(serviceRequest, itemId, effectiveStartTimeTicks);
+                CleanupExpired();
 
-            var deviceId = Normalize(GetDeviceId(serviceRequest));
-            var intent = new PlaybackIntent(itemId, userId, deviceId, startTimeTicks.Value, DateTime.UtcNow);
+                var deviceId = Normalize(GetDeviceId(serviceRequest));
+                var intent = new PlaybackIntent(itemId, userId, deviceId, effectiveStartTimeTicks, DateTime.UtcNow);
 
-            // Store an exact key plus a same-user/item fallback. The short TTL
-            // prevents an abandoned click from influencing later playback.
-            Intents[MakeKey(userId, itemId, deviceId)] = intent;
+                // Store an exact key plus a same-user/item fallback. The short TTL
+                // prevents an abandoned click from influencing later playback.
+                Intents[MakeKey(userId, itemId, deviceId)] = intent;
 
-            if (!string.IsNullOrEmpty(deviceId))
-                Intents[MakeKey(userId, itemId, string.Empty)] = intent;
+                if (!string.IsNullOrEmpty(deviceId))
+                    Intents[MakeKey(userId, itemId, string.Empty)] = intent;
+            }
 
-            return startTimeTicks.Value;
+            var client = GetRequestValue(serviceRequest, "X-Emby-Client") ?? "unknown";
+            var deviceName = GetRequestValue(serviceRequest, "X-Emby-Device-Name") ?? "unknown";
+            var userAgent = serviceRequest?.UserAgent ?? serviceRequest?.Headers["User-Agent"] ?? "unknown";
+            var ipAddress = serviceRequest?.XRealIp
+                            ?? serviceRequest?.XForwardedFor
+                            ?? serviceRequest?.RemoteIp?.ToString()
+                            ?? "unknown";
+            var maxBitrate = GetRequestValue(serviceRequest, "MaxStreamingBitrate") ?? "unknown";
+
+            return new PlaybackInfoPatchContext(
+                itemId,
+                client,
+                deviceName,
+                userAgent,
+                ipAddress,
+                maxBitrate,
+                effectiveStartTimeTicks,
+                hasStartTimeTicks,
+                isPlayback,
+                IsLikelyIosClient(serviceRequest),
+                IsLikelyNativeTheaterClient(serviceRequest));
         }
 
         private static void LogPlaybackInfoCapture(IRequest? request, string itemId, long startTimeTicks)
@@ -330,37 +375,61 @@ namespace Emby.YouTubePlugin
             if (_playbackInfoLogsRemaining <= 0)
                 return;
 
-            var client = GetRequestValue(request, "X-Emby-Client");
-            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
-            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"];
-            var isLikelyIos = ContainsIgnoreCase(deviceName, "iOS")
-                              || ContainsIgnoreCase(deviceName, "iPad")
-                              || ContainsIgnoreCase(userAgent, "iPad")
-                              || ContainsIgnoreCase(userAgent, "iPhone")
-                              || ContainsIgnoreCase(userAgent, "Mobile/")
-                              || ContainsIgnoreCase(userAgent, "VivaiOS");
-            if (!isLikelyIos)
+            var isLikelyIos = IsLikelyIosClient(request);
+            var isLikelyNativeTheater = IsLikelyNativeTheaterClient(request);
+            if (!isLikelyIos && !isLikelyNativeTheater)
                 return;
 
             _playbackInfoLogsRemaining--;
+            var client = GetRequestValue(request, "X-Emby-Client");
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
             var maxBitrate = GetRequestValue(request, "MaxStreamingBitrate") ?? "unknown";
+            var clientKind = isLikelyNativeTheater ? "native Theater/Xbox client" : "iOS-like client";
             YouTubeChannel.LogPublic(
-                $"[YT] PlaybackInfo captured for iOS-like client. Item={itemId}, StartTimeTicks={startTimeTicks}, MaxStreamingBitrate={maxBitrate}, Client={client ?? "unknown"}, Device={deviceName ?? "unknown"}.");
+                $"[YT] PlaybackInfo captured for {clientKind}. Item={itemId}, StartTimeTicks={startTimeTicks}, MaxStreamingBitrate={maxBitrate}, Client={client ?? "unknown"}, Device={deviceName ?? "unknown"}.");
         }
 
-        private static async Task<object> StampYouTubeStartTimeAsync(Task<object> responseTask, long startTimeTicks)
+        private static async Task<object> PatchYouTubePlaybackInfoAsync(Task<object> responseTask, PlaybackInfoPatchContext context)
         {
             var response = await responseTask.ConfigureAwait(false);
             try
             {
-                StampYouTubeStartTime(response, startTimeTicks);
+                // Resolve the YouTube video id from the library item itself. This
+                // is authoritative even when Emby rewrote the media source path
+                // for a transcode decision, and it lets us normalize the existing
+                // library items whose stored media source isn't a clean watch URL.
+                var youTubeVideoId = TryResolveYouTubeVideoId(context.ItemId);
+                var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context);
+                if (normalized.Changed > 0)
+                    LogPlaybackInfoNormalization(context, normalized);
+
+                if (context.HasStartTimeTicks && context.StartTimeTicks >= TimeSpan.TicksPerSecond * 5)
+                    StampYouTubeStartTime(response, context.StartTimeTicks);
             }
             catch (Exception ex)
             {
-                YouTubeChannel.LogPublic($"[YT] PlaybackInfo start-time stamp failed: {ex.Message}");
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo YouTube patch failed: {ex.Message}");
             }
 
             return response;
+        }
+
+        private static void LogPlaybackInfoNormalization(PlaybackInfoPatchContext context, PlaybackInfoNormalizationResult result)
+        {
+            if (_mediaSourceNormalizeLogsRemaining <= 0)
+                return;
+
+            _mediaSourceNormalizeLogsRemaining--;
+            var clientKind = context.IsLikelyNativeTheater
+                ? "native Theater/Xbox client"
+                : context.IsLikelyIos
+                    ? "iOS-like client"
+                    : "client";
+            var nativePart = result.NativeDirectPlayDisabled > 0
+                ? $", NativeDirectPlayDisabled={result.NativeDirectPlayDisabled}"
+                : string.Empty;
+            YouTubeChannel.LogPublic(
+                $"[YT] PlaybackInfo normalized {result.Changed} YouTube media source(s) for {clientKind}{nativePart}. Item={context.ItemId}, IsPlayback={context.IsPlayback}, StartTimeTicks={context.StartTimeTicks}, MaxStreamingBitrate={context.MaxStreamingBitrate}, Client={context.Client}, Device={context.DeviceName}, Ip={context.IpAddress}, UA={Shorten(context.UserAgent, 160)}.");
         }
 
         private static void StampYouTubeStartTime(object? response, long startTimeTicks)
@@ -384,7 +453,7 @@ namespace Emby.YouTubePlugin
                     continue;
 
                 var path = pathProp.GetValue(mediaSource) as string;
-                var stampedPath = StampYouTubeUrl(path, seconds);
+                var stampedPath = PatchYouTubeUrl(path, seconds);
                 if (string.IsNullOrEmpty(stampedPath)
                     || string.Equals(path, stampedPath, StringComparison.Ordinal))
                 {
@@ -400,7 +469,165 @@ namespace Emby.YouTubePlugin
                 YouTubeChannel.LogPublic($"[YT] PlaybackInfo media source stamped with YouTube start={seconds}s.");
         }
 
-        private static string? StampYouTubeUrl(string? path, long seconds)
+        private static PlaybackInfoNormalizationResult NormalizeYouTubeMediaSources(
+            object? response,
+            string? youTubeVideoId,
+            PlaybackInfoPatchContext context)
+        {
+            var mediaSources = response?.GetType()
+                .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(response) as IEnumerable;
+            if (mediaSources == null)
+                return new PlaybackInfoNormalizationResult(0, 0);
+
+            var changed = 0;
+            var nativeDirectPlayDisabled = 0;
+            foreach (var mediaSource in mediaSources)
+            {
+                if (mediaSource == null)
+                    continue;
+
+                var pathProp = mediaSource.GetType()
+                    .GetProperty("Path", BindingFlags.Instance | BindingFlags.Public);
+                var path = pathProp?.GetValue(mediaSource) as string;
+
+                // The library item is the authoritative source of the video id.
+                // Only when that lookup is unavailable do we fall back to a
+                // YouTube URL still present on the media source. We never key off
+                // a bare id so a non-YouTube item can't be misidentified.
+                var videoId = youTubeVideoId;
+                if (string.IsNullOrEmpty(videoId))
+                {
+                    videoId = ExtractYouTubeVideoId(path)
+                              ?? ExtractYouTubeVideoId(GetStringProperty(mediaSource, "OriginalPath"))
+                              ?? ExtractYouTubeVideoId(GetStringProperty(mediaSource, "DirectStreamUrl"));
+                }
+
+                if (string.IsNullOrEmpty(videoId))
+                    continue;
+
+                var mediaSourceChanged = false;
+
+                // Rewrite the path to a clean watch URL so the web client's
+                // YouTube player canPlayItem() matches and the embed gets the id.
+                if (pathProp?.CanWrite == true)
+                {
+                    var normalizedPath = YouTubeChannel.GetYouTubeWatchUrl(videoId);
+                    if (!string.IsNullOrEmpty(normalizedPath)
+                        && !string.Equals(path, normalizedPath, StringComparison.Ordinal))
+                    {
+                        pathProp.SetValue(mediaSource, normalizedPath);
+                        mediaSourceChanged = true;
+                    }
+                }
+
+                // Existing library items can carry a stored ~40 Mbps bitrate that
+                // trips a client's bitrate cap (e.g. iPad web at 4 Mbps) into a
+                // transcode it cannot perform for a YouTube watch page.
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "IsRemote", true);
+                mediaSourceChanged |= SetNumberProperty(mediaSource, "Bitrate", 1_000_000);
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsProbing", false);
+                mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "ProbePath");
+                mediaSourceChanged |= SetPropertyToNull(mediaSource, "ProbeProtocol");
+
+                if (context.IsLikelyNativeTheater)
+                {
+                    // Native Theater clients without a browser engine treat Path
+                    // as raw video. A YouTube watch URL is HTML, so advertising
+                    // direct play here causes MPV/native playback to spin or fail.
+                    mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsDirectPlay", false);
+                    mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "DirectStreamUrl");
+                    nativeDirectPlayDisabled++;
+                }
+                else
+                {
+                    // Browser/webview clients need the source to remain selectable
+                    // so their YouTube player can claim the item and embed it.
+                    mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsDirectPlay", true);
+                }
+
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsDirectStream", false);
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsTranscoding", false);
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresOpening", false);
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresClosing", false);
+                mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresLooping", false);
+
+                // Drop any transcode plan Emby attached before we forced direct play.
+                mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "TranscodingUrl");
+                mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "TranscodingSubProtocol");
+                mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "TranscodingContainer");
+
+                if (mediaSourceChanged)
+                    changed++;
+            }
+
+            return new PlaybackInfoNormalizationResult(changed, nativeDirectPlayDisabled);
+        }
+
+        // Resolves the canonical YouTube video id for a library item id using the
+        // same strict check (watch path + matching provider id + plugin external
+        // id) the rest of the plugin uses, so normal library items are untouched.
+        private static string? TryResolveYouTubeVideoId(string? itemId)
+        {
+            if (string.IsNullOrEmpty(itemId))
+                return null;
+
+            try
+            {
+                var library = Plugin.ResolveService<ILibraryManager>();
+                if (library == null)
+                    return null;
+
+                var item = ResolveBaseItem(library, itemId);
+                return item == null ? null : YouTubeImageProvider.TryGetVideoId(item);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo YouTube item lookup failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private static BaseItem? ResolveBaseItem(ILibraryManager library, string itemId)
+        {
+            // GetItemById overloads vary across Emby builds (long/Guid/string), so
+            // pick whichever exists at runtime instead of binding to one shape.
+            var methods = library.GetType()
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.Name == "GetItemById" && m.GetParameters().Length == 1)
+                .ToArray();
+
+            if (long.TryParse(itemId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numericId))
+            {
+                var longMethod = methods.FirstOrDefault(m => m.GetParameters()[0].ParameterType == typeof(long));
+                if (longMethod != null)
+                    return longMethod.Invoke(library, new object[] { numericId }) as BaseItem;
+            }
+
+            if (Guid.TryParse(itemId, out var guidId))
+            {
+                var guidMethod = methods.FirstOrDefault(m => m.GetParameters()[0].ParameterType == typeof(Guid));
+                if (guidMethod != null)
+                    return guidMethod.Invoke(library, new object[] { guidId }) as BaseItem;
+            }
+
+            var stringMethod = methods.FirstOrDefault(m => m.GetParameters()[0].ParameterType == typeof(string));
+            if (stringMethod != null)
+                return stringMethod.Invoke(library, new object[] { itemId }) as BaseItem;
+
+            return null;
+        }
+
+        private static string? ExtractYouTubeVideoId(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return null;
+
+            var match = YouTubeVideoIdRegex.Match(value);
+            return match.Success ? match.Groups[1].Value : null;
+        }
+
+        private static string? PatchYouTubeUrl(string? path, long? startSeconds)
         {
             if (string.IsNullOrWhiteSpace(path)
                 || !Uri.TryCreate(path, UriKind.Absolute, out var uri)
@@ -409,30 +636,37 @@ namespace Emby.YouTubePlugin
                 return null;
             }
 
-            var hasPlaysInline = false;
-            var hasEnableJsApi = false;
             var queryParts = uri.Query.TrimStart('?')
                 .Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(p =>
                 {
                     var keyEnd = p.IndexOf('=');
                     var key = keyEnd >= 0 ? p.Substring(0, keyEnd) : p;
-                    if (string.Equals(key, "playsinline", StringComparison.OrdinalIgnoreCase))
-                        hasPlaysInline = true;
-                    else if (string.Equals(key, "enablejsapi", StringComparison.OrdinalIgnoreCase))
-                        hasEnableJsApi = true;
+                    if (startSeconds.HasValue
+                        && (string.Equals(key, "t", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(key, "start", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return false;
+                    }
 
-                    return !string.Equals(key, "t", StringComparison.OrdinalIgnoreCase)
-                           && !string.Equals(key, "start", StringComparison.OrdinalIgnoreCase);
+                    if (string.Equals(key, "playsinline", StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    if (string.Equals(key, "enablejsapi", StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    return true;
                 })
                 .ToList();
 
-            if (!hasPlaysInline)
-                queryParts.Add("playsinline=1");
-            if (!hasEnableJsApi)
-                queryParts.Add("enablejsapi=1");
-            queryParts.Add($"t={seconds.ToString(CultureInfo.InvariantCulture)}s");
-            queryParts.Add($"start={seconds.ToString(CultureInfo.InvariantCulture)}");
+            queryParts.Add("playsinline=1");
+            queryParts.Add("enablejsapi=1");
+            if (startSeconds.HasValue)
+            {
+                var secondsText = startSeconds.Value.ToString(CultureInfo.InvariantCulture);
+                queryParts.Add($"t={secondsText}s");
+                queryParts.Add($"start={secondsText}");
+            }
 
             var builder = new UriBuilder(uri)
             {
@@ -440,6 +674,38 @@ namespace Emby.YouTubePlugin
                 Fragment = string.Empty
             };
             return builder.Uri.ToString();
+        }
+
+        private static bool SetStringPropertyToNull(object source, string name)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite != true || prop.PropertyType != typeof(string))
+                return false;
+
+            if (prop.GetValue(source) is null)
+                return false;
+
+            prop.SetValue(source, null);
+            return true;
+        }
+
+        private static bool SetPropertyToNull(object source, string name)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite != true)
+                return false;
+
+            if (prop.PropertyType.IsValueType
+                && Nullable.GetUnderlyingType(prop.PropertyType) == null)
+            {
+                return false;
+            }
+
+            if (prop.GetValue(source) is null)
+                return false;
+
+            prop.SetValue(source, null);
+            return true;
         }
 
         private static bool IsYouTubeHost(string host) =>
@@ -455,6 +721,51 @@ namespace Emby.YouTubePlugin
             {
                 prop.SetValue(source, value);
             }
+        }
+
+        private static bool SetBoolProperty(object source, string name, bool value)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite != true
+                || (prop.PropertyType != typeof(bool) && prop.PropertyType != typeof(bool?)))
+            {
+                return false;
+            }
+
+            var current = prop.GetValue(source);
+            if (current is bool currentBool && currentBool == value)
+                return false;
+
+            prop.SetValue(source, value);
+            return true;
+        }
+
+        private static bool SetNumberProperty(object source, string name, int value)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite != true)
+                return false;
+
+            var current = prop.GetValue(source);
+            if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
+            {
+                if (current is int currentInt && currentInt == value)
+                    return false;
+
+                prop.SetValue(source, value);
+                return true;
+            }
+
+            if (prop.PropertyType == typeof(long) || prop.PropertyType == typeof(long?))
+            {
+                if (current is long currentLong && currentLong == value)
+                    return false;
+
+                prop.SetValue(source, (long)value);
+                return true;
+            }
+
+            return false;
         }
 
         private static IRequest? GetServiceRequest(object service)
@@ -487,9 +798,60 @@ namespace Emby.YouTubePlugin
             return request.QueryString[name] ?? request.Headers[name];
         }
 
+        private static bool IsLikelyIosClient(IRequest? request)
+        {
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
+            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"];
+            return ContainsIgnoreCase(deviceName, "iOS")
+                   || ContainsIgnoreCase(deviceName, "iPad")
+                   || ContainsIgnoreCase(userAgent, "iPad")
+                   || ContainsIgnoreCase(userAgent, "iPhone")
+                   || ContainsIgnoreCase(userAgent, "Mobile/")
+                   || ContainsIgnoreCase(userAgent, "VivaiOS");
+        }
+
+        private static bool IsLikelyNativeTheaterClient(IRequest? request)
+        {
+            var client = GetRequestValue(request, "X-Emby-Client");
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
+            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"];
+
+            if (ContainsIgnoreCase(client, "Emby Web")
+                || IsLikelyBrowserEngineClient(userAgent))
+            {
+                return false;
+            }
+
+            return ContainsIgnoreCase(client, "Emby Xbox")
+                   || ContainsIgnoreCase(client, "Emby Theater")
+                   || ContainsIgnoreCase(client, "Emby Theatre")
+                   || ContainsIgnoreCase(client, "Emby Windows")
+                   || ContainsIgnoreCase(deviceName, "XBOX")
+                   || ContainsIgnoreCase(deviceName, "Xbox")
+                   || ContainsIgnoreCase(userAgent, "Xbox");
+        }
+
+        private static bool IsLikelyBrowserEngineClient(string? userAgent) =>
+            ContainsIgnoreCase(userAgent, "Chrome/")
+            || ContainsIgnoreCase(userAgent, "Chromium/")
+            || ContainsIgnoreCase(userAgent, "Edg/")
+            || ContainsIgnoreCase(userAgent, "AppleWebKit/")
+            || ContainsIgnoreCase(userAgent, "Safari/")
+            || ContainsIgnoreCase(userAgent, "Firefox/")
+            || ContainsIgnoreCase(userAgent, "CriOS/")
+            || ContainsIgnoreCase(userAgent, "FxiOS/");
+
         private static bool ContainsIgnoreCase(string? value, string needle) =>
             !string.IsNullOrEmpty(value)
             && value.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
+
+        private static string Shorten(string value, int maxLength)
+        {
+            if (value.Length <= maxLength)
+                return value;
+
+            return value.Substring(0, maxLength) + "...";
+        }
 
         private static string? GetStringProperty(object source, string name)
         {

@@ -20,7 +20,7 @@ namespace Emby.YouTubePlugin
         // Pre-accepted YouTube consent cookie. Without it, EU/UK requests get
         // bounced to consent.youtube.com which makes the redirect probe
         // useless — we can't tell if YouTube would have served the Short or
-        // sent us to /watch. yt-dlp does the same trick.
+        // sent us to /watch.
         private const string ShortsConsentCookie = "SOCS=CAESEwgDEgk2NzQwODc2NzAaAmRlIAEaBgiAtbGwBg";
 
         // /shorts/<channel> lists actual shorts inside JSON structures that
