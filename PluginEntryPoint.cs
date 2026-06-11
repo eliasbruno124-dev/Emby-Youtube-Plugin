@@ -347,6 +347,16 @@ namespace Emby.YouTubePlugin
                 if (string.Equals(kvp.Value.SessionId, sessionId, StringComparison.Ordinal))
                     _pendingResumeSeeks.TryRemove(kvp.Key, out _);
             }
+
+            // The in-flight stamps share the "<sessionId>|..." key prefix. Drop
+            // them with the pending seeks; otherwise every playback leaves one
+            // entry behind for the lifetime of the process.
+            var prefix = sessionId + "|";
+            foreach (var key in _resumeSeeksInFlight.Keys)
+            {
+                if (key.StartsWith(prefix, StringComparison.Ordinal))
+                    _resumeSeeksInFlight.TryRemove(key, out _);
+            }
         }
 
         private void OnPlaybackProgress(object? sender, PlaybackProgressEventArgs e)

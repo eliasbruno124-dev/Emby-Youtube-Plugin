@@ -2,14 +2,11 @@ using MediaBrowser.Controller.Net;
 using MediaBrowser.Model.Services;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Emby.YouTubePlugin
 {
@@ -287,64 +284,8 @@ namespace Emby.YouTubePlugin
             return PatchIframePlayer(source);
         }
 
-        private static string PatchIndexHtml(string source)
-        {
-            var token = DashboardCacheToken;
-            if (source.Contains("ytplugin=", StringComparison.Ordinal)
-                || source.Contains($"data-appversion=\"{token}\"", StringComparison.Ordinal))
-            {
-                return source;
-            }
-
-            var culture = GetSystemConfigValue("UICulture", CultureInfo.CurrentUICulture.Name);
-            var lang = culture.Split(new[] { '-' }, 2)[0];
-            var serverName = GetSystemConfigValue("ServerName", "Emby Server");
-            var encodedToken = WebUtility.HtmlEncode(token);
-            var encodedCulture = WebUtility.HtmlEncode(culture);
-            var encodedLang = WebUtility.HtmlEncode(lang);
-            var encodedServerName = WebUtility.HtmlEncode(serverName);
-            var queryToken = Uri.EscapeDataString(token);
-
-            var patched = source;
-            if (patched.Contains("<html>", StringComparison.Ordinal))
-            {
-                patched = patched.Replace(
-                    "<html>",
-                    $"<html data-appversion=\"{encodedToken}\" data-culture=\"{encodedCulture}\" lang=\"{encodedLang}\">",
-                    StringComparison.Ordinal);
-            }
-
-            patched = patched.Replace(
-                "<meta name=\"description\" content=\"Emby Server\">",
-                $"<meta name=\"description\" content=\"{encodedServerName}\">",
-                StringComparison.Ordinal);
-
-            patched = patched.Replace(
-                "<script src=\"apploader.js\" defer></script>",
-                $"<script src=\"apploader.js?v={queryToken}\" defer></script>",
-                StringComparison.Ordinal);
-
-            return patched;
-        }
-
-        private static string PatchAppLoader(string source)
-        {
-            var token = PluginCacheQueryPart;
-            if (source.Contains(token, StringComparison.Ordinal))
-                return source;
-
-            var patched = source;
-            return ReplaceRequired(ref patched,
-                "docElem?globalThis.urlCacheParam=\"v=\"+docElem:appMode||(globalThis.urlCacheParam=\"v=\"+Date.now()),",
-                $"docElem?globalThis.urlCacheParam=\"v=\"+docElem+\"&{token}\":appMode||(globalThis.urlCacheParam=\"v=\"+Date.now()+\"&{token}\"),",
-                "apploader cache token")
-                ? patched
-                : source;
-        }
-
         private static string PatchAppJs(string source)
         {
-            var token = $"?{PluginCacheQueryPart}";
             var patched = source;
 
             if (!patched.Contains(AppJsPatchMarker, StringComparison.Ordinal)
@@ -355,6 +296,22 @@ namespace Emby.YouTubePlugin
             {
                 return source;
             }
+
+            // The cache token must keep the plugin path ending in ".js": app.js routes
+            // "./..." plugin paths through getDynamicImport (which unwraps the module's
+            // ES default export into the player constructor) only when
+            // url.startsWith("./") && url.endsWith(".js"). Any other shape falls into
+            // pluginmanager.loadPluginFromUrl, which calls `new pluginFactory` on the raw
+            // AMD exports object ({__esModule, default}) and kills Emby Web at boot with
+            // "pluginFactory is not a constructor". If Emby ever changes that branch,
+            // skip the token entirely rather than risk the blank-web failure again.
+            if (!patched.Contains("url.startsWith(\"./\")&&url.endsWith(\".js\")", StringComparison.Ordinal))
+            {
+                YouTubeChannel.LogPublic("[YT] Dashboard app.js cache token skipped; plugin-path .js branch not found.");
+                return patched;
+            }
+
+            var token = $"?{PluginCacheQueryPart}&ext=.js";
 
             if (!patched.Contains($"plugin_webview.js{token}", StringComparison.Ordinal))
             {
@@ -646,30 +603,13 @@ namespace Emby.YouTubePlugin
                 : "application/x-javascript";
         }
 
+        // Full four-part version: the token has to change with every plugin revision so
+        // browsers refetch the patched modules; ToString(3) stayed "2.0.8" across releases.
         private static string PluginVersion =>
-            typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
-
-        private static string DashboardCacheToken =>
-            $"{Plugin.AppHost?.ApplicationVersion?.ToString() ?? "emby"}-yt{PluginVersion}";
+            typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}";
-
-        private static string GetSystemConfigValue(string elementName, string fallback)
-        {
-            var path = Plugin.SystemConfigurationFilePath;
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-                return fallback;
-
-            try
-            {
-                return XDocument.Load(path).Root?.Element(elementName)?.Value ?? fallback;
-            }
-            catch
-            {
-                return fallback;
-            }
-        }
 
         private const string PlayerPatchHelpers =
             "function ytPluginPatch20260606(){return 1}"
