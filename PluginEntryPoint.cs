@@ -60,6 +60,7 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan ResumePositionEstimateTtl = TimeSpan.FromMinutes(30);
         private static readonly TimeSpan[] YouTubeAutoplayUnlockDelays =
         {
+            TimeSpan.Zero,
             TimeSpan.FromMilliseconds(120),
             TimeSpan.FromMilliseconds(450),
             TimeSpan.FromMilliseconds(900),
@@ -249,6 +250,12 @@ namespace Emby.YouTubePlugin
                 if (runtimeTicks > 0 && runtimeTicks - positionTicks < ResumeSeekEndGuardTicks)
                 {
                     RemoveResumeCheckpoint(session.UserId, videoId);
+                    return;
+                }
+
+                if (IsLikelyNativeAndroidTabletSession(session))
+                {
+                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; native Android tablet will start without server-side resume seek.");
                     return;
                 }
 
@@ -867,6 +874,28 @@ namespace Emby.YouTubePlugin
                    || ContainsIgnoreCase(userAgent, "Edg/")
                    || ContainsIgnoreCase(userAgent, "AppleWebKit/")
                    || ContainsIgnoreCase(userAgent, "Safari/");
+        }
+
+        private static bool IsLikelyNativeAndroidTabletSession(SessionInfo session)
+        {
+            var client = GetStringProperty(session, "Client");
+            if (!ContainsIgnoreCase(client, "Emby for Android"))
+                return false;
+
+            var deviceName = GetStringProperty(session, "DeviceName");
+            var userAgent = GetStringProperty(session, "UserAgent");
+            if (ContainsIgnoreCase(deviceName, "Tab")
+                || ContainsIgnoreCase(deviceName, "Tablet")
+                || ContainsIgnoreCase(userAgent, "SM-X"))
+            {
+                return true;
+            }
+
+            return ContainsIgnoreCase(userAgent, "Android")
+                   && ContainsIgnoreCase(userAgent, "Safari/")
+                   && !ContainsIgnoreCase(userAgent, "Mobile")
+                   && !ContainsIgnoreCase(userAgent, "TV")
+                   && !ContainsIgnoreCase(deviceName, "TV");
         }
 
         private static string DescribeSession(SessionInfo session)

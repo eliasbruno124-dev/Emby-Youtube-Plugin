@@ -104,18 +104,34 @@ namespace Emby.YouTubePlugin
         public override void SaveConfiguration()
         {
             NormalizeConfiguration(Configuration);
+
+            // Only a change to a content-affecting field (the exact set
+            // ComputeConfigHash covers) warrants cache invalidation and a
+            // channel refresh. The configuration page auto-saves on every edit,
+            // so a re-save with no content change — or a Donate/poll-interval
+            // only change — must not invalidate caches and burn the tracked
+            // YouTube API quota on a needless refresh. Same gate the poll loop's
+            // RefreshOnConfigChange already uses.
+            var contentChanged = !string.Equals(
+                PluginEntryPoint.ComputeConfigHash(Configuration),
+                PluginEntryPoint.LastConfigHash,
+                StringComparison.Ordinal);
+
             base.SaveConfiguration();
+
+            // Update the shared config hash so the polling loop doesn't
+            // re-detect this same change and fire a duplicate refresh.
+            try { PluginEntryPoint.MarkConfigSaved(Configuration); }
+            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
+
+            if (!contentChanged)
+                return;
 
             try { YouTubeApi.InvalidateAllCache(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation after settings save failed: {ex.Message}"); }
 
             try { YouTubeChannel.ResetCrossFolderSeen(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Seen reset after settings save failed: {ex.Message}"); }
-
-            // Update the shared config hash so the polling loop doesn't
-            // re-detect this same change and fire a duplicate refresh.
-            try { PluginEntryPoint.MarkConfigSaved(Configuration); }
-            catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
 
             // Kick off a channel refresh right away so users see their changes
             // immediately. Serialized via ChannelRefreshInvoker so a flurry of

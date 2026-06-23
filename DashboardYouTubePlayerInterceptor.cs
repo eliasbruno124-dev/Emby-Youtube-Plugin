@@ -367,11 +367,20 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "playerVars:Object.assign({},playerVars)}",
-                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin},startSeconds>0?{start:startSeconds}:null)}",
+                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}",
                     "iframe playerVars start/inline/jsapi"))
             {
                 return source;
             }
+
+            // Wrap the YT.Player options with host overrides (youtube-nocookie
+            // on Android/Samsung). The opening Object.assign and its closing
+            // paren must both land or neither, or the parentheses unbalance — so
+            // this is applied as an atomic pair, and as OPTIONAL: a missed anchor
+            // (e.g. a future Emby minifier change to this niche tablet feature)
+            // keeps the rest of the iframe patch (seek/diag/canPlayItem) instead
+            // of discarding the whole thing via `return source`.
+            ApplyIframeHostOptionsWrap(ref patched);
 
             if (!ReplaceRequired(ref patched,
                 "[\"VolumeUp\",\"VolumeDown\",\"Mute\",\"Unmute\",\"ToggleMute\",\"SetVolume\"]",
@@ -552,6 +561,33 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private static void ApplyIframeHostOptionsWrap(ref string source)
+        {
+            const string startOld = "new YT.Player(\"player\",{height:";
+            const string startNew = "new YT.Player(\"player\",Object.assign({},ytPluginHostOptions20260617(),{height:";
+            const string endOld = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}),(resizeListener=";
+            const string endNew = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)})),(resizeListener=";
+
+            // Both edits balance each other (opening wrap + its closing paren),
+            // so commit only when BOTH anchors are present. A partial apply can
+            // never unbalance the parentheses, and a full miss leaves the prior
+            // iframe patches untouched.
+            if (!source.Contains(startOld, StringComparison.Ordinal)
+                || !source.Contains(endOld, StringComparison.Ordinal))
+            {
+                if (_optionalPatchLogsRemaining > 0)
+                {
+                    _optionalPatchLogsRemaining--;
+                    YouTubeChannel.LogPublic("[YT] Dashboard iframe host-options wrap skipped; anchors not found (rest of iframe patch kept).");
+                }
+                return;
+            }
+
+            source = source
+                .Replace(startOld, startNew, StringComparison.Ordinal)
+                .Replace(endOld, endNew, StringComparison.Ordinal);
+        }
+
         private static bool ReplaceOptional(ref string source, string oldValue, string newValue)
         {
             if (!source.Contains(oldValue, StringComparison.Ordinal))
@@ -603,13 +639,15 @@ namespace Emby.YouTubePlugin
                 : "application/x-javascript";
         }
 
-        // Full four-part version: the token has to change with every plugin revision so
-        // browsers refetch the patched modules; ToString(3) stayed "2.0.8" across releases.
+        // Full four-part version plus a dashboard patch revision: hotfix deploys can keep
+        // the same assembly version, but browsers must still refetch patched modules.
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
+        private const string DashboardPatchRevision = "20260617-android-tablet-start-v5";
+
         private static string PluginCacheQueryPart =>
-            $"ytplugin={PluginVersion}";
+            $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
 
         private const string PlayerPatchHelpers =
             "function ytPluginPatch20260606(){return 1}"
@@ -617,7 +655,8 @@ namespace Emby.YouTubePlugin
             + "function ytPluginCanPlayItem20260606(item){try{var yt=/^(https?:\\/\\/)?([^\\/]+\\.)?(youtube\\.com|youtu\\.be)\\//i,sources=item&&(item.MediaSources||item.mediaSources)||[];for(var i=0;i<sources.length;i++){var source=sources[i]||{},path=source.Path||source.path||source.DirectStreamUrl||source.directStreamUrl;if(path&&yt.test(path))return!0}var path=item&&(item.Path||item.path);return!!(path&&yt.test(path))}catch(e){return!1}}"
             // Diagnostic beacon: pings the server so the in-webview playback flow is
             // visible in the plugin log as [YT][DIAG] lines (client console is unreachable).
-            + "function ytPluginDiag20260606(m){try{new Image().src=\"modules/youtubeplayer/ytdiag.js?m=\"+encodeURIComponent(m)+\"&t=\"+Date.now()}catch(e){}}";
+            + "function ytPluginDiag20260606(m){try{new Image().src=\"modules/youtubeplayer/ytdiag.js?m=\"+encodeURIComponent(m)+\"&t=\"+Date.now()}catch(e){}}"
+            + "function ytPluginHostOptions20260617(){try{if(/Android|SamsungBrowser/i.test((globalThis.navigator&&navigator.userAgent)||\"\")){ytPluginDiag20260606(\"if-host-nocookie\");return{host:\"https://www.youtube-nocookie.com\"}}}catch(e){}return{}}";
 
         private static object? GetProperty(object source, string name)
         {

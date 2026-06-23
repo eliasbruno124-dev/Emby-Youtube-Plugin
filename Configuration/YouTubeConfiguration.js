@@ -440,6 +440,21 @@ define([
                     this.saveData(view);
                     return false;
                 });
+                // Auto-save: there is no Save button. Any control change persists
+                // immediately (debounced via scheduleAutoSave). Programmatic value
+                // changes during loadData don't fire these events, and the
+                // _autoSaveReady guard blocks saves until the initial load is done.
+                form.addEventListener('change', () => this.scheduleAutoSave(view));
+                form.addEventListener('input', (e) => {
+                    // The "add entry" boxes aren't persisted config fields —
+                    // their text only matters once Add is pressed — so typing
+                    // in them must not schedule a save.
+                    const id = e.target && e.target.id;
+                    if (id === 'txtSavedItemEntry' || id === 'txtWatchLaterEntry') {
+                        return;
+                    }
+                    this.scheduleAutoSave(view);
+                });
             }
 
             this.bindEntryControls(
@@ -474,6 +489,7 @@ define([
                 setValue(view, inputId, '');
                 this.renderEntryList(view, listId, getItems, setItems, classify);
                 this.syncEntryFields(view);
+                this.scheduleAutoSave(view);
             };
 
             if (button) {
@@ -538,6 +554,7 @@ define([
                     setItems(getItems().filter(existing => existing !== item));
                     this.renderEntryList(view, listId, getItems, setItems, classify);
                     this.syncEntryFields(view);
+                    this.scheduleAutoSave(view);
                 });
                 chip.appendChild(remove);
 
@@ -573,6 +590,13 @@ define([
                 return;
             }
 
+            this._autoSaveReady = false;
+            // Drop any save still pending from a previous edit so a reload
+            // can't race it into persisting stale/in-flux field values.
+            if (this._autoSaveTimer) {
+                clearTimeout(this._autoSaveTimer);
+                this._autoSaveTimer = null;
+            }
             loading.show();
             apiClient.getPluginConfiguration(pluginId).then(config => {
                 this.config = config || {};
@@ -600,6 +624,8 @@ define([
                 setStatus(view, '');
                 loading.hide();
                 renderPluginCredits(view, apiClient);
+                // Initial values are in place; enable auto-save for real edits.
+                this._autoSaveReady = true;
             }, error => {
                 loading.hide();
                 console.error('Error loading YouTube configuration:', error);
@@ -644,23 +670,41 @@ define([
             delete config.QuotaLifetime;
             delete config.ShortsEnabled;
 
-            loading.show();
-            apiClient.updatePluginConfiguration(pluginId, config).then(result => {
+            // Save through the plugin's own endpoint instead of Emby's
+            // updatePluginConfiguration. Emby Server 4.10.0.x's POST
+            // /Plugins/{guid}/Configuration handler throws "Unrecognized Guid
+            // format" and returns HTTP 500 for every plugin, so the normal path
+            // is unusable on the beta. No full-screen spinner / success toast:
+            // saving is automatic and silent on every change.
+            setStatus(view, 'Saving…');
+            apiClient.ajax({
+                type: 'POST',
+                url: apiClient.getUrl('YouTubePlugin/SaveConfiguration'),
+                data: JSON.stringify(config),
+                contentType: 'application/json'
+            }).then(() => {
                 this.config = config;
                 setDonateButton(view);
-                setStatus(view, 'Settings saved. The YouTube channel will refresh shortly.');
-                loading.hide();
-                showToast('success', 'YouTube settings saved');
-
-                if (window.Dashboard && Dashboard.processPluginConfigurationUpdateResult) {
-                    Dashboard.processPluginConfigurationUpdateResult(result);
-                }
+                setStatus(view, 'Saved automatically · the YouTube channel refreshes shortly.');
             }, error => {
-                loading.hide();
                 console.error('Error saving YouTube configuration:', error);
                 setStatus(view, 'Could not save plugin settings.');
                 showToast('error', 'Could not save YouTube settings');
             });
+        }
+
+        scheduleAutoSave(view) {
+            // Debounce so typing in a text field doesn't fire a save per keystroke.
+            if (!this._autoSaveReady) {
+                return;
+            }
+            if (this._autoSaveTimer) {
+                clearTimeout(this._autoSaveTimer);
+            }
+            this._autoSaveTimer = setTimeout(() => {
+                this._autoSaveTimer = null;
+                this.saveData(view);
+            }, 600);
         }
     };
 });

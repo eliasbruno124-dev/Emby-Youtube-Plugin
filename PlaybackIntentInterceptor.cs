@@ -33,6 +33,7 @@ namespace Emby.YouTubePlugin
         bool HasStartTimeTicks,
         bool IsPlayback,
         bool IsLikelyIos,
+        bool IsLikelyNativeAndroid,
         bool IsLikelyNativeTheater);
 
     internal sealed record PlaybackInfoNormalizationResult(
@@ -55,6 +56,8 @@ namespace Emby.YouTubePlugin
         private static DateTime _lastCleanupUtc = DateTime.MinValue;
         private static int _playbackInfoLogsRemaining = 24;
         private static int _mediaSourceNormalizeLogsRemaining = 24;
+        private static int _startStampSuppressLogsRemaining = 12;
+        private static int _legacyTabletSourceLogsRemaining = 12;
 
         internal static void Install()
         {
@@ -367,6 +370,7 @@ namespace Emby.YouTubePlugin
                 hasStartTimeTicks,
                 isPlayback,
                 IsLikelyIosClient(serviceRequest),
+                IsLikelyNativeAndroidClient(serviceRequest),
                 IsLikelyNativeTheaterClient(serviceRequest));
         }
 
@@ -376,15 +380,20 @@ namespace Emby.YouTubePlugin
                 return;
 
             var isLikelyIos = IsLikelyIosClient(request);
+            var isLikelyNativeAndroid = IsLikelyNativeAndroidClient(request);
             var isLikelyNativeTheater = IsLikelyNativeTheaterClient(request);
-            if (!isLikelyIos && !isLikelyNativeTheater)
+            if (!isLikelyIos && !isLikelyNativeAndroid && !isLikelyNativeTheater)
                 return;
 
             _playbackInfoLogsRemaining--;
             var client = GetRequestValue(request, "X-Emby-Client");
             var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
             var maxBitrate = GetRequestValue(request, "MaxStreamingBitrate") ?? "unknown";
-            var clientKind = isLikelyNativeTheater ? "native Theater/Xbox client" : "iOS-like client";
+            var clientKind = isLikelyNativeTheater
+                ? "native Theater/Xbox client"
+                : isLikelyNativeAndroid
+                    ? "native Android client"
+                    : "iOS-like client";
             YouTubeChannel.LogPublic(
                 $"[YT] PlaybackInfo captured for {clientKind}. Item={itemId}, StartTimeTicks={startTimeTicks}, MaxStreamingBitrate={maxBitrate}, Client={client ?? "unknown"}, Device={deviceName ?? "unknown"}.");
         }
@@ -404,7 +413,12 @@ namespace Emby.YouTubePlugin
                     LogPlaybackInfoNormalization(context, normalized);
 
                 if (context.HasStartTimeTicks && context.StartTimeTicks >= TimeSpan.TicksPerSecond * 5)
-                    StampYouTubeStartTime(response, context.StartTimeTicks);
+                {
+                    if (ShouldSuppressYouTubeStartStamp(context))
+                        LogYouTubeStartStampSuppressed(context);
+                    else
+                        StampYouTubeStartTime(response, context.StartTimeTicks);
+                }
             }
             catch (Exception ex)
             {
@@ -422,6 +436,8 @@ namespace Emby.YouTubePlugin
             _mediaSourceNormalizeLogsRemaining--;
             var clientKind = context.IsLikelyNativeTheater
                 ? "native Theater/Xbox client"
+                : context.IsLikelyNativeAndroid
+                    ? "native Android client"
                 : context.IsLikelyIos
                     ? "iOS-like client"
                     : "client";
@@ -469,6 +485,57 @@ namespace Emby.YouTubePlugin
                 YouTubeChannel.LogPublic($"[YT] PlaybackInfo media source stamped with YouTube start={seconds}s.");
         }
 
+        private static bool ShouldSuppressYouTubeStartStamp(PlaybackInfoPatchContext context)
+            => IsLikelyNativeAndroidTablet(context);
+
+        private static bool IsLikelyNativeAndroidTablet(PlaybackInfoPatchContext context)
+        {
+            if (!context.IsLikelyNativeAndroid)
+                return false;
+
+            if (ContainsIgnoreCase(context.DeviceName, "Tab")
+                || ContainsIgnoreCase(context.DeviceName, "Tablet")
+                || ContainsIgnoreCase(context.UserAgent, "SM-X"))
+            {
+                return true;
+            }
+
+            return ContainsIgnoreCase(context.UserAgent, "Android")
+                   && ContainsIgnoreCase(context.UserAgent, "Safari/")
+                   && !ContainsIgnoreCase(context.UserAgent, "Mobile")
+                   && !ContainsIgnoreCase(context.UserAgent, "TV")
+                   && !ContainsIgnoreCase(context.DeviceName, "TV");
+        }
+
+        private static string GetContextualYouTubeWatchUrl(string videoId, PlaybackInfoPatchContext context)
+        {
+            if (IsLikelyNativeAndroidTablet(context))
+                return $"https://www.youtube.com/watch?v={videoId}";
+
+            return YouTubeChannel.GetYouTubeWatchUrl(videoId);
+        }
+
+        private static void LogNativeAndroidTabletLegacySource(PlaybackInfoPatchContext context, string videoId)
+        {
+            if (_legacyTabletSourceLogsRemaining <= 0)
+                return;
+
+            _legacyTabletSourceLogsRemaining--;
+            YouTubeChannel.LogPublic(
+                $"[YT] PlaybackInfo using legacy YouTube watch source for native Android tablet. Video={videoId}, Item={context.ItemId}, Client={context.Client}, Device={context.DeviceName}, UA={Shorten(context.UserAgent, 160)}.");
+        }
+
+        private static void LogYouTubeStartStampSuppressed(PlaybackInfoPatchContext context)
+        {
+            if (_startStampSuppressLogsRemaining <= 0)
+                return;
+
+            _startStampSuppressLogsRemaining--;
+            var seconds = Math.Max(0, context.StartTimeTicks / TimeSpan.TicksPerSecond);
+            YouTubeChannel.LogPublic(
+                $"[YT] PlaybackInfo YouTube start={seconds}s suppressed for native Android tablet. Item={context.ItemId}, Client={context.Client}, Device={context.DeviceName}, UA={Shorten(context.UserAgent, 160)}.");
+        }
+
         private static PlaybackInfoNormalizationResult NormalizeYouTubeMediaSources(
             object? response,
             string? youTubeVideoId,
@@ -512,11 +579,13 @@ namespace Emby.YouTubePlugin
                 // YouTube player canPlayItem() matches and the embed gets the id.
                 if (pathProp?.CanWrite == true)
                 {
-                    var normalizedPath = YouTubeChannel.GetYouTubeWatchUrl(videoId);
+                    var normalizedPath = GetContextualYouTubeWatchUrl(videoId, context);
                     if (!string.IsNullOrEmpty(normalizedPath)
                         && !string.Equals(path, normalizedPath, StringComparison.Ordinal))
                     {
                         pathProp.SetValue(mediaSource, normalizedPath);
+                        if (IsLikelyNativeAndroidTablet(context))
+                            LogNativeAndroidTabletLegacySource(context, videoId);
                         mediaSourceChanged = true;
                     }
                 }
@@ -524,8 +593,17 @@ namespace Emby.YouTubePlugin
                 // Existing library items can carry a stored ~40 Mbps bitrate that
                 // trips a client's bitrate cap (e.g. iPad web at 4 Mbps) into a
                 // transcode it cannot perform for a YouTube watch page.
-                mediaSourceChanged |= SetBoolProperty(mediaSource, "IsRemote", true);
-                mediaSourceChanged |= SetNumberProperty(mediaSource, "Bitrate", 1_000_000);
+                if (IsLikelyNativeAndroidTablet(context))
+                {
+                    mediaSourceChanged |= SetBoolProperty(mediaSource, "IsRemote", false);
+                    mediaSourceChanged |= SetPropertyToNull(mediaSource, "Bitrate");
+                    mediaSourceChanged |= SetPropertyToNull(mediaSource, "ContainerStartTimeTicks");
+                }
+                else
+                {
+                    mediaSourceChanged |= SetBoolProperty(mediaSource, "IsRemote", true);
+                    mediaSourceChanged |= SetNumberProperty(mediaSource, "Bitrate", 1_000_000);
+                }
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "SupportsProbing", false);
                 mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "ProbePath");
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "ProbeProtocol");
@@ -808,6 +886,12 @@ namespace Emby.YouTubePlugin
                    || ContainsIgnoreCase(userAgent, "iPhone")
                    || ContainsIgnoreCase(userAgent, "Mobile/")
                    || ContainsIgnoreCase(userAgent, "VivaiOS");
+        }
+
+        private static bool IsLikelyNativeAndroidClient(IRequest? request)
+        {
+            var client = GetRequestValue(request, "X-Emby-Client");
+            return ContainsIgnoreCase(client, "Emby for Android");
         }
 
         private static bool IsLikelyNativeTheaterClient(IRequest? request)

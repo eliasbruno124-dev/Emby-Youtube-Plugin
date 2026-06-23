@@ -39,7 +39,29 @@ namespace Emby.YouTubePlugin
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
 
-        public string DataVersion => "1.0.0";
+        // Emby caches the channel's folders/items keyed by DataVersion and only
+        // re-queries GetChannelItems when it changes. A constant version means a
+        // saved setting (shorts/trending/categories/sort/saved-channels/API key…)
+        // is not applied until the cache otherwise expires. Deriving the version
+        // from the same content hash that gates the save-refresh makes any real
+        // settings change invalidate the cache so it takes effect on next browse.
+        public string DataVersion
+        {
+            get
+            {
+                try
+                {
+                    var config = Plugin.Instance?.Options;
+                    return config == null
+                        ? "1.0.0"
+                        : "1.0.0." + PluginEntryPoint.ComputeConfigHash(config);
+                }
+                catch
+                {
+                    return "1.0.0";
+                }
+            }
+        }
         public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
         public bool IsEnabledByDefault => true;
 
