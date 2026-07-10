@@ -346,12 +346,12 @@ namespace Emby.YouTubePlugin
                 return source;
             }
 
-            if (!ReplaceRequired(ref patched, "var params,tag,firstScriptTag;", "var params,startSeconds,tag,firstScriptTag;", "iframe start var"))
+            if (!ReplaceRequired(ref patched, "var params,tag,firstScriptTag;", "var params,startSeconds,startMuted,tag,firstScriptTag;", "iframe start var"))
                 return source;
 
             if (!ReplaceRequired(ref patched,
                     "params=new URLSearchParams(options.url.split(\"?\")[1]),window.onYouTubeIframeAPIReady=function(){",
-                    "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params),window.onYouTubeIframeAPIReady=function(){",
+                    "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params),startMuted=ytPluginShouldStartMuted20260629(),window.onYouTubeIframeAPIReady=function(){",
                     "iframe parse start"))
             {
                 return source;
@@ -359,7 +359,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "):event.target.playVideo()},onStateChange:function(event){",
-                    "):(ytPluginDiag20260606(\"if-ready\"),startSeconds>0&&event.target.seekTo(startSeconds,!0),event.target.playVideo())},onStateChange:function(event){",
+                    "):(ytPluginDiag20260606(\"if-ready\"),startMuted&&event.target.mute&&event.target.mute(),startSeconds>0&&event.target.seekTo(startSeconds,!0),event.target.playVideo(),startMuted&&setTimeout(function(){ytPluginUnmuteTarget20260629(event.target)},1800))},onStateChange:function(event){",
                     "iframe seek on ready"))
             {
                 return source;
@@ -367,7 +367,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "playerVars:Object.assign({},playerVars)}",
-                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}",
+                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:startMuted?1:0,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}",
                     "iframe playerVars start/inline/jsapi"))
             {
                 return source;
@@ -390,12 +390,11 @@ namespace Emby.YouTubePlugin
                 return source;
             }
 
-            // The iframe player now starts muted (mute:1 above) so autoplay is never blocked by
-            // a webview/browser without media-engagement history; restore sound once it actually
-            // reaches PLAYING. Best-effort: a pattern miss must not discard the whole iframe patch.
+            // Restore sound once playback reaches PLAYING, and also from the ready fallback
+            // above. Some clients miss one of those callbacks during startup.
             ReplaceOptional(ref patched,
                 "if(event.data===YT.PlayerState.PLAYING){var rejectFn=reject;",
-                "if(event.data===YT.PlayerState.PLAYING){ytPluginDiag20260606(\"if-playing\"),event.target&&!instance.ytUnmuted&&(instance.ytUnmuted=!0,setTimeout(function(){event.target.unMute&&event.target.unMute()},600));var rejectFn=reject;");
+                "if(event.data===YT.PlayerState.PLAYING){ytPluginDiag20260606(\"if-playing\"),startMuted&&event.target&&!instance.ytUnmuted&&(instance.ytUnmuted=!0,setTimeout(function(){ytPluginUnmuteTarget20260629(event.target)},600));var rejectFn=reject;");
 
             // Diagnostic beacons at the iframe player's own console.log points.
             ReplaceOptional(ref patched,
@@ -434,7 +433,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "case\"youtubePlayerReady\":if(signal.aborted)return stopInternal(this,!0,!1),void reject(getSignalRejectReason(signal));var _instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");_instance$videoDialog&&sendMessage(_instance$videoDialog,\"playVideo\");break;",
-                    "case\"youtubePlayerReady\":if(signal.aborted)return stopInternal(this,!0,!1),void reject(getSignalRejectReason(signal));var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&(ytPluginDiag20260606(\"wv-muteplay\"),sendMessage(_instance$videoDialog,\"mute\"),startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"));break;",
+                    "case\"youtubePlayerReady\":if(signal.aborted)return stopInternal(this,!0,!1),void reject(getSignalRejectReason(signal));var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,startMuted=!!(lastPlayerData&&lastPlayerData.startMuted),_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&(startMuted&&(ytPluginDiag20260606(\"wv-muteplay\"),sendMessage(_instance$videoDialog,\"mute\")),startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"),startMuted&&setTimeout(function(){sendMessage(_instance$videoDialog,\"unMute\")},1800));break;",
                     "webview seek on ready"))
             {
                 return source;
@@ -450,7 +449,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "signal.aborted?reject(getSignalRejectReason(signal)):(instance.playerData={resolve:resolve,reject:reject,signal:signal},function(instance,options){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),new URLSearchParams(options.url.split(\"?\")[1]).get(\"v\"));",
-                    "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
+                    "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params),startMuted:ytPluginShouldStartMuted20260629()},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
                     "webview parse start"))
             {
                 return source;
@@ -482,7 +481,7 @@ namespace Emby.YouTubePlugin
                         // Muted autoplay is the only autoplay a fresh webview (Xbox/UWP WebView2)
                         // allows, so playback is started muted; once it actually reaches PLAYING we
                         // restore sound. Delayed slightly so playback is settled before unmuting.
-                        + "_ytSeekIf&&!lastPlayerData.ytUnmuted&&(lastPlayerData.ytUnmuted=!0,setTimeout(function(){sendMessage(_ytSeekIf,\"unMute\")},600));",
+                        + "lastPlayerData.startMuted&&_ytSeekIf&&!lastPlayerData.ytUnmuted&&(lastPlayerData.ytUnmuted=!0,setTimeout(function(){sendMessage(_ytSeekIf,\"unMute\")},600));",
                     StringComparison.Ordinal);
             }
 
@@ -565,8 +564,8 @@ namespace Emby.YouTubePlugin
         {
             const string startOld = "new YT.Player(\"player\",{height:";
             const string startNew = "new YT.Player(\"player\",Object.assign({},ytPluginHostOptions20260617(),{height:";
-            const string endOld = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}),(resizeListener=";
-            const string endNew = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:1,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)})),(resizeListener=";
+            const string endOld = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:startMuted?1:0,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)}),(resizeListener=";
+            const string endNew = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,mute:startMuted?1:0,origin:window.location.origin,widget_referrer:window.location.href},startSeconds>0?{start:startSeconds}:null)})),(resizeListener=";
 
             // Both edits balance each other (opening wrap + its closing paren),
             // so commit only when BOTH anchors are present. A partial apply can
@@ -644,7 +643,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260617-android-tablet-start-v5";
+        private const string DashboardPatchRevision = "20260710-stream-stability-v1";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
@@ -653,10 +652,12 @@ namespace Emby.YouTubePlugin
             "function ytPluginPatch20260606(){return 1}"
             + "function ytPluginStartSeconds20260606(params){var raw=params.get(\"start\")||params.get(\"t\");if(!raw)return 0;if(/^\\d+$/.test(raw))return parseInt(raw,10);var match=/^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$/.exec(raw);return match?3600*parseInt(match[1]||\"0\",10)+60*parseInt(match[2]||\"0\",10)+parseInt(match[3]||\"0\",10):0}"
             + "function ytPluginCanPlayItem20260606(item){try{var yt=/^(https?:\\/\\/)?([^\\/]+\\.)?(youtube\\.com|youtu\\.be)\\//i,sources=item&&(item.MediaSources||item.mediaSources)||[];for(var i=0;i<sources.length;i++){var source=sources[i]||{},path=source.Path||source.path||source.DirectStreamUrl||source.directStreamUrl;if(path&&yt.test(path))return!0}var path=item&&(item.Path||item.path);return!!(path&&yt.test(path))}catch(e){return!1}}"
+            + "function ytPluginShouldStartMuted20260629(){try{var ua=(globalThis.navigator&&navigator.userAgent)||\"\";return/Xbox|UWP/i.test(ua)}catch(e){return!1}}"
+            + "function ytPluginUnmuteTarget20260629(target){try{target&&target.unMute&&(!target.isMuted||target.isMuted())&&target.unMute()}catch(e){}}"
             // Diagnostic beacon: pings the server so the in-webview playback flow is
             // visible in the plugin log as [YT][DIAG] lines (client console is unreachable).
             + "function ytPluginDiag20260606(m){try{new Image().src=\"modules/youtubeplayer/ytdiag.js?m=\"+encodeURIComponent(m)+\"&t=\"+Date.now()}catch(e){}}"
-            + "function ytPluginHostOptions20260617(){try{if(/Android|SamsungBrowser/i.test((globalThis.navigator&&navigator.userAgent)||\"\")){ytPluginDiag20260606(\"if-host-nocookie\");return{host:\"https://www.youtube-nocookie.com\"}}}catch(e){}return{}}";
+            + "function ytPluginHostOptions20260617(){try{var ua=(globalThis.navigator&&navigator.userAgent)||\"\";if(!/AFT|Fire[ \\/-]?TV|Android[ \\/-]?TV/i.test(ua)&&/Android|SamsungBrowser/i.test(ua)){ytPluginDiag20260606(\"if-host-nocookie\");return{host:\"https://www.youtube-nocookie.com\"}}}catch(e){}return{}}";
 
         private static object? GetProperty(object source, string name)
         {

@@ -1,9 +1,12 @@
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Session;
+using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Services;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -58,9 +61,36 @@ namespace Emby.YouTubePlugin
         private static int _mediaSourceNormalizeLogsRemaining = 24;
         private static int _startStampSuppressLogsRemaining = 12;
         private static int _legacyTabletSourceLogsRemaining = 12;
+        private static int _requestSubtitleSuppressLogsRemaining = 16;
+        private static int _acceptingRequests;
+        private static readonly TimeSpan UserSubtitleModePendingRestoreDelay = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan UserSubtitleModeLeaseCheckInterval = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan UserSubtitleModeStaleLeaseTimeout = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan UserSubtitleModeRestoreRetryDelay = TimeSpan.FromSeconds(10);
+        private static readonly object UserSubtitleModeSync = new();
+        private static readonly Dictionary<long, UserSubtitleModeOverride> UserSubtitleModeOverrides = new();
+
+        private sealed class UserSubtitleModeOverride
+        {
+            public UserSubtitleModeOverride(SubtitlePlaybackMode originalMode, bool originalRememberSubtitleSelections)
+            {
+                OriginalMode = originalMode;
+                OriginalRememberSubtitleSelections = originalRememberSubtitleSelections;
+                UpdatedUtc = DateTime.UtcNow;
+            }
+
+            public SubtitlePlaybackMode OriginalMode { get; }
+            public bool OriginalRememberSubtitleSelections { get; }
+            public Dictionary<string, DateTime> SessionLeases { get; } = new(StringComparer.Ordinal);
+            public bool PendingRestoreQueued { get; set; }
+            public DateTime? PendingPreflightUtc { get; set; }
+            public string? PendingPreflightVideoId { get; set; }
+            public DateTime UpdatedUtc { get; set; }
+        }
 
         internal static void Install()
         {
+            Volatile.Write(ref _acceptingRequests, 1);
             lock (Sync)
             {
                 if (_harmony != null)
@@ -90,15 +120,18 @@ namespace Emby.YouTubePlugin
 
                     var postfixMethod = typeof(PlaybackIntentInterceptor)
                         .GetMethod(nameof(CapturePlaybackInfoPostfix), BindingFlags.NonPublic | BindingFlags.Static);
-                    if (postfixMethod == null)
+                    var prefixMethod = typeof(PlaybackIntentInterceptor)
+                        .GetMethod(nameof(SanitizePlaybackInfoPrefix), BindingFlags.NonPublic | BindingFlags.Static);
+                    if (postfixMethod == null || prefixMethod == null)
                     {
-                        YouTubeChannel.LogPublic("[YT] Playback intent interceptor disabled; postfix method missing.");
+                        YouTubeChannel.LogPublic("[YT] Playback intent interceptor disabled; patch method missing.");
                         return;
                     }
 
+                    var prefix = Activator.CreateInstance(harmonyMethodType, prefixMethod);
                     var postfix = Activator.CreateInstance(harmonyMethodType, postfixMethod);
                     var harmony = Activator.CreateInstance(harmonyType, HarmonyId);
-                    if (harmony == null || postfix == null)
+                    if (harmony == null || prefix == null || postfix == null)
                     {
                         YouTubeChannel.LogPublic("[YT] Playback intent interceptor disabled; Harmony instance could not be created.");
                         return;
@@ -108,13 +141,13 @@ namespace Emby.YouTubePlugin
 
                     // Clients may use GET or POST PlaybackInfo depending on app
                     // and Emby version. Patch both shapes when they exist.
-                    if (PatchPublicMethod(harmony, postfix, mediaInfoServiceType, "Get",
+                    if (PatchPublicMethod(harmony, prefix, postfix, mediaInfoServiceType, "Get",
                             "Emby.Server.MediaEncoding.Api.GetPlaybackInfo"))
                     {
                         patched++;
                     }
 
-                    if (PatchPublicMethod(harmony, postfix, mediaInfoServiceType, "Post",
+                    if (PatchPublicMethod(harmony, prefix, postfix, mediaInfoServiceType, "Post",
                             "Emby.Server.MediaEncoding.Api.GetPostedPlaybackInfo"))
                     {
                         patched++;
@@ -139,6 +172,11 @@ namespace Emby.YouTubePlugin
 
         internal static void Uninstall()
         {
+            // Stop new subtitle-policy leases before removing the Harmony hooks.
+            // A prefix already in flight checks this flag again under the policy
+            // lock, so Dispose can restore settings without a late request
+            // immediately forcing them off again.
+            Volatile.Write(ref _acceptingRequests, 0);
             lock (Sync)
             {
                 try
@@ -174,7 +212,10 @@ namespace Emby.YouTubePlugin
             if (TryConsumeKey(MakeKey(normalizedUserId, normalizedItemId, normalizedDeviceId), out intent))
                 return true;
 
-            if (TryConsumeKey(MakeKey(normalizedUserId, normalizedItemId, string.Empty), out intent))
+            if (TryConsumeCompatibleKey(
+                    MakeKey(normalizedUserId, normalizedItemId, string.Empty),
+                    normalizedDeviceId,
+                    out intent))
                 return true;
 
             // Some clients omit or rename device ids between PlaybackInfo and
@@ -217,6 +258,7 @@ namespace Emby.YouTubePlugin
 
         private static bool PatchPublicMethod(
             object harmony,
+            object prefix,
             object postfix,
             Type serviceType,
             string methodName,
@@ -243,11 +285,11 @@ namespace Emby.YouTubePlugin
                 return false;
             }
 
-            InvokeHarmonyPatch(harmony, method, postfix);
+            InvokeHarmonyPatch(harmony, method, prefix, postfix);
             return true;
         }
 
-        private static void InvokeHarmonyPatch(object harmony, MethodInfo original, object postfix)
+        private static void InvokeHarmonyPatch(object harmony, MethodInfo original, object prefix, object postfix)
         {
             var patchMethod = harmony.GetType()
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -259,6 +301,7 @@ namespace Emby.YouTubePlugin
                     var parameters = m.GetParameters();
                     return parameters.Length >= 3
                            && typeof(MethodBase).IsAssignableFrom(parameters[0].ParameterType)
+                           && parameters.Any(p => string.Equals(p.Name, "prefix", StringComparison.OrdinalIgnoreCase))
                            && parameters.Any(p => string.Equals(p.Name, "postfix", StringComparison.OrdinalIgnoreCase));
                 });
 
@@ -270,7 +313,9 @@ namespace Emby.YouTubePlugin
             args[0] = original;
             for (var i = 1; i < patchParameters.Length; i++)
             {
-                if (string.Equals(patchParameters[i].Name, "postfix", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(patchParameters[i].Name, "prefix", StringComparison.OrdinalIgnoreCase))
+                    args[i] = prefix;
+                else if (string.Equals(patchParameters[i].Name, "postfix", StringComparison.OrdinalIgnoreCase))
                     args[i] = postfix;
                 else
                     args[i] = null;
@@ -299,6 +344,619 @@ namespace Emby.YouTubePlugin
             }
 
             return Type.GetType(fullName, throwOnError: false);
+        }
+
+        private static void SanitizePlaybackInfoPrefix(object __instance, object __0)
+        {
+            try
+            {
+                SanitizeYouTubePlaybackInfoRequest(__instance, __0);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo request sanitize failed: {ex.Message}");
+            }
+        }
+
+        private static void SanitizeYouTubePlaybackInfoRequest(object service, object requestDto)
+        {
+            var serviceRequest = GetServiceRequest(service);
+            var itemId = Normalize(GetStringProperty(requestDto, "Id"));
+            if (string.IsNullOrEmpty(itemId))
+                return;
+
+            var videoId = TryResolveYouTubeVideoId(itemId);
+            if (string.IsNullOrEmpty(videoId))
+                return;
+
+            // Emby may carry an old resume position on a persisted live item.
+            // Clear the request value before its normal playback pipeline sees
+            // it; the postfix already avoids adding our own URL start stamp.
+            if (IsYouTubeLiveItem(itemId))
+            {
+                SetNullableLongProperty(requestDto, "StartTimeTicks", 0);
+                TrySetRequestCollectionValue(serviceRequest?.QueryString, "StartTimeTicks", "0");
+            }
+
+            // A YouTube watch URL exposes neither Emby-managed audio tracks nor
+            // subtitle tracks. Remove a client-supplied audio index before Emby
+            // builds its response so stale native state cannot select a fake or
+            // previously remembered track. Subtitle off remains explicit -1;
+            // null is interpreted as automatic selection by some clients.
+            var previousAudioDtoValue = TryReadIntProperty(requestDto, "AudioStreamIndex");
+            var previousAudioQueryValue = serviceRequest?.QueryString["AudioStreamIndex"];
+            var audioDtoChanged = SetNullableIntProperty(requestDto, "AudioStreamIndex", null);
+            var audioQueryChanged = TryRemoveRequestCollectionValue(
+                serviceRequest?.QueryString,
+                "AudioStreamIndex");
+
+            var currentDtoValue = TryReadIntProperty(requestDto, "SubtitleStreamIndex");
+            var currentQueryValue = serviceRequest?.QueryString["SubtitleStreamIndex"];
+            var dtoChanged = SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
+            var queryChanged = TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
+
+            var isPlayback = TryReadBoolProperty(requestDto, "IsPlayback")
+                ?? TryReadBool(serviceRequest?.QueryString["IsPlayback"])
+                ?? true;
+            var isNativeAndroidTablet = IsLikelyNativeAndroidTabletRequest(serviceRequest);
+            if (isPlayback || isNativeAndroidTablet)
+                ForceUserSubtitleModeOffForRequest(serviceRequest, requestDto, videoId);
+
+            if (audioDtoChanged
+                || audioQueryChanged
+                || previousAudioDtoValue.HasValue
+                || !string.IsNullOrEmpty(previousAudioQueryValue)
+                || dtoChanged
+                || queryChanged
+                || currentDtoValue != -1
+                || !string.Equals(currentQueryValue, "-1", StringComparison.Ordinal))
+            {
+                LogPlaybackInfoSubtitleSuppressed(
+                    serviceRequest,
+                    itemId,
+                    videoId,
+                    currentDtoValue,
+                    currentQueryValue,
+                    dtoChanged,
+                    queryChanged,
+                    previousAudioDtoValue,
+                    previousAudioQueryValue,
+                    audioDtoChanged,
+                    audioQueryChanged,
+                    isNativeAndroidTablet);
+            }
+        }
+
+        private static void LogPlaybackInfoSubtitleSuppressed(
+            IRequest? request,
+            string itemId,
+            string videoId,
+            int? previousDtoValue,
+            string? previousQueryValue,
+            bool dtoChanged,
+            bool queryChanged,
+            int? previousAudioDtoValue,
+            string? previousAudioQueryValue,
+            bool audioDtoChanged,
+            bool audioQueryChanged,
+            bool isNativeAndroidTablet)
+        {
+            if (_requestSubtitleSuppressLogsRemaining <= 0)
+                return;
+
+            _requestSubtitleSuppressLogsRemaining--;
+            var client = GetRequestValue(request, "X-Emby-Client") ?? "unknown";
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name") ?? "unknown";
+            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"] ?? "unknown";
+            var previousDtoText = previousDtoValue.HasValue
+                ? previousDtoValue.Value.ToString(CultureInfo.InvariantCulture)
+                : "null";
+            var previousAudioDtoText = previousAudioDtoValue.HasValue
+                ? previousAudioDtoValue.Value.ToString(CultureInfo.InvariantCulture)
+                : "null";
+            var clientKind = isNativeAndroidTablet ? "native Android tablet" : "YouTube client";
+            YouTubeChannel.LogPublic(
+                $"[YT] PlaybackInfo sanitized stream selection for {clientKind}. Video={videoId}, Item={itemId}, PreviousAudioDto={previousAudioDtoText}, PreviousAudioQuery={previousAudioQueryValue ?? "null"}, AudioDtoChanged={audioDtoChanged}, AudioQueryChanged={audioQueryChanged}, PreviousSubtitleDto={previousDtoText}, PreviousSubtitleQuery={previousQueryValue ?? "null"}, SubtitleDtoChanged={dtoChanged}, SubtitleQueryChanged={queryChanged}, Client={client}, Device={deviceName}, UA={Shorten(userAgent, 160)}.");
+        }
+
+        internal static void ForceUserSubtitleModeOff(long userInternalId, string? sessionId, string videoId, string reason)
+        {
+            if (userInternalId <= 0)
+                return;
+
+            try
+            {
+                var userManager = Plugin.ResolveService<IUserManager>();
+                var user = userManager?.GetUserById(userInternalId);
+                if (userManager == null || user == null)
+                    return;
+
+                ForceUserSubtitleModeOff(
+                    userManager,
+                    user,
+                    userInternalId,
+                    sessionId,
+                    videoId,
+                    reason,
+                    trackSession: !string.IsNullOrEmpty(sessionId));
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] User subtitle mode force-off failed for {videoId}: {ex.Message}");
+            }
+        }
+
+        internal static void RestoreUserSubtitleMode(long userInternalId, string? sessionId, string videoId, string reason)
+        {
+            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
+                return;
+
+            var queueRestore = false;
+            lock (UserSubtitleModeSync)
+            {
+                if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
+                {
+                    // A late PlaybackStopped from an older/replaced play session
+                    // must never restore the user's normal subtitle policy while
+                    // a newer YouTube playback is still active.
+                    var removed = active.SessionLeases.Remove(sessionId);
+                    if (!removed)
+                        return;
+
+                    if (active.SessionLeases.Count == 0)
+                    {
+                        if (GetPendingPreflightDelay(active, DateTime.UtcNow) > TimeSpan.Zero)
+                        {
+                            queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
+                        }
+                        else if (TryRestoreUserSubtitleMode(userInternalId, active, videoId, reason))
+                        {
+                            UserSubtitleModeOverrides.Remove(userInternalId);
+                        }
+                        else
+                        {
+                            queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
+                        }
+                    }
+                }
+            }
+
+            if (queueRestore)
+                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModeRestoreRetryDelay);
+        }
+
+        internal static void TouchUserSubtitleMode(
+            long userInternalId,
+            string? leaseKey,
+            string? sessionId,
+            string videoId)
+        {
+            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
+                return;
+
+            lock (UserSubtitleModeSync)
+            {
+                if (!UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
+                    return;
+
+                var currentKey = !string.IsNullOrEmpty(leaseKey)
+                                 && active.SessionLeases.ContainsKey(leaseKey)
+                    ? leaseKey
+                    : active.SessionLeases.Keys.FirstOrDefault(key =>
+                        key.StartsWith(sessionId + "|", StringComparison.Ordinal)
+                        && key.EndsWith("|" + videoId, StringComparison.Ordinal));
+                if (string.IsNullOrEmpty(currentKey))
+                    return;
+
+                var now = DateTime.UtcNow;
+                active.SessionLeases[currentKey] = now;
+                active.UpdatedUtc = now;
+            }
+        }
+
+        internal static void ReleaseUserSubtitleModeForSession(
+            long userInternalId,
+            string? sessionId,
+            string reason)
+        {
+            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
+                return;
+
+            var queueRestore = false;
+            lock (UserSubtitleModeSync)
+            {
+                if (!UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
+                    return;
+
+                var sessionPrefix = sessionId + "|";
+                var staleKeys = active.SessionLeases.Keys
+                    .Where(key => key.StartsWith(sessionPrefix, StringComparison.Ordinal))
+                    .ToArray();
+                if (staleKeys.Length == 0)
+                    return;
+
+                foreach (var staleKey in staleKeys)
+                    active.SessionLeases.Remove(staleKey);
+
+                if (active.SessionLeases.Count == 0)
+                {
+                    if (GetPendingPreflightDelay(active, DateTime.UtcNow) > TimeSpan.Zero)
+                    {
+                        queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
+                    }
+                    else if (TryRestoreUserSubtitleMode(userInternalId, active, null, reason))
+                    {
+                        UserSubtitleModeOverrides.Remove(userInternalId);
+                    }
+                    else
+                    {
+                        queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
+                    }
+                }
+            }
+
+            if (queueRestore)
+                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModeRestoreRetryDelay);
+        }
+
+        internal static void RestoreAllUserSubtitleModes(string reason)
+        {
+            lock (UserSubtitleModeSync)
+            {
+                var restores = UserSubtitleModeOverrides.ToList();
+                foreach (var restore in restores)
+                {
+                    if (TryRestoreUserSubtitleMode(restore.Key, restore.Value, null, reason))
+                        UserSubtitleModeOverrides.Remove(restore.Key);
+                }
+            }
+        }
+
+        private static void ForceUserSubtitleModeOffForRequest(IRequest? request, object requestDto, string videoId)
+        {
+            try
+            {
+                var userId = Normalize(GetStringProperty(requestDto, "UserId"));
+                if (string.IsNullOrEmpty(userId))
+                    userId = Normalize(GetRequestValue(request, "UserId"));
+                if (string.IsNullOrEmpty(userId))
+                    userId = Normalize(GetRequestValue(request, "X-Emby-User-Id"));
+                if (string.IsNullOrEmpty(userId))
+                    userId = Normalize(GetRequestValue(request, "X-MediaBrowser-UserId"));
+                if (string.IsNullOrEmpty(userId))
+                    return;
+
+                var userManager = Plugin.ResolveService<IUserManager>();
+                if (userManager == null)
+                    return;
+
+                var user = TryResolveUser(userManager, userId);
+                if (user == null)
+                    return;
+
+                var userInternalId = TryReadLongProperty(user, "InternalId").GetValueOrDefault();
+                if (userInternalId <= 0)
+                    return;
+
+                ForceUserSubtitleModeOff(
+                    userManager,
+                    user,
+                    userInternalId,
+                    sessionId: null,
+                    videoId,
+                    reason: "playbackinfo",
+                    trackSession: false);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo user subtitle mode force-off failed for {videoId}: {ex.Message}");
+            }
+        }
+
+        private static void ForceUserSubtitleModeOff(
+            IUserManager userManager,
+            User user,
+            long userInternalId,
+            string? sessionId,
+            string videoId,
+            string reason,
+            bool trackSession)
+        {
+            if (Volatile.Read(ref _acceptingRequests) == 0)
+                return;
+
+            var queuePendingRestore = false;
+            string? logMessage = null;
+
+            lock (UserSubtitleModeSync)
+            {
+                if (Volatile.Read(ref _acceptingRequests) == 0)
+                    return;
+
+                // Configuration reads/writes and ownership changes are one
+                // transaction. Otherwise an old Stop can restore Smart between
+                // a replacement Start reading None and registering its session.
+                var config = userManager.GetUserConfiguration(user);
+                if (config == null)
+                    return;
+
+                var currentMode = config.SubtitleMode;
+                var currentRememberSubtitleSelections = config.RememberSubtitleSelections;
+                var shouldUpdate = false;
+                var addedSession = false;
+
+                var isNewOverride = !UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active);
+                if (isNewOverride)
+                {
+                    active = new UserSubtitleModeOverride(
+                        currentMode,
+                        currentRememberSubtitleSelections);
+                }
+
+                if (config.SubtitleMode != SubtitlePlaybackMode.None)
+                {
+                    config.SubtitleMode = SubtitlePlaybackMode.None;
+                    shouldUpdate = true;
+                }
+
+                if (config.RememberSubtitleSelections)
+                {
+                    config.RememberSubtitleSelections = false;
+                    shouldUpdate = true;
+                }
+
+                if (shouldUpdate)
+                {
+                    userManager.UpdateConfiguration(user, config);
+                }
+
+                // Publish ownership only after the configuration write succeeds.
+                // A failed write must not leave an override with no running
+                // restore worker.
+                if (isNewOverride)
+                    UserSubtitleModeOverrides[userInternalId] = active!;
+
+                var now = DateTime.UtcNow;
+                active!.UpdatedUtc = now;
+                if (trackSession && !string.IsNullOrEmpty(sessionId))
+                {
+                    // One Emby session has one current player. A replacement
+                    // start supersedes older play-session leases atomically.
+                    var separator = sessionId.IndexOf('|');
+                    var sessionPrefix = separator < 0
+                        ? sessionId + "|"
+                        : sessionId.Substring(0, separator + 1);
+                    foreach (var staleKey in active.SessionLeases.Keys
+                                 .Where(key => key.StartsWith(sessionPrefix, StringComparison.Ordinal))
+                                 .ToArray())
+                    {
+                        active.SessionLeases.Remove(staleKey);
+                    }
+
+                    addedSession = !active.SessionLeases.ContainsKey(sessionId);
+                    active.SessionLeases[sessionId] = now;
+                    if (string.Equals(active.PendingPreflightVideoId, videoId, StringComparison.Ordinal))
+                    {
+                        active.PendingPreflightUtc = null;
+                        active.PendingPreflightVideoId = null;
+                    }
+                }
+                else if (!trackSession)
+                {
+                    active.PendingPreflightUtc = now;
+                    active.PendingPreflightVideoId = videoId;
+                }
+
+                queuePendingRestore = EnsureUserSubtitleModeRestoreQueued(active);
+
+                if (shouldUpdate)
+                    logMessage = $"[YT] User subtitle mode forced off for YouTube video {videoId}. User={userInternalId}, Reason={reason}, PreviousMode={currentMode}, PreviousRemember={currentRememberSubtitleSelections}.";
+                else if (addedSession)
+                    logMessage = $"[YT] User subtitle mode already off for YouTube video {videoId}. User={userInternalId}, Reason={reason}.";
+            }
+
+            if (queuePendingRestore)
+                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModePendingRestoreDelay);
+
+            if (!string.IsNullOrEmpty(logMessage))
+                YouTubeChannel.LogPublic(logMessage);
+        }
+
+        private static User? TryResolveUser(IUserManager userManager, string userId)
+        {
+            try
+            {
+                if (long.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var internalId))
+                    return userManager.GetUserById(internalId);
+
+                return userManager.GetUserById(userId);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool EnsureUserSubtitleModeRestoreQueued(UserSubtitleModeOverride active)
+        {
+            if (active.PendingRestoreQueued)
+                return false;
+
+            active.PendingRestoreQueued = true;
+            return true;
+        }
+
+        private static void QueuePendingUserSubtitleModeRestore(long userInternalId, TimeSpan initialDelay)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var delay = initialDelay;
+                    while (delay > TimeSpan.Zero)
+                    {
+                        await Task.Delay(delay).ConfigureAwait(false);
+                        delay = RestoreIdleUserSubtitleMode(
+                            userInternalId,
+                            "playbackinfo timeout");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YT] Pending user subtitle mode restore failed: {ex.Message}");
+                    lock (UserSubtitleModeSync)
+                    {
+                        if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
+                            active.PendingRestoreQueued = false;
+                    }
+                }
+            });
+        }
+
+        private static TimeSpan RestoreIdleUserSubtitleMode(long userInternalId, string reason)
+        {
+            var retryDelay = TimeSpan.Zero;
+            lock (UserSubtitleModeSync)
+            {
+                if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
+                {
+                    var now = DateTime.UtcNow;
+                    var staleCutoff = now - UserSubtitleModeStaleLeaseTimeout;
+                    foreach (var stale in active.SessionLeases
+                                 .Where(entry => entry.Value <= staleCutoff)
+                                 .Select(entry => entry.Key)
+                                 .ToArray())
+                    {
+                        if (IsUserSubtitleLeaseStillActive(stale))
+                        {
+                            active.SessionLeases[stale] = now;
+                            continue;
+                        }
+
+                        active.SessionLeases.Remove(stale);
+                        YouTubeChannel.LogPublic(
+                            $"[YT] Removed stale YouTube subtitle policy lease. User={userInternalId}, Session={stale}.");
+                    }
+
+                    if (active.SessionLeases.Count > 0)
+                    {
+                        retryDelay = UserSubtitleModeLeaseCheckInterval;
+                    }
+                    else
+                    {
+                        var preflightDelay = GetPendingPreflightDelay(active, now);
+                        if (preflightDelay > TimeSpan.Zero)
+                        {
+                            retryDelay = preflightDelay;
+                        }
+                        else if (TryRestoreUserSubtitleMode(userInternalId, active, null, reason))
+                        {
+                            UserSubtitleModeOverrides.Remove(userInternalId);
+                        }
+                        else
+                        {
+                            retryDelay = UserSubtitleModeRestoreRetryDelay;
+                        }
+                    }
+                }
+            }
+
+            return retryDelay;
+        }
+
+        private static TimeSpan GetPendingPreflightDelay(UserSubtitleModeOverride active, DateTime now)
+        {
+            if (!active.PendingPreflightUtc.HasValue)
+                return TimeSpan.Zero;
+
+            var remaining = UserSubtitleModePendingRestoreDelay - (now - active.PendingPreflightUtc.Value);
+            if (remaining > TimeSpan.Zero)
+                return remaining;
+
+            active.PendingPreflightUtc = null;
+            active.PendingPreflightVideoId = null;
+            return TimeSpan.Zero;
+        }
+
+        private static bool IsUserSubtitleLeaseStillActive(string leaseKey)
+        {
+            try
+            {
+                var firstSeparator = leaseKey.IndexOf('|');
+                var lastSeparator = leaseKey.LastIndexOf('|');
+                if (firstSeparator <= 0 || lastSeparator <= firstSeparator)
+                    return false;
+
+                var sessionId = leaseKey.Substring(0, firstSeparator);
+                var videoId = leaseKey.Substring(lastSeparator + 1);
+                var sessionManager = Plugin.ResolveService<ISessionManager>();
+                var session = sessionManager?.Sessions
+                    .FirstOrDefault(candidate => string.Equals(candidate.Id, sessionId, StringComparison.Ordinal));
+                if (session == null)
+                    return false;
+
+                var currentVideoId = YouTubeImageProvider.TryGetVideoId(session.FullNowPlayingItem);
+                if (!string.IsNullOrEmpty(currentVideoId))
+                    return string.Equals(currentVideoId, videoId, StringComparison.Ordinal);
+
+                // If Emby only exposes the lightweight DTO, resolve its item id
+                // through the same strict plugin-item check.
+                var itemId = session.NowPlayingItem?.Id;
+                var library = Plugin.ResolveService<ILibraryManager>();
+                var item = library == null || string.IsNullOrEmpty(itemId)
+                    ? null
+                    : ResolveBaseItem(library, itemId);
+                currentVideoId = YouTubeImageProvider.TryGetVideoId(item);
+                return string.Equals(currentVideoId, videoId, StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Subtitle policy lease liveness check failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        private static bool TryRestoreUserSubtitleMode(
+            long userInternalId,
+            UserSubtitleModeOverride restore,
+            string? videoId,
+            string reason)
+        {
+            try
+            {
+                var userManager = Plugin.ResolveService<IUserManager>();
+                var user = userManager?.GetUserById(userInternalId);
+                if (userManager == null || user == null)
+                    return false;
+
+                var config = userManager.GetUserConfiguration(user);
+                if (config == null)
+                    return false;
+
+                var currentMode = config.SubtitleMode;
+                var currentRememberSubtitleSelections = config.RememberSubtitleSelections;
+                if (currentMode == SubtitlePlaybackMode.None
+                    && !currentRememberSubtitleSelections)
+                {
+                    config.SubtitleMode = restore.OriginalMode;
+                    config.RememberSubtitleSelections = restore.OriginalRememberSubtitleSelections;
+                    userManager.UpdateConfiguration(user, config);
+                    YouTubeChannel.LogPublic(
+                        $"[YT] User subtitle mode restored after YouTube playback. User={userInternalId}, Reason={reason}, Mode={restore.OriginalMode}, Remember={restore.OriginalRememberSubtitleSelections}, Video={videoId ?? "unknown"}.");
+                }
+                else
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] User subtitle mode restore skipped because the user setting changed. User={userInternalId}, Reason={reason}, CurrentMode={currentMode}, CurrentRemember={currentRememberSubtitleSelections}, Video={videoId ?? "unknown"}.");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] User subtitle mode restore failed for {videoId ?? "unknown"}: {ex.Message}");
+                return false;
+            }
         }
 
         private static void CapturePlaybackInfoPostfix(object __instance, object __0, ref Task<object> __result)
@@ -412,12 +1070,17 @@ namespace Emby.YouTubePlugin
                 if (normalized.Changed > 0)
                     LogPlaybackInfoNormalization(context, normalized);
 
-                if (context.HasStartTimeTicks && context.StartTimeTicks >= TimeSpan.TicksPerSecond * 5)
+                if (!IsYouTubeLiveItem(context.ItemId)
+                    && context.HasStartTimeTicks
+                    && context.StartTimeTicks >= TimeSpan.TicksPerSecond * 5)
                 {
                     if (ShouldSuppressYouTubeStartStamp(context))
                         LogYouTubeStartStampSuppressed(context);
                     else
-                        StampYouTubeStartTime(response, context.StartTimeTicks);
+                        StampYouTubeStartTime(
+                            response,
+                            context.StartTimeTicks,
+                            includePlayerHints: true);
                 }
             }
             catch (Exception ex)
@@ -448,7 +1111,10 @@ namespace Emby.YouTubePlugin
                 $"[YT] PlaybackInfo normalized {result.Changed} YouTube media source(s) for {clientKind}{nativePart}. Item={context.ItemId}, IsPlayback={context.IsPlayback}, StartTimeTicks={context.StartTimeTicks}, MaxStreamingBitrate={context.MaxStreamingBitrate}, Client={context.Client}, Device={context.DeviceName}, Ip={context.IpAddress}, UA={Shorten(context.UserAgent, 160)}.");
         }
 
-        private static void StampYouTubeStartTime(object? response, long startTimeTicks)
+        private static void StampYouTubeStartTime(
+            object? response,
+            long startTimeTicks,
+            bool includePlayerHints = true)
         {
             var mediaSources = response?.GetType()
                 .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
@@ -469,7 +1135,10 @@ namespace Emby.YouTubePlugin
                     continue;
 
                 var path = pathProp.GetValue(mediaSource) as string;
-                var stampedPath = PatchYouTubeUrl(path, seconds);
+                var stampedPath = PatchYouTubeUrl(
+                    path,
+                    seconds,
+                    includePlayerHints);
                 if (string.IsNullOrEmpty(stampedPath)
                     || string.Equals(path, stampedPath, StringComparison.Ordinal))
                 {
@@ -486,11 +1155,15 @@ namespace Emby.YouTubePlugin
         }
 
         private static bool ShouldSuppressYouTubeStartStamp(PlaybackInfoPatchContext context)
-            => IsLikelyNativeAndroidTablet(context);
+            => false;
 
         private static bool IsLikelyNativeAndroidTablet(PlaybackInfoPatchContext context)
         {
-            if (!context.IsLikelyNativeAndroid)
+            if (!context.IsLikelyNativeAndroid
+                || IsLikelyFireTvOrAndroidTv(
+                    context.Client,
+                    context.DeviceName,
+                    context.UserAgent))
                 return false;
 
             if (ContainsIgnoreCase(context.DeviceName, "Tab")
@@ -507,10 +1180,52 @@ namespace Emby.YouTubePlugin
                    && !ContainsIgnoreCase(context.DeviceName, "TV");
         }
 
+        private static bool IsLikelyNativeAndroidTabletRequest(IRequest? request)
+        {
+            if (!IsLikelyNativeAndroidClient(request))
+                return false;
+
+            var client = GetRequestValue(request, "X-Emby-Client");
+            var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
+            var userAgent = request?.UserAgent ?? request?.Headers["User-Agent"];
+            if (IsLikelyFireTvOrAndroidTv(client, deviceName, userAgent))
+                return false;
+
+            if (ContainsIgnoreCase(deviceName, "Tab")
+                || ContainsIgnoreCase(deviceName, "Tablet")
+                || ContainsIgnoreCase(userAgent, "SM-X"))
+            {
+                return true;
+            }
+
+            return ContainsIgnoreCase(userAgent, "Android")
+                   && ContainsIgnoreCase(userAgent, "Safari/")
+                   && !ContainsIgnoreCase(userAgent, "Mobile")
+                   && !ContainsIgnoreCase(userAgent, "TV")
+                   && !ContainsIgnoreCase(deviceName, "TV");
+        }
+
+        private static bool IsLikelyFireTvOrAndroidTv(
+            string? client,
+            string? deviceName,
+            string? userAgent)
+        {
+            return ContainsIgnoreCase(deviceName, "Fire TV")
+                   || ContainsIgnoreCase(deviceName, "FireTV")
+                   || ContainsIgnoreCase(deviceName, "AFT")
+                   || ContainsIgnoreCase(userAgent, "Fire TV")
+                   || ContainsIgnoreCase(userAgent, "AFT")
+                   || ContainsIgnoreCase(userAgent, "Android TV")
+                   || ContainsIgnoreCase(deviceName, "Android TV")
+                   || ContainsIgnoreCase(client, "AndroidTv")
+                   || ContainsIgnoreCase(client, "Android TV")
+                   || ContainsIgnoreCase(client, "Emby for Android TV");
+        }
+
         private static string GetContextualYouTubeWatchUrl(string videoId, PlaybackInfoPatchContext context)
         {
             if (IsLikelyNativeAndroidTablet(context))
-                return $"https://www.youtube.com/watch?v={videoId}";
+                return $"https://www.youtube.com/watch?v={videoId}&playsinline=1&enablejsapi=1";
 
             return YouTubeChannel.GetYouTubeWatchUrl(videoId);
         }
@@ -522,7 +1237,7 @@ namespace Emby.YouTubePlugin
 
             _legacyTabletSourceLogsRemaining--;
             YouTubeChannel.LogPublic(
-                $"[YT] PlaybackInfo using legacy YouTube watch source for native Android tablet. Video={videoId}, Item={context.ItemId}, Client={context.Client}, Device={context.DeviceName}, UA={Shorten(context.UserAgent, 160)}.");
+                $"[YT] PlaybackInfo using official YouTube watch source for native Android tablet. Video={videoId}, Item={context.ItemId}, Client={context.Client}, Device={context.DeviceName}, UA={Shorten(context.UserAgent, 160)}.");
         }
 
         private static void LogYouTubeStartStampSuppressed(PlaybackInfoPatchContext context)
@@ -630,6 +1345,17 @@ namespace Emby.YouTubePlugin
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresClosing", false);
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresLooping", false);
 
+                // A YouTube watch URL is owned by the YouTube player, not by
+                // Emby's native stream selector. Persisted or probed stream
+                // metadata here can make clients pick stale stream indexes for
+                // a source that has no Emby-managed tracks. Subtitle off is
+                // explicit -1; null lets some native clients fall back to auto.
+                mediaSourceChanged |= ClearListProperty(mediaSource, "MediaStreams");
+                mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStream");
+                mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStreamIndex");
+                mediaSourceChanged |= SetNumberProperty(mediaSource, "DefaultSubtitleStreamIndex", -1);
+                mediaSourceChanged |= SetPropertyToNull(mediaSource, "VideoStream");
+
                 // Drop any transcode plan Emby attached before we forced direct play.
                 mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "TranscodingUrl");
                 mediaSourceChanged |= SetStringPropertyToNull(mediaSource, "TranscodingSubProtocol");
@@ -705,7 +1431,10 @@ namespace Emby.YouTubePlugin
             return match.Success ? match.Groups[1].Value : null;
         }
 
-        private static string? PatchYouTubeUrl(string? path, long? startSeconds)
+        private static string? PatchYouTubeUrl(
+            string? path,
+            long? startSeconds,
+            bool includePlayerHints = true)
         {
             if (string.IsNullOrWhiteSpace(path)
                 || !Uri.TryCreate(path, UriKind.Absolute, out var uri)
@@ -737,8 +1466,11 @@ namespace Emby.YouTubePlugin
                 })
                 .ToList();
 
-            queryParts.Add("playsinline=1");
-            queryParts.Add("enablejsapi=1");
+            if (includePlayerHints)
+            {
+                queryParts.Add("playsinline=1");
+                queryParts.Add("enablejsapi=1");
+            }
             if (startSeconds.HasValue)
             {
                 var secondsText = startSeconds.Value.ToString(CultureInfo.InvariantCulture);
@@ -767,6 +1499,27 @@ namespace Emby.YouTubePlugin
             return true;
         }
 
+        private static bool IsYouTubeLiveItem(string? itemId)
+        {
+            if (string.IsNullOrEmpty(itemId))
+                return false;
+
+            try
+            {
+                var library = Plugin.ResolveService<ILibraryManager>();
+                var item = library == null ? null : ResolveBaseItem(library, itemId);
+                return item != null
+                       && YouTubeImageProvider.TryGetVideoId(item) != null
+                       && !string.IsNullOrEmpty(item.ExternalId)
+                       && item.ExternalId.StartsWith("LIVE_", StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackInfo live-item lookup failed: {ex.Message}");
+                return false;
+            }
+        }
+
         private static bool SetPropertyToNull(object source, string name)
         {
             var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
@@ -786,6 +1539,23 @@ namespace Emby.YouTubePlugin
             return true;
         }
 
+        private static bool ClearListProperty(object source, string name)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.GetValue(source) is not IList list || list.Count == 0)
+                return false;
+
+            try
+            {
+                list.Clear();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static bool IsYouTubeHost(string host) =>
             host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase)
             || host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase)
@@ -799,6 +1569,29 @@ namespace Emby.YouTubePlugin
             {
                 prop.SetValue(source, value);
             }
+        }
+
+        private static bool SetNullableIntProperty(object source, string name, int? value)
+        {
+            var prop = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (prop?.CanWrite != true
+                || (prop.PropertyType != typeof(int) && prop.PropertyType != typeof(int?)))
+            {
+                return false;
+            }
+
+            if (!value.HasValue && prop.PropertyType == typeof(int))
+                return false;
+
+            var current = prop.GetValue(source);
+            if (current is int currentInt && value.HasValue && currentInt == value.Value)
+                return false;
+
+            if (current == null && !value.HasValue)
+                return false;
+
+            prop.SetValue(source, value.HasValue ? value.Value : null);
+            return true;
         }
 
         private static bool SetBoolProperty(object source, string name, bool value)
@@ -876,6 +1669,151 @@ namespace Emby.YouTubePlugin
             return request.QueryString[name] ?? request.Headers[name];
         }
 
+        private static bool TrySetRequestCollectionValue(object? collection, string name, string value)
+        {
+            if (collection == null)
+                return false;
+
+            try
+            {
+                var collectionType = collection.GetType();
+                var indexer = collectionType
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(p =>
+                    {
+                        var indexParameters = p.GetIndexParameters();
+                        return indexParameters.Length == 1
+                               && indexParameters[0].ParameterType == typeof(string);
+                    });
+
+                if (indexer?.CanRead == true)
+                {
+                    var current = indexer.GetValue(collection, new object[] { name }) as string;
+                    if (string.Equals(current, value, StringComparison.Ordinal))
+                        return false;
+                }
+
+                if (indexer?.CanWrite == true)
+                {
+                    indexer.SetValue(collection, value, new object[] { name });
+                    return true;
+                }
+
+                var setMethod = collectionType
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(m =>
+                    {
+                        if (m.Name != "Set")
+                            return false;
+
+                        var parameters = m.GetParameters();
+                        return parameters.Length == 2
+                               && parameters[0].ParameterType == typeof(string)
+                               && parameters[1].ParameterType == typeof(string);
+                    });
+                if (setMethod != null)
+                {
+                    setMethod.Invoke(collection, new object[] { name, value });
+                    return true;
+                }
+            }
+            catch
+            {
+                // Query collection mutation is best-effort; the request DTO is
+                // the primary path and unsupported collection shapes are fine.
+            }
+
+            return false;
+        }
+
+        private static bool TryConsumeCompatibleKey(
+            string key,
+            string deviceId,
+            out PlaybackIntent intent)
+        {
+            while (Intents.TryGetValue(key, out var candidate))
+            {
+                // The shared no-device fallback may have been overwritten by a
+                // concurrent request from another device. Never consume that
+                // request when both sides identify different devices.
+                if (!string.IsNullOrEmpty(deviceId)
+                    && !string.IsNullOrEmpty(candidate.DeviceId)
+                    && !string.Equals(candidate.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+
+                if (!Intents.TryRemove(new KeyValuePair<string, PlaybackIntent>(key, candidate)))
+                    continue;
+
+                if (DateTime.UtcNow - candidate.CapturedUtc <= IntentTtl)
+                {
+                    intent = candidate;
+                    return true;
+                }
+
+                break;
+            }
+
+            intent = default!;
+            return false;
+        }
+
+        private static bool TryRemoveRequestCollectionValue(object? collection, string name)
+        {
+            if (collection == null)
+                return false;
+
+            try
+            {
+                if (collection is IDictionary dictionary)
+                {
+                    if (!dictionary.Contains(name))
+                        return false;
+
+                    dictionary.Remove(name);
+                    return true;
+                }
+
+                var collectionType = collection.GetType();
+                var indexer = collectionType
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(p =>
+                    {
+                        var indexParameters = p.GetIndexParameters();
+                        return p.CanRead
+                               && indexParameters.Length == 1
+                               && indexParameters[0].ParameterType == typeof(string);
+                    });
+                var current = indexer?.GetValue(collection, new object[] { name });
+                if (current == null)
+                    return false;
+
+                var removeMethod = collectionType
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(m =>
+                    {
+                        if (m.Name != "Remove")
+                            return false;
+
+                        var parameters = m.GetParameters();
+                        return parameters.Length == 1
+                               && parameters[0].ParameterType == typeof(string);
+                    });
+                if (removeMethod == null)
+                    return false;
+
+                removeMethod.Invoke(collection, new object[] { name });
+                return true;
+            }
+            catch
+            {
+                // Request collection shapes differ between Emby releases. The
+                // request DTO and response normalization remain the fallback.
+                return false;
+            }
+        }
+
         private static bool IsLikelyIosClient(IRequest? request)
         {
             var deviceName = GetRequestValue(request, "X-Emby-Device-Name");
@@ -950,6 +1888,25 @@ namespace Emby.YouTubePlugin
                 .GetProperty(name, BindingFlags.Instance | BindingFlags.Public)
                 ?.GetValue(source);
             return TryReadLong(value);
+        }
+
+        private static int? TryReadIntProperty(object source, string name)
+        {
+            var value = source.GetType()
+                .GetProperty(name, BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(source);
+            return TryReadInt(value);
+        }
+
+        private static int? TryReadInt(object? value)
+        {
+            return value switch
+            {
+                int intValue => intValue,
+                long longValue when longValue >= int.MinValue && longValue <= int.MaxValue => (int)longValue,
+                string text when int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) => parsed,
+                _ => null
+            };
         }
 
         private static long? TryReadLong(object? value)

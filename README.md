@@ -119,6 +119,15 @@ The plugin caches responses on disk. Search results are cached longer because se
 ## Notes
 
 - This plugin uses the official YouTube Data API v3.
+- Playback stays on official YouTube watch/embed players. The plugin clears stale
+  Emby audio-track selections so the YouTube player can choose the video's own
+  source track, but YouTube's official IFrame API does not expose a command for
+  selecting the "original" audio track. For signed-in YouTube players, add the
+  languages you normally watch under YouTube's **Preferred languages** setting;
+  YouTube then keeps original audio when it matches one of those languages.
+- YouTube subtitles are requested as off at Emby's request, media-source,
+  user-policy, and active-session layers. YouTube can still apply its own saved
+  caption preference in player contexts that do not expose caption-off control.
 - Private YouTube account data is not supported. Use playlists that your API key can read.
 - If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
 

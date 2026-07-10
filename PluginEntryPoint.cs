@@ -33,6 +33,8 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<string, long> _resumeTrackingFloorsBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, DateTime> _lastResumeCheckpointFlushByKey = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, DateTime> _youtubeAutoplayUnlocksInFlight = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, DateTime> _youtubeSubtitleDisablesInFlight = new(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, string> _activeYouTubePlaySessions = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private readonly object _resumeCheckpointFileLock = new();
         private ILibraryManager? _libraryManager;
@@ -79,6 +81,7 @@ namespace Emby.YouTubePlugin
             long ItemId,
             long PositionTicks,
             long RuntimeTicks,
+            bool SingleSeekAttempt,
             int AttemptsSent,
             DateTime? LastSeekUtc);
 
@@ -207,9 +210,39 @@ namespace Emby.YouTubePlugin
 
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
                 if (string.IsNullOrEmpty(videoId))
+                {
+                    PlaybackIntentInterceptor.ReleaseUserSubtitleModeForSession(
+                        session.UserInternalId,
+                        session.Id,
+                        "non-YouTube playback start");
                     return;
+                }
 
+                PlaybackIntentInterceptor.ForceUserSubtitleModeOff(
+                    session.UserInternalId,
+                    GetUserSubtitleModeSessionKey(session.Id, e.PlaySessionId, videoId),
+                    videoId,
+                    "playback start");
+                var playbackInstanceId = RegisterYouTubePlaySession(session.Id, e.PlaySessionId);
+                ClearNativeStreamSelections(item, session, videoId);
+                ScheduleYouTubeSubtitleDisable(e, item, videoId, playbackInstanceId);
                 ScheduleYouTubeWebViewAutoplayUnlock(e, item, videoId);
+
+                // A live/upcoming YouTube item has no stable timeline to resume.
+                // Seeking it can jump behind the live edge and trigger reloads on
+                // resource-constrained TV clients, so consume any captured intent
+                // and keep both plugin and native resume handling out of this path.
+                if (IsYouTubeLiveItem(item))
+                {
+                    PlaybackIntentInterceptor.TryConsume(
+                        session.UserId,
+                        item.InternalId,
+                        session.DeviceId,
+                        out _);
+                    RemoveResumeCheckpoint(session.UserId, videoId);
+                    YouTubeChannel.LogPublic($"[YT] Resume disabled for live YouTube video {videoId}.");
+                    return;
+                }
 
                 var runtimeTicks = item.RunTimeTicks.GetValueOrDefault();
                 long positionTicks;
@@ -253,9 +286,18 @@ namespace Emby.YouTubePlugin
                     return;
                 }
 
-                if (IsLikelyNativeAndroidTabletSession(session))
+                // Protect the requested resume point even on TV clients where
+                // server-side seek commands are intentionally suppressed. A
+                // Fire TV that briefly reports zero/the beginning while its
+                // YouTube player consumes URL start= must not overwrite a good
+                // checkpoint and break the next resume attempt.
+                _resumeTrackingFloorsBySession[session.Id] = Math.Max(
+                    ResumeSeekMinimumTicks,
+                    positionTicks - ResumeSeekEndGuardTicks);
+
+                if (ShouldSuppressServerSideResumeSeek(session))
                 {
-                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; native Android tablet will start without server-side resume seek.");
+                    YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; TV player will use the URL/player start only.");
                     return;
                 }
 
@@ -268,13 +310,11 @@ namespace Emby.YouTubePlugin
                     item.InternalId,
                     positionTicks,
                     runtimeTicks,
+                    IsLikelyNativeAndroidTabletSession(session),
                     0,
                     null);
 
                 _pendingResumeSeeks[key] = pending;
-                _resumeTrackingFloorsBySession[session.Id] = Math.Max(
-                    ResumeSeekMinimumTicks,
-                    positionTicks - ResumeSeekEndGuardTicks);
 
                 SchedulePendingResumeSeek(key, ResumeSeekDelay, "delayed start");
             }
@@ -286,51 +326,73 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e)
         {
+            var item = e.Item;
+            var session = e.Session;
+            var sessionId = session?.Id;
+            var videoId = item == null ? null : YouTubeImageProvider.TryGetVideoId(item);
+
             try
             {
-                var item = e.Item;
-                var session = e.Session;
-                var sessionId = session?.Id;
-
-                if (item != null)
+                if (item != null && !string.IsNullOrEmpty(videoId))
                 {
-                    var videoId = YouTubeImageProvider.TryGetVideoId(item);
-                    if (!string.IsNullOrEmpty(videoId))
+                    if (IsYouTubeLiveItem(item))
                     {
-                        if (e.PlayedToCompletion)
+                        // Never recreate a live-stream checkpoint on Stop after
+                        // Start/Progress deliberately removed it.
+                        RemoveResumeCheckpoint(session?.UserId, videoId);
+                    }
+                    else if (e.PlayedToCompletion)
+                    {
+                        RemoveResumeCheckpoint(session?.UserId, videoId);
+                    }
+                    else
+                    {
+                        var stopPositionTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
+                        if (CanTrackPlaybackPosition(sessionId, stopPositionTicks))
                         {
-                            RemoveResumeCheckpoint(session?.UserId, videoId);
+                            TrackResumeCheckpoint(
+                                sessionId,
+                                session?.UserId,
+                                videoId,
+                                stopPositionTicks,
+                                item.RunTimeTicks.GetValueOrDefault(),
+                                forceSave: true);
+                            SaveNativeResumePosition(
+                                item,
+                                session,
+                                stopPositionTicks,
+                                UserDataSaveReason.PlaybackProgress);
                         }
                         else
                         {
-                            var stopPositionTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
-                            if (CanTrackPlaybackPosition(sessionId, stopPositionTicks))
-                            {
-                                TrackResumeCheckpoint(
-                                    sessionId,
-                                    session?.UserId,
-                                    videoId,
-                                    stopPositionTicks,
-                                    item.RunTimeTicks.GetValueOrDefault(),
-                                    forceSave: true);
-                                SaveNativeResumePosition(
-                                    item,
-                                    session,
-                                    stopPositionTicks,
-                                    UserDataSaveReason.PlaybackProgress);
-                            }
-                            else
-                            {
-                                RestoreProtectedNativeResumePosition(item, session, videoId);
-                            }
+                            RestoreProtectedNativeResumePosition(item, session, videoId);
                         }
-
-                        SaveResumeCheckpoints();
                     }
+
+                    SaveResumeCheckpoints();
+                }
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] PlaybackStopped resume tracking failed: {ex.Message}");
+            }
+            finally
+            {
+                // Preference restoration and seek cleanup must not be skipped if
+                // checkpoint persistence throws. Otherwise one malformed stop
+                // event could leave subtitles disabled for all later media.
+                if (!string.IsNullOrEmpty(videoId))
+                {
+                    PlaybackIntentInterceptor.RestoreUserSubtitleMode(
+                        session?.UserInternalId ?? 0,
+                        GetUserSubtitleModeSessionKey(sessionId, e.PlaySessionId, videoId),
+                        videoId,
+                        "playback stop");
                 }
 
                 if (!string.IsNullOrEmpty(sessionId))
                 {
+                    UnregisterYouTubePlaySession(sessionId, e.PlaySessionId);
                     CancelPendingResumeSeeksForSession(sessionId);
                     // A clean Stop ends the "is this a network restart?" window.
                     // Without this, an explicit replay within RecentSessionRestartWindow
@@ -340,10 +402,6 @@ namespace Emby.YouTubePlugin
                     _resumeTrackingFloorsBySession.TryRemove(sessionId, out _);
                     CleanupRecentSessionCheckpoints();
                 }
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] PlaybackStopped resume tracking failed: {ex.Message}");
             }
         }
 
@@ -382,6 +440,23 @@ namespace Emby.YouTubePlugin
 
                 if (!string.IsNullOrEmpty(videoId))
                 {
+                    PlaybackIntentInterceptor.TouchUserSubtitleMode(
+                        session?.UserInternalId ?? 0,
+                        GetUserSubtitleModeSessionKey(session?.Id, e.PlaySessionId, videoId),
+                        session?.Id,
+                        videoId);
+                    ClearNativeStreamSelections(item, session, videoId, logWhenCleared: false);
+                    if (IsYouTubeLiveItem(item))
+                    {
+                        RemoveResumeCheckpoint(session?.UserId, videoId);
+                        if (hasPendingSeek && pending != null)
+                        {
+                            _pendingResumeSeeks.TryRemove(key, out _);
+                            _resumeSeeksInFlight.TryRemove($"{key}|{pending.PositionTicks}", out _);
+                        }
+                        return;
+                    }
+
                     if (CanTrackPlaybackPosition(session?.Id, currentTicks))
                     {
                         var runtimeTicksForCheckpoint = item.RunTimeTicks.GetValueOrDefault();
@@ -563,6 +638,13 @@ namespace Emby.YouTubePlugin
         }
 
         private async Task SendGeneralCommandAsync(string sessionId, string? userId, GeneralCommandType commandType)
+            => await SendGeneralCommandAsync(sessionId, userId, commandType, null).ConfigureAwait(false);
+
+        private async Task SendGeneralCommandAsync(
+            string sessionId,
+            string? userId,
+            GeneralCommandType commandType,
+            Dictionary<string, string>? arguments)
         {
             if (_sessionManager == null)
                 return;
@@ -570,7 +652,8 @@ namespace Emby.YouTubePlugin
             var command = new GeneralCommand
             {
                 Name = commandType.ToString(),
-                ControllingUserId = userId
+                ControllingUserId = userId,
+                Arguments = arguments ?? new Dictionary<string, string>()
             };
 
             await _sessionManager.SendGeneralCommand(
@@ -579,6 +662,123 @@ namespace Emby.YouTubePlugin
                     command,
                     CancellationToken.None)
                 .ConfigureAwait(false);
+        }
+
+        private void ScheduleYouTubeSubtitleDisable(
+            PlaybackProgressEventArgs e,
+            BaseItem item,
+            string videoId,
+            string playbackInstanceId)
+        {
+            if (_sessionManager == null)
+                return;
+
+            var session = e.Session;
+            if (session == null
+                || string.IsNullOrEmpty(session.Id)
+                || !IsLikelyNativeAndroidTabletSession(session))
+            {
+                return;
+            }
+
+            var key = $"{session.Id}|{playbackInstanceId}|{item.InternalId}|suboff";
+            if (!_youtubeSubtitleDisablesInFlight.TryAdd(key, DateTime.UtcNow))
+                return;
+
+            var sessionId = session.Id;
+            var userId = session.UserId;
+            var itemId = item.InternalId;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var arguments = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["Index"] = "-1",
+                        ["SubtitleStreamIndex"] = "-1",
+                        ["Value"] = "-1"
+                    };
+
+                    var delays = new[]
+                    {
+                        TimeSpan.FromMilliseconds(250),
+                        TimeSpan.FromMilliseconds(900),
+                        TimeSpan.FromMilliseconds(2200)
+                    };
+
+                    for (var i = 0; i < delays.Length; i++)
+                    {
+                        await Task.Delay(delays[i]).ConfigureAwait(false);
+                        if (!IsYouTubePlaySessionCurrent(
+                                sessionId,
+                                playbackInstanceId,
+                                itemId,
+                                "subtitle disable"))
+                            return;
+
+                        await SendGeneralCommandAsync(
+                                sessionId,
+                                userId,
+                                GeneralCommandType.SetSubtitleStreamIndex,
+                                arguments)
+                            .ConfigureAwait(false);
+
+                        YouTubeChannel.LogPublic($"[YT] YouTube subtitle disable command sent for {videoId} (attempt {i + 1}).");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YT] YouTube subtitle disable command failed for {videoId}: {ex.Message}");
+                }
+                finally
+                {
+                    _youtubeSubtitleDisablesInFlight.TryRemove(key, out _);
+                }
+            });
+        }
+
+        private string RegisterYouTubePlaySession(string sessionId, string? playSessionId)
+        {
+            var playbackInstanceId = string.IsNullOrEmpty(playSessionId)
+                ? Guid.NewGuid().ToString("N")
+                : playSessionId;
+            _activeYouTubePlaySessions[sessionId] = playbackInstanceId;
+            return playbackInstanceId;
+        }
+
+        private void UnregisterYouTubePlaySession(string sessionId, string? playSessionId)
+        {
+            if (!_activeYouTubePlaySessions.TryGetValue(sessionId, out var current))
+                return;
+
+            // With a real PlaySessionId, only the matching Stop owns the slot.
+            // Legacy clients without one are removed only when the session no
+            // longer reports an active item; a replacement Start overwrites the
+            // generated id and invalidates the old command task immediately.
+            if (!string.IsNullOrEmpty(playSessionId))
+            {
+                if (string.Equals(current, playSessionId, StringComparison.Ordinal))
+                    _activeYouTubePlaySessions.TryRemove(
+                        new KeyValuePair<string, string>(sessionId, current));
+                return;
+            }
+
+            if (!IsSessionStillOnItem(sessionId, 0, "subtitle session cleanup"))
+            {
+                _activeYouTubePlaySessions.TryRemove(
+                    new KeyValuePair<string, string>(sessionId, current));
+            }
+        }
+
+        private bool IsYouTubePlaySessionCurrent(
+            string sessionId,
+            string playbackInstanceId,
+            long itemId,
+            string operation)
+        {
+            return _activeYouTubePlaySessions.TryGetValue(sessionId, out var current)
+                   && string.Equals(current, playbackInstanceId, StringComparison.Ordinal)
+                   && IsSessionStillOnItem(sessionId, itemId, operation);
         }
 
         private async Task SendPlaystateCommandAsync(string sessionId, string? userId, PlaystateCommand commandType)
@@ -619,13 +819,20 @@ namespace Emby.YouTubePlugin
                 return;
             }
 
-            var inFlightKey = $"{key}|{pending.PositionTicks}";
-            var now = DateTime.UtcNow;
-            if (_resumeSeeksInFlight.TryGetValue(inFlightKey, out var lastAttempt)
-                && now - lastAttempt < ResumeSeekRetryDelay)
+            // The initial delayed task and a progress-triggered task can wake
+            // independently. Enforce the post-send quiet period here as well as
+            // in OnPlaybackProgress so the delayed path cannot re-cue a player
+            // that is still applying the first seek.
+            if (pending.LastSeekUtc is { } lastSeekUtc
+                && DateTime.UtcNow - lastSeekUtc < ResumeSeekPostSendGrace)
             {
                 return;
             }
+
+            var inFlightKey = $"{key}|{pending.PositionTicks}";
+            var now = DateTime.UtcNow;
+            if (!TryClaimResumeSeekAttempt(inFlightKey, now))
+                return;
 
             if (TryGetSessionPositionTicks(pending.SessionId, out var currentTicks)
                 && currentTicks >= ResumeSeekMinimumTicks
@@ -637,7 +844,8 @@ namespace Emby.YouTubePlugin
                 return;
             }
 
-            if (pending.AttemptsSent >= ResumeSeekMaxAttempts)
+            var maxAttempts = pending.SingleSeekAttempt ? 1 : ResumeSeekMaxAttempts;
+            if (pending.AttemptsSent >= maxAttempts)
             {
                 _pendingResumeSeeks.TryRemove(key, out _);
                 _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
@@ -668,6 +876,26 @@ namespace Emby.YouTubePlugin
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
+            }
+        }
+
+        private bool TryClaimResumeSeekAttempt(string inFlightKey, DateTime now)
+        {
+            while (true)
+            {
+                if (_resumeSeeksInFlight.TryGetValue(inFlightKey, out var lastAttempt))
+                {
+                    if (now - lastAttempt < ResumeSeekRetryDelay)
+                        return false;
+
+                    if (_resumeSeeksInFlight.TryUpdate(inFlightKey, now, lastAttempt))
+                        return true;
+
+                    continue;
+                }
+
+                if (_resumeSeeksInFlight.TryAdd(inFlightKey, now))
+                    return true;
             }
         }
 
@@ -758,6 +986,56 @@ namespace Emby.YouTubePlugin
             catch (Exception ex)
             {
                 YouTubeChannel.LogPublic($"[YT] Native resume position save failed: {ex.Message}");
+            }
+        }
+
+        private void ClearNativeStreamSelections(
+            BaseItem item,
+            SessionInfo? session,
+            string videoId,
+            bool logWhenCleared = true)
+        {
+            if (_userDataManager == null
+                || session == null
+                || session.UserInternalId <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var data = _userDataManager.GetUserData(session.UserInternalId, item);
+                if (data == null)
+                    return;
+
+                var cleared = new List<string>();
+                if (data.AudioStreamIndex != null)
+                {
+                    data.AudioStreamIndex = null;
+                    cleared.Add("audio");
+                }
+
+                if (data.SubtitleStreamIndex != -1)
+                {
+                    data.SubtitleStreamIndex = -1;
+                    cleared.Add("subtitle-off");
+                }
+
+                if (cleared.Count == 0)
+                    return;
+
+                _userDataManager.SaveUserData(
+                    session.UserInternalId,
+                    item,
+                    data,
+                    UserDataSaveReason.PlaybackProgress,
+                    CancellationToken.None);
+                if (logWhenCleared)
+                    YouTubeChannel.LogPublic($"[YT] Forced Emby {string.Join("/", cleared)} stream selection for YouTube video {videoId}.");
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] YouTube stream selection cleanup failed for {videoId}: {ex.Message}");
             }
         }
 
@@ -876,8 +1154,29 @@ namespace Emby.YouTubePlugin
                    || ContainsIgnoreCase(userAgent, "Safari/");
         }
 
+        private static bool ShouldSuppressServerSideResumeSeek(SessionInfo session)
+            => IsLikelyFireTvOrAndroidTvSession(session)
+               || IsLikelyLgOrWebOsSession(session);
+
+        private static string? GetUserSubtitleModeSessionKey(
+            string? sessionId,
+            string? playSessionId,
+            string videoId)
+        {
+            if (string.IsNullOrEmpty(sessionId))
+                return null;
+
+            var playbackComponent = string.IsNullOrEmpty(playSessionId)
+                ? "legacy"
+                : playSessionId;
+            return $"{sessionId}|{playbackComponent}|{videoId}";
+        }
+
         private static bool IsLikelyNativeAndroidTabletSession(SessionInfo session)
         {
+            if (IsLikelyFireTvOrAndroidTvSession(session))
+                return false;
+
             var client = GetStringProperty(session, "Client");
             if (!ContainsIgnoreCase(client, "Emby for Android"))
                 return false;
@@ -897,6 +1196,42 @@ namespace Emby.YouTubePlugin
                    && !ContainsIgnoreCase(userAgent, "TV")
                    && !ContainsIgnoreCase(deviceName, "TV");
         }
+
+        private static bool IsLikelyFireTvOrAndroidTvSession(SessionInfo session)
+        {
+            var client = GetStringProperty(session, "Client");
+            var deviceName = GetStringProperty(session, "DeviceName");
+            var userAgent = GetStringProperty(session, "UserAgent");
+
+            return ContainsIgnoreCase(deviceName, "Fire TV")
+                   || ContainsIgnoreCase(deviceName, "FireTV")
+                   || ContainsIgnoreCase(deviceName, "AFT")
+                   || ContainsIgnoreCase(userAgent, "Fire TV")
+                   || ContainsIgnoreCase(userAgent, "AFT")
+                   || ContainsIgnoreCase(userAgent, "Android TV")
+                   || ContainsIgnoreCase(deviceName, "Android TV")
+                   || ContainsIgnoreCase(client, "AndroidTv")
+                   || ContainsIgnoreCase(client, "Android TV")
+                   || ContainsIgnoreCase(client, "Emby for Android TV");
+        }
+
+        private static bool IsLikelyLgOrWebOsSession(SessionInfo session)
+        {
+            var client = GetStringProperty(session, "Client");
+            var deviceName = GetStringProperty(session, "DeviceName");
+            var userAgent = GetStringProperty(session, "UserAgent");
+
+            return ContainsIgnoreCase(client, "Emby for LG")
+                   || ContainsIgnoreCase(client, "WebOS")
+                   || ContainsIgnoreCase(deviceName, "LG TV")
+                   || ContainsIgnoreCase(deviceName, "WebOS")
+                   || ContainsIgnoreCase(userAgent, "Web0S")
+                   || ContainsIgnoreCase(userAgent, "WebOS");
+        }
+
+        private static bool IsYouTubeLiveItem(BaseItem item) =>
+            !string.IsNullOrEmpty(item.ExternalId)
+            && item.ExternalId.StartsWith("LIVE_", StringComparison.Ordinal);
 
         private static string DescribeSession(SessionInfo session)
         {
@@ -936,10 +1271,13 @@ namespace Emby.YouTubePlugin
 
                 var nowPlaying = session.FullNowPlayingItem;
                 if (nowPlaying != null)
-                    return nowPlaying.InternalId == itemId;
+                    return itemId <= 0 || nowPlaying.InternalId == itemId;
 
                 // Some session DTOs only expose the public item id.
                 var dtoId = session.NowPlayingItem?.Id;
+                if (itemId <= 0)
+                    return !string.IsNullOrEmpty(dtoId);
+
                 return long.TryParse(dtoId, out var parsedId) && parsedId == itemId;
             }
             catch (Exception ex)
@@ -1636,9 +1974,11 @@ namespace Emby.YouTubePlugin
             _switchTimer?.Dispose();
             _resumeCheckpointSaveTimer?.Dispose();
             _sortNameRepairer.Dispose();
+            _activeYouTubePlaySessions.Clear();
             SaveResumeCheckpoints();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
+            PlaybackIntentInterceptor.RestoreAllUserSubtitleModes("plugin dispose");
         }
     }
 
