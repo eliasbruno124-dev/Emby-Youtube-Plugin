@@ -9,7 +9,7 @@ namespace Emby.YouTubePlugin
 
         public string Key => "YouTube";
 
-        public string UrlFormatString => "http://www.youtube.com/watch?v={0}";
+        public string UrlFormatString => "https://www.youtube.com/watch?v={0}";
 
         public bool Supports(IHasProviderIds item)
         {

@@ -2,9 +2,10 @@ bin/
 obj/
 .vs/
 scripts/
+tests/
+.github/workflows/
 *.user
 *.suo
 
 
 MD/
-

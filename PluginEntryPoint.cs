@@ -32,9 +32,6 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<string, ResumePositionEstimate> _resumePositionEstimatesBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, long> _resumeTrackingFloorsBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, DateTime> _lastResumeCheckpointFlushByKey = new(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<string, DateTime> _youtubeAutoplayUnlocksInFlight = new(StringComparer.Ordinal);
-        private readonly ConcurrentDictionary<string, DateTime> _youtubeSubtitleDisablesInFlight = new(StringComparer.Ordinal);
-        private readonly ConcurrentDictionary<string, string> _activeYouTubePlaySessions = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
         private readonly object _resumeCheckpointFileLock = new();
         private ILibraryManager? _libraryManager;
@@ -60,16 +57,6 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan RecentSessionRestartWindow = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan RecentSessionCleanupInterval = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan ResumePositionEstimateTtl = TimeSpan.FromMinutes(30);
-        private static readonly TimeSpan[] YouTubeAutoplayUnlockDelays =
-        {
-            TimeSpan.Zero,
-            TimeSpan.FromMilliseconds(120),
-            TimeSpan.FromMilliseconds(450),
-            TimeSpan.FromMilliseconds(900),
-            TimeSpan.FromMilliseconds(1600),
-            TimeSpan.FromMilliseconds(2800)
-        };
-        private static readonly TimeSpan YouTubeAutoplayUnmuteDelay = TimeSpan.FromSeconds(8);
         private const int ResumeSeekMaxAttempts = 5;
         private DateTime _lastRecentSessionCleanupUtc = DateTime.MinValue;
 
@@ -223,10 +210,7 @@ namespace Emby.YouTubePlugin
                     GetUserSubtitleModeSessionKey(session.Id, e.PlaySessionId, videoId),
                     videoId,
                     "playback start");
-                var playbackInstanceId = RegisterYouTubePlaySession(session.Id, e.PlaySessionId);
                 ClearNativeStreamSelections(item, session, videoId);
-                ScheduleYouTubeSubtitleDisable(e, item, videoId, playbackInstanceId);
-                ScheduleYouTubeWebViewAutoplayUnlock(e, item, videoId);
 
                 // A live/upcoming YouTube item has no stable timeline to resume.
                 // Seeking it can jump behind the live edge and trigger reloads on
@@ -392,7 +376,6 @@ namespace Emby.YouTubePlugin
 
                 if (!string.IsNullOrEmpty(sessionId))
                 {
-                    UnregisterYouTubePlaySession(sessionId, e.PlaySessionId);
                     CancelPendingResumeSeeksForSession(sessionId);
                     // A clean Stop ends the "is this a network restart?" window.
                     // Without this, an explicit replay within RecentSessionRestartWindow
@@ -573,212 +556,6 @@ namespace Emby.YouTubePlugin
                     YouTubeChannel.LogPublic($"[YT] Resume seek retry task failed: {ex.Message}");
                 }
             });
-        }
-
-        private void ScheduleYouTubeWebViewAutoplayUnlock(
-            PlaybackProgressEventArgs e,
-            BaseItem item,
-            string videoId)
-        {
-            if (_sessionManager == null)
-                return;
-
-            var session = e.Session;
-            if (session == null
-                || string.IsNullOrEmpty(session.Id)
-                || !IsLikelyYouTubeWebViewAutoplayClient(session))
-            {
-                return;
-            }
-
-            var key = $"{session.Id}|{e.PlaySessionId ?? string.Empty}|{item.InternalId}";
-            if (!_youtubeAutoplayUnlocksInFlight.TryAdd(key, DateTime.UtcNow))
-                return;
-
-            var sessionId = session.Id;
-            var userId = session.UserId;
-            var itemId = item.InternalId;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    YouTubeChannel.LogPublic($"[YT] YouTube WebView autoplay unlock scheduled for {videoId} on {DescribeSession(session)}.");
-
-                    for (var i = 0; i < YouTubeAutoplayUnlockDelays.Length; i++)
-                    {
-                        await Task.Delay(YouTubeAutoplayUnlockDelays[i]).ConfigureAwait(false);
-                        if (!IsSessionStillOnItem(sessionId, itemId, "autoplay unlock"))
-                            return;
-
-                        await SendGeneralCommandAsync(sessionId, userId, GeneralCommandType.Mute).ConfigureAwait(false);
-                        await Task.Delay(TimeSpan.FromMilliseconds(80)).ConfigureAwait(false);
-                        if (!IsSessionStillOnItem(sessionId, itemId, "autoplay unlock"))
-                            return;
-
-                        await SendPlaystateCommandAsync(sessionId, userId, PlaystateCommand.Unpause).ConfigureAwait(false);
-                        YouTubeChannel.LogPublic($"[YT] YouTube WebView autoplay unlock sent for {videoId} (attempt {i + 1}).");
-                    }
-
-                    await Task.Delay(YouTubeAutoplayUnmuteDelay).ConfigureAwait(false);
-                    if (IsSessionStillOnItem(sessionId, itemId, "autoplay unmute"))
-                    {
-                        await SendGeneralCommandAsync(sessionId, userId, GeneralCommandType.Unmute).ConfigureAwait(false);
-                        YouTubeChannel.LogPublic($"[YT] YouTube WebView autoplay unmute sent for {videoId}.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    YouTubeChannel.LogPublic($"[YT] YouTube WebView autoplay unlock failed for {videoId}: {ex.Message}");
-                }
-                finally
-                {
-                    _youtubeAutoplayUnlocksInFlight.TryRemove(key, out _);
-                }
-            });
-        }
-
-        private async Task SendGeneralCommandAsync(string sessionId, string? userId, GeneralCommandType commandType)
-            => await SendGeneralCommandAsync(sessionId, userId, commandType, null).ConfigureAwait(false);
-
-        private async Task SendGeneralCommandAsync(
-            string sessionId,
-            string? userId,
-            GeneralCommandType commandType,
-            Dictionary<string, string>? arguments)
-        {
-            if (_sessionManager == null)
-                return;
-
-            var command = new GeneralCommand
-            {
-                Name = commandType.ToString(),
-                ControllingUserId = userId,
-                Arguments = arguments ?? new Dictionary<string, string>()
-            };
-
-            await _sessionManager.SendGeneralCommand(
-                    sessionId,
-                    sessionId,
-                    command,
-                    CancellationToken.None)
-                .ConfigureAwait(false);
-        }
-
-        private void ScheduleYouTubeSubtitleDisable(
-            PlaybackProgressEventArgs e,
-            BaseItem item,
-            string videoId,
-            string playbackInstanceId)
-        {
-            if (_sessionManager == null)
-                return;
-
-            var session = e.Session;
-            if (session == null
-                || string.IsNullOrEmpty(session.Id)
-                || !IsLikelyNativeAndroidTabletSession(session))
-            {
-                return;
-            }
-
-            var key = $"{session.Id}|{playbackInstanceId}|{item.InternalId}|suboff";
-            if (!_youtubeSubtitleDisablesInFlight.TryAdd(key, DateTime.UtcNow))
-                return;
-
-            var sessionId = session.Id;
-            var userId = session.UserId;
-            var itemId = item.InternalId;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var arguments = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["Index"] = "-1",
-                        ["SubtitleStreamIndex"] = "-1",
-                        ["Value"] = "-1"
-                    };
-
-                    var delays = new[]
-                    {
-                        TimeSpan.FromMilliseconds(250),
-                        TimeSpan.FromMilliseconds(900),
-                        TimeSpan.FromMilliseconds(2200)
-                    };
-
-                    for (var i = 0; i < delays.Length; i++)
-                    {
-                        await Task.Delay(delays[i]).ConfigureAwait(false);
-                        if (!IsYouTubePlaySessionCurrent(
-                                sessionId,
-                                playbackInstanceId,
-                                itemId,
-                                "subtitle disable"))
-                            return;
-
-                        await SendGeneralCommandAsync(
-                                sessionId,
-                                userId,
-                                GeneralCommandType.SetSubtitleStreamIndex,
-                                arguments)
-                            .ConfigureAwait(false);
-
-                        YouTubeChannel.LogPublic($"[YT] YouTube subtitle disable command sent for {videoId} (attempt {i + 1}).");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    YouTubeChannel.LogPublic($"[YT] YouTube subtitle disable command failed for {videoId}: {ex.Message}");
-                }
-                finally
-                {
-                    _youtubeSubtitleDisablesInFlight.TryRemove(key, out _);
-                }
-            });
-        }
-
-        private string RegisterYouTubePlaySession(string sessionId, string? playSessionId)
-        {
-            var playbackInstanceId = string.IsNullOrEmpty(playSessionId)
-                ? Guid.NewGuid().ToString("N")
-                : playSessionId;
-            _activeYouTubePlaySessions[sessionId] = playbackInstanceId;
-            return playbackInstanceId;
-        }
-
-        private void UnregisterYouTubePlaySession(string sessionId, string? playSessionId)
-        {
-            if (!_activeYouTubePlaySessions.TryGetValue(sessionId, out var current))
-                return;
-
-            // With a real PlaySessionId, only the matching Stop owns the slot.
-            // Legacy clients without one are removed only when the session no
-            // longer reports an active item; a replacement Start overwrites the
-            // generated id and invalidates the old command task immediately.
-            if (!string.IsNullOrEmpty(playSessionId))
-            {
-                if (string.Equals(current, playSessionId, StringComparison.Ordinal))
-                    _activeYouTubePlaySessions.TryRemove(
-                        new KeyValuePair<string, string>(sessionId, current));
-                return;
-            }
-
-            if (!IsSessionStillOnItem(sessionId, 0, "subtitle session cleanup"))
-            {
-                _activeYouTubePlaySessions.TryRemove(
-                    new KeyValuePair<string, string>(sessionId, current));
-            }
-        }
-
-        private bool IsYouTubePlaySessionCurrent(
-            string sessionId,
-            string playbackInstanceId,
-            long itemId,
-            string operation)
-        {
-            return _activeYouTubePlaySessions.TryGetValue(sessionId, out var current)
-                   && string.Equals(current, playbackInstanceId, StringComparison.Ordinal)
-                   && IsSessionStillOnItem(sessionId, itemId, operation);
         }
 
         private async Task SendPlaystateCommandAsync(string sessionId, string? userId, PlaystateCommand commandType)
@@ -1127,33 +904,6 @@ namespace Emby.YouTubePlugin
                 .GetProperty(name, BindingFlags.Instance | BindingFlags.Public)
                 ?.GetValue(source) as string ?? string.Empty;
 
-        private static bool IsLikelyYouTubeWebViewAutoplayClient(SessionInfo session)
-        {
-            var client = GetStringProperty(session, "Client");
-            var deviceName = GetStringProperty(session, "DeviceName");
-            var userAgent = GetStringProperty(session, "UserAgent");
-
-            if (ContainsIgnoreCase(client, "Emby Web"))
-                return false;
-
-            var isTheaterFamily = ContainsIgnoreCase(client, "Emby Xbox")
-                                  || ContainsIgnoreCase(client, "Emby Windows")
-                                  || ContainsIgnoreCase(client, "Emby Theater")
-                                  || ContainsIgnoreCase(client, "Emby Theatre")
-                                  || ContainsIgnoreCase(deviceName, "XBOX")
-                                  || ContainsIgnoreCase(deviceName, "Xbox");
-
-            if (!isTheaterFamily)
-                return false;
-
-            return string.IsNullOrEmpty(userAgent)
-                   || ContainsIgnoreCase(userAgent, "Chrome/")
-                   || ContainsIgnoreCase(userAgent, "Chromium/")
-                   || ContainsIgnoreCase(userAgent, "Edg/")
-                   || ContainsIgnoreCase(userAgent, "AppleWebKit/")
-                   || ContainsIgnoreCase(userAgent, "Safari/");
-        }
-
         private static bool ShouldSuppressServerSideResumeSeek(SessionInfo session)
             => IsLikelyFireTvOrAndroidTvSession(session)
                || IsLikelyLgOrWebOsSession(session);
@@ -1232,17 +982,6 @@ namespace Emby.YouTubePlugin
         private static bool IsYouTubeLiveItem(BaseItem item) =>
             !string.IsNullOrEmpty(item.ExternalId)
             && item.ExternalId.StartsWith("LIVE_", StringComparison.Ordinal);
-
-        private static string DescribeSession(SessionInfo session)
-        {
-            var client = GetStringProperty(session, "Client");
-            var deviceName = GetStringProperty(session, "DeviceName");
-            var userAgent = GetStringProperty(session, "UserAgent");
-            return $"client={NonEmptyOrUnknown(client)}, device={NonEmptyOrUnknown(deviceName)}, ua={Shorten(NonEmptyOrUnknown(userAgent), 140)}";
-        }
-
-        private static string NonEmptyOrUnknown(string value) =>
-            string.IsNullOrWhiteSpace(value) ? "unknown" : value;
 
         private static bool ContainsIgnoreCase(string? value, string needle) =>
             !string.IsNullOrEmpty(value)
@@ -1974,7 +1713,6 @@ namespace Emby.YouTubePlugin
             _switchTimer?.Dispose();
             _resumeCheckpointSaveTimer?.Dispose();
             _sortNameRepairer.Dispose();
-            _activeYouTubePlaySessions.Clear();
             SaveResumeCheckpoints();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();

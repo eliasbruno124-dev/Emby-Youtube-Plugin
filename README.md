@@ -20,14 +20,6 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 
 ## Screenshots
 
-### Settings
-
-<img width="600" alt="Settings screen 1" src="docs/screenshots/setting%201.png" />
-<br>
-<img width="600" alt="Settings screen 2" src="docs/screenshots/setting%202.png" />
-<br>
-<img width="600" alt="Settings screen 3" src="docs/screenshots/setting%203.png" />
-
 ### Setup Guide
 
 <img width="740" alt="Setup guide 1" src="docs/screenshots/setup%201.png" />
@@ -125,9 +117,17 @@ The plugin caches responses on disk. Search results are cached longer because se
   selecting the "original" audio track. For signed-in YouTube players, add the
   languages you normally watch under YouTube's **Preferred languages** setting;
   YouTube then keeps original audio when it matches one of those languages.
-- YouTube subtitles are requested as off at Emby's request, media-source,
-  user-policy, and active-session layers. YouTube can still apply its own saved
-  caption preference in player contexts that do not expose caption-off control.
+- YouTube subtitles are requested as off at Emby's request, media-source, and
+  user-policy layers. The plugin reads only the caption language/name metadata
+  from YouTube's watch-page player response and exposes those virtual tracks in
+  Emby's subtitle selector; it never requests a timed-text URL or caption
+  payload. In the server web player, choosing a track initializes the same
+  YouTube IFrame with `cc_load_policy=1` and `cc_lang_pref=<language>`, while
+  **Off** keeps captions disabled. YouTube still renders every caption. The web
+  player also keeps YouTube's own controls visible, including its per-video
+  **Audio track** menu when available. Native Emby apps ship their own player
+  code; they can display the server-provided track metadata, but the app must
+  forward its selection to YouTube for it to take effect.
 - Private YouTube account data is not supported. Use playlists that your API key can read.
 - If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
 

@@ -2,6 +2,9 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Configuration;
+using MediaBrowser.Model.Dlna;
+using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Services;
 using System;
 using System.Collections;
@@ -35,6 +38,7 @@ namespace Emby.YouTubePlugin
         long StartTimeTicks,
         bool HasStartTimeTicks,
         bool IsPlayback,
+        int RequestedSubtitleStreamIndex,
         bool IsLikelyIos,
         bool IsLikelyNativeAndroid,
         bool IsLikelyNativeTheater);
@@ -392,8 +396,14 @@ namespace Emby.YouTubePlugin
 
             var currentDtoValue = TryReadIntProperty(requestDto, "SubtitleStreamIndex");
             var currentQueryValue = serviceRequest?.QueryString["SubtitleStreamIndex"];
-            var dtoChanged = SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
-            var queryChanged = TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
+            var currentQueryIndex = TryReadInt(currentQueryValue);
+            var hasVirtualYouTubeTrack = currentDtoValue >= 10_000 || currentQueryIndex >= 10_000;
+            var dtoChanged = hasVirtualYouTubeTrack
+                ? false
+                : SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
+            var queryChanged = hasVirtualYouTubeTrack
+                ? false
+                : TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
 
             var isPlayback = TryReadBoolProperty(requestDto, "IsPlayback")
                 ?? TryReadBool(serviceRequest?.QueryString["IsPlayback"])
@@ -616,21 +626,14 @@ namespace Emby.YouTubePlugin
         {
             try
             {
-                var userId = Normalize(GetStringProperty(requestDto, "UserId"));
-                if (string.IsNullOrEmpty(userId))
-                    userId = Normalize(GetRequestValue(request, "UserId"));
-                if (string.IsNullOrEmpty(userId))
-                    userId = Normalize(GetRequestValue(request, "X-Emby-User-Id"));
-                if (string.IsNullOrEmpty(userId))
-                    userId = Normalize(GetRequestValue(request, "X-MediaBrowser-UserId"));
-                if (string.IsNullOrEmpty(userId))
-                    return;
-
                 var userManager = Plugin.ResolveService<IUserManager>();
                 if (userManager == null)
                     return;
 
-                var user = TryResolveUser(userManager, userId);
+                var userId = ResolveRequestUserId(request, requestDto);
+                var user = string.IsNullOrEmpty(userId)
+                    ? null
+                    : TryResolveUser(userManager, userId);
                 if (user == null)
                     return;
 
@@ -775,6 +778,43 @@ namespace Emby.YouTubePlugin
             {
                 return null;
             }
+        }
+
+        private static string ResolveRequestUserId(IRequest? request, object requestDto)
+        {
+            var userId = Normalize(GetStringProperty(requestDto, "UserId"));
+            if (string.IsNullOrEmpty(userId))
+                userId = Normalize(GetRequestValue(request, "UserId"));
+            if (string.IsNullOrEmpty(userId))
+                userId = Normalize(GetRequestValue(request, "X-Emby-User-Id"));
+            if (string.IsNullOrEmpty(userId))
+                userId = Normalize(GetRequestValue(request, "X-MediaBrowser-UserId"));
+            if (!string.IsNullOrEmpty(userId))
+                return userId;
+
+            // Some native clients authenticate PlaybackInfo but omit UserId
+            // from both the DTO and query. Their already registered Emby
+            // session still carries the user. Only accept an unambiguous device
+            // match so a shared/reused device id can never mutate the wrong
+            // user's subtitle configuration.
+            var deviceId = Normalize(GetDeviceId(request));
+            if (string.IsNullOrEmpty(deviceId))
+                return string.Empty;
+
+            var sessionManager = Plugin.ResolveService<ISessionManager>();
+            var candidates = sessionManager?.Sessions
+                .Where(session => session.UserInternalId > 0
+                                  && string.Equals(
+                                      Normalize(session.DeviceId),
+                                      deviceId,
+                                      StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (candidates?.Length != 1)
+                return string.Empty;
+
+            return !string.IsNullOrEmpty(candidates[0].UserId)
+                ? candidates[0].UserId
+                : candidates[0].UserInternalId.ToString(CultureInfo.InvariantCulture);
         }
 
         private static bool EnsureUserSubtitleModeRestoreQueued(UserSubtitleModeOverride active)
@@ -979,7 +1019,7 @@ namespace Emby.YouTubePlugin
             // POST can carry it directly on the request DTO. Read both.
             var serviceRequest = GetServiceRequest(service);
             var itemId = Normalize(GetStringProperty(requestDto, "Id"));
-            var userId = Normalize(GetStringProperty(requestDto, "UserId"));
+            var userId = ResolveRequestUserId(serviceRequest, requestDto);
             if (string.IsNullOrEmpty(itemId) || string.IsNullOrEmpty(userId))
                 return null;
 
@@ -1016,6 +1056,9 @@ namespace Emby.YouTubePlugin
                             ?? serviceRequest?.RemoteIp?.ToString()
                             ?? "unknown";
             var maxBitrate = GetRequestValue(serviceRequest, "MaxStreamingBitrate") ?? "unknown";
+            var requestedSubtitleStreamIndex = TryReadIntProperty(requestDto, "SubtitleStreamIndex")
+                                               ?? TryReadInt(serviceRequest?.QueryString["SubtitleStreamIndex"])
+                                               ?? -1;
 
             return new PlaybackInfoPatchContext(
                 itemId,
@@ -1027,6 +1070,7 @@ namespace Emby.YouTubePlugin
                 effectiveStartTimeTicks,
                 hasStartTimeTicks,
                 isPlayback,
+                requestedSubtitleStreamIndex,
                 IsLikelyIosClient(serviceRequest),
                 IsLikelyNativeAndroidClient(serviceRequest),
                 IsLikelyNativeTheaterClient(serviceRequest));
@@ -1066,7 +1110,10 @@ namespace Emby.YouTubePlugin
                 // for a transcode decision, and it lets us normalize the existing
                 // library items whose stored media source isn't a clean watch URL.
                 var youTubeVideoId = TryResolveYouTubeVideoId(context.ItemId);
-                var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context);
+                var captionTracks = string.IsNullOrEmpty(youTubeVideoId)
+                    ? Array.Empty<YouTubeCaptionTrackMetadata>()
+                    : await YouTubeCaptionMetadata.GetTracksAsync(youTubeVideoId).ConfigureAwait(false);
+                var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context, captionTracks);
                 if (normalized.Changed > 0)
                     LogPlaybackInfoNormalization(context, normalized);
 
@@ -1254,7 +1301,8 @@ namespace Emby.YouTubePlugin
         private static PlaybackInfoNormalizationResult NormalizeYouTubeMediaSources(
             object? response,
             string? youTubeVideoId,
-            PlaybackInfoPatchContext context)
+            PlaybackInfoPatchContext context,
+            IReadOnlyList<YouTubeCaptionTrackMetadata> captionTracks)
         {
             var mediaSources = response?.GetType()
                 .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
@@ -1345,15 +1393,18 @@ namespace Emby.YouTubePlugin
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresClosing", false);
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresLooping", false);
 
-                // A YouTube watch URL is owned by the YouTube player, not by
-                // Emby's native stream selector. Persisted or probed stream
-                // metadata here can make clients pick stale stream indexes for
-                // a source that has no Emby-managed tracks. Subtitle off is
-                // explicit -1; null lets some native clients fall back to auto.
-                mediaSourceChanged |= ClearListProperty(mediaSource, "MediaStreams");
+                // Expose only virtual caption metadata. The player receives the
+                // selected language code; no timed-text URL or caption payload
+                // is returned to Emby.
+                mediaSourceChanged |= SetYouTubeCaptionStreams(mediaSource, captionTracks);
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStream");
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStreamIndex");
-                mediaSourceChanged |= SetNumberProperty(mediaSource, "DefaultSubtitleStreamIndex", -1);
+                mediaSourceChanged |= SetNumberProperty(
+                    mediaSource,
+                    "DefaultSubtitleStreamIndex",
+                    context.RequestedSubtitleStreamIndex >= 10_000
+                        ? context.RequestedSubtitleStreamIndex
+                        : -1);
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "VideoStream");
 
                 // Drop any transcode plan Emby attached before we forced direct play.
@@ -1366,6 +1417,36 @@ namespace Emby.YouTubePlugin
             }
 
             return new PlaybackInfoNormalizationResult(changed, nativeDirectPlayDisabled);
+        }
+
+        private static bool SetYouTubeCaptionStreams(
+            object mediaSource,
+            IReadOnlyList<YouTubeCaptionTrackMetadata> captionTracks)
+        {
+            if (mediaSource is not MediaSourceInfo typedMediaSource)
+                return ClearListProperty(mediaSource, "MediaStreams");
+
+            var streams = new List<MediaStream>(captionTracks.Count);
+            for (var i = 0; i < captionTracks.Count; i++)
+            {
+                var track = captionTracks[i];
+                streams.Add(new MediaStream
+                {
+                    Type = MediaStreamType.Subtitle,
+                    Index = 10_000 + i,
+                    Language = track.LanguageCode,
+                    DisplayTitle = track.DisplayName,
+                    Title = track.DisplayName,
+                    Comment = track.Kind,
+                    Codec = "youtube",
+                    DeliveryMethod = SubtitleDeliveryMethod.Embed,
+                    IsExternal = false,
+                    SupportsExternalStream = false
+                });
+            }
+
+            typedMediaSource.MediaStreams = streams;
+            return true;
         }
 
         // Resolves the canonical YouTube video id for a library item id using the
