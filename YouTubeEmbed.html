@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>YouTube Player</title>
+    <style>
+        html, body, #player {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="player"></div>
+    <script>
+        "use strict";
+
+        var parentOrigin = window.location.origin;
+        var videoId = new URLSearchParams(window.location.search).get("videoId");
+        var player = null;
+        var reportTimer = 0;
+        var initialReadySent = false;
+        var pendingCaptionRequest = null;
+        var lastCaptionRequest = null;
+        var currentPlayerToken = null;
+
+        function notify(type, data) {
+            window.parent.postMessage({ type: type, data: data }, parentOrigin);
+        }
+
+        function callPlayer(name, fallback) {
+            try {
+                return player && typeof player[name] === "function" ? player[name]() : fallback;
+            } catch (_) {
+                return fallback;
+            }
+        }
+
+        function replacePlayerHost() {
+            var current = document.getElementById("player");
+            var replacement = document.createElement("div");
+            replacement.id = "player";
+            if (current && current.parentNode) {
+                current.parentNode.replaceChild(replacement, current);
+            } else {
+                document.body.appendChild(replacement);
+            }
+        }
+
+        function makePlayerVars(language) {
+            var vars = {
+                controls: 0,
+                enablejsapi: 1,
+                modestbranding: 1,
+                rel: 0,
+                fs: 0,
+                playsinline: 1,
+                cc_load_policy: language ? 1 : 0,
+                iv_load_policy: 3,
+                disablekb: 1,
+                origin: parentOrigin,
+                widget_referrer: window.location.href
+            };
+            if (language) vars.cc_lang_pref = language;
+            return vars;
+        }
+
+        function startStatusTimer() {
+            if (reportTimer) return;
+            reportTimer = window.setInterval(function () {
+                if (!player) return;
+                window.parent.postMessage({
+                    type: "youtubeStatus",
+                    currentTime: callPlayer("getCurrentTime", 0),
+                    volume: callPlayer("getVolume", 100),
+                    isMuted: callPlayer("isMuted", false),
+                    duration: callPlayer("getDuration", 0)
+                }, parentOrigin);
+            }, 500);
+        }
+
+        function restorePlayer(event, restore, captionRequest, playerToken) {
+            if (playerToken !== currentPlayerToken) {
+                try { event.target.destroy(); } catch (_) {}
+                return;
+            }
+            player = event.target;
+
+            if (!restore) {
+                if (!initialReadySent) {
+                    initialReadySent = true;
+                    notify("youtubePlayerReady");
+                }
+                startStatusTimer();
+                return;
+            }
+
+            try {
+                event.target.setVolume(restore.volume);
+                restore.muted ? event.target.mute() : event.target.unMute();
+                if (restore.currentTime > 0) event.target.seekTo(restore.currentTime, true);
+                if (restore.state === YT.PlayerState.PLAYING) event.target.playVideo();
+                else if (restore.state === YT.PlayerState.PAUSED) event.target.pauseVideo();
+            } catch (_) {}
+
+            var completed = pendingCaptionRequest;
+            if (!completed || completed !== captionRequest) return;
+            pendingCaptionRequest = null;
+            lastCaptionRequest = {
+                generation: completed.generation,
+                language: completed.language
+            };
+            notify("youtubeCaptionChanged", {
+                generation: completed.generation,
+                language: completed.language
+            });
+        }
+
+        function createPlayer(language, restore, captionRequest) {
+            var playerToken = {};
+            currentPlayerToken = playerToken;
+            var nextPlayer = new YT.Player("player", {
+                height: "100%",
+                width: "100%",
+                videoId: videoId,
+                playerVars: makePlayerVars(language),
+                events: {
+                    onReady: function (event) {
+                        restorePlayer(event, restore, captionRequest, playerToken);
+                    },
+                    onStateChange: function (event) {
+                        if (playerToken === currentPlayerToken) notify("youtubeStateChange", event.data);
+                    },
+                    onPlaybackQualityChange: function (event) {
+                        if (playerToken === currentPlayerToken) notify("youtubePlaybackQualityChange", event.data);
+                    },
+                    onPlaybackRateChange: function (event) {
+                        if (playerToken === currentPlayerToken) notify("youtubePlaybackRateChange", event.data);
+                    },
+                    onError: function (event) {
+                        if (playerToken === currentPlayerToken) notify("youtubeError", event.data);
+                    },
+                    onApiChange: function () {
+                        if (playerToken === currentPlayerToken) notify("youtubeApiChange");
+                    }
+                }
+            });
+            player = nextPlayer;
+        }
+
+        function selectCaption(language, generation) {
+            language = language || "";
+            if (lastCaptionRequest
+                && lastCaptionRequest.generation === generation
+                && lastCaptionRequest.language === language) {
+                notify("youtubeCaptionChanged", { generation: generation, language: language });
+                return;
+            }
+
+            var restore = pendingCaptionRequest && pendingCaptionRequest.restore;
+            if (!restore) {
+                restore = {
+                    currentTime: callPlayer("getCurrentTime", 0),
+                    state: callPlayer("getPlayerState", YT.PlayerState.UNSTARTED),
+                    volume: callPlayer("getVolume", 100),
+                    muted: callPlayer("isMuted", false)
+                };
+            }
+            var captionRequest = {
+                language: language,
+                generation: generation,
+                restore: restore
+            };
+            pendingCaptionRequest = captionRequest;
+
+            currentPlayerToken = null;
+            try {
+                if (player && typeof player.destroy === "function") player.destroy();
+            } catch (_) {}
+            player = null;
+            replacePlayerHost();
+            createPlayer(language, restore, captionRequest);
+        }
+
+        window.onYouTubeIframeAPIReady = function () {
+            if (!videoId) {
+                notify("youtubeError", "missing-video-id");
+                return;
+            }
+            createPlayer("", null, null);
+        };
+
+        window.addEventListener("message", function (event) {
+            if (event.origin !== parentOrigin || event.source !== window.parent) return;
+            var message = event.data || {};
+            if (message.type !== "youtubeCommand") return;
+            var args = message.args || [];
+            if (message.func === "setCaptionTrack") {
+                selectCaption(args[0] || "", args[1]);
+                return;
+            }
+            try {
+                if (player && typeof player[message.func] === "function") {
+                    player[message.func].apply(player, args);
+                }
+            } catch (_) {}
+        });
+
+        window.addEventListener("beforeunload", function () {
+            if (reportTimer) window.clearInterval(reportTimer);
+        });
+
+        var apiScript = document.createElement("script");
+        apiScript.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(apiScript);
+    </script>
+</body>
+</html>

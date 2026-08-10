@@ -145,6 +145,10 @@ namespace Emby.YouTubePlugin
 
                 return new ChannelItemResult { Items = items };
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 Log($"[YT] GetChannelItems error: {ex}");

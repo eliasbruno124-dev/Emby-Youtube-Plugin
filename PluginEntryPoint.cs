@@ -29,20 +29,26 @@ namespace Emby.YouTubePlugin
         private readonly ConcurrentDictionary<string, PendingResumeSeek> _pendingResumeSeeks = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, ResumeCheckpoint> _resumeCheckpoints = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, ResumeCheckpoint> _lastResumeProgressBySession = new(StringComparer.Ordinal);
-        private readonly ConcurrentDictionary<string, ResumePositionEstimate> _resumePositionEstimatesBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, long> _resumeTrackingFloorsBySession = new(StringComparer.Ordinal);
         private readonly ConcurrentDictionary<string, DateTime> _lastResumeCheckpointFlushByKey = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, string> _lastVideoIdsByPlaylist = new();
+        private readonly Dictionary<string, string> _lastPlaylistFingerprints = new(StringComparer.Ordinal);
+        private readonly object _playlistFingerprintLock = new();
+        private static readonly object PlaylistFingerprintFileLock = new();
         private readonly object _resumeCheckpointFileLock = new();
+        private readonly CancellationTokenSource _lifetimeCts = new();
+        private readonly ManualResetEventSlim _pollIdle = new(initialState: true);
         private ILibraryManager? _libraryManager;
         private ISessionManager? _sessionManager;
         private IUserDataManager? _userDataManager;
         private Timer? _pollTimer;
-        private Timer? _switchTimer;
         private Timer? _resumeCheckpointSaveTimer;
         private int _pollRunning;
         private int _currentPollMinutes;
         private int _resumeCheckpointsDirty;
+        private int _disposed;
+        private int _bootstrapHashChecked;
+        private bool _playlistFingerprintsDirty;
+        private static PluginEntryPoint? _current;
         private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
         private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
         private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
@@ -56,7 +62,6 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan ResumeCheckpointTtl = TimeSpan.FromDays(180);
         private static readonly TimeSpan RecentSessionRestartWindow = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan RecentSessionCleanupInterval = TimeSpan.FromSeconds(30);
-        private static readonly TimeSpan ResumePositionEstimateTtl = TimeSpan.FromMinutes(30);
         private const int ResumeSeekMaxAttempts = 5;
         private DateTime _lastRecentSessionCleanupUtc = DateTime.MinValue;
 
@@ -79,14 +84,6 @@ namespace Emby.YouTubePlugin
             long RuntimeTicks,
             DateTime UpdatedUtc);
 
-        private sealed record ResumePositionEstimate(
-            string UserId,
-            string VideoId,
-            long ItemId,
-            long BasePositionTicks,
-            long RuntimeTicks,
-            DateTime BaseUtc);
-
         // Static so Plugin.SaveConfiguration can update the hash directly when
         // settings are saved through the UI. Otherwise the next poll would
         // re-detect the same change and trigger a duplicate refresh.
@@ -97,6 +94,9 @@ namespace Emby.YouTubePlugin
 
         private static string ResumeCheckpointPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-resume-checkpoints.json");
+
+        private static string PlaylistFingerprintPath =>
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-playlist-fingerprints.json");
 
         public PluginEntryPoint(
             IApplicationHost applicationHost,
@@ -114,6 +114,7 @@ namespace Emby.YouTubePlugin
 
         public void Run()
         {
+            _current = this;
             // If the plugin DLL was updated, wipe transient caches automatically
             // so users don't have to clear them by hand. Persistent plugin
             // state stays intact: config hash, quota, logs and resume
@@ -129,6 +130,7 @@ namespace Emby.YouTubePlugin
             DashboardYouTubePlayerInterceptor.Install();
             YouTubeChannel.LoadShortsProbeCache();
             LoadResumeCheckpoints();
+            LoadPlaylistFingerprints();
             _sortNameRepairer.Start();
             AttachImageRepairHook();
             QueueExistingSortNameRepair("startup");
@@ -144,18 +146,15 @@ namespace Emby.YouTubePlugin
                 YouTubeChannel.LogPublic($"[YT] Failed to read config hash: {ex.Message}");
             }
 
-            _pollTimer = new Timer(PollTick, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15));
-            _switchTimer = new Timer(_ =>
-            {
-                try
-                {
-                    var minutes = Math.Clamp(Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3, 1, 60);
-                    _pollTimer?.Change(TimeSpan.FromMinutes(minutes), TimeSpan.FromMinutes(minutes));
-                    _currentPollMinutes = minutes;
-                }
-                catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Failed to switch poll interval: {ex.Message}"); }
-                _switchTimer?.Dispose();
-            }, null, TimeSpan.FromMinutes(3), Timeout.InfiniteTimeSpan);
+            _currentPollMinutes = Math.Clamp(
+                Plugin.Instance?.Options.WatchLaterPollMinutes ?? 3,
+                1,
+                60);
+            _pollTimer = new Timer(
+                PollTick,
+                null,
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromMinutes(_currentPollMinutes));
         }
 
         private void AttachResumeSeekHook()
@@ -192,25 +191,11 @@ namespace Emby.YouTubePlugin
                     return;
 
                 CancelPendingResumeSeeksForSession(session.Id);
-                _resumePositionEstimatesBySession.TryRemove(session.Id, out _);
                 _resumeTrackingFloorsBySession.TryRemove(session.Id, out _);
 
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
                 if (string.IsNullOrEmpty(videoId))
-                {
-                    PlaybackIntentInterceptor.ReleaseUserSubtitleModeForSession(
-                        session.UserInternalId,
-                        session.Id,
-                        "non-YouTube playback start");
                     return;
-                }
-
-                PlaybackIntentInterceptor.ForceUserSubtitleModeOff(
-                    session.UserInternalId,
-                    GetUserSubtitleModeSessionKey(session.Id, e.PlaySessionId, videoId),
-                    videoId,
-                    "playback start");
-                ClearNativeStreamSelections(item, session, videoId);
 
                 // A live/upcoming YouTube item has no stable timeline to resume.
                 // Seeking it can jump behind the live edge and trigger reloads on
@@ -331,7 +316,7 @@ namespace Emby.YouTubePlugin
                     }
                     else
                     {
-                        var stopPositionTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
+                        var stopPositionTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session);
                         if (CanTrackPlaybackPosition(sessionId, stopPositionTicks))
                         {
                             TrackResumeCheckpoint(
@@ -362,18 +347,6 @@ namespace Emby.YouTubePlugin
             }
             finally
             {
-                // Preference restoration and seek cleanup must not be skipped if
-                // checkpoint persistence throws. Otherwise one malformed stop
-                // event could leave subtitles disabled for all later media.
-                if (!string.IsNullOrEmpty(videoId))
-                {
-                    PlaybackIntentInterceptor.RestoreUserSubtitleMode(
-                        session?.UserInternalId ?? 0,
-                        GetUserSubtitleModeSessionKey(sessionId, e.PlaySessionId, videoId),
-                        videoId,
-                        "playback stop");
-                }
-
                 if (!string.IsNullOrEmpty(sessionId))
                 {
                     CancelPendingResumeSeeksForSession(sessionId);
@@ -381,7 +354,6 @@ namespace Emby.YouTubePlugin
                     // Without this, an explicit replay within RecentSessionRestartWindow
                     // would be misinterpreted as a reconnect and skip back.
                     _lastResumeProgressBySession.TryRemove(sessionId, out _);
-                    _resumePositionEstimatesBySession.TryRemove(sessionId, out _);
                     _resumeTrackingFloorsBySession.TryRemove(sessionId, out _);
                     CleanupRecentSessionCheckpoints();
                 }
@@ -419,16 +391,10 @@ namespace Emby.YouTubePlugin
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
                 var key = GetResumeSeekKey(e, item);
                 var hasPendingSeek = _pendingResumeSeeks.TryGetValue(key, out var pending);
-                var currentTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session, videoId, item.InternalId);
+                var currentTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session);
 
                 if (!string.IsNullOrEmpty(videoId))
                 {
-                    PlaybackIntentInterceptor.TouchUserSubtitleMode(
-                        session?.UserInternalId ?? 0,
-                        GetUserSubtitleModeSessionKey(session?.Id, e.PlaySessionId, videoId),
-                        session?.Id,
-                        videoId);
-                    ClearNativeStreamSelections(item, session, videoId, logWhenCleared: false);
                     if (IsYouTubeLiveItem(item))
                     {
                         RemoveResumeCheckpoint(session?.UserId, videoId);
@@ -521,7 +487,7 @@ namespace Emby.YouTubePlugin
             return $"{sessionId}|{playSessionId}|{item.InternalId}";
         }
 
-        private long GetPlaybackPositionTicks(long? eventPositionTicks, object? session, string? videoId, long itemId)
+        private long GetPlaybackPositionTicks(long? eventPositionTicks, object? session)
         {
             var positionTicks = eventPositionTicks.GetValueOrDefault();
             if (positionTicks > 0)
@@ -535,9 +501,7 @@ namespace Emby.YouTubePlugin
                 return sessionPositionTicks;
             }
 
-            return TryGetEstimatedResumePositionTicks(sessionId, videoId, itemId, out var estimatedTicks)
-                ? estimatedTicks
-                : 0;
+            return 0;
         }
 
         private void SchedulePendingResumeSeek(string key, TimeSpan delay, string reason)
@@ -591,7 +555,6 @@ namespace Emby.YouTubePlugin
             {
                 YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
                 _pendingResumeSeeks.TryRemove(key, out _);
-                _resumePositionEstimatesBySession.TryRemove(pending.SessionId, out _);
                 _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
                 return;
             }
@@ -626,7 +589,6 @@ namespace Emby.YouTubePlugin
             {
                 _pendingResumeSeeks.TryRemove(key, out _);
                 _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
-                _resumePositionEstimatesBySession.TryRemove(pending.SessionId, out _);
                 YouTubeChannel.LogPublic($"[YT] Resume seek gave up for {pending.VideoId}; player stayed before the resume point after {pending.AttemptsSent} attempts.");
                 return;
             }
@@ -636,8 +598,6 @@ namespace Emby.YouTubePlugin
             try
             {
                 await SendSeekCommandAsync(pending).ConfigureAwait(false);
-
-                ArmZeroPositionEstimateIfNeeded(pending);
 
                 // TryUpdate avoids resurrecting a pending entry that was just
                 // removed (e.g. by PlaybackStopped) — if the slot moved on, the
@@ -766,56 +726,6 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private void ClearNativeStreamSelections(
-            BaseItem item,
-            SessionInfo? session,
-            string videoId,
-            bool logWhenCleared = true)
-        {
-            if (_userDataManager == null
-                || session == null
-                || session.UserInternalId <= 0)
-            {
-                return;
-            }
-
-            try
-            {
-                var data = _userDataManager.GetUserData(session.UserInternalId, item);
-                if (data == null)
-                    return;
-
-                var cleared = new List<string>();
-                if (data.AudioStreamIndex != null)
-                {
-                    data.AudioStreamIndex = null;
-                    cleared.Add("audio");
-                }
-
-                if (data.SubtitleStreamIndex != -1)
-                {
-                    data.SubtitleStreamIndex = -1;
-                    cleared.Add("subtitle-off");
-                }
-
-                if (cleared.Count == 0)
-                    return;
-
-                _userDataManager.SaveUserData(
-                    session.UserInternalId,
-                    item,
-                    data,
-                    UserDataSaveReason.PlaybackProgress,
-                    CancellationToken.None);
-                if (logWhenCleared)
-                    YouTubeChannel.LogPublic($"[YT] Forced Emby {string.Join("/", cleared)} stream selection for YouTube video {videoId}.");
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] YouTube stream selection cleanup failed for {videoId}: {ex.Message}");
-            }
-        }
-
         private void RestoreProtectedNativeResumePosition(BaseItem item, SessionInfo? session, string videoId)
         {
             if (session == null || session.UserInternalId <= 0)
@@ -841,61 +751,6 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private void ArmZeroPositionEstimateIfNeeded(PendingResumeSeek pending)
-        {
-            var session = _sessionManager?.Sessions
-                .FirstOrDefault(s => string.Equals(s.Id, pending.SessionId, StringComparison.Ordinal));
-            if (!ShouldUseZeroPositionEstimate(session))
-                return;
-
-            _resumePositionEstimatesBySession[pending.SessionId] = new ResumePositionEstimate(
-                NormalizeResumeComponent(pending.UserId),
-                NormalizeResumeComponent(pending.VideoId),
-                pending.ItemId,
-                pending.PositionTicks,
-                pending.RuntimeTicks,
-                DateTime.UtcNow);
-        }
-
-        private static bool ShouldUseZeroPositionEstimate(object? session)
-        {
-            var client = GetStringProperty(session, "Client");
-            return client.IndexOf("Android", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        private bool TryGetEstimatedResumePositionTicks(
-            string? sessionId,
-            string? videoId,
-            long itemId,
-            out long positionTicks)
-        {
-            positionTicks = 0;
-            if (string.IsNullOrEmpty(sessionId)
-                || !_resumePositionEstimatesBySession.TryGetValue(sessionId, out var estimate))
-            {
-                return false;
-            }
-
-            if (DateTime.UtcNow - estimate.BaseUtc > ResumePositionEstimateTtl
-                || estimate.ItemId != itemId
-                || !string.Equals(estimate.VideoId, NormalizeResumeComponent(videoId), StringComparison.OrdinalIgnoreCase))
-            {
-                _resumePositionEstimatesBySession.TryRemove(sessionId, out _);
-                return false;
-            }
-
-            var elapsedTicks = Math.Max(0, (DateTime.UtcNow - estimate.BaseUtc).Ticks);
-            var estimatedTicks = estimate.BasePositionTicks + elapsedTicks;
-            if (estimate.RuntimeTicks > 0)
-                estimatedTicks = Math.Min(estimatedTicks, Math.Max(0, estimate.RuntimeTicks - TimeSpan.TicksPerSecond));
-
-            if (estimatedTicks < ResumeSeekMinimumTicks)
-                return false;
-
-            positionTicks = estimatedTicks;
-            return true;
-        }
-
         private static string? GetSessionId(object? session) =>
             GetStringProperty(session, "Id");
 
@@ -907,20 +762,6 @@ namespace Emby.YouTubePlugin
         private static bool ShouldSuppressServerSideResumeSeek(SessionInfo session)
             => IsLikelyFireTvOrAndroidTvSession(session)
                || IsLikelyLgOrWebOsSession(session);
-
-        private static string? GetUserSubtitleModeSessionKey(
-            string? sessionId,
-            string? playSessionId,
-            string videoId)
-        {
-            if (string.IsNullOrEmpty(sessionId))
-                return null;
-
-            var playbackComponent = string.IsNullOrEmpty(playSessionId)
-                ? "legacy"
-                : playSessionId;
-            return $"{sessionId}|{playbackComponent}|{videoId}";
-        }
 
         private static bool IsLikelyNativeAndroidTabletSession(SessionInfo session)
         {
@@ -1150,11 +991,6 @@ namespace Emby.YouTubePlugin
                     _lastResumeProgressBySession.TryRemove(kvp.Key, out _);
             }
 
-            foreach (var kvp in _resumePositionEstimatesBySession)
-            {
-                if (now - kvp.Value.BaseUtc > ResumePositionEstimateTtl)
-                    _resumePositionEstimatesBySession.TryRemove(kvp.Key, out _);
-            }
         }
 
         private void RemoveResumeCheckpoint(string? userId, string? videoId)
@@ -1296,20 +1132,23 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
+        private const string PluginBuildRevision = "2.0.8.9-stability-20260810";
+
         // Wipes transient caches when the installed plugin version differs
         // from the one we recorded last time. Saves the user from having to
         // clear caches by hand after every upgrade. Library items are NOT
         // touched.
         private static string ChannelSurfaceStampPath =>
-            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-channel-surface-v3.txt");
+            Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-channel-surface-v4.txt");
 
-        private const string ChannelSurfaceStamp = "youtube-channel-container-video-folders";
+        private const string ChannelSurfaceStamp = "youtube-channel-video-shorts-live-folders";
 
         private bool WipeCachesIfPluginUpgraded()
         {
             try
             {
-                var current = typeof(PluginEntryPoint).Assembly.GetName().Version?.ToString() ?? "0";
+                var version = typeof(PluginEntryPoint).Assembly.GetName().Version?.ToString() ?? "0";
+                var current = version + "|" + PluginBuildRevision;
                 string? previous = null;
                 var stampPath = PluginVersionStampPath;
                 try
@@ -1527,21 +1366,34 @@ namespace Emby.YouTubePlugin
             var hash = ComputeConfigHash(config);
             LastConfigHash = hash;
             TrySaveConfigHash(hash);
+            _current?.AdjustPollIntervalToConfig(config);
             return hash;
         }
 
         private void PollTick(object? state)
         {
+            if (Volatile.Read(ref _disposed) != 0)
+                return;
+
             if (Interlocked.Exchange(ref _pollRunning, 1) == 1)
                 return;
 
-            _ = PollTickAsync();
+            _pollIdle.Reset();
+            if (Volatile.Read(ref _disposed) != 0)
+            {
+                _pollIdle.Set();
+                Interlocked.Exchange(ref _pollRunning, 0);
+                return;
+            }
+
+            _ = PollTickAsync(_lifetimeCts.Token);
         }
 
-        private async Task PollTickAsync()
+        private async Task PollTickAsync(CancellationToken ct)
         {
             try
             {
+                ct.ThrowIfCancellationRequested();
                 var config = Plugin.Instance?.Options;
                 if (config == null) return;
 
@@ -1555,9 +1407,13 @@ namespace Emby.YouTubePlugin
                 // on disk). We only do this once per process so the poll loop
                 // stays focused on playlist change detection.
                 if (Interlocked.CompareExchange(ref _bootstrapHashChecked, 1, 0) == 0)
-                    await RefreshOnConfigChange(apiKey, config).ConfigureAwait(false);
+                    await RefreshOnConfigChange(apiKey, config, ct).ConfigureAwait(false);
 
-                await PollWatchLaterPlaylists(apiKey, watchLaterRaw).ConfigureAwait(false);
+                await PollWatchLaterPlaylists(apiKey, watchLaterRaw, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                // Normal during plugin unload or reload.
             }
             catch (Exception ex)
             {
@@ -1565,16 +1421,15 @@ namespace Emby.YouTubePlugin
             }
             finally
             {
+                _pollIdle.Set();
                 Interlocked.Exchange(ref _pollRunning, 0);
             }
         }
 
-        private static int _bootstrapHashChecked;
-
         private void AdjustPollIntervalToConfig(PluginConfiguration config)
         {
-            // Only matters once we're past the bootstrap fast-poll phase.
-            if (_currentPollMinutes <= 0) return;
+            if (Volatile.Read(ref _disposed) != 0)
+                return;
 
             var configured = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
             if (configured == _currentPollMinutes) return;
@@ -1583,7 +1438,7 @@ namespace Emby.YouTubePlugin
             {
                 _pollTimer?.Change(TimeSpan.FromMinutes(configured), TimeSpan.FromMinutes(configured));
                 _currentPollMinutes = configured;
-                YouTubeChannel.LogPublic($"[YT] Watch Later poll interval updated to {configured} min");
+                YouTubeChannel.LogPublic($"[YT] Auto-refreshed playlist interval updated to {configured} min");
             }
             catch (Exception ex)
             {
@@ -1591,8 +1446,12 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private async Task RefreshOnConfigChange(string apiKey, PluginConfiguration config)
+        private async Task RefreshOnConfigChange(
+            string apiKey,
+            PluginConfiguration config,
+            CancellationToken ct)
         {
+            ct.ThrowIfCancellationRequested();
             var currentHash = ComputeConfigHash(config);
             var configChanged = !string.Equals(currentHash, LastConfigHash, StringComparison.Ordinal);
 
@@ -1605,25 +1464,49 @@ namespace Emby.YouTubePlugin
             if (string.IsNullOrEmpty(apiKey))
                 return;
 
+            ct.ThrowIfCancellationRequested();
             try { YouTubeApi.InvalidateAllCache(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation failed: {ex.Message}"); }
 
+            ct.ThrowIfCancellationRequested();
             await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
         }
 
-        private async Task PollWatchLaterPlaylists(string apiKey, string watchLaterRaw)
+        private async Task PollWatchLaterPlaylists(
+            string apiKey,
+            string watchLaterRaw,
+            CancellationToken ct)
         {
-            if (watchLaterRaw.Length <= 2 || string.IsNullOrEmpty(apiKey))
-                return;
-
+            ct.ThrowIfCancellationRequested();
             var playlists = watchLaterRaw
                 .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
-                .Where(s => s.Length > 2)
+                .Where(YouTubeChannel.IsSupportedPublicPlaylistId)
                 .Distinct(StringComparer.Ordinal)
                 .ToList();
 
-            if (playlists.Count == 0)
+            // Clean state for entries that were removed, including when the
+            // configuration is now empty or temporarily has no API key.
+            var configured = new HashSet<string>(playlists, StringComparer.Ordinal);
+            lock (_playlistFingerprintLock)
+            {
+                if (Volatile.Read(ref _disposed) != 0)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    return;
+                }
+
+                foreach (var stalePlaylist in _lastPlaylistFingerprints.Keys
+                             .Where(id => !configured.Contains(id))
+                             .ToList())
+                {
+                    _lastPlaylistFingerprints.Remove(stalePlaylist);
+                    _playlistFingerprintsDirty = true;
+                }
+            }
+            SavePlaylistFingerprints();
+
+            if (playlists.Count == 0 || string.IsNullOrEmpty(apiKey))
                 return;
 
             var anyChanged = false;
@@ -1631,31 +1514,141 @@ namespace Emby.YouTubePlugin
             {
                 try
                 {
-                    // Up to 250 IDs gives us solid change detection without
-                    // burning extra quota every poll. Goes through the
-                    // cache-bypass helper so we always see live state.
-                    var ids = await YouTubeApi.GetPlaylistVideoIdsFreshAsync(
-                            apiKey, playlist, 250, CancellationToken.None)
+                    ct.ThrowIfCancellationRequested();
+                    // Hash five pages plus YouTube's total result count. This
+                    // catches appends/removals beyond item 250 without making
+                    // very large playlists exhaust the daily API allowance.
+                    var snapshot = await YouTubeApi.GetPlaylistSnapshotFreshAsync(
+                            apiKey, playlist, 250, ct)
                         .ConfigureAwait(false);
-                    var current = string.Join(",", ids);
+                    ct.ThrowIfCancellationRequested();
+                    var current = ComputePlaylistFingerprint(snapshot.VideoIds, snapshot.TotalResults);
 
-                    _lastVideoIdsByPlaylist.TryGetValue(playlist, out var previous);
-                    if (!string.IsNullOrEmpty(previous) && current != previous)
+                    bool hasPrevious;
+                    string? previous;
+                    bool changed;
+                    lock (_playlistFingerprintLock)
+                    {
+                        if (Volatile.Read(ref _disposed) != 0)
+                        {
+                            ct.ThrowIfCancellationRequested();
+                            return;
+                        }
+
+                        hasPrevious = _lastPlaylistFingerprints.TryGetValue(playlist, out previous);
+                        changed = !hasPrevious || !string.Equals(current, previous, StringComparison.Ordinal);
+                        if (changed)
+                        {
+                            _lastPlaylistFingerprints[playlist] = current;
+                            _playlistFingerprintsDirty = true;
+                        }
+                    }
+
+                    if (hasPrevious && changed)
                     {
                         YouTubeApi.InvalidateCacheContaining(playlist);
                         anyChanged = true;
                     }
-
-                    _lastVideoIdsByPlaylist[playlist] = current;
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
-                    YouTubeChannel.LogPublic($"[YT] Watch Later poll failed for {playlist}: {ex.Message}");
+                    YouTubeChannel.LogPublic($"[YT] Auto-refreshed playlist poll failed for {playlist}: {ex.Message}");
                 }
             }
 
+            // Keeping the compact fingerprints across process restarts lets
+            // the first poll detect changes that happened while Emby was
+            // offline. On a first-ever run we establish a baseline without
+            // forcing an otherwise unnecessary deep channel refresh.
+            ct.ThrowIfCancellationRequested();
+            SavePlaylistFingerprints();
+
             if (anyChanged)
+            {
+                ct.ThrowIfCancellationRequested();
                 await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
+            }
+        }
+
+        private static string ComputePlaylistFingerprint(IEnumerable<string> videoIds, int totalResults)
+        {
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            var value = totalResults.ToString(CultureInfo.InvariantCulture)
+                        + "\n"
+                        + string.Join("\n", videoIds);
+            return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(value)));
+        }
+
+        private void LoadPlaylistFingerprints()
+        {
+            try
+            {
+                lock (PlaylistFingerprintFileLock)
+                {
+                    if (!File.Exists(PlaylistFingerprintPath))
+                        return;
+
+                    var json = File.ReadAllText(PlaylistFingerprintPath);
+                    var loaded = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    if (loaded == null)
+                        return;
+
+                    lock (_playlistFingerprintLock)
+                    {
+                        foreach (var pair in loaded)
+                        {
+                            if (YouTubeChannel.IsSupportedPublicPlaylistId(pair.Key)
+                                && pair.Value is { Length: 64 }
+                                && pair.Value.All(Uri.IsHexDigit))
+                            {
+                                _lastPlaylistFingerprints[pair.Key] = pair.Value;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Failed to load playlist fingerprints: {ex.Message}");
+            }
+        }
+
+        private void SavePlaylistFingerprints()
+        {
+            lock (PlaylistFingerprintFileLock)
+            {
+                lock (_playlistFingerprintLock)
+                {
+                    if (!_playlistFingerprintsDirty)
+                        return;
+
+                    var path = PlaylistFingerprintPath;
+                    var tempPath = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                    try
+                    {
+                        var directory = Path.GetDirectoryName(path);
+                        if (!string.IsNullOrEmpty(directory))
+                            Directory.CreateDirectory(directory);
+
+                        File.WriteAllText(tempPath, JsonSerializer.Serialize(_lastPlaylistFingerprints));
+                        if (File.Exists(path))
+                            File.Replace(tempPath, path, null);
+                        else
+                            File.Move(tempPath, path);
+                        _playlistFingerprintsDirty = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        try { if (File.Exists(tempPath)) File.Delete(tempPath); }
+                        catch { }
+                        YouTubeChannel.LogPublic($"[YT] Failed to save playlist fingerprints: {ex.Message}");
+                    }
+                }
+            }
         }
 
         private static void TrySaveConfigHash(string currentHash)
@@ -1699,6 +1692,12 @@ namespace Emby.YouTubePlugin
 
         public void Dispose()
         {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+                return;
+
+            _lifetimeCts.Cancel();
+            if (ReferenceEquals(_current, this))
+                _current = null;
             if (_libraryManager != null)
                 _libraryManager.ItemUpdated -= OnItemUpdated;
 
@@ -1710,13 +1709,17 @@ namespace Emby.YouTubePlugin
             }
 
             _pollTimer?.Dispose();
-            _switchTimer?.Dispose();
+            var pollStopped = _pollIdle.Wait(TimeSpan.FromSeconds(15));
+            if (!pollStopped)
+                YouTubeChannel.LogPublic("[YT] Playlist poll did not stop within 15 seconds during plugin unload.");
             _resumeCheckpointSaveTimer?.Dispose();
             _sortNameRepairer.Dispose();
+            SavePlaylistFingerprints();
             SaveResumeCheckpoints();
+            if (pollStopped)
+                _lifetimeCts.Dispose();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
-            PlaybackIntentInterceptor.RestoreAllUserSubtitleModes("plugin dispose");
         }
     }
 
@@ -1727,6 +1730,7 @@ namespace Emby.YouTubePlugin
         private static IChannelManager? _channelMgr;
         private static IChannel? _registeredChannel;
         private static int _refreshAgainRequested;
+        private static int _nonSkippableRefreshRequested;
         private static int _nextRefreshDepth = RootRefreshDepth;
 
         // Serializes channel refreshes. Save-triggered refreshes, watch-later
@@ -1787,6 +1791,8 @@ namespace Emby.YouTubePlugin
         public static async Task TriggerRefreshAsync(int requestedDepth = RootRefreshDepth, bool skipIfScanActive = false)
         {
             RaiseNextRefreshDepth(requestedDepth);
+            if (!skipIfScanActive)
+                Interlocked.Exchange(ref _nonSkippableRefreshRequested, 1);
 
             if (!await RefreshGate.WaitAsync(TimeSpan.FromMilliseconds(50)).ConfigureAwait(false))
             {
@@ -1802,7 +1808,10 @@ namespace Emby.YouTubePlugin
                 while (true)
                 {
                     var refreshDepth = ConsumeNextRefreshDepth();
-                    await TriggerRefreshCoreAsync(refreshDepth, skipIfScanActive).ConfigureAwait(false);
+                    var maySkipIfScanActive = Interlocked.Exchange(
+                        ref _nonSkippableRefreshRequested,
+                        0) == 0;
+                    await TriggerRefreshCoreAsync(refreshDepth, maySkipIfScanActive).ConfigureAwait(false);
 
                     if (Interlocked.Exchange(ref _refreshAgainRequested, 0) != 1)
                         break;
@@ -1814,8 +1823,11 @@ namespace Emby.YouTubePlugin
             {
                 RefreshGate.Release();
 
-                if (Volatile.Read(ref _refreshAgainRequested) == 1)
-                    _ = Task.Run(() => TriggerRefreshAsync());
+                if (Interlocked.Exchange(ref _refreshAgainRequested, 0) == 1)
+                {
+                    var maySkipIfScanActive = Volatile.Read(ref _nonSkippableRefreshRequested) == 0;
+                    _ = Task.Run(() => TriggerRefreshAsync(RootRefreshDepth, maySkipIfScanActive));
+                }
             }
         }
 

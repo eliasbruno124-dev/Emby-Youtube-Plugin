@@ -1,9 +1,12 @@
 using MediaBrowser.Controller.Net;
 using MediaBrowser.Model.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
@@ -27,6 +30,24 @@ namespace Emby.YouTubePlugin
         public bool Saved { get; set; }
     }
 
+    [Route("/YouTubePlugin/Regions", "GET", Summary = "Returns content regions currently supported by YouTube.")]
+    [Authenticated(Roles = "Admin")]
+    public class GetYouTubeRegions : IReturn<GetYouTubeRegionsResult>
+    {
+    }
+
+    public sealed class YouTubeRegionInfo
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public sealed class GetYouTubeRegionsResult
+    {
+        public bool LookupSucceeded { get; set; }
+        public List<YouTubeRegionInfo> Regions { get; set; } = new();
+    }
+
     public sealed class YouTubeConfigSaveService : IService, IRequiresRequest
     {
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -40,6 +61,61 @@ namespace Emby.YouTubePlugin
         private static readonly object SaveLock = new();
 
         public IRequest Request { get; set; } = null!;
+
+        public async Task<object> Get(GetYouTubeRegions request)
+        {
+            var apiKey = (Plugin.Instance?.Options.ApiKey ?? string.Empty).Trim();
+            if (apiKey.Length == 0)
+                return new GetYouTubeRegionsResult();
+
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            JsonDocument? doc;
+            try
+            {
+                doc = await YouTubeApi.GetI18nRegionsAsync(apiKey, timeout.Token)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+            {
+                return new GetYouTubeRegionsResult();
+            }
+            using (doc)
+            {
+                if (doc == null
+                    || !doc.RootElement.TryGetProperty("items", out var items)
+                    || items.ValueKind != JsonValueKind.Array)
+                {
+                    return new GetYouTubeRegionsResult();
+                }
+
+                var regions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in items.EnumerateArray())
+                {
+                    var code = YouTubeApi.GetString(item, "id")
+                               ?? YouTubeApi.GetNestedString(item, "snippet", "gl");
+                    var name = YouTubeApi.GetNestedString(item, "snippet", "name");
+                    if (code is not { Length: 2 }
+                        || !code.All(character =>
+                            character is >= 'A' and <= 'Z'
+                            || character is >= 'a' and <= 'z')
+                        || string.IsNullOrWhiteSpace(name))
+                    {
+                        continue;
+                    }
+
+                    regions[code.ToUpperInvariant()] = name.Trim();
+                }
+
+                return new GetYouTubeRegionsResult
+                {
+                    LookupSucceeded = regions.Count > 0,
+                    Regions = regions
+                        .Select(pair => new YouTubeRegionInfo { Code = pair.Key, Name = pair.Value })
+                        .OrderBy(region => region.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList()
+                };
+            }
+        }
 
         public async Task<object> Post(SaveYouTubeConfiguration request)
         {

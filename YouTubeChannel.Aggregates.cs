@@ -40,6 +40,12 @@ namespace Emby.YouTubePlugin
 
             try
             {
+                var effectiveRegion = await YouTubeApi.ResolveContentRegionAsync(
+                    apiKey,
+                    region,
+                    isCategoryChild ? "US" : null,
+                    ct).ConfigureAwait(false);
+
                 if (!isCategoryChild)
                 {
                     // Each bucket is one cheap videos.list call (not search.list).
@@ -48,11 +54,10 @@ namespace Emby.YouTubePlugin
                     {
                         if (allVideos.Count >= target) break;
                         ct.ThrowIfCancellationRequested();
-                        string? reg = string.IsNullOrEmpty(region) ? null : region;
-                        using var doc = await YouTubeApi.GetTrendingAsync(apiKey, reg, cat, ct)
+                        using var doc = await YouTubeApi.GetTrendingAsync(apiKey, effectiveRegion, cat, ct)
                             .ConfigureAwait(false);
                         if (doc == null) continue;
-                        foreach (var v in ExtractTrendingVideos(doc))
+                        foreach (var v in ExtractTrendingVideos(doc, effectiveRegion))
                         {
                             TryAdd(v);
                             if (allVideos.Count >= target) break;
@@ -62,18 +67,21 @@ namespace Emby.YouTubePlugin
                 else
                 {
                     ct.ThrowIfCancellationRequested();
-                    string? reg = string.IsNullOrEmpty(region) ? null : region;
-                    using var doc = await YouTubeApi.GetTrendingAsync(apiKey, reg, category, ct)
+                    using var doc = await YouTubeApi.GetTrendingAsync(apiKey, effectiveRegion, category, ct)
                         .ConfigureAwait(false);
                     if (doc != null)
                     {
-                        foreach (var v in ExtractTrendingVideos(doc))
+                        foreach (var v in ExtractTrendingVideos(doc, effectiveRegion))
                         {
                             TryAdd(v);
                             if (allVideos.Count >= target) break;
                         }
                     }
                 }
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -90,6 +98,10 @@ namespace Emby.YouTubePlugin
             try
             {
                 await ApplyShortsProbeUpgradeAsync(allVideos, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {

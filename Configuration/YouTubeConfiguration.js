@@ -10,72 +10,6 @@ define([
 
     const pluginId = 'B2C3D4E5-F6A7-4B5C-9D0E-1F2A3B4C5D6E';
     const defaultDonateUrl = 'https://paypal.me/eliasbruno123';
-    const trendingRegions = [
-        ['AF', 'Afghanistan'], ['AX', 'Aland Islands'], ['AL', 'Albania'], ['DZ', 'Algeria'],
-        ['AS', 'American Samoa'], ['AD', 'Andorra'], ['AO', 'Angola'], ['AI', 'Anguilla'],
-        ['AQ', 'Antarctica'], ['AG', 'Antigua and Barbuda'], ['AR', 'Argentina'], ['AM', 'Armenia'],
-        ['AW', 'Aruba'], ['AU', 'Australia'], ['AT', 'Austria'], ['AZ', 'Azerbaijan'],
-        ['BS', 'Bahamas'], ['BH', 'Bahrain'], ['BD', 'Bangladesh'], ['BB', 'Barbados'],
-        ['BY', 'Belarus'], ['BE', 'Belgium'], ['BZ', 'Belize'], ['BJ', 'Benin'],
-        ['BM', 'Bermuda'], ['BT', 'Bhutan'], ['BO', 'Bolivia'], ['BQ', 'Bonaire, Sint Eustatius and Saba'],
-        ['BA', 'Bosnia and Herzegovina'], ['BW', 'Botswana'], ['BV', 'Bouvet Island'], ['BR', 'Brazil'],
-        ['IO', 'British Indian Ocean Territory'], ['BN', 'Brunei Darussalam'], ['BG', 'Bulgaria'], ['BF', 'Burkina Faso'],
-        ['BI', 'Burundi'], ['CV', 'Cabo Verde'], ['KH', 'Cambodia'], ['CM', 'Cameroon'],
-        ['CA', 'Canada'], ['KY', 'Cayman Islands'], ['CF', 'Central African Republic'], ['TD', 'Chad'],
-        ['CL', 'Chile'], ['CN', 'China'], ['CX', 'Christmas Island'], ['CC', 'Cocos (Keeling) Islands'],
-        ['CO', 'Colombia'], ['KM', 'Comoros'], ['CG', 'Congo'], ['CD', 'Congo, Democratic Republic of the'],
-        ['CK', 'Cook Islands'], ['CR', 'Costa Rica'], ['CI', "Cote d'Ivoire"], ['HR', 'Croatia'],
-        ['CU', 'Cuba'], ['CW', 'Curacao'], ['CY', 'Cyprus'], ['CZ', 'Czechia'],
-        ['DK', 'Denmark'], ['DJ', 'Djibouti'], ['DM', 'Dominica'], ['DO', 'Dominican Republic'],
-        ['EC', 'Ecuador'], ['EG', 'Egypt'], ['SV', 'El Salvador'], ['GQ', 'Equatorial Guinea'],
-        ['ER', 'Eritrea'], ['EE', 'Estonia'], ['SZ', 'Eswatini'], ['ET', 'Ethiopia'],
-        ['FK', 'Falkland Islands'], ['FO', 'Faroe Islands'], ['FJ', 'Fiji'], ['FI', 'Finland'],
-        ['FR', 'France'], ['GF', 'French Guiana'], ['PF', 'French Polynesia'], ['TF', 'French Southern Territories'],
-        ['GA', 'Gabon'], ['GM', 'Gambia'], ['GE', 'Georgia'], ['DE', 'Germany'],
-        ['GH', 'Ghana'], ['GI', 'Gibraltar'], ['GR', 'Greece'], ['GL', 'Greenland'],
-        ['GD', 'Grenada'], ['GP', 'Guadeloupe'], ['GU', 'Guam'], ['GT', 'Guatemala'],
-        ['GG', 'Guernsey'], ['GN', 'Guinea'], ['GW', 'Guinea-Bissau'], ['GY', 'Guyana'],
-        ['HT', 'Haiti'], ['HM', 'Heard Island and McDonald Islands'], ['VA', 'Holy See'], ['HN', 'Honduras'],
-        ['HK', 'Hong Kong'], ['HU', 'Hungary'], ['IS', 'Iceland'], ['IN', 'India'],
-        ['ID', 'Indonesia'], ['IR', 'Iran'], ['IQ', 'Iraq'], ['IE', 'Ireland'],
-        ['IM', 'Isle of Man'], ['IL', 'Israel'], ['IT', 'Italy'], ['JM', 'Jamaica'],
-        ['JP', 'Japan'], ['JE', 'Jersey'], ['JO', 'Jordan'], ['KZ', 'Kazakhstan'],
-        ['KE', 'Kenya'], ['KI', 'Kiribati'], ['KP', 'Korea, Democratic People\'s Republic of'], ['KR', 'Korea, Republic of'],
-        ['KW', 'Kuwait'], ['KG', 'Kyrgyzstan'], ['LA', 'Lao People\'s Democratic Republic'], ['LV', 'Latvia'],
-        ['LB', 'Lebanon'], ['LS', 'Lesotho'], ['LR', 'Liberia'], ['LY', 'Libya'],
-        ['LI', 'Liechtenstein'], ['LT', 'Lithuania'], ['LU', 'Luxembourg'], ['MO', 'Macao'],
-        ['MG', 'Madagascar'], ['MW', 'Malawi'], ['MY', 'Malaysia'], ['MV', 'Maldives'],
-        ['ML', 'Mali'], ['MT', 'Malta'], ['MH', 'Marshall Islands'], ['MQ', 'Martinique'],
-        ['MR', 'Mauritania'], ['MU', 'Mauritius'], ['YT', 'Mayotte'], ['MX', 'Mexico'],
-        ['FM', 'Micronesia'], ['MD', 'Moldova'], ['MC', 'Monaco'], ['MN', 'Mongolia'],
-        ['ME', 'Montenegro'], ['MS', 'Montserrat'], ['MA', 'Morocco'], ['MZ', 'Mozambique'],
-        ['MM', 'Myanmar'], ['NA', 'Namibia'], ['NR', 'Nauru'], ['NP', 'Nepal'],
-        ['NL', 'Netherlands'], ['NC', 'New Caledonia'], ['NZ', 'New Zealand'], ['NI', 'Nicaragua'],
-        ['NE', 'Niger'], ['NG', 'Nigeria'], ['NU', 'Niue'], ['NF', 'Norfolk Island'],
-        ['MK', 'North Macedonia'], ['MP', 'Northern Mariana Islands'], ['NO', 'Norway'], ['OM', 'Oman'],
-        ['PK', 'Pakistan'], ['PW', 'Palau'], ['PS', 'Palestine, State of'], ['PA', 'Panama'],
-        ['PG', 'Papua New Guinea'], ['PY', 'Paraguay'], ['PE', 'Peru'], ['PH', 'Philippines'],
-        ['PN', 'Pitcairn'], ['PL', 'Poland'], ['PT', 'Portugal'], ['PR', 'Puerto Rico'],
-        ['QA', 'Qatar'], ['RE', 'Reunion'], ['RO', 'Romania'], ['RU', 'Russian Federation'],
-        ['RW', 'Rwanda'], ['BL', 'Saint Barthelemy'], ['SH', 'Saint Helena, Ascension and Tristan da Cunha'], ['KN', 'Saint Kitts and Nevis'],
-        ['LC', 'Saint Lucia'], ['MF', 'Saint Martin'], ['PM', 'Saint Pierre and Miquelon'], ['VC', 'Saint Vincent and the Grenadines'],
-        ['WS', 'Samoa'], ['SM', 'San Marino'], ['ST', 'Sao Tome and Principe'], ['SA', 'Saudi Arabia'],
-        ['SN', 'Senegal'], ['RS', 'Serbia'], ['SC', 'Seychelles'], ['SL', 'Sierra Leone'],
-        ['SG', 'Singapore'], ['SX', 'Sint Maarten'], ['SK', 'Slovakia'], ['SI', 'Slovenia'],
-        ['SB', 'Solomon Islands'], ['SO', 'Somalia'], ['ZA', 'South Africa'], ['GS', 'South Georgia and the South Sandwich Islands'],
-        ['SS', 'South Sudan'], ['ES', 'Spain'], ['LK', 'Sri Lanka'], ['SD', 'Sudan'],
-        ['SR', 'Suriname'], ['SJ', 'Svalbard and Jan Mayen'], ['SE', 'Sweden'], ['CH', 'Switzerland'],
-        ['SY', 'Syrian Arab Republic'], ['TW', 'Taiwan'], ['TJ', 'Tajikistan'], ['TZ', 'Tanzania'],
-        ['TH', 'Thailand'], ['TL', 'Timor-Leste'], ['TG', 'Togo'], ['TK', 'Tokelau'],
-        ['TO', 'Tonga'], ['TT', 'Trinidad and Tobago'], ['TN', 'Tunisia'], ['TR', 'Turkey'],
-        ['TM', 'Turkmenistan'], ['TC', 'Turks and Caicos Islands'], ['TV', 'Tuvalu'], ['UG', 'Uganda'],
-        ['UA', 'Ukraine'], ['AE', 'United Arab Emirates'], ['GB', 'United Kingdom'], ['US', 'United States'],
-        ['UM', 'United States Minor Outlying Islands'], ['UY', 'Uruguay'], ['UZ', 'Uzbekistan'], ['VU', 'Vanuatu'],
-        ['VE', 'Venezuela'], ['VN', 'Viet Nam'], ['VG', 'Virgin Islands, British'], ['VI', 'Virgin Islands, U.S.'],
-        ['WF', 'Wallis and Futuna'], ['EH', 'Western Sahara'], ['YE', 'Yemen'], ['ZM', 'Zambia'],
-        ['ZW', 'Zimbabwe']
-    ];
-
     function client() {
         return window.ApiClient || (window.Dashboard && Dashboard.getCurrentApiClient && Dashboard.getCurrentApiClient());
     }
@@ -135,18 +69,27 @@ define([
     }
 
     function uniqueEntries(entries) {
-        const seen = {};
+        const seen = new Set();
         const result = [];
 
         entries.forEach(item => {
-            const key = item.toLowerCase();
-            if (!seen[key]) {
-                seen[key] = true;
+            if (!seen.has(item)) {
+                seen.add(item);
                 result.push(item);
             }
         });
 
         return result;
+    }
+
+    function setConfigurationControlsDisabled(view, disabled) {
+        const form = view.querySelector('.youtubeConfigurationForm');
+        if (!form) {
+            return;
+        }
+        form.querySelectorAll('input, select, textarea, button').forEach(control => {
+            control.disabled = !!disabled;
+        });
     }
 
     function formatNumber(n) {
@@ -164,26 +107,19 @@ define([
         return m + 'm';
     }
 
-    function renderQuota(view, config) {
-        const used = Number(config.QuotaUsedToday) || 0;
-        const limit = Number(config.QuotaDailyLimit) || 10000;
-        const lifetime = Number(config.QuotaLifetime) || 0;
-        const resetSec = Number(config.QuotaResetSeconds) || 0;
+    function renderQuotaBucket(view, prefix, usedValue, limitValue, lifetimeValue, unit) {
+        const used = Number(usedValue) || 0;
+        const limit = Number(limitValue) || 1;
+        const lifetime = Number(lifetimeValue) || 0;
         const pct = limit > 0 ? Math.min(100, Math.max(0, (used / limit) * 100)) : 0;
 
-        setText(view, 'quotaNumber', formatNumber(used));
-        setText(view, 'quotaTotal', formatNumber(limit));
-        setText(view, 'quotaPercent', pct.toFixed(1) + '%');
-        setText(view, 'quotaLifetime', 'Lifetime: ' + formatNumber(lifetime) + ' units');
+        setText(view, prefix + 'Number', formatNumber(used));
+        setText(view, prefix + 'Total', formatNumber(limit));
+        setText(view, prefix + 'Percent', pct.toFixed(1) + '%');
+        setText(view, prefix + 'Lifetime', 'Locally tracked: ' + formatNumber(lifetime) + ' ' + unit);
 
-        const reset = field(view, 'quotaReset');
-        if (reset) {
-            reset.textContent = '⏱ Reset in ' + formatResetCountdown(resetSec);
-            reset.classList.toggle('quotaResetWarn', resetSec > 0 && resetSec < 1800);
-        }
-
-        const bar = field(view, 'quotaBar');
-        const fill = field(view, 'quotaBarFill');
+        const bar = field(view, prefix + 'Bar');
+        const fill = field(view, prefix + 'BarFill');
         if (fill) fill.style.width = pct.toFixed(2) + '%';
         if (bar) {
             bar.classList.remove('warn', 'danger');
@@ -192,17 +128,54 @@ define([
         }
     }
 
+    function renderQuota(view, config) {
+        renderQuotaBucket(
+            view,
+            'quotaSearch',
+            config.QuotaSearchCallsToday,
+            config.QuotaSearchDailyLimit || 100,
+            config.QuotaTotalSearchCalls,
+            'calls');
+        renderQuotaBucket(
+            view,
+            'quotaOther',
+            config.QuotaOtherUnitsToday,
+            config.QuotaOtherDailyLimit || 10000,
+            config.QuotaTotalOtherUnits,
+            'units');
+
+        const resetSec = Number(config.QuotaResetSeconds) || 0;
+        const reset = field(view, 'quotaReset');
+        if (reset) {
+            reset.textContent = '⏱ Reset in ' + formatResetCountdown(resetSec);
+            reset.classList.toggle('quotaResetWarn', resetSec > 0 && resetSec < 1800);
+        }
+    }
+
     function classifySavedItem(item) {
         if (item.indexOf('@') === 0) {
-            return 'Handle';
+            return item.length > 1 && !/\s/.test(item) ? 'Handle' : 'Invalid ID';
         }
         if (item.indexOf('UC') === 0) {
-            return 'Channel';
+            return /^UC[A-Za-z0-9_-]{22}$/.test(item) ? 'Channel' : 'Invalid ID';
         }
-        if (item.indexOf('PL') === 0 || item.indexOf('UU') === 0 || item.indexOf('OL') === 0 || item.indexOf('WL') === 0) {
-            return 'Playlist';
+        if (item.indexOf('WL') === 0) {
+            return 'Private / unsupported';
+        }
+        if (item.indexOf('PL') === 0 || item.indexOf('UU') === 0 || item.indexOf('OL') === 0) {
+            return /^(PL|UU|OL)[A-Za-z0-9_-]{19,}$/.test(item) ? 'Playlist' : 'Invalid ID';
         }
         return 'Search';
+    }
+
+    function classifyAutoPlaylistItem(item) {
+        if (item.indexOf('WL') === 0) {
+            return 'Private / unsupported';
+        }
+        if (/^(PL|UU|OL)[A-Za-z0-9_-]{19,}$/.test(item)) {
+            return 'Playlist';
+        }
+        return 'Invalid ID';
     }
 
     function setDonateButton(view) {
@@ -225,19 +198,21 @@ define([
         const images = view.querySelectorAll('[data-guide-image]');
         images.forEach(img => {
             const name = img.getAttribute('data-guide-image');
-            if (name && !img.src) {
+            if (name && !img.getAttribute('src')) {
                 img.src = pluginUrl('YouTubePlugin/GuideImage/' + encodeURIComponent(name));
             }
         });
     }
 
-    function populateTrendingRegions(view) {
+    function populateTrendingRegions(view, regionResult, selectedValue) {
         const select = field(view, 'selectTrendingRegion');
-        if (!select || select.youtubeRegionsLoaded) {
-            return;
+        if (!select) {
+            return false;
         }
 
-        select.youtubeRegionsLoaded = true;
+        const selected = String(selectedValue || '').trim().toUpperCase();
+        const lookupSucceeded = !!(regionResult && regionResult.LookupSucceeded);
+        const regions = (regionResult && regionResult.Regions) || [];
         select.innerHTML = '';
 
         const defaultOption = document.createElement('option');
@@ -245,11 +220,63 @@ define([
         defaultOption.textContent = 'YouTube default';
         select.appendChild(defaultOption);
 
-        trendingRegions.forEach(region => {
+        const normalized = Array.isArray(regions) ? regions : [];
+        normalized.forEach(region => {
             const option = document.createElement('option');
-            option.value = region[0];
-            option.textContent = region[1] + ' (' + region[0] + ')';
+            option.value = region.Code;
+            option.textContent = region.Name + ' (' + region.Code + ')';
             select.appendChild(option);
+        });
+
+        const selectedIsSupported = normalized.some(region => region.Code === selected);
+        if (selected && !selectedIsSupported && !lookupSucceeded) {
+            const savedOption = document.createElement('option');
+            savedOption.value = selected;
+            savedOption.textContent = 'Saved value (' + selected + ')';
+            select.appendChild(savedOption);
+        }
+        select.value = selectedIsSupported || !lookupSucceeded ? selected : '';
+        return !!selected && lookupSucceeded && !selectedIsSupported;
+    }
+
+    function fetchTrendingRegions(apiClient) {
+        if (!apiClient || typeof apiClient.ajax !== 'function') {
+            return Promise.resolve({ LookupSucceeded: false, Regions: [] });
+        }
+
+        return apiClient.ajax({
+            type: 'GET',
+            url: apiClient.getUrl('YouTubePlugin/Regions'),
+            dataType: 'json'
+        }).then(payload => {
+            if (typeof payload === 'string') {
+                try { payload = JSON.parse(payload); }
+                catch (e) { return { LookupSucceeded: false, Regions: [] }; }
+            }
+
+            const source = (payload && (payload.Regions || payload.regions)) || [];
+            if (!Array.isArray(source)) {
+                return { LookupSucceeded: false, Regions: [] };
+            }
+            const seen = new Set();
+            const regions = source.map(region => ({
+                Code: String((region && (region.Code || region.code)) || '').trim().toUpperCase(),
+                Name: String((region && (region.Name || region.name)) || '').trim()
+            })).filter(region => {
+                if (!/^[A-Z]{2}$/.test(region.Code) || !region.Name || seen.has(region.Code)) {
+                    return false;
+                }
+                seen.add(region.Code);
+                return true;
+            }).sort((a, b) => a.Name.localeCompare(b.Name));
+            return {
+                LookupSucceeded: !!(payload && (payload.LookupSucceeded || payload.lookupSucceeded))
+                    && regions.length > 0,
+                Regions: regions
+            };
+        }).catch(error => {
+            console.log('[YT] Supported-region lookup failed:', error);
+            return { LookupSucceeded: false, Regions: [] };
         });
     }
 
@@ -273,6 +300,10 @@ define([
                         pages[key].classList.toggle('hide', key !== target);
                     }
                 });
+
+                if (target === 'setupGuidePage') {
+                    setGuideImages(view);
+                }
             });
         });
     }
@@ -370,10 +401,7 @@ define([
             fetchLatestGithubVersion().then(latest => {
                 if (!latest) return;
                 if (!currentVersion) {
-                    // Couldn't determine installed version — show the badge
-                    // anyway so the user at least sees a release exists.
-                    console.log('[YT] No installed version, showing badge for', latest);
-                    showUpdateBadge(latest);
+                    console.log('[YT] Installed version unavailable; update comparison skipped. Latest published tag:', latest);
                     return;
                 }
                 const cmp = compareVersions(latest, currentVersion);
@@ -415,12 +443,22 @@ define([
             this.config = {};
             this.savedItems = [];
             this.watchLaterItems = [];
+            this._saveInFlight = false;
+            this._pendingSave = null;
+            this._saveRevision = 0;
+            this._loadRevision = 0;
+            this._hasLoadedConfiguration = false;
+            this._regionResult = { LookupSucceeded: false, Regions: [] };
+            this._regionLookupRevision = 0;
+            this._regionLookupApiKey = '';
         }
 
         onResume(options) {
             super.onResume(options);
-            populateTrendingRegions(this.view);
-            setGuideImages(this.view);
+            populateTrendingRegions(
+                this.view,
+                this._regionResult,
+                value(this.view, 'selectTrendingRegion'));
             this.bindEventListeners(this.view);
             this.loadData(this.view);
         }
@@ -437,7 +475,9 @@ define([
             if (form) {
                 form.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    this.saveData(view);
+                    if (this._autoSaveReady) {
+                        this.saveData(view);
+                    }
                     return false;
                 });
                 // Auto-save: there is no Save button. Any control change persists
@@ -464,7 +504,12 @@ define([
                 'savedItemsList',
                 () => this.savedItems,
                 value => { this.savedItems = value; },
-                item => classifySavedItem(item));
+                item => classifySavedItem(item),
+                item => {
+                    const kind = classifySavedItem(item);
+                    return kind !== 'Invalid ID' && kind !== 'Private / unsupported';
+                },
+                'Private or malformed YouTube IDs were not added.');
 
             this.bindEntryControls(
                 view,
@@ -473,10 +518,12 @@ define([
                 'watchLaterItemsList',
                 () => this.watchLaterItems,
                 value => { this.watchLaterItems = value; },
-                () => 'Playlist');
+                item => classifyAutoPlaylistItem(item),
+                item => classifyAutoPlaylistItem(item) === 'Playlist',
+                'Only public or unlisted PL, UU or OL playlist IDs can be auto-refreshed.');
         }
 
-        bindEntryControls(view, inputId, buttonId, listId, getItems, setItems, classify) {
+        bindEntryControls(view, inputId, buttonId, listId, getItems, setItems, classify, validate, invalidMessage) {
             const input = field(view, inputId);
             const button = field(view, buttonId);
             const add = () => {
@@ -485,7 +532,16 @@ define([
                     return;
                 }
 
-                setItems(uniqueEntries(getItems().concat(newItems)));
+                const acceptedItems = validate ? newItems.filter(validate) : newItems;
+                if (acceptedItems.length !== newItems.length) {
+                    setStatus(view, invalidMessage || 'Some entries were not valid.');
+                    showToast('error', invalidMessage || 'Some entries were not valid');
+                }
+                if (acceptedItems.length === 0) {
+                    return;
+                }
+
+                setItems(uniqueEntries(getItems().concat(acceptedItems)));
                 setValue(view, inputId, '');
                 this.renderEntryList(view, listId, getItems, setItems, classify);
                 this.syncEntryFields(view);
@@ -580,58 +636,146 @@ define([
                 'watchLaterItemsList',
                 () => this.watchLaterItems,
                 value => { this.watchLaterItems = value; },
-                () => 'Playlist');
+                item => classifyAutoPlaylistItem(item));
+        }
+
+        refreshTrendingRegions(view, apiClient, loadRevision, apiKeyAtRequest) {
+            const lookupRevision = ++this._regionLookupRevision;
+            const selectedBeforeLookup = value(view, 'selectTrendingRegion');
+            this._regionLookupApiKey = String(apiKeyAtRequest || '').trim();
+
+            return fetchTrendingRegions(apiClient).then(regionResult => {
+                if (lookupRevision !== this._regionLookupRevision
+                    || (loadRevision != null && loadRevision !== this._loadRevision)
+                    || value(view, 'selectTrendingRegion') !== selectedBeforeLookup) {
+                    return;
+                }
+
+                if (regionResult.LookupSucceeded) {
+                    this._regionResult = regionResult;
+                }
+
+                // A transient refresh failure must not discard a previously
+                // validated region list from this page instance.
+                const displayResult = regionResult.LookupSucceeded
+                    ? regionResult
+                    : this._regionResult;
+                const resetUnsupported = populateTrendingRegions(
+                    view,
+                    displayResult,
+                    selectedBeforeLookup);
+                if (resetUnsupported) {
+                    setStatus(view, 'The saved region is not supported by YouTube and was reset to the default.');
+                    this.scheduleAutoSave(view);
+                }
+            });
         }
 
         loadData(view) {
+            this._autoSaveReady = false;
+            setConfigurationControlsDisabled(view, true);
             const apiClient = client();
             if (!apiClient) {
+                if (this._autoSaveTimer) {
+                    clearTimeout(this._autoSaveTimer);
+                    this._autoSaveTimer = null;
+                }
                 setStatus(view, 'Could not find the Emby API client.');
                 return;
             }
 
-            this._autoSaveReady = false;
-            // Drop any save still pending from a previous edit so a reload
-            // can't race it into persisting stale/in-flux field values.
+            // Preserve a debounced edit before reloading, then wait until the
+            // serialized save queue is empty. A stale GET must never repaint
+            // the form while an older POST is still being committed.
             if (this._autoSaveTimer) {
                 clearTimeout(this._autoSaveTimer);
                 this._autoSaveTimer = null;
+                this.saveData(view);
             }
-            loading.show();
-            apiClient.getPluginConfiguration(pluginId).then(config => {
-                this.config = config || {};
-                config = this.config;
+            const loadRevision = ++this._loadRevision;
+            const requestWhenIdle = () => {
+                if (loadRevision !== this._loadRevision) {
+                    return;
+                }
+                if (this._saveInFlight || this._pendingSave) {
+                    setTimeout(requestWhenIdle, 100);
+                    return;
+                }
 
-                setValue(view, 'txtApiKey', config.ApiKey);
-                this.savedItems = uniqueEntries(splitEntries(config.SavedItems));
-                this.watchLaterItems = uniqueEntries(splitEntries(config.WatchLaterPlaylist));
-                this.syncEntryFields(view);
-                this.renderAllEntryLists(view);
-                setChecked(view, 'chkShowRootFoldersAtTopLevel', !!config.ShowRootFoldersAtTopLevel);
-                setChecked(view, 'chkShowTrending', config.ShowTrending !== false);
-                setChecked(view, 'chkShowCategories', config.ShowCategories !== false);
-                setChecked(view, 'chkShowShorts', config.HideShorts === true ? false : config.ShowShorts !== false);
-                setValue(view, 'selectTrendingRegion', config.TrendingRegion);
-                setValue(view, 'selectTrendingCategory', config.TrendingCategory === '0' ? '' : (config.TrendingCategory || ''));
-                setChecked(view, 'chkShowLikeCount', config.ShowLikeCount !== false);
-                setChecked(view, 'chkShowCommentCount', !!config.ShowCommentCount);
-                setValue(view, 'selectChannelSortBy', config.ChannelSortBy || 'date');
-                setValue(view, 'numMaxChannelVideos', config.MaxChannelVideos || 50);
-                setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
-                setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
-                renderQuota(view, config);
-                setDonateButton(view);
-                setStatus(view, '');
-                loading.hide();
-                renderPluginCredits(view, apiClient);
-                // Initial values are in place; enable auto-save for real edits.
-                this._autoSaveReady = true;
-            }, error => {
-                loading.hide();
-                console.error('Error loading YouTube configuration:', error);
-                setStatus(view, 'Could not load plugin settings.');
-                showToast('error', 'Could not load YouTube settings');
-            });
+                const saveRevisionAtRequest = this._saveRevision;
+                loading.show();
+                apiClient.getPluginConfiguration(pluginId).then(loadedConfig => {
+                    if (loadRevision !== this._loadRevision) {
+                        loading.hide();
+                        return;
+                    }
+                    if (this._saveInFlight
+                        || this._pendingSave
+                        || saveRevisionAtRequest !== this._saveRevision) {
+                        loading.hide();
+                        setTimeout(requestWhenIdle, 100);
+                        return;
+                    }
+                    this.config = loadedConfig || {};
+                    const config = this.config;
+
+                    setValue(view, 'txtApiKey', config.ApiKey);
+                    this.savedItems = uniqueEntries(splitEntries(config.SavedItems));
+                    this.watchLaterItems = uniqueEntries(splitEntries(config.WatchLaterPlaylist));
+                    this.syncEntryFields(view);
+                    this.renderAllEntryLists(view);
+                    setChecked(view, 'chkShowRootFoldersAtTopLevel', !!config.ShowRootFoldersAtTopLevel);
+                    setChecked(view, 'chkShowTrending', config.ShowTrending !== false);
+                    setChecked(view, 'chkShowCategories', config.ShowCategories !== false);
+                    setChecked(view, 'chkShowShorts', config.HideShorts === true ? false : config.ShowShorts !== false);
+                    const resetFromKnownRegions = populateTrendingRegions(
+                        view,
+                        this._regionResult,
+                        config.TrendingRegion);
+                    setValue(view, 'selectTrendingCategory', config.TrendingCategory === '0' ? '' : (config.TrendingCategory || ''));
+                    setChecked(view, 'chkShowLikeCount', config.ShowLikeCount !== false);
+                    setChecked(view, 'chkShowCommentCount', !!config.ShowCommentCount);
+                    setValue(view, 'selectChannelSortBy', config.ChannelSortBy || 'date');
+                    setValue(view, 'numMaxChannelVideos', config.MaxChannelVideos || 50);
+                    setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
+                    setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
+                    renderQuota(view, config);
+                    setDonateButton(view);
+                    setStatus(view, '');
+                    loading.hide();
+                    renderPluginCredits(view, apiClient);
+                    // Initial values are in place; enable auto-save for real edits.
+                    this._hasLoadedConfiguration = true;
+                    this._autoSaveReady = true;
+                    setConfigurationControlsDisabled(view, false);
+
+                    if (resetFromKnownRegions) {
+                        setStatus(view, 'The saved region is not supported by YouTube and was reset to the default.');
+                        this.scheduleAutoSave(view);
+                    }
+
+                    // Region discovery is deliberately independent of the
+                    // main config load. A slow or unreachable YouTube API must
+                    // never keep the whole settings page disabled.
+                    this.refreshTrendingRegions(view, apiClient, loadRevision, config.ApiKey);
+                }, error => {
+                    if (loadRevision !== this._loadRevision) {
+                        loading.hide();
+                        return;
+                    }
+                    loading.hide();
+                    console.error('Error loading YouTube configuration:', error);
+                    this._autoSaveReady = this._hasLoadedConfiguration;
+                    setConfigurationControlsDisabled(view, !this._hasLoadedConfiguration);
+                    setStatus(
+                        view,
+                        this._hasLoadedConfiguration
+                            ? 'Could not refresh plugin settings; keeping the last loaded values.'
+                            : 'Could not load plugin settings. Reopen this page to retry.');
+                    showToast('error', 'Could not load YouTube settings');
+                });
+            };
+            requestWhenIdle();
         }
 
         saveData(view) {
@@ -641,7 +785,7 @@ define([
                 return;
             }
 
-            const config = this.config || {};
+            const config = Object.assign({}, this.config || {});
             config.ApiKey = value(view, 'txtApiKey').trim();
             this.syncEntryFields(view);
             config.SavedItems = this.savedItems.join(', ');
@@ -668,28 +812,65 @@ define([
             delete config.QuotaDailyLimit;
             delete config.QuotaResetSeconds;
             delete config.QuotaLifetime;
+            delete config.QuotaSearchCallsToday;
+            delete config.QuotaSearchDailyLimit;
+            delete config.QuotaOtherUnitsToday;
+            delete config.QuotaOtherDailyLimit;
+            delete config.QuotaTotalSearchCalls;
+            delete config.QuotaTotalOtherUnits;
             delete config.ShortsEnabled;
 
-            // Save through the plugin's own endpoint instead of Emby's
-            // updatePluginConfiguration. Emby Server 4.10.0.x's POST
-            // /Plugins/{guid}/Configuration handler throws "Unrecognized Guid
-            // format" and returns HTTP 500 for every plugin, so the normal path
-            // is unusable on the beta. No full-screen spinner / success toast:
-            // saving is automatic and silent on every change.
+            this._pendingSave = {
+                apiClient,
+                config,
+                revision: ++this._saveRevision,
+                view
+            };
+            this.flushSaveQueue();
+        }
+
+        flushSaveQueue() {
+            if (this._saveInFlight || !this._pendingSave) {
+                return;
+            }
+
+            const pending = this._pendingSave;
+            this._pendingSave = null;
+            this._saveInFlight = true;
+
+            // Save through the plugin's own endpoint. Requests are serialized and
+            // edits made while one is in flight collapse into the newest snapshot,
+            // so a slow older response can never overwrite newer settings.
+            const view = pending.view;
             setStatus(view, 'Saving…');
-            apiClient.ajax({
+            pending.apiClient.ajax({
                 type: 'POST',
-                url: apiClient.getUrl('YouTubePlugin/SaveConfiguration'),
-                data: JSON.stringify(config),
+                url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),
+                data: JSON.stringify(pending.config),
                 contentType: 'application/json'
             }).then(() => {
-                this.config = config;
+                this.config = pending.config;
                 setDonateButton(view);
-                setStatus(view, 'Saved automatically · the YouTube channel refreshes shortly.');
+                if (!this._pendingSave && pending.revision === this._saveRevision) {
+                    setStatus(view, 'Saved automatically.');
+                    const savedApiKey = String(pending.config.ApiKey || '').trim();
+                    if (savedApiKey !== this._regionLookupApiKey) {
+                        this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);
+                    }
+                }
             }, error => {
                 console.error('Error saving YouTube configuration:', error);
-                setStatus(view, 'Could not save plugin settings.');
-                showToast('error', 'Could not save YouTube settings');
+                if (!this._pendingSave && pending.revision === this._saveRevision) {
+                    setStatus(view, 'Could not save plugin settings.');
+                    showToast('error', 'Could not save YouTube settings');
+                }
+            }).then(() => {
+                this._saveInFlight = false;
+                this.flushSaveQueue();
+            }, error => {
+                console.error('Error finalizing YouTube configuration save:', error);
+                this._saveInFlight = false;
+                this.flushSaveQueue();
             });
         }
 

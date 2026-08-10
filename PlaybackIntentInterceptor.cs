@@ -1,7 +1,6 @@
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
-using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Dlna;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Entities;
@@ -14,7 +13,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
@@ -66,35 +64,9 @@ namespace Emby.YouTubePlugin
         private static int _startStampSuppressLogsRemaining = 12;
         private static int _legacyTabletSourceLogsRemaining = 12;
         private static int _requestSubtitleSuppressLogsRemaining = 16;
-        private static int _acceptingRequests;
-        private static readonly TimeSpan UserSubtitleModePendingRestoreDelay = TimeSpan.FromMinutes(2);
-        private static readonly TimeSpan UserSubtitleModeLeaseCheckInterval = TimeSpan.FromMinutes(2);
-        private static readonly TimeSpan UserSubtitleModeStaleLeaseTimeout = TimeSpan.FromMinutes(30);
-        private static readonly TimeSpan UserSubtitleModeRestoreRetryDelay = TimeSpan.FromSeconds(10);
-        private static readonly object UserSubtitleModeSync = new();
-        private static readonly Dictionary<long, UserSubtitleModeOverride> UserSubtitleModeOverrides = new();
-
-        private sealed class UserSubtitleModeOverride
-        {
-            public UserSubtitleModeOverride(SubtitlePlaybackMode originalMode, bool originalRememberSubtitleSelections)
-            {
-                OriginalMode = originalMode;
-                OriginalRememberSubtitleSelections = originalRememberSubtitleSelections;
-                UpdatedUtc = DateTime.UtcNow;
-            }
-
-            public SubtitlePlaybackMode OriginalMode { get; }
-            public bool OriginalRememberSubtitleSelections { get; }
-            public Dictionary<string, DateTime> SessionLeases { get; } = new(StringComparer.Ordinal);
-            public bool PendingRestoreQueued { get; set; }
-            public DateTime? PendingPreflightUtc { get; set; }
-            public string? PendingPreflightVideoId { get; set; }
-            public DateTime UpdatedUtc { get; set; }
-        }
 
         internal static void Install()
         {
-            Volatile.Write(ref _acceptingRequests, 1);
             lock (Sync)
             {
                 if (_harmony != null)
@@ -176,11 +148,6 @@ namespace Emby.YouTubePlugin
 
         internal static void Uninstall()
         {
-            // Stop new subtitle-policy leases before removing the Harmony hooks.
-            // A prefix already in flight checks this flag again under the policy
-            // lock, so Dispose can restore settings without a late request
-            // immediately forcing them off again.
-            Volatile.Write(ref _acceptingRequests, 0);
             lock (Sync)
             {
                 try
@@ -373,6 +340,12 @@ namespace Emby.YouTubePlugin
             if (string.IsNullOrEmpty(videoId))
                 return;
 
+            // Start the metadata request while Emby builds PlaybackInfo. Preview
+            // and playback requests use separate, bounded budgets so the first
+            // usable response normally contains its selectable caption tracks
+            // without inheriting the full external request timeout.
+            YouTubeCaptionMetadata.Prefetch(videoId);
+
             // Emby may carry an old resume position on a persisted live item.
             // Clear the request value before its normal playback pipeline sees
             // it; the postfix already avoids adding our own URL start stamp.
@@ -405,12 +378,7 @@ namespace Emby.YouTubePlugin
                 ? false
                 : TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
 
-            var isPlayback = TryReadBoolProperty(requestDto, "IsPlayback")
-                ?? TryReadBool(serviceRequest?.QueryString["IsPlayback"])
-                ?? true;
             var isNativeAndroidTablet = IsLikelyNativeAndroidTabletRequest(serviceRequest);
-            if (isPlayback || isNativeAndroidTablet)
-                ForceUserSubtitleModeOffForRequest(serviceRequest, requestDto, videoId);
 
             if (audioDtoChanged
                 || audioQueryChanged
@@ -469,317 +437,6 @@ namespace Emby.YouTubePlugin
                 $"[YT] PlaybackInfo sanitized stream selection for {clientKind}. Video={videoId}, Item={itemId}, PreviousAudioDto={previousAudioDtoText}, PreviousAudioQuery={previousAudioQueryValue ?? "null"}, AudioDtoChanged={audioDtoChanged}, AudioQueryChanged={audioQueryChanged}, PreviousSubtitleDto={previousDtoText}, PreviousSubtitleQuery={previousQueryValue ?? "null"}, SubtitleDtoChanged={dtoChanged}, SubtitleQueryChanged={queryChanged}, Client={client}, Device={deviceName}, UA={Shorten(userAgent, 160)}.");
         }
 
-        internal static void ForceUserSubtitleModeOff(long userInternalId, string? sessionId, string videoId, string reason)
-        {
-            if (userInternalId <= 0)
-                return;
-
-            try
-            {
-                var userManager = Plugin.ResolveService<IUserManager>();
-                var user = userManager?.GetUserById(userInternalId);
-                if (userManager == null || user == null)
-                    return;
-
-                ForceUserSubtitleModeOff(
-                    userManager,
-                    user,
-                    userInternalId,
-                    sessionId,
-                    videoId,
-                    reason,
-                    trackSession: !string.IsNullOrEmpty(sessionId));
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] User subtitle mode force-off failed for {videoId}: {ex.Message}");
-            }
-        }
-
-        internal static void RestoreUserSubtitleMode(long userInternalId, string? sessionId, string videoId, string reason)
-        {
-            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
-                return;
-
-            var queueRestore = false;
-            lock (UserSubtitleModeSync)
-            {
-                if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
-                {
-                    // A late PlaybackStopped from an older/replaced play session
-                    // must never restore the user's normal subtitle policy while
-                    // a newer YouTube playback is still active.
-                    var removed = active.SessionLeases.Remove(sessionId);
-                    if (!removed)
-                        return;
-
-                    if (active.SessionLeases.Count == 0)
-                    {
-                        if (GetPendingPreflightDelay(active, DateTime.UtcNow) > TimeSpan.Zero)
-                        {
-                            queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
-                        }
-                        else if (TryRestoreUserSubtitleMode(userInternalId, active, videoId, reason))
-                        {
-                            UserSubtitleModeOverrides.Remove(userInternalId);
-                        }
-                        else
-                        {
-                            queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
-                        }
-                    }
-                }
-            }
-
-            if (queueRestore)
-                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModeRestoreRetryDelay);
-        }
-
-        internal static void TouchUserSubtitleMode(
-            long userInternalId,
-            string? leaseKey,
-            string? sessionId,
-            string videoId)
-        {
-            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
-                return;
-
-            lock (UserSubtitleModeSync)
-            {
-                if (!UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
-                    return;
-
-                var currentKey = !string.IsNullOrEmpty(leaseKey)
-                                 && active.SessionLeases.ContainsKey(leaseKey)
-                    ? leaseKey
-                    : active.SessionLeases.Keys.FirstOrDefault(key =>
-                        key.StartsWith(sessionId + "|", StringComparison.Ordinal)
-                        && key.EndsWith("|" + videoId, StringComparison.Ordinal));
-                if (string.IsNullOrEmpty(currentKey))
-                    return;
-
-                var now = DateTime.UtcNow;
-                active.SessionLeases[currentKey] = now;
-                active.UpdatedUtc = now;
-            }
-        }
-
-        internal static void ReleaseUserSubtitleModeForSession(
-            long userInternalId,
-            string? sessionId,
-            string reason)
-        {
-            if (userInternalId <= 0 || string.IsNullOrEmpty(sessionId))
-                return;
-
-            var queueRestore = false;
-            lock (UserSubtitleModeSync)
-            {
-                if (!UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
-                    return;
-
-                var sessionPrefix = sessionId + "|";
-                var staleKeys = active.SessionLeases.Keys
-                    .Where(key => key.StartsWith(sessionPrefix, StringComparison.Ordinal))
-                    .ToArray();
-                if (staleKeys.Length == 0)
-                    return;
-
-                foreach (var staleKey in staleKeys)
-                    active.SessionLeases.Remove(staleKey);
-
-                if (active.SessionLeases.Count == 0)
-                {
-                    if (GetPendingPreflightDelay(active, DateTime.UtcNow) > TimeSpan.Zero)
-                    {
-                        queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
-                    }
-                    else if (TryRestoreUserSubtitleMode(userInternalId, active, null, reason))
-                    {
-                        UserSubtitleModeOverrides.Remove(userInternalId);
-                    }
-                    else
-                    {
-                        queueRestore = EnsureUserSubtitleModeRestoreQueued(active);
-                    }
-                }
-            }
-
-            if (queueRestore)
-                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModeRestoreRetryDelay);
-        }
-
-        internal static void RestoreAllUserSubtitleModes(string reason)
-        {
-            lock (UserSubtitleModeSync)
-            {
-                var restores = UserSubtitleModeOverrides.ToList();
-                foreach (var restore in restores)
-                {
-                    if (TryRestoreUserSubtitleMode(restore.Key, restore.Value, null, reason))
-                        UserSubtitleModeOverrides.Remove(restore.Key);
-                }
-            }
-        }
-
-        private static void ForceUserSubtitleModeOffForRequest(IRequest? request, object requestDto, string videoId)
-        {
-            try
-            {
-                var userManager = Plugin.ResolveService<IUserManager>();
-                if (userManager == null)
-                    return;
-
-                var userId = ResolveRequestUserId(request, requestDto);
-                var user = string.IsNullOrEmpty(userId)
-                    ? null
-                    : TryResolveUser(userManager, userId);
-                if (user == null)
-                    return;
-
-                var userInternalId = TryReadLongProperty(user, "InternalId").GetValueOrDefault();
-                if (userInternalId <= 0)
-                    return;
-
-                ForceUserSubtitleModeOff(
-                    userManager,
-                    user,
-                    userInternalId,
-                    sessionId: null,
-                    videoId,
-                    reason: "playbackinfo",
-                    trackSession: false);
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] PlaybackInfo user subtitle mode force-off failed for {videoId}: {ex.Message}");
-            }
-        }
-
-        private static void ForceUserSubtitleModeOff(
-            IUserManager userManager,
-            User user,
-            long userInternalId,
-            string? sessionId,
-            string videoId,
-            string reason,
-            bool trackSession)
-        {
-            if (Volatile.Read(ref _acceptingRequests) == 0)
-                return;
-
-            var queuePendingRestore = false;
-            string? logMessage = null;
-
-            lock (UserSubtitleModeSync)
-            {
-                if (Volatile.Read(ref _acceptingRequests) == 0)
-                    return;
-
-                // Configuration reads/writes and ownership changes are one
-                // transaction. Otherwise an old Stop can restore Smart between
-                // a replacement Start reading None and registering its session.
-                var config = userManager.GetUserConfiguration(user);
-                if (config == null)
-                    return;
-
-                var currentMode = config.SubtitleMode;
-                var currentRememberSubtitleSelections = config.RememberSubtitleSelections;
-                var shouldUpdate = false;
-                var addedSession = false;
-
-                var isNewOverride = !UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active);
-                if (isNewOverride)
-                {
-                    active = new UserSubtitleModeOverride(
-                        currentMode,
-                        currentRememberSubtitleSelections);
-                }
-
-                if (config.SubtitleMode != SubtitlePlaybackMode.None)
-                {
-                    config.SubtitleMode = SubtitlePlaybackMode.None;
-                    shouldUpdate = true;
-                }
-
-                if (config.RememberSubtitleSelections)
-                {
-                    config.RememberSubtitleSelections = false;
-                    shouldUpdate = true;
-                }
-
-                if (shouldUpdate)
-                {
-                    userManager.UpdateConfiguration(user, config);
-                }
-
-                // Publish ownership only after the configuration write succeeds.
-                // A failed write must not leave an override with no running
-                // restore worker.
-                if (isNewOverride)
-                    UserSubtitleModeOverrides[userInternalId] = active!;
-
-                var now = DateTime.UtcNow;
-                active!.UpdatedUtc = now;
-                if (trackSession && !string.IsNullOrEmpty(sessionId))
-                {
-                    // One Emby session has one current player. A replacement
-                    // start supersedes older play-session leases atomically.
-                    var separator = sessionId.IndexOf('|');
-                    var sessionPrefix = separator < 0
-                        ? sessionId + "|"
-                        : sessionId.Substring(0, separator + 1);
-                    foreach (var staleKey in active.SessionLeases.Keys
-                                 .Where(key => key.StartsWith(sessionPrefix, StringComparison.Ordinal))
-                                 .ToArray())
-                    {
-                        active.SessionLeases.Remove(staleKey);
-                    }
-
-                    addedSession = !active.SessionLeases.ContainsKey(sessionId);
-                    active.SessionLeases[sessionId] = now;
-                    if (string.Equals(active.PendingPreflightVideoId, videoId, StringComparison.Ordinal))
-                    {
-                        active.PendingPreflightUtc = null;
-                        active.PendingPreflightVideoId = null;
-                    }
-                }
-                else if (!trackSession)
-                {
-                    active.PendingPreflightUtc = now;
-                    active.PendingPreflightVideoId = videoId;
-                }
-
-                queuePendingRestore = EnsureUserSubtitleModeRestoreQueued(active);
-
-                if (shouldUpdate)
-                    logMessage = $"[YT] User subtitle mode forced off for YouTube video {videoId}. User={userInternalId}, Reason={reason}, PreviousMode={currentMode}, PreviousRemember={currentRememberSubtitleSelections}.";
-                else if (addedSession)
-                    logMessage = $"[YT] User subtitle mode already off for YouTube video {videoId}. User={userInternalId}, Reason={reason}.";
-            }
-
-            if (queuePendingRestore)
-                QueuePendingUserSubtitleModeRestore(userInternalId, UserSubtitleModePendingRestoreDelay);
-
-            if (!string.IsNullOrEmpty(logMessage))
-                YouTubeChannel.LogPublic(logMessage);
-        }
-
-        private static User? TryResolveUser(IUserManager userManager, string userId)
-        {
-            try
-            {
-                if (long.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var internalId))
-                    return userManager.GetUserById(internalId);
-
-                return userManager.GetUserById(userId);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         private static string ResolveRequestUserId(IRequest? request, object requestDto)
         {
             var userId = Normalize(GetStringProperty(requestDto, "UserId"));
@@ -795,8 +452,8 @@ namespace Emby.YouTubePlugin
             // Some native clients authenticate PlaybackInfo but omit UserId
             // from both the DTO and query. Their already registered Emby
             // session still carries the user. Only accept an unambiguous device
-            // match so a shared/reused device id can never mutate the wrong
-            // user's subtitle configuration.
+            // match so a shared/reused device id can never attach the playback
+            // intent to the wrong user.
             var deviceId = Normalize(GetDeviceId(request));
             if (string.IsNullOrEmpty(deviceId))
                 return string.Empty;
@@ -815,188 +472,6 @@ namespace Emby.YouTubePlugin
             return !string.IsNullOrEmpty(candidates[0].UserId)
                 ? candidates[0].UserId
                 : candidates[0].UserInternalId.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static bool EnsureUserSubtitleModeRestoreQueued(UserSubtitleModeOverride active)
-        {
-            if (active.PendingRestoreQueued)
-                return false;
-
-            active.PendingRestoreQueued = true;
-            return true;
-        }
-
-        private static void QueuePendingUserSubtitleModeRestore(long userInternalId, TimeSpan initialDelay)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var delay = initialDelay;
-                    while (delay > TimeSpan.Zero)
-                    {
-                        await Task.Delay(delay).ConfigureAwait(false);
-                        delay = RestoreIdleUserSubtitleMode(
-                            userInternalId,
-                            "playbackinfo timeout");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    YouTubeChannel.LogPublic($"[YT] Pending user subtitle mode restore failed: {ex.Message}");
-                    lock (UserSubtitleModeSync)
-                    {
-                        if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
-                            active.PendingRestoreQueued = false;
-                    }
-                }
-            });
-        }
-
-        private static TimeSpan RestoreIdleUserSubtitleMode(long userInternalId, string reason)
-        {
-            var retryDelay = TimeSpan.Zero;
-            lock (UserSubtitleModeSync)
-            {
-                if (UserSubtitleModeOverrides.TryGetValue(userInternalId, out var active))
-                {
-                    var now = DateTime.UtcNow;
-                    var staleCutoff = now - UserSubtitleModeStaleLeaseTimeout;
-                    foreach (var stale in active.SessionLeases
-                                 .Where(entry => entry.Value <= staleCutoff)
-                                 .Select(entry => entry.Key)
-                                 .ToArray())
-                    {
-                        if (IsUserSubtitleLeaseStillActive(stale))
-                        {
-                            active.SessionLeases[stale] = now;
-                            continue;
-                        }
-
-                        active.SessionLeases.Remove(stale);
-                        YouTubeChannel.LogPublic(
-                            $"[YT] Removed stale YouTube subtitle policy lease. User={userInternalId}, Session={stale}.");
-                    }
-
-                    if (active.SessionLeases.Count > 0)
-                    {
-                        retryDelay = UserSubtitleModeLeaseCheckInterval;
-                    }
-                    else
-                    {
-                        var preflightDelay = GetPendingPreflightDelay(active, now);
-                        if (preflightDelay > TimeSpan.Zero)
-                        {
-                            retryDelay = preflightDelay;
-                        }
-                        else if (TryRestoreUserSubtitleMode(userInternalId, active, null, reason))
-                        {
-                            UserSubtitleModeOverrides.Remove(userInternalId);
-                        }
-                        else
-                        {
-                            retryDelay = UserSubtitleModeRestoreRetryDelay;
-                        }
-                    }
-                }
-            }
-
-            return retryDelay;
-        }
-
-        private static TimeSpan GetPendingPreflightDelay(UserSubtitleModeOverride active, DateTime now)
-        {
-            if (!active.PendingPreflightUtc.HasValue)
-                return TimeSpan.Zero;
-
-            var remaining = UserSubtitleModePendingRestoreDelay - (now - active.PendingPreflightUtc.Value);
-            if (remaining > TimeSpan.Zero)
-                return remaining;
-
-            active.PendingPreflightUtc = null;
-            active.PendingPreflightVideoId = null;
-            return TimeSpan.Zero;
-        }
-
-        private static bool IsUserSubtitleLeaseStillActive(string leaseKey)
-        {
-            try
-            {
-                var firstSeparator = leaseKey.IndexOf('|');
-                var lastSeparator = leaseKey.LastIndexOf('|');
-                if (firstSeparator <= 0 || lastSeparator <= firstSeparator)
-                    return false;
-
-                var sessionId = leaseKey.Substring(0, firstSeparator);
-                var videoId = leaseKey.Substring(lastSeparator + 1);
-                var sessionManager = Plugin.ResolveService<ISessionManager>();
-                var session = sessionManager?.Sessions
-                    .FirstOrDefault(candidate => string.Equals(candidate.Id, sessionId, StringComparison.Ordinal));
-                if (session == null)
-                    return false;
-
-                var currentVideoId = YouTubeImageProvider.TryGetVideoId(session.FullNowPlayingItem);
-                if (!string.IsNullOrEmpty(currentVideoId))
-                    return string.Equals(currentVideoId, videoId, StringComparison.Ordinal);
-
-                // If Emby only exposes the lightweight DTO, resolve its item id
-                // through the same strict plugin-item check.
-                var itemId = session.NowPlayingItem?.Id;
-                var library = Plugin.ResolveService<ILibraryManager>();
-                var item = library == null || string.IsNullOrEmpty(itemId)
-                    ? null
-                    : ResolveBaseItem(library, itemId);
-                currentVideoId = YouTubeImageProvider.TryGetVideoId(item);
-                return string.Equals(currentVideoId, videoId, StringComparison.Ordinal);
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] Subtitle policy lease liveness check failed: {ex.Message}");
-                return false;
-            }
-        }
-
-        private static bool TryRestoreUserSubtitleMode(
-            long userInternalId,
-            UserSubtitleModeOverride restore,
-            string? videoId,
-            string reason)
-        {
-            try
-            {
-                var userManager = Plugin.ResolveService<IUserManager>();
-                var user = userManager?.GetUserById(userInternalId);
-                if (userManager == null || user == null)
-                    return false;
-
-                var config = userManager.GetUserConfiguration(user);
-                if (config == null)
-                    return false;
-
-                var currentMode = config.SubtitleMode;
-                var currentRememberSubtitleSelections = config.RememberSubtitleSelections;
-                if (currentMode == SubtitlePlaybackMode.None
-                    && !currentRememberSubtitleSelections)
-                {
-                    config.SubtitleMode = restore.OriginalMode;
-                    config.RememberSubtitleSelections = restore.OriginalRememberSubtitleSelections;
-                    userManager.UpdateConfiguration(user, config);
-                    YouTubeChannel.LogPublic(
-                        $"[YT] User subtitle mode restored after YouTube playback. User={userInternalId}, Reason={reason}, Mode={restore.OriginalMode}, Remember={restore.OriginalRememberSubtitleSelections}, Video={videoId ?? "unknown"}.");
-                }
-                else
-                {
-                    YouTubeChannel.LogPublic(
-                        $"[YT] User subtitle mode restore skipped because the user setting changed. User={userInternalId}, Reason={reason}, CurrentMode={currentMode}, CurrentRemember={currentRememberSubtitleSelections}, Video={videoId ?? "unknown"}.");
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                YouTubeChannel.LogPublic($"[YT] User subtitle mode restore failed for {videoId ?? "unknown"}: {ex.Message}");
-                return false;
-            }
         }
 
         private static void CapturePlaybackInfoPostfix(object __instance, object __0, ref Task<object> __result)
@@ -1111,8 +586,14 @@ namespace Emby.YouTubePlugin
                 // library items whose stored media source isn't a clean watch URL.
                 var youTubeVideoId = TryResolveYouTubeVideoId(context.ItemId);
                 var captionTracks = string.IsNullOrEmpty(youTubeVideoId)
+                                    || context.IsLikelyNativeAndroid
                     ? Array.Empty<YouTubeCaptionTrackMetadata>()
-                    : await YouTubeCaptionMetadata.GetTracksAsync(youTubeVideoId).ConfigureAwait(false);
+                    : await YouTubeCaptionMetadata.GetTracksWithBudgetAsync(
+                            youTubeVideoId,
+                            context.IsPlayback
+                                ? TimeSpan.FromSeconds(3)
+                                : TimeSpan.FromMilliseconds(1500))
+                        .ConfigureAwait(false);
                 var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context, captionTracks);
                 if (normalized.Changed > 0)
                     LogPlaybackInfoNormalization(context, normalized);
@@ -1393,16 +874,22 @@ namespace Emby.YouTubePlugin
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresClosing", false);
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresLooping", false);
 
-                // Expose only virtual caption metadata. The player receives the
-                // selected language code; no timed-text URL or caption payload
-                // is returned to Emby.
-                mediaSourceChanged |= SetYouTubeCaptionStreams(mediaSource, captionTracks);
+                // Expose only virtual caption metadata to clients whose player
+                // actually implements subtitle selection. Emby's native Android
+                // YouTube player ships an empty setSubtitleStreamIndex method;
+                // showing tracks there would create a selector that cannot work.
+                // No timed-text URL or caption payload is returned to Emby.
+                var exposedCaptionTracks = context.IsLikelyNativeAndroid
+                    ? Array.Empty<YouTubeCaptionTrackMetadata>()
+                    : captionTracks;
+                mediaSourceChanged |= SetYouTubeCaptionStreams(mediaSource, exposedCaptionTracks);
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStream");
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStreamIndex");
                 mediaSourceChanged |= SetNumberProperty(
                     mediaSource,
                     "DefaultSubtitleStreamIndex",
-                    context.RequestedSubtitleStreamIndex >= 10_000
+                    !context.IsLikelyNativeAndroid
+                    && context.RequestedSubtitleStreamIndex >= 10_000
                         ? context.RequestedSubtitleStreamIndex
                         : -1);
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "VideoStream");

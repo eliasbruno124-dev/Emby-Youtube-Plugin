@@ -53,17 +53,19 @@ namespace Emby.YouTubePlugin
                 ?.SetValue(mediaSource, false);
         }
 
-        private static List<ChannelItemInfo> ExtractTrendingVideos(JsonDocument doc)
+        private static List<ChannelItemInfo> ExtractTrendingVideos(
+            JsonDocument doc,
+            string? effectiveRegion = null)
         {
             var list = new List<ChannelItemInfo>();
             if (!doc.RootElement.TryGetProperty("items", out var items)
                 || items.ValueKind != JsonValueKind.Array)
                 return list;
 
-            // Use the API's region metadata instead of probing the watch page.
-            // We only do this when the user actually picked a region —
-            // otherwise we'd be guessing where the server is.
-            var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
+            // Use the same validated region as the request itself. Keeping the
+            // effective value explicit prevents an unsupported saved code from
+            // disagreeing with the API's default/US fallback.
+            var serverRegion = (effectiveRegion ?? string.Empty).Trim();
 
             foreach (var el in items.EnumerateArray())
             {

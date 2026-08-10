@@ -41,7 +41,6 @@ namespace Emby.YouTubePlugin
             List<ChannelItemInfo> items, string apiKey, PluginConfiguration config, CancellationToken ct)
         {
             var playlistIds = SplitConfiguredItems(config.WatchLaterPlaylist)
-                .Where(s => s.Length > 2)
                 .Distinct(StringComparer.Ordinal)
                 .ToList();
 
@@ -49,17 +48,28 @@ namespace Emby.YouTubePlugin
             {
                 ct.ThrowIfCancellationRequested();
                 var playlistId = playlistIds[index];
+                if (IsPrivateWatchLaterPlaylistId(playlistId))
+                {
+                    Log($"[YT] Skipping unsupported private Watch Later playlist: {playlistId}");
+                    continue;
+                }
+                if (!IsSupportedPublicPlaylistId(playlistId))
+                {
+                    Log($"[YT] Skipping unsupported auto-refreshed playlist ID: {playlistId}");
+                    continue;
+                }
+
                 var details = await YouTubeApi.GetPlaylistDetailsAsync(apiKey, playlistId, ct)
                     .ConfigureAwait(false);
-                if (details.videoCount <= 0)
+                if (details.lookupSucceeded && details.videoCount <= 0)
                 {
-                    Log($"[YT] Skipping empty Watch Later playlist folder: {playlistId}");
+                    Log($"[YT] Skipping empty auto-refreshed playlist folder: {playlistId}");
                     continue;
                 }
 
                 var displayName = playlistIds.Count == 1
-                    ? "\u2B50 " + (details.name ?? "Watch Later")
-                    : "\u2B50 " + (details.name ?? $"Watch Later {index + 1}");
+                    ? "\u2B50 " + (details.name ?? "Auto-refreshed playlist")
+                    : "\u2B50 " + (details.name ?? $"Auto-refreshed playlist {index + 1}");
 
                 items.Add(Folder(
                     displayName,
@@ -75,7 +85,7 @@ namespace Emby.YouTubePlugin
             {
                 ct.ThrowIfCancellationRequested();
 
-                if (term.StartsWith(HandlePrefix))
+                if (IsSupportedHandle(term))
                 {
                     Log($"[YT] Loading handle: {term}");
                     var details = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, true, ct)
@@ -86,7 +96,7 @@ namespace Emby.YouTubePlugin
                         $"channel{FolderSeparator}{details.id ?? term}",
                         details.thumb));
                 }
-                else if (term.StartsWith(ChannelIdPrefix) && term.Length > MinChannelIdLength)
+                else if (IsSupportedChannelId(term))
                 {
                     var details = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, false, ct)
                         .ConfigureAwait(false);
@@ -95,11 +105,15 @@ namespace Emby.YouTubePlugin
                         $"channel{FolderSeparator}{term}",
                         details.thumb));
                 }
-                else if (term.StartsWith(PlaylistPrefix))
+                else if (IsPrivateWatchLaterPlaylistId(term))
+                {
+                    Log($"[YT] Skipping unsupported private Watch Later playlist: {term}");
+                }
+                else if (IsSupportedPublicPlaylistId(term))
                 {
                     var details = await YouTubeApi.GetPlaylistDetailsAsync(apiKey, term, ct)
                         .ConfigureAwait(false);
-                    if (details.videoCount <= 0)
+                    if (details.lookupSucceeded && details.videoCount <= 0)
                     {
                         Log($"[YT] Skipping empty saved playlist folder: {term}");
                         continue;
@@ -109,6 +123,10 @@ namespace Emby.YouTubePlugin
                         details.name ?? "Playlist",
                         $"playlist{FolderSeparator}{term}",
                         details.thumb));
+                }
+                else if (HasReservedResourcePrefix(term))
+                {
+                    Log($"[YT] Skipping malformed or unsupported configured YouTube ID: {term}");
                 }
                 else
                 {
@@ -153,6 +171,10 @@ namespace Emby.YouTubePlugin
                 if (!string.IsNullOrEmpty(details.id))
                     resolvedChannelId = details.id!;
             }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 Log($"[YT] Channel details lookup failed for {term}: {ex.Message}");
@@ -160,11 +182,12 @@ namespace Emby.YouTubePlugin
 
             var includeShorts = config.ShortsEnabled
                 && await ChannelHasShortsAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
+            var includeLive = await ChannelHasLiveAsync(apiKey, resolvedChannelId, ct).ConfigureAwait(false);
 
             // If the channel would only have a single "Videos" subfolder, skip the
             // wrapper level and return the videos directly so users don't have to
             // click through an empty parent folder containing one child.
-            if (!includeShorts)
+            if (!includeShorts && !includeLive)
             {
                 return await LoadMediaFolderAsync(apiKey, config, "channelvideos", resolvedChannelId, ct)
                     .ConfigureAwait(false);
@@ -175,15 +198,28 @@ namespace Emby.YouTubePlugin
             if (includeShorts)
                 items.Add(Folder("⚡ Shorts", $"channelshorts{FolderSeparator}{resolvedChannelId}", channelThumb ?? FolderIcons.Shorts));
 
+            if (includeLive)
+            {
+                items.Add(Folder(
+                    "🔴 Live & Upcoming",
+                    $"channellive{FolderSeparator}{resolvedChannelId}",
+                    channelThumb ?? FolderIcons.Live));
+            }
+
             return ToResult(items);
         }
 
         private static async Task<ChannelItemResult> LoadCategoryRootAsync(
             string apiKey, PluginConfiguration config, CancellationToken ct)
         {
-            var region = string.IsNullOrWhiteSpace(config.TrendingRegion)
+            var configuredRegion = string.IsNullOrWhiteSpace(config.TrendingRegion)
                 ? "US"
                 : config.TrendingRegion.Trim();
+            var region = await YouTubeApi.ResolveContentRegionAsync(
+                apiKey,
+                configuredRegion,
+                "US",
+                ct).ConfigureAwait(false) ?? "US";
 
             var candidates = await GetAssignableCategoriesAsync(apiKey, region, ct)
                 .ConfigureAwait(false);
@@ -250,7 +286,7 @@ namespace Emby.YouTubePlugin
                         .ConfigureAwait(false);
                     if (doc == null) return;
 
-                    var videos = ExtractTrendingVideos(doc);
+                    var videos = ExtractTrendingVideos(doc, region);
                     if (videos.Count == 0) return;
 
                     // When Shorts are off, run the same local URL probe we use
@@ -259,12 +295,17 @@ namespace Emby.YouTubePlugin
                     if (!showShorts)
                     {
                         try { await ApplyShortsProbeUpgradeAsync(videos, ct).ConfigureAwait(false); }
+                        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
                         catch { /* probe can fail, no big deal */ }
                         videos.RemoveAll(v => v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));
                     }
 
                     if (videos.Count > 0)
                         nonEmpty.TryAdd(category.id, 1);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -277,6 +318,7 @@ namespace Emby.YouTubePlugin
             });
 
             try { await Task.WhenAll(probes).ConfigureAwait(false); }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
             catch (Exception ex) { Log($"[YT] Category probes failed: {ex.Message}"); }
 
             return nonEmpty;

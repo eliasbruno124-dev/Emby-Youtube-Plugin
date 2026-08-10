@@ -17,10 +17,10 @@ namespace Emby.YouTubePlugin
     public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages, IHasThumbImage
     {
         private static readonly string PluginVersion =
-            typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+            typeof(Plugin).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.0";
 
         public override string Name => "YouTube";
-        public override string Description => $"Official YouTube integration for Emby via YouTube Data API v3. (v{PluginVersion})";
+        public override string Description => $"YouTube channel integration for Emby using the YouTube Data API v3. (v{PluginVersion})";
         public override Guid Id => Guid.Parse("B2C3D4E5-F6A7-4B5C-9D0E-1F2A3B4C5D6E");
 
         public static Plugin? Instance { get; private set; }
@@ -198,6 +198,8 @@ namespace Emby.YouTubePlugin
             config.SavedItems = (config.SavedItems ?? string.Empty).Trim();
             config.WatchLaterPlaylist = (config.WatchLaterPlaylist ?? string.Empty).Trim();
             config.TrendingRegion = (config.TrendingRegion ?? string.Empty).Trim().ToUpperInvariant();
+            if (config.TrendingRegion.Length > 0 && !IsRegionCodeShape(config.TrendingRegion))
+                config.TrendingRegion = string.Empty;
             config.TrendingCategory = (config.TrendingCategory ?? string.Empty).Trim();
             if (config.TrendingCategory == "0")
                 config.TrendingCategory = string.Empty;
@@ -228,6 +230,11 @@ namespace Emby.YouTubePlugin
                 _ => "date"
             };
         }
+
+        private static bool IsRegionCodeShape(string value) =>
+            value.Length == 2
+            && value[0] is >= 'A' and <= 'Z'
+            && value[1] is >= 'A' and <= 'Z';
 
         private static void SetStringPropertyIfExists(object target, string propertyName, string value)
         {

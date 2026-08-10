@@ -46,7 +46,13 @@ namespace Emby.YouTubePlugin
 
         private static HttpClient CreateImageHttp()
         {
-            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            var client = new HttpClient(
+                YouTubeHttpClientFactory.CreateHandler(
+                    allowAutoRedirect: true,
+                    automaticDecompression: System.Net.DecompressionMethods.All))
+            {
+                Timeout = TimeSpan.FromSeconds(15)
+            };
             // i.ytimg.com sometimes hands back a tiny placeholder when the
             // request doesn't look like a browser. A real User-Agent fixes that.
             client.DefaultRequestHeaders.TryAddWithoutValidation(
@@ -131,7 +137,11 @@ namespace Emby.YouTubePlugin
                     response.Stream = new MemoryStream(bytes, writable: false);
                     return response;
                 }
-                catch (OperationCanceledException) { throw; }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+                catch (OperationCanceledException ex)
+                {
+                    Debug.WriteLine($"[YouTubeImageProvider] Thumbnail fetch timed out for {url}: {ex.Message}");
+                }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[YouTubeImageProvider] Thumbnail fetch failed for {url}: {ex.Message}");
@@ -208,21 +218,30 @@ namespace Emby.YouTubePlugin
         {
             var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
-
-            response.EnsureSuccessStatusCode();
-
-            return new HttpResponseInfo(new IDisposable[] { response })
+            try
             {
-                Content = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
-                ContentLength = response.Content.Headers.ContentLength,
-                ContentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg",
-                ResponseUrl = url,
-                StatusCode = response.StatusCode,
-                Headers = response.Headers.ToDictionary(
-                    h => h.Key,
-                    h => string.Join(",", h.Value),
-                    StringComparer.OrdinalIgnoreCase)
-            };
+                response.EnsureSuccessStatusCode();
+
+                return new HttpResponseInfo(new IDisposable[] { response })
+                {
+                    Content = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false),
+                    ContentLength = response.Content.Headers.ContentLength,
+                    ContentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg",
+                    ResponseUrl = url,
+                    StatusCode = response.StatusCode,
+                    Headers = response.Headers.ToDictionary(
+                        h => h.Key,
+                        h => string.Join(",", h.Value),
+                        StringComparer.OrdinalIgnoreCase)
+                };
+            }
+            catch
+            {
+                // HttpResponseInfo owns the response only after a successful
+                // return. Dispose every exceptional path here.
+                response.Dispose();
+                throw;
+            }
         }
 
         public bool HasChanged(BaseItem item, LibraryOptions libraryOptions, IDirectoryService directoryService)

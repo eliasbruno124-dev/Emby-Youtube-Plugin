@@ -86,6 +86,7 @@ namespace Emby.YouTubePlugin
                             c.item.Name = $"▶ Short: {c.item.Name}";
                     }
                 }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
                 catch { /* probe can fail, no big deal */ }
                 finally { sem.Release(); }
             })).ConfigureAwait(false);
@@ -113,8 +114,7 @@ namespace Emby.YouTubePlugin
         private static async Task EnrichBatch(
             string apiKey, List<ChannelItemInfo> batch, List<string> videoIds,
             CancellationToken ct,
-            HashSet<string>? knownShortsIds = null,
-            HashSet<string>? knownLiveIds = null)
+            HashSet<string>? knownShortsIds = null)
         {
             // Remember which IDs YouTube actually returned. If a successful
             // request does not return an ID, the video is gone for this key/region
@@ -132,6 +132,12 @@ namespace Emby.YouTubePlugin
             var queriedIds = new HashSet<string>(StringComparer.Ordinal);
             try
             {
+                var serverRegion = await YouTubeApi.ResolveContentRegionAsync(
+                    apiKey,
+                    Plugin.Instance?.Options.TrendingRegion,
+                    null,
+                    ct).ConfigureAwait(false);
+
                 // YouTube caps videos.list at 50 IDs per request.
                 for (int i = 0; i < videoIds.Count; i += 50)
                 {
@@ -237,7 +243,6 @@ namespace Emby.YouTubePlugin
 
                             // Region checks only kick in if the user actually picked
                             // a region — otherwise we'd be guessing.
-                            var serverRegion = (Plugin.Instance?.Options.TrendingRegion ?? "").Trim();
                             if (!string.IsNullOrEmpty(serverRegion)
                                 && cdEl.ValueKind == JsonValueKind.Object
                                 && cdEl.TryGetProperty("regionRestriction", out var rrEl)
@@ -352,27 +357,25 @@ namespace Emby.YouTubePlugin
                                 batchItem.ProductionYear = premiere.Value.Year;
                             }
 
-                            // Live status. Prefer the local /streams page result when
-                            // we have it (zero quota, also catches scheduled premieres).
-                            // Otherwise fall back to liveStreamingDetails from the same
-                            // videos.list response we already paid for.
-                            bool flaggedLiveByList = knownLiveIds != null
-                                && knownLiveIds.Contains(rawId);
-                            if (flaggedLiveByList && !batchItem.Id.StartsWith(LivePrefix))
+                            // Reconcile the lightweight listing with the current
+                            // video details. This also removes a stale LIVE_ prefix
+                            // after a broadcast has ended.
+                            var isLiveOrUpcoming = IsLiveOrUpcomingVideo(detail);
+                            if (isLiveOrUpcoming)
                             {
-                                batchItem.Name = $"🔴 LIVE: {batchItem.Name}";
-                                batchItem.Id = LivePrefix + rawId;
-                            }
-                            else if (detail.TryGetProperty("liveStreamingDetails", out var lsd))
-                            {
-                                var concurrentViewers = YouTubeApi.GetString(lsd, "concurrentViewers");
-                                if (!string.IsNullOrEmpty(concurrentViewers)
-                                    && !batchItem.Id.StartsWith(LivePrefix))
+                                if (!batchItem.Id.StartsWith(LivePrefix, StringComparison.Ordinal))
                                 {
-                                    // Currently live.
-                                    batchItem.Name = $"🔴 LIVE: {batchItem.Name}";
+                                    batchItem.Name = $"🔴 LIVE: {RemoveLivePrefix(batchItem.Name)}";
                                     batchItem.Id = LivePrefix + rawId;
                                 }
+                                batchItem.RunTimeTicks = null;
+                                batchItem.MediaSources = MakeMediaSources(rawId, true);
+                            }
+                            else if (batchItem.Id.StartsWith(LivePrefix, StringComparison.Ordinal))
+                            {
+                                batchItem.Id = rawId;
+                                batchItem.Name = RemoveLivePrefix(batchItem.Name);
+                                batchItem.MediaSources = MakeMediaSources(rawId, false);
                             }
 
                             // Audio language hint for the watch URL.
@@ -382,13 +385,20 @@ namespace Emby.YouTubePlugin
                             // Cache the enriched metadata so later folder loads are cheap.
                             MetaCache[batchItem.Id] = new VideoMeta(
                                 overview, premiere, premiere?.Year,
-                                ts?.Ticks, batchItem.ImageUrl, DateTime.UtcNow, origLang);
+                                isLiveOrUpcoming ? null : ts?.Ticks,
+                                batchItem.ImageUrl,
+                                DateTime.UtcNow,
+                                origLang);
                         }
                     }
                 }
 
                 EvictExpiredMetaCache();
                 PersistShortsProbeCache();
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -414,6 +424,35 @@ namespace Emby.YouTubePlugin
                     });
                 }
             }
+        }
+
+        private static bool IsLiveOrUpcomingVideo(JsonElement detail)
+        {
+            var broadcastState = YouTubeApi.GetNestedString(detail, "snippet", "liveBroadcastContent");
+            if (string.Equals(broadcastState, "live", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(broadcastState, "upcoming", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (string.Equals(broadcastState, "none", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (!detail.TryGetProperty("liveStreamingDetails", out var liveDetails)
+                || liveDetails.ValueKind != JsonValueKind.Object)
+                return false;
+
+            if (!string.IsNullOrEmpty(YouTubeApi.GetString(liveDetails, "actualEndTime")))
+                return false;
+
+            return !string.IsNullOrEmpty(YouTubeApi.GetString(liveDetails, "concurrentViewers"))
+                || !string.IsNullOrEmpty(YouTubeApi.GetString(liveDetails, "scheduledStartTime"))
+                || !string.IsNullOrEmpty(YouTubeApi.GetString(liveDetails, "actualStartTime"));
+        }
+
+        private static string RemoveLivePrefix(string value)
+        {
+            const string prefix = "🔴 LIVE: ";
+            return value.StartsWith(prefix, StringComparison.Ordinal)
+                ? value.Substring(prefix.Length)
+                : value;
         }
 
         private static void ApplyCachedMeta(List<ChannelItemInfo> batch)

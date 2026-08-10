@@ -7,7 +7,6 @@ namespace Emby.YouTubePlugin
     {
         private const string ChannelIdPrefix = "UC";
         private const int MinChannelIdLength = 20;
-        private const string PlaylistPrefix = "PL";
         private const string HandlePrefix = "@";
         private const string FolderSeparator = "_x_";
         private const int MaxMetaCacheEntries = 2000;
@@ -21,10 +20,13 @@ namespace Emby.YouTubePlugin
         private static readonly ConcurrentDictionary<string, ShortsPageCacheEntry> ShortsPageCache = new(StringComparer.Ordinal);
         private static readonly TimeSpan MetaCacheTtl = TimeSpan.FromDays(365);
         private static readonly TimeSpan ShortsPageCacheTtl = TimeSpan.FromHours(6);
-        private static readonly TimeSpan ShortsPageEmptyCacheTtl = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan ShortsPageEmptyCacheTtl = TimeSpan.FromMinutes(30);
         private static readonly TimeSpan NegativeCacheTtl = TimeSpan.FromHours(1);
 
         private sealed record ShortsPageCacheEntry(System.Collections.Generic.HashSet<string> VideoIds, DateTime CachedAt);
+        private sealed record ChannelPageProbeResult(
+            System.Collections.Generic.HashSet<string> VideoIds,
+            bool LookupSucceeded);
 
         // Backwards-compatible no-op kept for callers that still invoke it.
         // Cross-folder dedup used to live here, but the seen set was never
@@ -39,6 +41,42 @@ namespace Emby.YouTubePlugin
             if (id.StartsWith(ReelPrefix, StringComparison.Ordinal)) return id.Substring(ReelPrefix.Length);
             return id;
         }
+
+        internal static bool IsSupportedPublicPlaylistId(string value) =>
+            value.Length > MinChannelIdLength
+            && (value.StartsWith("PL", StringComparison.Ordinal)
+                || value.StartsWith("UU", StringComparison.Ordinal)
+                || value.StartsWith("OL", StringComparison.Ordinal))
+            && HasResourceIdCharacters(value);
+
+        private static bool IsSupportedChannelId(string value) =>
+            value.Length == 24
+            && value.StartsWith(ChannelIdPrefix, StringComparison.Ordinal)
+            && HasResourceIdCharacters(value);
+
+        private static bool IsSupportedHandle(string value) =>
+            value.Length > 1
+            && value.StartsWith(HandlePrefix, StringComparison.Ordinal)
+            && value.Skip(1).All(character => !char.IsWhiteSpace(character));
+
+        private static bool HasResourceIdCharacters(string value) =>
+            value.All(character =>
+                character is >= 'A' and <= 'Z'
+                || character is >= 'a' and <= 'z'
+                || character is >= '0' and <= '9'
+                || character == '_'
+                || character == '-');
+
+        private static bool IsPrivateWatchLaterPlaylistId(string value) =>
+            value.StartsWith("WL", StringComparison.Ordinal);
+
+        private static bool HasReservedResourcePrefix(string value) =>
+            value.StartsWith(ChannelIdPrefix, StringComparison.Ordinal)
+            || value.StartsWith("PL", StringComparison.Ordinal)
+            || value.StartsWith("UU", StringComparison.Ordinal)
+            || value.StartsWith("OL", StringComparison.Ordinal)
+            || value.StartsWith("WL", StringComparison.Ordinal)
+            || value.StartsWith(HandlePrefix, StringComparison.Ordinal);
 
         private const string LivePrefix = "LIVE_";
         private const string ReelPrefix = "REEL_";

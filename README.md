@@ -77,7 +77,7 @@ The **My YouTube Content** field accepts:
 - Playlist IDs starting with `PL...`
 - Plain search text
 
-Handles, channel IDs, and playlist IDs are the best options because they use cheap API calls. Plain search text works too, but it uses YouTube's expensive `search.list` endpoint.
+Handles, channel IDs, and playlist IDs are the best options because they avoid the separate daily `search.list` limit. Plain search text works too, but each result page uses one Search Queries call.
 
 The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes its own top-level folder and can be checked regularly for new videos.
 
@@ -104,9 +104,11 @@ Most browsing uses low-cost YouTube API endpoints:
 | Playlist videos | `playlistItems.list` | 1 unit |
 | Video details | `videos.list` | 1 unit per batch |
 | Categories | `videoCategories.list` | 1 unit |
-| Search folders | `search.list` | 100 units |
+| Search folders | `search.list` | 1 Search Queries call |
 
-The plugin caches responses on disk. Search results are cached longer because search is the most expensive operation.
+The plugin caches responses on disk. Search results are cached longer because
+`search.list` has a separate default limit of 100 calls per day, while most
+other endpoints share the regular 10,000-unit daily bucket.
 
 ## Notes
 
@@ -117,17 +119,19 @@ The plugin caches responses on disk. Search results are cached longer because se
   selecting the "original" audio track. For signed-in YouTube players, add the
   languages you normally watch under YouTube's **Preferred languages** setting;
   YouTube then keeps original audio when it matches one of those languages.
-- YouTube subtitles are requested as off at Emby's request, media-source, and
-  user-policy layers. The plugin reads only the caption language/name metadata
-  from YouTube's watch-page player response and exposes those virtual tracks in
-  Emby's subtitle selector; it never requests a timed-text URL or caption
-  payload. In the server web player, choosing a track initializes the same
-  YouTube IFrame with `cc_load_policy=1` and `cc_lang_pref=<language>`, while
-  **Off** keeps captions disabled. YouTube still renders every caption. The web
-  player also keeps YouTube's own controls visible, including its per-video
-  **Audio track** menu when available. Native Emby apps ship their own player
-  code; they can display the server-provided track metadata, but the app must
-  forward its selection to YouTube for it to take effect.
+- The plugin reads only caption language/name metadata from YouTube's watch-page
+  response and exposes selectable virtual tracks only to clients whose YouTube
+  player implements the selection bridge; it never requests timed-text URLs or
+  caption payloads. In the patched server web players, choosing a track rebuilds
+  the official YouTube IFrame with `cc_load_policy=1` and
+  `cc_lang_pref=<language>`. Choosing **Off** rebuilds without a forced caption
+  language; YouTube's documented default can still follow the viewer's caption
+  preference, so absolute suppression cannot be guaranteed. Selected captions
+  are rendered by YouTube. Native Android is intentionally not offered virtual
+  caption tracks because its bundled player does not forward subtitle
+  selections; supporting them requires a client-side app change. YouTube's own
+  **Audio track** menu is available only where the client exposes YouTube's
+  controls.
 - Private YouTube account data is not supported. Use playlists that your API key can read.
 - If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
 

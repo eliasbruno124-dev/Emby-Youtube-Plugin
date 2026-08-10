@@ -36,13 +36,9 @@ namespace Emby.YouTubePlugin
 
         private static HttpClient CreateShortsHttp()
         {
-            var handler = new SocketsHttpHandler
-            {
-                AllowAutoRedirect = true,
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-                ConnectTimeout = TimeSpan.FromSeconds(10),
-                PooledConnectionLifetime = TimeSpan.FromMinutes(10)
-            };
+            var handler = YouTubeHttpClientFactory.CreateHandler(
+                allowAutoRedirect: true,
+                automaticDecompression: DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli);
 
             var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
             client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", ShortsBrowserUserAgent);
@@ -62,13 +58,9 @@ namespace Emby.YouTubePlugin
 
         private static HttpClient CreateShortsProbeHttp()
         {
-            var handler = new SocketsHttpHandler
-            {
-                AllowAutoRedirect = false,
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-                ConnectTimeout = TimeSpan.FromSeconds(10),
-                PooledConnectionLifetime = TimeSpan.FromMinutes(10)
-            };
+            var handler = YouTubeHttpClientFactory.CreateHandler(
+                allowAutoRedirect: false,
+                automaticDecompression: DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli);
             var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(10) };
             client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", ShortsBrowserUserAgent);
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -193,11 +185,24 @@ namespace Emby.YouTubePlugin
                         .ConfigureAwait(false);
                 }
 
-                var isShort = result ?? false;
+                if (!result.HasValue)
+                {
+                    // A consent/login/block response is not evidence either
+                    // way. Treat it as regular for this one folder build, but
+                    // do not poison the 24-hour cache with a guessed false.
+                    Log($"[YT] Shorts URL probe for {videoId}: ambiguous response, not cached");
+                    return false;
+                }
+
+                var isShort = result.Value;
                 ShortsUrlProbeCache[videoId] = (isShort, DateTime.UtcNow);
                 Log($"[YT] Shorts URL probe for {videoId}: isShort={isShort}");
                 EvictShortsUrlProbeCache();
                 return isShort;
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -211,8 +216,8 @@ namespace Emby.YouTubePlugin
         //   expectShorts=true  → starting URL is /shorts/<id>;
         //                        200 means Short, redirect to /watch means not.
         //   expectShorts=false → starting URL is /watch?v=<id>;
-        //                        redirect to /shorts means Short, anything else
-        //                        (200 on /watch, redirect to consent) means not.
+        //                        redirect to /shorts means Short, 200 on /watch
+        //                        means regular, unrelated redirects are unclear.
         private static async Task<bool?> ProbeShortsRedirectAsync(string url, bool expectShorts, CancellationToken ct)
         {
             using var req = new HttpRequestMessage(HttpMethod.Head, url);
@@ -240,13 +245,17 @@ namespace Emby.YouTubePlugin
             }
             else
             {
+                if (status == 200) return false;
                 if (status >= 300 && status < 400)
                 {
                     var loc = resp.Headers.Location?.ToString() ?? "";
                     if (loc.Contains("/shorts/", StringComparison.OrdinalIgnoreCase))
                         return true;
+                    if (loc.Contains("/watch", StringComparison.OrdinalIgnoreCase))
+                        return false;
+                    return null;
                 }
-                return false;
+                return null;
             }
         }
 
@@ -274,14 +283,20 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static async Task<HashSet<string>> GetChannelShortVideoIdsAsync(string channelId, CancellationToken cancellationToken)
+        private static async Task<ChannelPageProbeResult> GetChannelShortVideoIdsAsync(
+            string channelId,
+            CancellationToken cancellationToken)
         {
             if (!IsChannelId(channelId))
-                return new HashSet<string>(StringComparer.Ordinal);
+                return new ChannelPageProbeResult(new HashSet<string>(StringComparer.Ordinal), true);
 
             if (ShortsPageCache.TryGetValue(channelId, out var cached)
                 && (DateTime.UtcNow - cached.CachedAt) < (cached.VideoIds.Count == 0 ? ShortsPageEmptyCacheTtl : ShortsPageCacheTtl))
-                return new HashSet<string>(cached.VideoIds, StringComparer.Ordinal);
+            {
+                return new ChannelPageProbeResult(
+                    new HashSet<string>(cached.VideoIds, StringComparer.Ordinal),
+                    true);
+            }
 
             var ids = new HashSet<string>(StringComparer.Ordinal);
 
@@ -290,16 +305,19 @@ namespace Emby.YouTubePlugin
                 var url = $"https://www.youtube.com/channel/{channelId}/shorts";
                 var html = await GetShortsPageHtmlAsync(url, cancellationToken).ConfigureAwait(false);
                 var usedExternalFallback = false;
-                if (!HasShortsMarkers(html))
+                if (!IsUsableShortsPage(html))
                 {
                     var fallbackHtml = await TryGetShortsPageHtmlWithExternalToolAsync(url, cancellationToken)
                         .ConfigureAwait(false);
-                    if (!string.IsNullOrEmpty(fallbackHtml))
+                    if (IsUsableShortsPage(fallbackHtml))
                     {
-                        html = fallbackHtml;
+                        html = fallbackHtml!;
                         usedExternalFallback = true;
                     }
                 }
+
+                if (!IsUsableShortsPage(html))
+                    throw new InvalidOperationException("YouTube returned a consent, block, or incomplete Shorts page.");
 
                 foreach (Match match in ShortsVideoIdRegex.Matches(html))
                 {
@@ -324,22 +342,37 @@ namespace Emby.YouTubePlugin
                 {
                     Log($"[YT] Shorts page probe for {channelId}: {ids.Count} ids (externalFallback={usedExternalFallback})");
                 }
+
+                return new ChannelPageProbeResult(ids, true);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception ex)
             {
                 Log($"[YT] Shorts page probe failed for {channelId}: {ex.Message}");
                 if (ShortsPageCache.TryGetValue(channelId, out var stale))
-                    return new HashSet<string>(stale.VideoIds, StringComparer.Ordinal);
+                {
+                    return new ChannelPageProbeResult(
+                        new HashSet<string>(stale.VideoIds, StringComparer.Ordinal),
+                        false);
+                }
+                return new ChannelPageProbeResult(ids, false);
             }
-
-            return ids;
         }
 
-        private static bool HasShortsMarkers(string html) =>
-            html.IndexOf("\"videoId\":\"", StringComparison.Ordinal) >= 0
-            || html.IndexOf("\\\"videoId\\\":\\\"", StringComparison.Ordinal) >= 0
-            || html.IndexOf("/shorts/", StringComparison.Ordinal) >= 0
-            || html.IndexOf("\\/shorts\\/", StringComparison.Ordinal) >= 0;
+        private static bool IsUsableShortsPage(string? html)
+        {
+            if (string.IsNullOrWhiteSpace(html) || html.Length < 512)
+                return false;
+
+            return html.IndexOf("ytInitialData", StringComparison.Ordinal) >= 0
+                && (html.IndexOf("channelMetadataRenderer", StringComparison.Ordinal) >= 0
+                    || html.IndexOf("tabRenderer", StringComparison.Ordinal) >= 0
+                    || html.IndexOf("reelItemRenderer", StringComparison.Ordinal) >= 0
+                    || html.IndexOf("shortsLockupViewModel", StringComparison.Ordinal) >= 0);
+        }
 
         private static async Task<string> GetShortsPageHtmlAsync(string url, CancellationToken cancellationToken)
         {
@@ -365,8 +398,12 @@ namespace Emby.YouTubePlugin
                 try
                 {
                     var html = await RunShortsFetchToolAsync(tool, url, cancellationToken).ConfigureAwait(false);
-                    if (!string.IsNullOrWhiteSpace(html) && HasShortsMarkers(html))
+                    if (!string.IsNullOrWhiteSpace(html))
                         return html;
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -410,6 +447,8 @@ namespace Emby.YouTubePlugin
             else
             {
                 startInfo.ArgumentList.Add("-q");
+                startInfo.ArgumentList.Add("--timeout=15");
+                startInfo.ArgumentList.Add("--tries=1");
                 startInfo.ArgumentList.Add("-O");
                 startInfo.ArgumentList.Add("-");
                 startInfo.ArgumentList.Add("-U");
@@ -433,7 +472,16 @@ namespace Emby.YouTubePlugin
             var stdoutTask = process.StandardOutput.ReadToEndAsync();
             var stderrTask = process.StandardError.ReadToEndAsync();
 
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            try
+            {
+                await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
+                catch { }
+                throw;
+            }
             var stdout = await stdoutTask.ConfigureAwait(false);
             await stderrTask.ConfigureAwait(false);
 

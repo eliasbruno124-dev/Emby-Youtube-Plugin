@@ -20,6 +20,7 @@
     <EmbeddedResource Include="Configuration\*.html" />
     <EmbeddedResource Include="Configuration\*.js" />
     <EmbeddedResource Include="Configuration\guide\*.png" />
+    <EmbeddedResource Include="YouTubeEmbed.html" />
     <EmbeddedResource Include="$(PkgLib_Harmony)\lib\net6.0\0Harmony.dll" LogicalName="Emby.YouTubePlugin.Embedded.0Harmony.dll" />
     <EmbeddedResource Include="thumb.png" />
     <Content Include="thumb.png">

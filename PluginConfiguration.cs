@@ -47,25 +47,44 @@ namespace Emby.YouTubePlugin
         [XmlIgnore]
         public string QuotaStatus => QuotaTracker.FormatStatus();
 
-        // Structured quota data so the settings UI can draw a real progress
-        // bar instead of the ASCII version embedded in QuotaStatus.
+        // Legacy structured fields retained for configuration compatibility. They
+        // now represent only the common non-search bucket instead of mixing two
+        // unrelated quota systems.
         [XmlIgnore]
-        public long QuotaUsedToday => QuotaTracker.GetStats().usedToday;
+        public long QuotaUsedToday => QuotaTracker.GetStats().OtherUnitsToday;
 
         [XmlIgnore]
-        public long QuotaDailyLimit => QuotaTracker.GetStats().dailyQuota;
+        public long QuotaDailyLimit => QuotaTracker.GetStats().OtherUnitLimit;
 
         [XmlIgnore]
         public long QuotaResetSeconds
         {
             get
             {
-                var sec = (long)QuotaTracker.GetStats().untilReset.TotalSeconds;
+                var sec = (long)QuotaTracker.GetStats().UntilReset.TotalSeconds;
                 return sec < 0 ? 0 : sec;
             }
         }
 
         [XmlIgnore]
-        public long QuotaLifetime => QuotaTracker.GetStats().totalUsed;
+        public long QuotaLifetime => QuotaTracker.GetStats().TotalOtherUnits;
+
+        [XmlIgnore]
+        public long QuotaSearchCallsToday => QuotaTracker.GetStats().SearchCallsToday;
+
+        [XmlIgnore]
+        public long QuotaSearchDailyLimit => QuotaTracker.GetStats().SearchCallLimit;
+
+        [XmlIgnore]
+        public long QuotaOtherUnitsToday => QuotaTracker.GetStats().OtherUnitsToday;
+
+        [XmlIgnore]
+        public long QuotaOtherDailyLimit => QuotaTracker.GetStats().OtherUnitLimit;
+
+        [XmlIgnore]
+        public long QuotaTotalSearchCalls => QuotaTracker.GetStats().TotalSearchCalls;
+
+        [XmlIgnore]
+        public long QuotaTotalOtherUnits => QuotaTracker.GetStats().TotalOtherUnits;
     }
 }
