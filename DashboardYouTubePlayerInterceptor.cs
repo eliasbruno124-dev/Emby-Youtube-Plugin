@@ -399,7 +399,7 @@ namespace Emby.YouTubePlugin
             {
                 if (!ReplaceRequired(ref patched,
                         currentStart,
-                        "var tag,firstScriptTag,params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params);ytPluginNextCaptionGeneration20260810(instance);instance.ytPlayOptions=options;instance.ytCaptionExplicitSelection=!1;instance.ytRequestedCaptionIndex=null;",
+                        "var tag,firstScriptTag,params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params);",
                         "iframe 4.10 parse start"))
                 {
                     return source;
@@ -417,7 +417,7 @@ namespace Emby.YouTubePlugin
 
                 if (!ReplaceRequired(ref patched,
                         "params=new URLSearchParams(options.url.split(\"?\")[1]),window.onYouTubeIframeAPIReady=function(){",
-                        "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params),ytPluginNextCaptionGeneration20260810(instance),instance.ytPlayOptions=options,instance.ytCaptionExplicitSelection=!1,instance.ytRequestedCaptionIndex=null,window.onYouTubeIframeAPIReady=function(){",
+                        "params=new URLSearchParams(options.url.split(\"?\")[1]),startSeconds=ytPluginStartSeconds20260606(params),window.onYouTubeIframeAPIReady=function(){",
                         "iframe legacy parse start"))
                 {
                     return source;
@@ -429,40 +429,72 @@ namespace Emby.YouTubePlugin
             {
                 if (!ReplaceRequired(ref patched,
                         currentReady,
-                        "}else{ytPluginDiag20260606(\"if-ready\");startSeconds>0&&event.target.seekTo(startSeconds,!0);event.target.playVideo();ytPluginApplyDefaultCaption20260711(instance)}},onStateChange:function(event){",
-                        "iframe 4.10 seek/caption selection on ready"))
+                        "}else{ytPluginDiag20260606(\"if-ready\");ytPluginStartCaptionGuard20260822(instance,event.target);startSeconds>0&&event.target.seekTo(startSeconds,!0);event.target.playVideo()}},onStateChange:function(event){",
+                        "iframe 4.10 seek on ready"))
                 {
                     return source;
                 }
             }
             else if (!ReplaceRequired(ref patched,
                          "):event.target.playVideo()},onStateChange:function(event){",
-                         "):(ytPluginDiag20260606(\"if-ready\"),startSeconds>0&&event.target.seekTo(startSeconds,!0),event.target.playVideo(),ytPluginApplyDefaultCaption20260711(instance))},onStateChange:function(event){",
-                         "iframe legacy seek/caption selection on ready"))
+                         "):(ytPluginDiag20260606(\"if-ready\"),ytPluginStartCaptionGuard20260822(instance,event.target),startSeconds>0&&event.target.seekTo(startSeconds,!0),event.target.playVideo())},onStateChange:function(event){",
+                         "iframe legacy seek on ready"))
             {
                 return source;
             }
 
             if (!ReplaceRequired(ref patched,
-                    "},onError:function(event){",
-                    "},onApiChange:function(){ytPluginDiag20260606(\"if-api-change\")},onError:function(event){",
-                    "iframe caption API event"))
-            {
-                return source;
-            }
-
-            if (!ReplaceRequired(ref patched,
-                    "function onEndedInternal(instance,triggerStopped){",
-                    "function onEndedInternal(instance,triggerStopped){ytPluginNextCaptionGeneration20260810(instance);",
-                    "iframe caption cleanup on stop"))
+                    "},onStateChange:function(event){",
+                    "},onApiChange:function(event){ytPluginForceCaptionsOff20260822(event.target)},onStateChange:function(event){ytPluginForceCaptionsOff20260822(event.target);",
+                    "iframe permanent caption-off events"))
             {
                 return source;
             }
 
             if (!ReplaceRequired(ref patched,
                     "playerVars:Object.assign({},playerVars)}",
-                    "playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,origin:window.location.origin,widget_referrer:window.location.href},ytPluginCaptionPlayerVars20260711(instance),startSeconds>0?{start:startSeconds}:null)}",
+                    "playerVars:ytPluginPlayerVars20260822(playerVars,startSeconds)}",
                     "iframe playerVars start/inline/jsapi/controls"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){},",
+                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){ytPluginStartCaptionGuard20260822(this,this.currentYoutubePlayer);return Promise.resolve()},",
+                    "iframe permanent caption-off selection"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "function onEndedInternal(instance,triggerStopped){",
+                    "function onEndedInternal(instance,triggerStopped){ytPluginStopCaptionGuard20260822(instance);",
+                    "iframe caption guard cleanup on end"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "function stopInternal(instance,destroyPlayer,triggerStopped){",
+                    "function stopInternal(instance,destroyPlayer,triggerStopped){ytPluginStopCaptionGuard20260822(instance);",
+                    "iframe caption guard cleanup on stop"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "YoutubePlayer.prototype.destroy=function(){var dlg=this.videoDialog;",
+                    "YoutubePlayer.prototype.destroy=function(){ytPluginStopCaptionGuard20260822(this);var dlg=this.videoDialog;",
+                    "iframe caption guard cleanup on destroy"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "onError:function(event){console.log(\"youtubeplayer, received error code during playback : \"+event.data);",
+                    "onError:function(event){ytPluginStopCaptionGuard20260822(instance);console.log(\"youtubeplayer, received error code during playback : \"+event.data);",
+                    "iframe caption guard cleanup on error"))
             {
                 return source;
             }
@@ -477,25 +509,9 @@ namespace Emby.YouTubePlugin
             ApplyIframeHostOptionsWrap(ref patched);
 
             if (!ReplaceRequired(ref patched,
-                    "new YT.Player(\"player\",",
-                    "ytPluginCreatePlayer20260810(instance,",
-                    "iframe rebuildable player factory"))
-            {
-                return source;
-            }
-
-            if (!ReplaceRequired(ref patched,
                 "[\"VolumeUp\",\"VolumeDown\",\"Mute\",\"Unmute\",\"ToggleMute\",\"SetVolume\"]",
                 "[\"VolumeUp\",\"VolumeDown\",\"Mute\",\"Unmute\",\"ToggleMute\",\"SetVolume\",\"Seek\",\"SeekRelative\"]",
                 "iframe seek support"))
-            {
-                return source;
-            }
-
-            if (!ReplaceRequired(ref patched,
-                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){},",
-                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){return ytPluginSetCaptionTrack20260711(this,index)},",
-                    "iframe Emby caption bridge"))
             {
                 return source;
             }
@@ -533,7 +549,7 @@ namespace Emby.YouTubePlugin
             if (!ReplaceRequired(ref patched,
                     "iframeBaseUrl=\"https://mediabrowser.github.io\",iframeUrl=iframeBaseUrl+\"/youtube-embed\"",
                     "iframeBaseUrl=window.location.origin,iframeUrl=\"modules/youtubeplayer/youtube-embed.html\"",
-                    "webview local caption-capable player"))
+                    "webview local player"))
             {
                 return source;
             }
@@ -547,9 +563,17 @@ namespace Emby.YouTubePlugin
             }
 
             if (!ReplaceRequired(ref patched,
-                    "function onEndedInternal(instance,triggerStopped){",
-                    "function onEndedInternal(instance,triggerStopped){ytPluginNextCaptionGeneration20260810(instance);",
-                    "webview caption cleanup on stop"))
+                    "instance.playerData=null,triggerStopped&&_events.default.trigger(instance,\"stopped\",[{}])}",
+                    "instance.playerData=null,instance.destroy(),triggerStopped&&_events.default.trigger(instance,\"stopped\",[{}])}",
+                    "webview deterministic teardown on end"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "function stopInternal(instance,destroyPlayer,triggerStopped){var _instance$videoDialog3=null==(_instance$videoDialog3=instance.videoDialog)?void 0:_instance$videoDialog3.querySelector(\"iframe\");_instance$videoDialog3&&(sendMessage(_instance$videoDialog3,\"stopVideo\"),onEndedInternal(instance,triggerStopped)),destroyPlayer&&instance.destroy()}",
+                    "function stopInternal(instance,destroyPlayer,triggerStopped){var wasActive=!!(instance.videoDialog||instance.playerData),_instance$videoDialog3=null==(_instance$videoDialog3=instance.videoDialog)?void 0:_instance$videoDialog3.querySelector(\"iframe\");if(!wasActive)return;try{_instance$videoDialog3&&sendMessage(_instance$videoDialog3,\"stopVideo\")}catch(e){}onEndedInternal(instance,triggerStopped)}",
+                    "webview deterministic teardown on stop"))
             {
                 return source;
             }
@@ -563,9 +587,17 @@ namespace Emby.YouTubePlugin
             }
 
             if (!ReplaceRequired(ref patched,
+                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){},",
+                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){var iframe=this.videoDialog&&this.videoDialog.querySelector(\"iframe\");iframe&&sendMessage(iframe,\"unloadModule\",[\"captions\"]);return Promise.resolve()},",
+                    "webview permanent caption-off selection"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
                     "var _instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");_instance$videoDialog&&sendMessage(_instance$videoDialog,\"playVideo\");break;",
-                    "var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&(startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"),ytPluginApplyDefaultWebViewCaption20260810(this));break;",
-                    "webview seek/caption selection on ready"))
+                    "var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&(startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"));break;",
+                    "webview seek on ready"))
             {
                 return source;
             }
@@ -583,7 +615,7 @@ namespace Emby.YouTubePlugin
 
                 if (!ReplaceRequired(ref patched,
                         "else instance.playerData={resolve:resolve,reject:reject,signal:signal},function(instance,options){",
-                        "else params=new URLSearchParams(options.url.split(\"?\")[1]),ytPluginNextCaptionGeneration20260810(instance),instance.ytPlayOptions=options,instance.ytCaptionExplicitSelection=!1,instance.ytRequestedCaptionIndex=null,instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){",
+                        "else params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){",
                         "webview 4.10 parse start"))
                 {
                     return source;
@@ -609,7 +641,7 @@ namespace Emby.YouTubePlugin
 
                 if (!ReplaceRequired(ref patched,
                         "signal.aborted?reject(getSignalRejectReason(signal)):(instance.playerData={resolve:resolve,reject:reject,signal:signal},function(instance,options){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),new URLSearchParams(options.url.split(\"?\")[1]).get(\"v\"));",
-                        "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),ytPluginNextCaptionGeneration20260810(instance),instance.ytPlayOptions=options,instance.ytCaptionExplicitSelection=!1,instance.ytRequestedCaptionIndex=null,instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
+                        "signal.aborted?reject(getSignalRejectReason(signal)):(params=new URLSearchParams(options.url.split(\"?\")[1]),instance.playerData={resolve:resolve,reject:reject,signal:signal,startTime:ytPluginStartSeconds20260606(params)},function(instance,options,params){var dlg=document.querySelector(\".youtubePlayerContainer\"),instance=(dlg||((dlg=document.createElement(\"div\")).classList.add(\"youtubePlayerContainer\"),document.body.insertBefore(dlg,document.body.firstChild),instance.videoDialog=dlg),window.removeEventListener(\"message\",instance.boundOnWindowMessage),window.addEventListener(\"message\",instance.boundOnWindowMessage),params.get(\"v\"));",
                         "webview legacy parse start"))
                 {
                     return source;
@@ -624,23 +656,7 @@ namespace Emby.YouTubePlugin
                 return source;
             }
 
-            if (!ReplaceRequired(ref patched,
-                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){},",
-                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){return ytPluginSetWebViewCaptionTrack20260810(this,index)},",
-                    "webview Emby caption bridge"))
-            {
-                return source;
-            }
-
-            if (!ReplaceRequired(ref patched,
-                    "case\"youtubeStatus\":",
-                    "case\"youtubeApiChange\":ytPluginDiag20260606(\"wv-api-change\");break;case\"youtubeCaptionChanged\":ytPluginConfirmWebViewCaption20260810(this,youtubeData);break;case\"youtubeStatus\":",
-                    "webview caption acknowledgement"))
-            {
-                return source;
-            }
-
-            // Best-effort safety net: the mediabrowser.github.io embed ignores a
+            // Best-effort safety net: the local compatibility embed ignores a
             // URL start param, so the only lever is postMessage("seekTo"). The
             // on-ready seek can be dropped while the embed is still cueing, so
             // re-assert it exactly once when playback first reaches PLAYING.
@@ -774,10 +790,10 @@ namespace Emby.YouTubePlugin
         {
             const string startOld = "new YT.Player(\"player\",{height:";
             const string startNew = "new YT.Player(\"player\",Object.assign({},ytPluginHostOptions20260617(),{height:";
-            const string legacyEndOld = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,origin:window.location.origin,widget_referrer:window.location.href},ytPluginCaptionPlayerVars20260711(instance),startSeconds>0?{start:startSeconds}:null)}),(resizeListener=";
-            const string legacyEndNew = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,origin:window.location.origin,widget_referrer:window.location.href},ytPluginCaptionPlayerVars20260711(instance),startSeconds>0?{start:startSeconds}:null)})),(resizeListener=";
-            const string currentEndOld = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,origin:window.location.origin,widget_referrer:window.location.href},ytPluginCaptionPlayerVars20260711(instance),startSeconds>0?{start:startSeconds}:null)}),instance.resizeListener);";
-            const string currentEndNew = "},playerVars:Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,origin:window.location.origin,widget_referrer:window.location.href},ytPluginCaptionPlayerVars20260711(instance),startSeconds>0?{start:startSeconds}:null)})),instance.resizeListener);";
+            const string legacyEndOld = "},playerVars:ytPluginPlayerVars20260822(playerVars,startSeconds)}),(resizeListener=";
+            const string legacyEndNew = "},playerVars:ytPluginPlayerVars20260822(playerVars,startSeconds)})),(resizeListener=";
+            const string currentEndOld = "},playerVars:ytPluginPlayerVars20260822(playerVars,startSeconds)}),instance.resizeListener);";
+            const string currentEndNew = "},playerVars:ytPluginPlayerVars20260822(playerVars,startSeconds)})),instance.resizeListener);";
 
             // Both edits balance each other (opening wrap + its closing paren),
             // so commit only when BOTH anchors are present. A partial apply can
@@ -877,7 +893,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260810-emby410-player-v6";
+        private const string DashboardPatchRevision = "20260822-emby410-player-v9";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
@@ -886,19 +902,10 @@ namespace Emby.YouTubePlugin
             "function ytPluginPatch20260606(){return 1}"
             + "function ytPluginStartSeconds20260606(params){var raw=params.get(\"start\")||params.get(\"t\");if(!raw)return 0;if(/^\\d+$/.test(raw))return parseInt(raw,10);var match=/^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$/.exec(raw);return match?3600*parseInt(match[1]||\"0\",10)+60*parseInt(match[2]||\"0\",10)+parseInt(match[3]||\"0\",10):0}"
             + "function ytPluginCanPlayItem20260606(item){try{var yt=/^(https?:\\/\\/)?([^\\/]+\\.)?(youtube\\.com|youtu\\.be)\\//i,sources=item&&(item.MediaSources||item.mediaSources)||[];for(var i=0;i<sources.length;i++){var source=sources[i]||{},path=source.Path||source.path||source.DirectStreamUrl||source.directStreamUrl;if(path&&yt.test(path))return!0}var path=item&&(item.Path||item.path);return!!(path&&yt.test(path))}catch(e){return!1}}"
-            + "function ytPluginCaptionSource20260810(instance){var options=instance&&instance.ytPlayOptions;return options&&(options.mediaSource||options.MediaSource)||null}"
-            + "function ytPluginCaptionStream20260711(instance,index){try{var source=ytPluginCaptionSource20260810(instance),streams=source&&(source.MediaStreams||source.mediaStreams)||[];for(var i=0;i<streams.length;i++){var stream=streams[i],streamIndex=stream&&(null!=stream.Index?stream.Index:stream.index);if(stream&&streamIndex===index)return stream}}catch(e){}return null}"
-            + "function ytPluginDefaultCaptionIndex20260810(instance){var source=ytPluginCaptionSource20260810(instance);return source&&(null!=source.DefaultSubtitleStreamIndex?source.DefaultSubtitleStreamIndex:source.defaultSubtitleStreamIndex)}"
-            + "function ytPluginCaptionPlayerVars20260711(instance){try{var index=ytPluginDefaultCaptionIndex20260810(instance),stream=ytPluginCaptionStream20260711(instance,index),language=stream&&(stream.Language||stream.language);return language?{cc_load_policy:1,cc_lang_pref:language}:{}}catch(e){return{}}}"
-            + "function ytPluginNextCaptionGeneration20260810(instance){if(!instance)return 0;instance.ytCaptionTimer&&(clearTimeout(instance.ytCaptionTimer),instance.ytCaptionTimer=0);instance.ytCaptionPending=null;return instance.ytCaptionGeneration=(instance.ytCaptionGeneration||0)+1}"
-            + "function ytPluginCreatePlayer20260810(instance,options){instance.ytPlayerOptions=options;return new globalThis.YT.Player(\"player\",options)}"
-            + "function ytPluginRebuildIframeCaption20260810(instance,language,generation){try{var oldPlayer=instance&&instance.currentYoutubePlayer,options=instance&&instance.ytPlayerOptions,dialog=instance&&instance.videoDialog;if(!oldPlayer||!options||!dialog)return;var currentTime=0,state=-1,volume=100,muted=!1;try{currentTime=oldPlayer.getCurrentTime?oldPlayer.getCurrentTime():0;state=oldPlayer.getPlayerState?oldPlayer.getPlayerState():-1;volume=oldPlayer.getVolume?oldPlayer.getVolume():100;muted=oldPlayer.isMuted?oldPlayer.isMuted():!1}catch(e){}try{oldPlayer.destroy&&oldPlayer.destroy()}catch(e){}dialog.innerHTML=\"<div id='player'></div>\";var events=Object.assign({},options.events,{onReady:function(event){if(instance.ytCaptionGeneration!==generation){try{event.target.destroy()}catch(e){}return}instance.currentYoutubePlayer=event.target;try{event.target.setVolume&&event.target.setVolume(volume);muted?event.target.mute&&event.target.mute():event.target.unMute&&event.target.unMute();currentTime>0&&event.target.seekTo&&event.target.seekTo(currentTime,!0);state===2?event.target.pauseVideo&&event.target.pauseVideo():event.target.playVideo&&event.target.playVideo()}catch(e){}instance.ytCaptionTimer&&(clearTimeout(instance.ytCaptionTimer),instance.ytCaptionTimer=0);instance.ytCaptionPending=null;ytPluginDiag20260606(\"if-caption-applied-\"+(language||\"off\"))}}),playerVars=Object.assign({},options.playerVars,{cc_load_policy:language?1:0});language?playerVars.cc_lang_pref=language:delete playerVars.cc_lang_pref;instance.currentYoutubePlayer=ytPluginCreatePlayer20260810(instance,Object.assign({},options,{events:events,playerVars:playerVars}));instance.ytCaptionTimer=setTimeout(function(){instance.ytCaptionGeneration===generation&&instance.ytCaptionPending&&(instance.ytCaptionPending=null,instance.ytCaptionTimer=0,ytPluginDiag20260606(\"if-caption-rebuild-timeout\"))},12000)}catch(e){instance&&(instance.ytCaptionPending=null);ytPluginDiag20260606(\"if-caption-rebuild-error\")}}"
-            + "function ytPluginSendWebViewCaption20260810(instance){try{var pending=instance&&instance.ytCaptionPending,iframe=instance&&instance.videoDialog&&instance.videoDialog.querySelector(\"iframe\");if(!pending||pending.mode!==\"webview\"||pending.generation!==instance.ytCaptionGeneration||pending.target!==iframe||!iframe)return;instance.ytCaptionTimer&&(clearTimeout(instance.ytCaptionTimer),instance.ytCaptionTimer=0);if(pending.attempts>=3){instance.ytCaptionPending=null;ytPluginDiag20260606(\"wv-caption-timeout\");return}pending.attempts++;sendMessage(iframe,\"setCaptionTrack\",[pending.language,pending.generation]);instance.ytCaptionTimer=setTimeout(function(){ytPluginSendWebViewCaption20260810(instance)},2500)}catch(e){ytPluginDiag20260606(\"wv-caption-send-error\")}}"
-            + "function ytPluginConfirmWebViewCaption20260810(instance,data){try{var pending=instance&&instance.ytCaptionPending;if(!pending||!data||pending.generation!==data.generation||pending.language!==(data.language||\"\"))return;instance.ytCaptionTimer&&(clearTimeout(instance.ytCaptionTimer),instance.ytCaptionTimer=0);instance.ytCaptionPending=null;ytPluginDiag20260606(\"wv-caption-applied-\"+(data.language||\"off\"))}catch(e){ytPluginDiag20260606(\"wv-caption-confirm-error\")}}"
-            + "function ytPluginSetCaptionTrack20260711(instance,index,applyingDefault){try{applyingDefault||(instance.ytCaptionExplicitSelection=!0,instance.ytRequestedCaptionIndex=index);if(applyingDefault&&!instance.ytCaptionExplicitSelection)return Promise.resolve();var generation=ytPluginNextCaptionGeneration20260810(instance),player=instance&&instance.currentYoutubePlayer;if(!player)return Promise.resolve();var stream=index==null||index<0?null:ytPluginCaptionStream20260711(instance,index),language=stream&&(stream.Language||stream.language)||\"\";if(index>=0&&!language)return Promise.resolve();instance.ytCaptionPending={mode:\"iframe\",generation:generation,target:player,language:language};ytPluginRebuildIframeCaption20260810(instance,language,generation);ytPluginDiag20260606(\"if-caption-select-\"+(language||\"off\"));return Promise.resolve()}catch(e){ytPluginDiag20260606(\"if-caption-select-error\");return Promise.resolve()}}"
-            + "function ytPluginSetWebViewCaptionTrack20260810(instance,index,applyingDefault){try{applyingDefault||(instance.ytCaptionExplicitSelection=!0,instance.ytRequestedCaptionIndex=index);var generation=ytPluginNextCaptionGeneration20260810(instance),iframe=instance&&instance.videoDialog&&instance.videoDialog.querySelector(\"iframe\");if(!iframe)return Promise.resolve();var stream=index==null||index<0?null:ytPluginCaptionStream20260711(instance,index),language=stream&&(stream.Language||stream.language)||\"\";if(index>=0&&!language)return Promise.resolve();instance.ytCaptionPending={mode:\"webview\",generation:generation,target:iframe,language:language,attempts:0};ytPluginSendWebViewCaption20260810(instance);ytPluginDiag20260606(\"wv-caption-select-\"+(language||\"off\"));return Promise.resolve()}catch(e){ytPluginDiag20260606(\"wv-caption-select-error\");return Promise.resolve()}}"
-            + "function ytPluginApplyDefaultCaption20260711(instance){try{return instance&&instance.ytCaptionExplicitSelection?ytPluginSetCaptionTrack20260711(instance,instance.ytRequestedCaptionIndex,!0):Promise.resolve()}catch(e){ytPluginDiag20260606(\"if-caption-default-error\")}}"
-            + "function ytPluginApplyDefaultWebViewCaption20260810(instance){try{if(instance&&instance.ytCaptionExplicitSelection)return ytPluginSetWebViewCaptionTrack20260810(instance,instance.ytRequestedCaptionIndex,!0);var index=ytPluginDefaultCaptionIndex20260810(instance);return index>=0?ytPluginSetWebViewCaptionTrack20260810(instance,index,!0):Promise.resolve()}catch(e){ytPluginDiag20260606(\"wv-caption-default-error\")}}"
+            + "function ytPluginPlayerVars20260822(playerVars,startSeconds){var result=Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,cc_load_policy:0,origin:window.location.origin,widget_referrer:window.location.href});delete result.cc_lang_pref;startSeconds>0&&(result.start=startSeconds);return result}"
+            + "function ytPluginForceCaptionsOff20260822(player){try{if(!player)return!1;if(typeof player.unloadModule===\"function\"){player.unloadModule(\"captions\");return!0}if(typeof player.setOption===\"function\"){player.setOption(\"captions\",\"track\",{});return!0}}catch(e){}return!1}"
+            + "function ytPluginStopCaptionGuard20260822(instance){try{if(!instance)return;var timers=instance.ytCaptionOffTimers||[];for(var i=0;i<timers.length;i++)clearTimeout(timers[i]);instance.ytCaptionOffTimers=[];instance.ytCaptionOffInterval&&(clearInterval(instance.ytCaptionOffInterval),instance.ytCaptionOffInterval=0);instance.ytCaptionOffPlayer=null}catch(e){}}"
+            + "function ytPluginStartCaptionGuard20260822(instance,player){try{if(!instance||!instance.videoDialog||!player)return;ytPluginStopCaptionGuard20260822(instance);instance.ytCaptionOffPlayer=player;var keep=function(){instance.videoDialog&&instance.ytCaptionOffPlayer===player&&instance.currentYoutubePlayer===player&&ytPluginForceCaptionsOff20260822(player)};keep();instance.ytCaptionOffTimers=[100,500,1500,4000].map(function(delay){return setTimeout(keep,delay)});instance.ytCaptionOffInterval=setInterval(keep,2000)}catch(e){}}"
             // Diagnostic beacon: pings the server so the in-webview playback flow is
             // visible in the plugin log as [YT][DIAG] lines (client console is unreachable).
             + "function ytPluginDiag20260606(m){try{new Image().src=\"modules/youtubeplayer/ytdiag.js?m=\"+encodeURIComponent(m)+\"&t=\"+Date.now()}catch(e){}}"

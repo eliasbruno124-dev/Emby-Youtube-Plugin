@@ -97,7 +97,11 @@ namespace Emby.YouTubePlugin
             // ShortsEnabled toggle) actually work in here too.
             try
             {
-                await ApplyShortsProbeUpgradeAsync(allVideos, ct).ConfigureAwait(false);
+                await ApplyShortsProbeUpgradeAsync(
+                        allVideos,
+                        ct,
+                        removeUnknown: !showShorts)
+                    .ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {

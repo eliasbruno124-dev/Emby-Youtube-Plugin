@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,15 @@ namespace Emby.YouTubePlugin
 {
     public partial class YouTubeChannel
     {
+        internal enum ShortsClassification
+        {
+            Unknown = 0,
+            Regular = 1,
+            Short = 2
+        }
+
         private static readonly HttpClient ShortsHttp = CreateShortsHttp();
+        private const int ShortsProbeTimeoutSeconds = 10;
         private const string ShortsBrowserUserAgent =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
@@ -61,7 +70,7 @@ namespace Emby.YouTubePlugin
             var handler = YouTubeHttpClientFactory.CreateHandler(
                 allowAutoRedirect: false,
                 automaticDecompression: DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli);
-            var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(10) };
+            var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(ShortsProbeTimeoutSeconds) };
             client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", ShortsBrowserUserAgent);
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9,de;q=0.8");
@@ -73,13 +82,24 @@ namespace Emby.YouTubePlugin
             new(StringComparer.Ordinal);
         private static readonly TimeSpan ShortsUrlProbeTtl = TimeSpan.FromDays(1);
         private const int ShortsUrlProbeCacheMaxEntries = 5000;
+        private const int ShortsProbeDocumentPrefixBytes = 80 * 1024;
+        private static readonly byte[] ShortsWatchBootstrapMarker =
+            Encoding.UTF8.GetBytes("\"WEB_PLAYER_CONTEXT_CONFIGS\"");
+        private static readonly SemaphoreSlim ShortsUrlProbeConcurrency = new(8, 8);
+        private static readonly object ShortsProbeCircuitLock = new();
+        private static readonly TimeSpan ShortsProbeFailureWindow = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan ShortsProbeCooldown = TimeSpan.FromMinutes(1);
+        private const int ShortsProbeFailureThreshold = 8;
+        private static DateTime _shortsProbeFailureWindowStartedUtc = DateTime.MinValue;
+        private static DateTime _shortsProbeCooldownUntilUtc = DateTime.MinValue;
+        private static int _shortsProbeAmbiguousCount;
         private static int _probeCacheLoaded;
         private static long _probeCacheLastWriteTicks;
 
         private static string ShortsProbeCachePath =>
             System.IO.Path.Combine(
                 Plugin.CachePath ?? System.IO.Path.GetTempPath(),
-                "shorts-probe-cache.json");
+                "shorts-probe-cache-v3.json");
 
         // Loaded once per process. Persisting it across restarts means a user's
         // first refresh after an upgrade doesn't have to re-probe every Short.
@@ -149,56 +169,69 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        // The redirect itself is the only signal that's always reliable.
-        // Metadata tags can be missing, but the /shorts/<id> URL either stays
-        // a Short or 30x's to /watch.
-        //
-        // We check the redirect status directly instead of letting the client
-        // follow it. With AllowAutoRedirect=true a consent dialog ends up as
-        // the final URI and the old code defaulted to "not Short", which let
-        // some Shorts slip into the videos folder. Looking at the Location
-        // header explicitly tells us:
-        //   - HTTP 200             → /shorts/<id> served → Short
-        //   - 30x to /watch?v=<id> → regular video
-        //   - 30x to consent/login → unclear, fall back to a HEAD on
-        //                            /watch?v=<id> and check if YouTube
-        //                            bounces it back to /shorts/
-        internal static async Task<bool> IsShortByUrlProbeAsync(string videoId, CancellationToken ct)
+        // Only the /shorts/<id> endpoint is authoritative. A successful response
+        // is accepted only after its YouTube watch bootstrap confirms the exact
+        // Shorts URL; an explicit redirect to /watch is a regular video. Consent,
+        // block, rate-limit and network outcomes remain Unknown so the caller can
+        // fail closed when the user disabled Shorts.
+        internal static async Task<ShortsClassification> IsShortByUrlProbeAsync(
+            string videoId,
+            CancellationToken ct)
         {
             if (ShortsUrlProbeCache.TryGetValue(videoId, out var entry)
                 && (DateTime.UtcNow - entry.CachedAt) < ShortsUrlProbeTtl)
-                return entry.IsShort;
+            {
+                return entry.IsShort
+                    ? ShortsClassification.Short
+                    : ShortsClassification.Regular;
+            }
 
+            if (IsShortsProbeCircuitOpen())
+                return ShortsClassification.Unknown;
+
+            await ShortsUrlProbeConcurrency.WaitAsync(ct).ConfigureAwait(false);
             try
             {
-                bool? result = await ProbeShortsRedirectAsync(
-                        $"https://www.youtube.com/shorts/{videoId}", expectShorts: true, ct)
+                // A concurrent request may have populated the cache while this
+                // call waited for the global probe slot.
+                if (ShortsUrlProbeCache.TryGetValue(videoId, out entry)
+                    && (DateTime.UtcNow - entry.CachedAt) < ShortsUrlProbeTtl)
+                {
+                    return entry.IsShort
+                        ? ShortsClassification.Short
+                        : ShortsClassification.Regular;
+                }
+
+                if (IsShortsProbeCircuitOpen())
+                    return ShortsClassification.Unknown;
+
+                var url = $"https://www.youtube.com/shorts/{videoId}";
+                var headProbe = await ProbeShortsRedirectAsync(url, HttpMethod.Head, ct)
                     .ConfigureAwait(false);
+                var result = headProbe.Classification;
 
-                if (!result.HasValue)
+                if (result == ShortsClassification.Unknown && headProbe.ShouldRetryWithGet)
                 {
-                    // Consent / unrelated redirect: flip the question and
-                    // hit /watch?v=<id> to see if YouTube bounces it onto
-                    // /shorts/<id>.
-                    result = await ProbeShortsRedirectAsync(
-                            $"https://www.youtube.com/watch?v={videoId}", expectShorts: false, ct)
+                    // Some intermediaries handle HEAD differently. Retry the
+                    // same authoritative URL with GET and inspect only a bounded
+                    // document prefix for YouTube's watch bootstrap.
+                    var getProbe = await ProbeShortsRedirectAsync(url, HttpMethod.Get, ct)
                         .ConfigureAwait(false);
+                    result = getProbe.Classification;
                 }
 
-                if (!result.HasValue)
+                if (result == ShortsClassification.Unknown)
                 {
-                    // A consent/login/block response is not evidence either
-                    // way. Treat it as regular for this one folder build, but
-                    // do not poison the 24-hour cache with a guessed false.
+                    RegisterAmbiguousShortsProbe();
                     Log($"[YT] Shorts URL probe for {videoId}: ambiguous response, not cached");
-                    return false;
+                    return ShortsClassification.Unknown;
                 }
 
-                var isShort = result.Value;
+                var isShort = result == ShortsClassification.Short;
                 ShortsUrlProbeCache[videoId] = (isShort, DateTime.UtcNow);
-                Log($"[YT] Shorts URL probe for {videoId}: isShort={isShort}");
+                Log($"[YT] Shorts URL probe for {videoId}: classification={result}");
                 EvictShortsUrlProbeCache();
-                return isShort;
+                return result;
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {
@@ -206,58 +239,158 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
+                RegisterAmbiguousShortsProbe();
                 Log($"[YT] Shorts URL probe failed for {videoId}: {ex.Message}");
+                return ShortsClassification.Unknown;
+            }
+            finally
+            {
+                ShortsUrlProbeConcurrency.Release();
+            }
+        }
+
+        internal static bool IsShortsProbeCircuitOpen()
+        {
+            lock (ShortsProbeCircuitLock)
+            {
+                var now = DateTime.UtcNow;
+                if (_shortsProbeCooldownUntilUtc > now)
+                    return true;
+
+                if (_shortsProbeCooldownUntilUtc != DateTime.MinValue)
+                {
+                    _shortsProbeCooldownUntilUtc = DateTime.MinValue;
+                    _shortsProbeFailureWindowStartedUtc = DateTime.MinValue;
+                    _shortsProbeAmbiguousCount = 0;
+                }
+
                 return false;
             }
         }
 
-        // Returns true/false when the response is clear, or null when YouTube
-        // sent us somewhere unrelated (consent, login, etc).
-        //   expectShorts=true  → starting URL is /shorts/<id>;
-        //                        200 means Short, redirect to /watch means not.
-        //   expectShorts=false → starting URL is /watch?v=<id>;
-        //                        redirect to /shorts means Short, 200 on /watch
-        //                        means regular, unrelated redirects are unclear.
-        private static async Task<bool?> ProbeShortsRedirectAsync(string url, bool expectShorts, CancellationToken ct)
+        private static void RegisterAmbiguousShortsProbe()
         {
-            using var req = new HttpRequestMessage(HttpMethod.Head, url);
+            var opened = false;
+            lock (ShortsProbeCircuitLock)
+            {
+                var now = DateTime.UtcNow;
+                if (_shortsProbeFailureWindowStartedUtc == DateTime.MinValue
+                    || now - _shortsProbeFailureWindowStartedUtc > ShortsProbeFailureWindow)
+                {
+                    _shortsProbeFailureWindowStartedUtc = now;
+                    _shortsProbeAmbiguousCount = 0;
+                }
+
+                _shortsProbeAmbiguousCount++;
+                if (_shortsProbeAmbiguousCount >= ShortsProbeFailureThreshold
+                    && _shortsProbeCooldownUntilUtc <= now)
+                {
+                    _shortsProbeCooldownUntilUtc = now + ShortsProbeCooldown;
+                    opened = true;
+                }
+            }
+
+            if (opened)
+                Log("[YT] Shorts URL probes temporarily paused for 1 minute after repeated ambiguous responses.");
+        }
+
+        internal static ShortsClassification ClassifyShortsProbeResponse(
+            int status,
+            Uri requestUri,
+            Uri? location)
+        {
+            if (status >= 300 && status < 400 && location != null)
+            {
+                var resolved = location.IsAbsoluteUri
+                    ? location
+                    : new Uri(requestUri, location);
+                var path = resolved.AbsolutePath;
+                if (string.Equals(path, "/watch", StringComparison.OrdinalIgnoreCase))
+                    return ShortsClassification.Regular;
+                if (path.StartsWith("/shorts/", StringComparison.OrdinalIgnoreCase))
+                    return ShortsClassification.Short;
+            }
+
+            return ShortsClassification.Unknown;
+        }
+
+        private static async Task<(ShortsClassification Classification, bool ShouldRetryWithGet)> ProbeShortsRedirectAsync(
+            string url,
+            HttpMethod method,
+            CancellationToken ct)
+        {
+            using var requestCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            requestCts.CancelAfter(TimeSpan.FromSeconds(ShortsProbeTimeoutSeconds));
+            var requestToken = requestCts.Token;
+
+            using var req = new HttpRequestMessage(method, url);
             req.Headers.Referrer = new Uri("https://www.youtube.com/");
 
             using var resp = await ShortsProbeHttp.SendAsync(
-                    req, HttpCompletionOption.ResponseHeadersRead, ct)
+                    req, HttpCompletionOption.ResponseHeadersRead, requestToken)
                 .ConfigureAwait(false);
 
-            var status = (int)resp.StatusCode;
+            var result = ClassifyShortsProbeResponse(
+                (int)resp.StatusCode,
+                req.RequestUri!,
+                resp.Headers.Location);
 
-            if (expectShorts)
+            if (result != ShortsClassification.Unknown
+                || resp.StatusCode != HttpStatusCode.OK
+                || method == HttpMethod.Head)
             {
-                if (status == 200) return true;
-                if (status >= 300 && status < 400)
-                {
-                    var loc = resp.Headers.Location?.ToString() ?? "";
-                    if (loc.Contains("/watch", StringComparison.OrdinalIgnoreCase))
-                        return false;
-                    if (loc.Contains("/shorts/", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    return null; // consent/login — ambiguous
-                }
-                return null;
+                var shouldRetryWithGet = method == HttpMethod.Head
+                    && (resp.StatusCode == HttpStatusCode.OK
+                        || resp.StatusCode == HttpStatusCode.MethodNotAllowed
+                        || resp.StatusCode == HttpStatusCode.NotImplemented);
+                return (result, shouldRetryWithGet);
             }
-            else
-            {
-                if (status == 200) return false;
-                if (status >= 300 && status < 400)
-                {
-                    var loc = resp.Headers.Location?.ToString() ?? "";
-                    if (loc.Contains("/shorts/", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if (loc.Contains("/watch", StringComparison.OrdinalIgnoreCase))
-                        return false;
-                    return null;
-                }
-                return null;
-            }
+
+            var documentResult = await ClassifyShortsDocumentAsync(
+                    resp, req.RequestUri!, requestToken)
+                .ConfigureAwait(false);
+            return (documentResult, false);
         }
+
+        private static async Task<ShortsClassification> ClassifyShortsDocumentAsync(
+            HttpResponseMessage response,
+            Uri requestUri,
+            CancellationToken ct)
+        {
+            var mediaType = response.Content.Headers.ContentType?.MediaType;
+            if (!string.Equals(mediaType, "text/html", StringComparison.OrdinalIgnoreCase))
+                return ShortsClassification.Unknown;
+
+            using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+            var buffer = new byte[ShortsProbeDocumentPrefixBytes];
+            var total = 0;
+            while (total < buffer.Length)
+            {
+                var read = await stream.ReadAsync(
+                        buffer.AsMemory(total, buffer.Length - total), ct)
+                    .ConfigureAwait(false);
+                if (read == 0)
+                    break;
+                total += read;
+            }
+
+            if (total == 0)
+                return ShortsClassification.Unknown;
+
+            var expectedUrl = requestUri.GetLeftPart(UriPartial.Path);
+            var expectedUrlMarker = Encoding.UTF8.GetBytes(
+                $"\"originalUrl\":\"{expectedUrl}\"");
+            var hasExpectedUrl = ContainsBytes(buffer, total, expectedUrlMarker);
+            var hasWatchBootstrap = ContainsBytes(
+                buffer, total, ShortsWatchBootstrapMarker);
+
+            return hasExpectedUrl && hasWatchBootstrap
+                ? ShortsClassification.Short
+                : ShortsClassification.Unknown;
+        }
+
+        private static bool ContainsBytes(byte[] buffer, int count, byte[] marker) =>
+            buffer.AsSpan(0, count).IndexOf(marker) >= 0;
 
         private static void EvictShortsUrlProbeCache()
         {

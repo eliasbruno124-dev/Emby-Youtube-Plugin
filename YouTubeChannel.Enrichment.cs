@@ -37,7 +37,9 @@ namespace Emby.YouTubePlugin
         // run the URL probe to catch Shorts the API didn't tag for us. No extra
         // quota — just hits the cached probe results.
         internal static async Task ApplyShortsProbeUpgradeAsync(
-            List<ChannelItemInfo> batch, CancellationToken ct)
+            List<ChannelItemInfo> batch,
+            CancellationToken ct,
+            bool removeUnknown = false)
         {
             if (batch == null || batch.Count == 0) return;
 
@@ -55,7 +57,8 @@ namespace Emby.YouTubePlugin
                 else if (rawId.StartsWith(ReelPrefix, StringComparison.Ordinal))
                     rawId = rawId.Substring(ReelPrefix.Length);
 
-                // Don't bother probing things longer than 4 minutes.
+                // Longer videos cannot be Shorts. Unknown/missing runtimes are
+                // still probed so an API metadata failure cannot leak a Short.
                 double? secs = null;
                 if (item.RunTimeTicks.HasValue && item.RunTimeTicks.Value > 0)
                     secs = TimeSpan.FromTicks(item.RunTimeTicks.Value).TotalSeconds;
@@ -63,33 +66,52 @@ namespace Emby.YouTubePlugin
                          && meta.RuntimeTicks.HasValue && meta.RuntimeTicks.Value > 0)
                     secs = TimeSpan.FromTicks(meta.RuntimeTicks.Value).TotalSeconds;
 
-                if (!secs.HasValue || secs.Value <= 0 || secs.Value > 240.0) continue;
+                if (secs.HasValue && secs.Value > 240.0) continue;
 
                 candidates.Add((item, rawId));
             }
 
             if (candidates.Count == 0) return;
 
+            var classifications = new ConcurrentDictionary<string, ShortsClassification>(StringComparer.Ordinal);
             using var sem = new SemaphoreSlim(8);
             await Task.WhenAll(candidates.Select(async c =>
             {
                 await sem.WaitAsync(ct).ConfigureAwait(false);
                 try
                 {
-                    bool isShort = await IsShortByUrlProbeAsync(c.id, ct).ConfigureAwait(false);
-                    if (isShort
-                        && !c.item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)
-                        && !c.item.Id.StartsWith(LivePrefix, StringComparison.Ordinal))
-                    {
-                        c.item.Id = ReelPrefix + c.id;
-                        if (!c.item.Name.StartsWith("▶ Short:", StringComparison.Ordinal))
-                            c.item.Name = $"▶ Short: {c.item.Name}";
-                    }
+                    classifications[c.id] = await IsShortByUrlProbeAsync(c.id, ct).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-                catch { /* probe can fail, no big deal */ }
+                catch { classifications[c.id] = ShortsClassification.Unknown; }
                 finally { sem.Release(); }
             })).ConfigureAwait(false);
+
+            foreach (var candidate in candidates)
+            {
+                if (!classifications.TryGetValue(candidate.id, out var classification))
+                    classification = ShortsClassification.Unknown;
+
+                if (classification == ShortsClassification.Short
+                    && !candidate.item.Id.StartsWith(ReelPrefix, StringComparison.Ordinal)
+                    && !candidate.item.Id.StartsWith(LivePrefix, StringComparison.Ordinal))
+                {
+                    candidate.item.Id = ReelPrefix + candidate.id;
+                    if (!candidate.item.Name.StartsWith("▶ Short:", StringComparison.Ordinal))
+                        candidate.item.Name = $"▶ Short: {candidate.item.Name}";
+                }
+            }
+
+            if (removeUnknown)
+            {
+                batch.RemoveAll(item =>
+                {
+                    if (item == null || string.IsNullOrEmpty(item.Id)) return false;
+                    var rawId = StripPrefix(item.Id);
+                    return classifications.TryGetValue(rawId, out var classification)
+                           && classification == ShortsClassification.Unknown;
+                });
+            }
         }
 
         private static void EvictExpiredMetaCache()
@@ -114,7 +136,8 @@ namespace Emby.YouTubePlugin
         private static async Task EnrichBatch(
             string apiKey, List<ChannelItemInfo> batch, List<string> videoIds,
             CancellationToken ct,
-            HashSet<string>? knownShortsIds = null)
+            HashSet<string>? knownShortsIds = null,
+            bool excludeUnknownShortCandidates = false)
         {
             // Remember which IDs YouTube actually returned. If a successful
             // request does not return an ID, the video is gone for this key/region
@@ -130,6 +153,13 @@ namespace Emby.YouTubePlugin
             // Only count an ID as missing when the chunk actually succeeded.
             // Otherwise a flaky network would look like a bunch of deleted videos.
             var queriedIds = new HashSet<string>(StringComparer.Ordinal);
+            // When Shorts are disabled, every item must receive a definitive
+            // Short/Regular classification. Entries left unresolved after API
+            // or probe failures are hidden for this folder build rather than
+            // leaking Shorts through as ordinary videos.
+            var unresolvedShortCandidates = excludeUnknownShortCandidates
+                ? new HashSet<string>(videoIds, StringComparer.Ordinal)
+                : null;
             try
             {
                 var serverRegion = await YouTubeApi.ResolveContentRegionAsync(
@@ -172,13 +202,30 @@ namespace Emby.YouTubePlugin
                         // serving them as Shorts (only the redirect tells us).
                         // Probe results are persisted, so each video is hit once.
                         var probeCandidates = new List<string>();
+                        var probeResults = new ConcurrentDictionary<string, ShortsClassification>(StringComparer.Ordinal);
                         foreach (var (vid, det) in detailsMap)
                         {
-                            if (knownShortsIds != null && knownShortsIds.Contains(vid)) continue;
-                            if (ShortsUrlProbeCache.ContainsKey(vid) || HasShortsTagOrHashtag(det)) continue;
+                            if (knownShortsIds != null && knownShortsIds.Contains(vid))
+                            {
+                                probeResults[vid] = ShortsClassification.Short;
+                                continue;
+                            }
+                            if (HasShortsTagOrHashtag(det))
+                            {
+                                probeResults[vid] = ShortsClassification.Short;
+                                continue;
+                            }
+                            if (ShortsUrlProbeCache.TryGetValue(vid, out var cachedProbe)
+                                && (DateTime.UtcNow - cachedProbe.CachedAt) < ShortsUrlProbeTtl)
+                            {
+                                probeResults[vid] = cachedProbe.IsShort
+                                    ? ShortsClassification.Short
+                                    : ShortsClassification.Regular;
+                                continue;
+                            }
                             var durStr = YouTubeApi.GetNestedString(det, "contentDetails", "duration");
                             var tsDet = YouTubeApi.ParseDuration(durStr);
-                            if (tsDet.HasValue && tsDet.Value.TotalSeconds > 0 && tsDet.Value.TotalSeconds <= 360)
+                            if (tsDet.HasValue && tsDet.Value.TotalSeconds > 0 && tsDet.Value.TotalSeconds <= 240)
                                 probeCandidates.Add(vid);
                         }
                         if (probeCandidates.Count > 0)
@@ -187,7 +234,10 @@ namespace Emby.YouTubePlugin
                             await Task.WhenAll(probeCandidates.Select(async vid =>
                             {
                                 await sem.WaitAsync(ct).ConfigureAwait(false);
-                                try { await IsShortByUrlProbeAsync(vid, ct).ConfigureAwait(false); }
+                                try
+                                {
+                                    probeResults[vid] = await IsShortByUrlProbeAsync(vid, ct).ConfigureAwait(false);
+                                }
                                 finally { sem.Release(); }
                             })).ConfigureAwait(false);
                         }
@@ -303,14 +353,37 @@ namespace Emby.YouTubePlugin
                             // Hard cap: anything over 240s is never a Short, even if
                             // a probe somehow lights up. Keeps long uploads out of the
                             // Shorts folder.
-                            bool durationAllowsShort = ts.HasValue
+                            bool durationAllowsShort = !isLiveStream
+                                                       && ts.HasValue
                                                        && ts.Value.TotalSeconds > 0
                                                        && ts.Value.TotalSeconds <= 240.0;
-                            bool isShort = durationAllowsShort && HasShortsTagOrHashtag(detail);
-                            if (!isShort && durationAllowsShort && knownShortsIds != null)
-                                isShort = knownShortsIds.Contains(rawId);
-                            if (!isShort && durationAllowsShort)
-                                isShort = await IsShortByUrlProbeAsync(rawId, ct).ConfigureAwait(false);
+                            var shortsClassification = isLiveStream
+                                                       || (ts.HasValue && ts.Value.TotalSeconds > 240.0)
+                                ? ShortsClassification.Regular
+                                : ShortsClassification.Unknown;
+                            if (durationAllowsShort && HasShortsTagOrHashtag(detail))
+                            {
+                                shortsClassification = ShortsClassification.Short;
+                            }
+                            else if (durationAllowsShort
+                                     && knownShortsIds != null
+                                     && knownShortsIds.Contains(rawId))
+                            {
+                                shortsClassification = ShortsClassification.Short;
+                            }
+                            else if (durationAllowsShort)
+                            {
+                                if (!probeResults.TryGetValue(rawId, out shortsClassification))
+                                {
+                                    shortsClassification = await IsShortByUrlProbeAsync(rawId, ct)
+                                        .ConfigureAwait(false);
+                                }
+                            }
+
+                            if (shortsClassification != ShortsClassification.Unknown)
+                                unresolvedShortCandidates?.Remove(rawId);
+
+                            bool isShort = shortsClassification == ShortsClassification.Short;
 
                             if (isShort
                                 && !batchItem.Id.StartsWith(ReelPrefix)
@@ -421,6 +494,19 @@ namespace Emby.YouTubePlugin
                             raw = raw.Substring(ReelPrefix.Length);
                         if (unplayableIds.Contains(raw)) return true;
                         return queriedIds.Contains(raw) && !foundIds.Contains(raw);
+                    });
+                }
+
+                if (unresolvedShortCandidates?.Count > 0)
+                {
+                    batch.RemoveAll(item =>
+                    {
+                        var raw = item.Id;
+                        if (raw.StartsWith(LivePrefix, StringComparison.Ordinal))
+                            raw = raw.Substring(LivePrefix.Length);
+                        else if (raw.StartsWith(ReelPrefix, StringComparison.Ordinal))
+                            raw = raw.Substring(ReelPrefix.Length);
+                        return unresolvedShortCandidates.Contains(raw);
                     });
                 }
             }

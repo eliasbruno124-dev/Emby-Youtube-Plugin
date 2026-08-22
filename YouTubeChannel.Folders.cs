@@ -294,7 +294,14 @@ namespace Emby.YouTubePlugin
                     // that's all Shorts would show up here but be empty inside.
                     if (!showShorts)
                     {
-                        try { await ApplyShortsProbeUpgradeAsync(videos, ct).ConfigureAwait(false); }
+                        try
+                        {
+                            await ApplyShortsProbeUpgradeAsync(
+                                    videos,
+                                    ct,
+                                    removeUnknown: true)
+                                .ConfigureAwait(false);
+                        }
                         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
                         catch { /* probe can fail, no big deal */ }
                         videos.RemoveAll(v => v.Id.StartsWith(ReelPrefix, StringComparison.Ordinal));

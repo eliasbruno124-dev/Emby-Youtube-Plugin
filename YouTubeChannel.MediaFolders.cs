@@ -88,7 +88,14 @@ namespace Emby.YouTubePlugin
                 var videoIds = KeepUniquePageItems(batch, seenIds);
 
                 if (videoIds.Count > 0)
-                    await EnrichBatch(apiKey, batch, videoIds, ct, knownShortsIds).ConfigureAwait(false);
+                    await EnrichBatch(
+                            apiKey,
+                            batch,
+                            videoIds,
+                            ct,
+                            knownShortsIds,
+                            excludeUnknownShortCandidates: !config.ShortsEnabled)
+                        .ConfigureAwait(false);
 
                 CacheInitialThumbnails(batch);
                 ApplyCachedMeta(batch);
@@ -103,6 +110,14 @@ namespace Emby.YouTubePlugin
                 var remaining = limit - items.Count;
                 if (remaining > 0)
                     items.AddRange(batch.Take(remaining));
+
+                if (!config.ShortsEnabled
+                    && batch.Count == 0
+                    && IsShortsProbeCircuitOpen())
+                {
+                    Log($"[YT] Stopping {type} pagination for {term}: Shorts classification is temporarily unavailable.");
+                    break;
+                }
             }
 
             if (hasMore && pageRequests >= maxPageRequests)

@@ -119,19 +119,17 @@ other endpoints share the regular 10,000-unit daily bucket.
   selecting the "original" audio track. For signed-in YouTube players, add the
   languages you normally watch under YouTube's **Preferred languages** setting;
   YouTube then keeps original audio when it matches one of those languages.
-- The plugin reads only caption language/name metadata from YouTube's watch-page
-  response and exposes selectable virtual tracks only to clients whose YouTube
-  player implements the selection bridge; it never requests timed-text URLs or
-  caption payloads. In the patched server web players, choosing a track rebuilds
-  the official YouTube IFrame with `cc_load_policy=1` and
-  `cc_lang_pref=<language>`. Choosing **Off** rebuilds without a forced caption
-  language; YouTube's documented default can still follow the viewer's caption
-  preference, so absolute suppression cannot be guaranteed. Selected captions
-  are rendered by YouTube. Native Android is intentionally not offered virtual
-  caption tracks because its bundled player does not forward subtitle
-  selections; supporting them requires a client-side app change. YouTube's own
-  **Audio track** menu is available only where the client exposes YouTube's
-  controls.
+- YouTube may serve ads in its official embedded player; the plugin does not
+  suppress them. In Emby's Windows WebView path, the YouTube controls remain
+  available and the embedded player is removed deterministically when playback
+  stops or ends, so it cannot remain over the next library item.
+- The plugin does not download, expose, or pass through YouTube caption tracks.
+  During plugin playback, the patched server web players keep the official
+  YouTube IFrame caption module disabled, and Emby subtitle-selection commands
+  cannot enable it. The native Emby Android app uses its own bundled player,
+  which a server plugin cannot patch; use Emby Web or its PWA on Android when
+  server-side caption suppression is required. YouTube's own **Audio track**
+  menu is available only where the client exposes YouTube's controls.
 - Private YouTube account data is not supported. Use playlists that your API key can read.
 - If the settings page looks stale after an update, restart Emby and clear the browser cache for the Emby web app.
 

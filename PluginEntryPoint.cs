@@ -1132,7 +1132,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
-        private const string PluginBuildRevision = "2.0.8.9-stability-20260810";
+        private const string PluginBuildRevision = "2.0.8.9-caption-off-20260822";
 
         // Wipes transient caches when the installed plugin version differs
         // from the one we recorded last time. Saves the user from having to

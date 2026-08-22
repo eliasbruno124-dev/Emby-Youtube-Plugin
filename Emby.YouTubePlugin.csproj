@@ -17,6 +17,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Caption metadata is intentionally not compiled. Emby exposes no
+         YouTube subtitle streams; the web players keep the caption module off. -->
+    <Compile Remove="YouTubeCaptionMetadata.cs" />
     <EmbeddedResource Include="Configuration\*.html" />
     <EmbeddedResource Include="Configuration\*.js" />
     <EmbeddedResource Include="Configuration\guide\*.png" />

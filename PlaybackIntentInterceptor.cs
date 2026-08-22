@@ -36,7 +36,6 @@ namespace Emby.YouTubePlugin
         long StartTimeTicks,
         bool HasStartTimeTicks,
         bool IsPlayback,
-        int RequestedSubtitleStreamIndex,
         bool IsLikelyIos,
         bool IsLikelyNativeAndroid,
         bool IsLikelyNativeTheater);
@@ -340,12 +339,6 @@ namespace Emby.YouTubePlugin
             if (string.IsNullOrEmpty(videoId))
                 return;
 
-            // Start the metadata request while Emby builds PlaybackInfo. Preview
-            // and playback requests use separate, bounded budgets so the first
-            // usable response normally contains its selectable caption tracks
-            // without inheriting the full external request timeout.
-            YouTubeCaptionMetadata.Prefetch(videoId);
-
             // Emby may carry an old resume position on a persisted live item.
             // Clear the request value before its normal playback pipeline sees
             // it; the postfix already avoids adding our own URL start stamp.
@@ -369,14 +362,8 @@ namespace Emby.YouTubePlugin
 
             var currentDtoValue = TryReadIntProperty(requestDto, "SubtitleStreamIndex");
             var currentQueryValue = serviceRequest?.QueryString["SubtitleStreamIndex"];
-            var currentQueryIndex = TryReadInt(currentQueryValue);
-            var hasVirtualYouTubeTrack = currentDtoValue >= 10_000 || currentQueryIndex >= 10_000;
-            var dtoChanged = hasVirtualYouTubeTrack
-                ? false
-                : SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
-            var queryChanged = hasVirtualYouTubeTrack
-                ? false
-                : TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
+            var dtoChanged = SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
+            var queryChanged = TrySetRequestCollectionValue(serviceRequest?.QueryString, "SubtitleStreamIndex", "-1");
 
             var isNativeAndroidTablet = IsLikelyNativeAndroidTabletRequest(serviceRequest);
 
@@ -531,10 +518,6 @@ namespace Emby.YouTubePlugin
                             ?? serviceRequest?.RemoteIp?.ToString()
                             ?? "unknown";
             var maxBitrate = GetRequestValue(serviceRequest, "MaxStreamingBitrate") ?? "unknown";
-            var requestedSubtitleStreamIndex = TryReadIntProperty(requestDto, "SubtitleStreamIndex")
-                                               ?? TryReadInt(serviceRequest?.QueryString["SubtitleStreamIndex"])
-                                               ?? -1;
-
             return new PlaybackInfoPatchContext(
                 itemId,
                 client,
@@ -545,7 +528,6 @@ namespace Emby.YouTubePlugin
                 effectiveStartTimeTicks,
                 hasStartTimeTicks,
                 isPlayback,
-                requestedSubtitleStreamIndex,
                 IsLikelyIosClient(serviceRequest),
                 IsLikelyNativeAndroidClient(serviceRequest),
                 IsLikelyNativeTheaterClient(serviceRequest));
@@ -585,16 +567,7 @@ namespace Emby.YouTubePlugin
                 // for a transcode decision, and it lets us normalize the existing
                 // library items whose stored media source isn't a clean watch URL.
                 var youTubeVideoId = TryResolveYouTubeVideoId(context.ItemId);
-                var captionTracks = string.IsNullOrEmpty(youTubeVideoId)
-                                    || context.IsLikelyNativeAndroid
-                    ? Array.Empty<YouTubeCaptionTrackMetadata>()
-                    : await YouTubeCaptionMetadata.GetTracksWithBudgetAsync(
-                            youTubeVideoId,
-                            context.IsPlayback
-                                ? TimeSpan.FromSeconds(3)
-                                : TimeSpan.FromMilliseconds(1500))
-                        .ConfigureAwait(false);
-                var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context, captionTracks);
+                var normalized = NormalizeYouTubeMediaSources(response, youTubeVideoId, context);
                 if (normalized.Changed > 0)
                     LogPlaybackInfoNormalization(context, normalized);
 
@@ -782,8 +755,7 @@ namespace Emby.YouTubePlugin
         private static PlaybackInfoNormalizationResult NormalizeYouTubeMediaSources(
             object? response,
             string? youTubeVideoId,
-            PlaybackInfoPatchContext context,
-            IReadOnlyList<YouTubeCaptionTrackMetadata> captionTracks)
+            PlaybackInfoPatchContext context)
         {
             var mediaSources = response?.GetType()
                 .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
@@ -874,24 +846,16 @@ namespace Emby.YouTubePlugin
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresClosing", false);
                 mediaSourceChanged |= SetBoolProperty(mediaSource, "RequiresLooping", false);
 
-                // Expose only virtual caption metadata to clients whose player
-                // actually implements subtitle selection. Emby's native Android
-                // YouTube player ships an empty setSubtitleStreamIndex method;
-                // showing tracks there would create a selector that cannot work.
-                // No timed-text URL or caption payload is returned to Emby.
-                var exposedCaptionTracks = context.IsLikelyNativeAndroid
-                    ? Array.Empty<YouTubeCaptionTrackMetadata>()
-                    : captionTracks;
-                mediaSourceChanged |= SetYouTubeCaptionStreams(mediaSource, exposedCaptionTracks);
+                // YouTube captions are controlled by the official player. Do not
+                // expose synthetic streams to Emby: stale virtual selections can
+                // otherwise make the iframe turn captions back on.
+                mediaSourceChanged |= ClearListProperty(mediaSource, "MediaStreams");
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStream");
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "DefaultAudioStreamIndex");
                 mediaSourceChanged |= SetNumberProperty(
                     mediaSource,
                     "DefaultSubtitleStreamIndex",
-                    !context.IsLikelyNativeAndroid
-                    && context.RequestedSubtitleStreamIndex >= 10_000
-                        ? context.RequestedSubtitleStreamIndex
-                        : -1);
+                    -1);
                 mediaSourceChanged |= SetPropertyToNull(mediaSource, "VideoStream");
 
                 // Drop any transcode plan Emby attached before we forced direct play.
@@ -904,36 +868,6 @@ namespace Emby.YouTubePlugin
             }
 
             return new PlaybackInfoNormalizationResult(changed, nativeDirectPlayDisabled);
-        }
-
-        private static bool SetYouTubeCaptionStreams(
-            object mediaSource,
-            IReadOnlyList<YouTubeCaptionTrackMetadata> captionTracks)
-        {
-            if (mediaSource is not MediaSourceInfo typedMediaSource)
-                return ClearListProperty(mediaSource, "MediaStreams");
-
-            var streams = new List<MediaStream>(captionTracks.Count);
-            for (var i = 0; i < captionTracks.Count; i++)
-            {
-                var track = captionTracks[i];
-                streams.Add(new MediaStream
-                {
-                    Type = MediaStreamType.Subtitle,
-                    Index = 10_000 + i,
-                    Language = track.LanguageCode,
-                    DisplayTitle = track.DisplayName,
-                    Title = track.DisplayName,
-                    Comment = track.Kind,
-                    Codec = "youtube",
-                    DeliveryMethod = SubtitleDeliveryMethod.Embed,
-                    IsExternal = false,
-                    SupportsExternalStream = false
-                });
-            }
-
-            typedMediaSource.MediaStreams = streams;
-            return true;
         }
 
         // Resolves the canonical YouTube video id for a library item id using the
