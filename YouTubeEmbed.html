@@ -25,6 +25,7 @@
         var reportTimer = 0;
         var captionGuardTimer = 0;
         var captionRetryTimers = [];
+        var captionForceBusy = false;
         var initialReadySent = false;
 
         function notify(type, data) {
@@ -57,14 +58,22 @@
 
         function forceCaptionsOff(target) {
             var current = target || player;
-            if (!current) return;
+            if (!current || captionForceBusy) return;
+            captionForceBusy = true;
             try {
-                if (typeof current.unloadModule === "function") {
-                    current.unloadModule("captions");
-                } else if (typeof current.setOption === "function") {
-                    current.setOption("captions", "track", {});
-                }
-            } catch (_) {}
+                try {
+                    if (typeof current.setOption === "function") {
+                        current.setOption("captions", "track", {});
+                    }
+                } catch (_) {}
+                try {
+                    if (typeof current.unloadModule === "function") {
+                        current.unloadModule("captions");
+                    }
+                } catch (_) {}
+            } finally {
+                captionForceBusy = false;
+            }
         }
 
         function stopCaptionGuard() {
@@ -81,6 +90,7 @@
         function startCaptionGuard(target) {
             stopCaptionGuard();
             var guardedPlayer = target || player;
+            if (!guardedPlayer) return;
             forceCaptionsOff(guardedPlayer);
             [100, 500, 1500, 4000].forEach(function (delay) {
                 captionRetryTimers.push(window.setTimeout(function () {
@@ -121,6 +131,7 @@
                 height: "100%",
                 width: "100%",
                 videoId: videoId,
+                host: "https://www.youtube-nocookie.com",
                 playerVars: makePlayerVars(),
                 events: {
                     onReady: onPlayerReady,
@@ -128,9 +139,12 @@
                         forceCaptionsOff(event.target);
                     },
                     onStateChange: function (event) {
-                        forceCaptionsOff(event.target);
                         if (event.data === YT.PlayerState.ENDED) {
                             stopCaptionGuard();
+                        } else if (event.data === YT.PlayerState.PLAYING) {
+                            startCaptionGuard(event.target);
+                        } else {
+                            forceCaptionsOff(event.target);
                         }
                         notify("youtubeStateChange", event.data);
                     },
@@ -162,12 +176,13 @@
             if (message.type !== "youtubeCommand") return;
             var args = message.args || [];
             try {
-                if (message.func === "loadModule" && args[0] === "captions") {
-                    forceCaptionsOff(player);
-                    return;
-                }
-                if (message.func === "setOption" && args[0] === "captions") {
-                    forceCaptionsOff(player);
+                var isCaptionPolicyCommand =
+                    ((message.func === "loadModule" || message.func === "unloadModule") && args[0] === "captions") ||
+                    (message.func === "setOption" && args[0] === "captions") ||
+                    message.func === "setCaptionTrack" ||
+                    message.func === "forceCaptionsOff";
+                if (isCaptionPolicyCommand) {
+                    startCaptionGuard(player);
                     return;
                 }
                 if (message.func === "stopVideo") {

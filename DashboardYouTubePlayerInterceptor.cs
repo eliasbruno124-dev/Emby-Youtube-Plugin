@@ -588,7 +588,7 @@ namespace Emby.YouTubePlugin
 
             if (!ReplaceRequired(ref patched,
                     "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){},",
-                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){var iframe=this.videoDialog&&this.videoDialog.querySelector(\"iframe\");iframe&&sendMessage(iframe,\"unloadModule\",[\"captions\"]);return Promise.resolve()},",
+                    "YoutubePlayer.prototype.setSubtitleStreamIndex=function(index){var iframe=this.videoDialog&&this.videoDialog.querySelector(\"iframe\");iframe&&sendMessage(iframe,\"forceCaptionsOff\",[]);return Promise.resolve()},",
                     "webview permanent caption-off selection"))
             {
                 return source;
@@ -893,7 +893,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260822-emby410-player-v9";
+        private const string DashboardPatchRevision = "20260823-emby410-player-v11";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
@@ -903,7 +903,7 @@ namespace Emby.YouTubePlugin
             + "function ytPluginStartSeconds20260606(params){var raw=params.get(\"start\")||params.get(\"t\");if(!raw)return 0;if(/^\\d+$/.test(raw))return parseInt(raw,10);var match=/^(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s?)?$/.exec(raw);return match?3600*parseInt(match[1]||\"0\",10)+60*parseInt(match[2]||\"0\",10)+parseInt(match[3]||\"0\",10):0}"
             + "function ytPluginCanPlayItem20260606(item){try{var yt=/^(https?:\\/\\/)?([^\\/]+\\.)?(youtube\\.com|youtu\\.be)\\//i,sources=item&&(item.MediaSources||item.mediaSources)||[];for(var i=0;i<sources.length;i++){var source=sources[i]||{},path=source.Path||source.path||source.DirectStreamUrl||source.directStreamUrl;if(path&&yt.test(path))return!0}var path=item&&(item.Path||item.path);return!!(path&&yt.test(path))}catch(e){return!1}}"
             + "function ytPluginPlayerVars20260822(playerVars,startSeconds){var result=Object.assign({},playerVars,{enablejsapi:1,playsinline:1,controls:1,disablekb:0,cc_load_policy:0,origin:window.location.origin,widget_referrer:window.location.href});delete result.cc_lang_pref;startSeconds>0&&(result.start=startSeconds);return result}"
-            + "function ytPluginForceCaptionsOff20260822(player){try{if(!player)return!1;if(typeof player.unloadModule===\"function\"){player.unloadModule(\"captions\");return!0}if(typeof player.setOption===\"function\"){player.setOption(\"captions\",\"track\",{});return!0}}catch(e){}return!1}"
+            + "function ytPluginForceCaptionsOff20260822(player){if(!player||player.ytPluginCaptionForceBusy20260822)return!1;var applied=!1;player.ytPluginCaptionForceBusy20260822=!0;try{try{typeof player.setOption===\"function\"&&(player.setOption(\"captions\",\"track\",{}),applied=!0)}catch(e){}try{typeof player.unloadModule===\"function\"&&(player.unloadModule(\"captions\"),applied=!0)}catch(e){}}finally{player.ytPluginCaptionForceBusy20260822=!1}return applied}"
             + "function ytPluginStopCaptionGuard20260822(instance){try{if(!instance)return;var timers=instance.ytCaptionOffTimers||[];for(var i=0;i<timers.length;i++)clearTimeout(timers[i]);instance.ytCaptionOffTimers=[];instance.ytCaptionOffInterval&&(clearInterval(instance.ytCaptionOffInterval),instance.ytCaptionOffInterval=0);instance.ytCaptionOffPlayer=null}catch(e){}}"
             + "function ytPluginStartCaptionGuard20260822(instance,player){try{if(!instance||!instance.videoDialog||!player)return;ytPluginStopCaptionGuard20260822(instance);instance.ytCaptionOffPlayer=player;var keep=function(){instance.videoDialog&&instance.ytCaptionOffPlayer===player&&instance.currentYoutubePlayer===player&&ytPluginForceCaptionsOff20260822(player)};keep();instance.ytCaptionOffTimers=[100,500,1500,4000].map(function(delay){return setTimeout(keep,delay)});instance.ytCaptionOffInterval=setInterval(keep,2000)}catch(e){}}"
             // Diagnostic beacon: pings the server so the in-webview playback flow is
