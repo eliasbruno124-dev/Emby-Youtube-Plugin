@@ -491,9 +491,14 @@
                                 <input is="emby-checkbox" id="chkShowRootFoldersAtTopLevel" type="checkbox" />
                                 <span>Show saved YouTube channels on Emby's home screen — on Emby 4.10 and newer,
                                     every saved channel gets its own latest-videos row for each user who can access it.
-                                    The option also exposes YouTube root folders at Emby's top level. On Emby 4.9,
-                                    only the top-level-folder behavior is available because that server version cannot
-                                    write custom home rows. Turning this off removes only rows managed by this plugin.</span>
+                                    Once those rows are confirmed, one uniquely recognized legacy combined
+                                    <em>Neueste YouTube-Videos</em> row is backed up and temporarily hidden. Matching
+                                    never uses the name alone and never touches <em>YouTube weiterschauen</em>, other
+                                    resume rows, or ambiguous/custom rows. Turning this off removes the plugin-managed
+                                    channel rows and restores the exact backed-up section and its saved position when
+                                    the server exposes the move API; otherwise it safely stays at the end. The option also exposes YouTube root folders
+                                    at Emby's top level. On Emby 4.9, only the top-level-folder behavior is available
+                                    because that server version cannot write custom home rows.</span>
                             </label>
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowTrending" type="checkbox" />

@@ -6,10 +6,13 @@ using MediaBrowser.Model.Library;
 using MediaBrowser.Model.Querying;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,14 +30,34 @@ namespace Emby.YouTubePlugin
         // ownership from a user-editable row name or ParentId.
         private const string ManagedIdPrefix =
             "emby-youtube-b2c3d4e5f6a74b5c9d0e1f2a3b4c5d6e-latest-";
+        private const string AggregateBackupDirectoryName = "youtube-home-aggregate-backups";
+        private const string LegacyAggregateName = "Neueste YouTube-Videos";
+        private static readonly JsonSerializerOptions BackupJsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = true
+        };
 
         private readonly IUserManager _userManager;
         private readonly IUserViewManager _userViewManager;
         private readonly MethodInfo? _addHomeSection;
         private readonly MethodInfo? _updateHomeSection;
         private readonly MethodInfo? _deleteHomeSections;
+        private readonly MethodInfo? _moveHomeSections;
         private readonly SemaphoreSlim _syncGate = new(1, 1);
         private int _unsupportedLogged;
+
+        private sealed class AggregateBackup
+        {
+            public string SectionId { get; set; } = string.Empty;
+            public string SectionJson { get; set; } = string.Empty;
+            public int OriginalIndex { get; set; } = -1;
+            public DateTime SavedAtUtc { get; set; }
+        }
+
+        private sealed record AggregateFolderContext(
+            HashSet<string> AllViewIds,
+            HashSet<string> YouTubeRootIds);
 
         public YouTubeHomeSectionManager(
             IUserManager userManager,
@@ -45,6 +68,7 @@ namespace Emby.YouTubePlugin
             _addHomeSection = FindSectionMutation("AddHomeSection", typeof(ContentSection));
             _updateHomeSection = FindSectionMutation("UpdateHomeSection", typeof(ContentSection));
             _deleteHomeSections = FindSectionMutation("DeleteHomeSections", typeof(string[]));
+            _moveHomeSections = FindMoveHomeSections();
         }
 
         private bool SupportsHomeSectionWrites =>
@@ -85,6 +109,7 @@ namespace Emby.YouTubePlugin
                         var userEnabled = !_userManager.GetUserPolicy(user).IsDisabled;
                         await SyncUserAsync(
                                 user,
+                                enabled,
                                 enabled && userEnabled,
                                 hasConfiguredChannels,
                                 cancellationToken)
@@ -109,6 +134,7 @@ namespace Emby.YouTubePlugin
 
         private async Task SyncUserAsync(
             User user,
+            bool globallyEnabled,
             bool enabled,
             bool hasConfiguredChannels,
             CancellationToken cancellationToken)
@@ -128,9 +154,13 @@ namespace Emby.YouTubePlugin
             }
 
             IReadOnlyList<Folder>? roots = Array.Empty<Folder>();
+            AggregateFolderContext? aggregateContext = null;
             if (enabled)
             {
-                roots = GetSavedChannelRoots(user, hasConfiguredChannels);
+                roots = GetSavedChannelRoots(
+                    user,
+                    hasConfiguredChannels,
+                    out aggregateContext);
                 if (roots == null)
                 {
                     // A configured channel can temporarily be absent while Emby
@@ -230,11 +260,36 @@ namespace Emby.YouTubePlugin
                     .Sum(group => group.Count());
             }
 
-            if (added > 0 || updated > 0 || removed > 0)
+            var aggregateSuppressed = 0;
+            var aggregateRestored = 0;
+            if (enabled && desired.Count > 0 && aggregateContext != null)
+            {
+                aggregateSuppressed = await SuppressLegacyAggregateAsync(
+                        user,
+                        aggregateContext,
+                        desired,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            else if (!globallyEnabled)
+            {
+                aggregateRestored = await RestoreLegacyAggregateAsync(
+                        user,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            if (added > 0
+                || updated > 0
+                || removed > 0
+                || aggregateSuppressed > 0
+                || aggregateRestored > 0)
             {
                 YouTubeChannel.LogPublic(
                     $"[YT] Home rows synchronized for user {user.Name}: "
-                    + $"added={added}, updated={updated}, removed={removed}.");
+                    + $"added={added}, updated={updated}, removed={removed}, "
+                    + $"aggregateSuppressed={aggregateSuppressed}, "
+                    + $"aggregateRestored={aggregateRestored}.");
             }
         }
 
@@ -245,8 +300,10 @@ namespace Emby.YouTubePlugin
         /// </summary>
         private IReadOnlyList<Folder>? GetSavedChannelRoots(
             User user,
-            bool hasConfiguredChannels)
+            bool hasConfiguredChannels,
+            out AggregateFolderContext? aggregateContext)
         {
+            aggregateContext = null;
             // With dynamic children disabled Emby returns the YouTube Channel
             // object itself. With them enabled, it replaces that Channel with
             // its root folders. We need both calls: the first gives us the
@@ -271,6 +328,17 @@ namespace Emby.YouTubePlugin
                         view.ParentId == candidate.InternalId
                         && YouTubeChannel.IsSavedChannelRootExternalId(view.ExternalId)))
                 ?? youtubeCandidates[0];
+
+            var allViewIds = dynamicViews
+                .Select(view => view.GetClientId())
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var youtubeRootIds = dynamicViews
+                .Where(view => view.ParentId == youtubeView.InternalId)
+                .Select(view => view.GetClientId())
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            aggregateContext = new AggregateFolderContext(allViewIds, youtubeRootIds);
 
             var roots = dynamicViews
                 .Where(view =>
@@ -297,6 +365,407 @@ namespace Emby.YouTubePlugin
                 IncludeLiveTVView = false,
                 IncludeHidden = false
             }) ?? Array.Empty<Folder>();
+
+        private async Task<int> SuppressLegacyAggregateAsync(
+            User user,
+            AggregateFolderContext context,
+            IReadOnlyDictionary<string, ContentSection> desired,
+            CancellationToken cancellationToken)
+        {
+            // Re-read after all per-channel creates/updates. A section that was
+            // renamed or otherwise changed concurrently must not be deleted
+            // based on the stale snapshot taken at the start of this sync.
+            var current = GetCurrentSections(user, cancellationToken);
+            var desiredRowsReady = desired.All(pair =>
+            {
+                var live = current
+                    .Where(section => string.Equals(
+                        section.Id,
+                        pair.Key,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                return live.Length == 1 && !NeedsUpdate(live[0], pair.Value);
+            });
+            if (!desiredRowsReady)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
+                    + "not all per-channel rows are present in the HomeSections readback.");
+                return 0;
+            }
+
+            var matches = current
+                .Select((section, index) => (Section: section, Index: index))
+                .Where(match => IsStrictLegacyAggregate(match.Section, context))
+                .ToArray();
+            if (matches.Length == 0)
+                return 0;
+            if (matches.Length > 1)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
+                    + $"{matches.Length} strict matches are ambiguous.");
+                return 0;
+            }
+
+            var candidate = matches[0];
+            var duplicateIdCount = current.Count(section => string.Equals(
+                section.Id,
+                candidate.Section.Id,
+                StringComparison.OrdinalIgnoreCase));
+            if (duplicateIdCount != 1)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
+                    + $"id {candidate.Section.Id} occurs {duplicateIdCount} times.");
+                return 0;
+            }
+
+            if (!TryLoadAggregateBackup(user, out var existingBackup, out _))
+                return 0;
+            if (existingBackup != null)
+            {
+                if (!string.Equals(
+                        existingBackup.SectionId,
+                        candidate.Section.Id,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
+                        + "a different aggregate id is already backed up.");
+                    return 0;
+                }
+                if (!MatchesAggregateSnapshot(candidate.Section, existingBackup))
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
+                        + "the live section differs from its existing backup.");
+                    return 0;
+                }
+            }
+            else if (!TryStoreAggregateBackup(user, candidate.Section, candidate.Index))
+            {
+                // Never delete a row unless its complete runtime ContentSection
+                // was durably saved first.
+                return 0;
+            }
+
+            await InvokeMutationAsync(
+                    _deleteHomeSections!,
+                    user.InternalId,
+                    new[] { candidate.Section.Id },
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            if (GetCurrentSections(user, cancellationToken).Any(section => string.Equals(
+                    section.Id,
+                    candidate.Section.Id,
+                    StringComparison.OrdinalIgnoreCase)))
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate row remained present for user {user.Name}; "
+                    + "the durable backup was retained and no suppression was reported.");
+                return 0;
+            }
+
+            YouTubeChannel.LogPublic(
+                $"[YT] Suppressed legacy aggregate latest row for user {user.Name}: "
+                + $"{candidate.Section.Id} (original index {candidate.Index}).");
+            return 1;
+        }
+
+        private async Task<int> RestoreLegacyAggregateAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            if (!TryLoadAggregateBackup(user, out var backup, out var section)
+                || backup == null
+                || section == null)
+                return 0;
+
+            var current = GetCurrentSections(user, cancellationToken);
+            var sameId = current.Where(section => string.Equals(
+                    section.Id,
+                    backup.SectionId,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (sameId.Length == 1)
+            {
+                // The delete may have failed after the durable backup, or the
+                // user may have reused/edited that id. In either case the live
+                // row wins and must never be overwritten.
+                TryRemoveAggregateBackup(user);
+                return 0;
+            }
+            if (sameId.Length > 1)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Aggregate restore deferred for user {user.Name}: "
+                    + $"original id {backup.SectionId} occurs {sameId.Length} times.");
+                return 0;
+            }
+
+            if (current.Any(HasLegacyAggregateShape))
+            {
+                // Another tool or the user already restored an equivalent
+                // aggregate under a new id. Avoid creating a duplicate, but
+                // retain our original snapshot instead of discarding it based
+                // on a row we do not own.
+                YouTubeChannel.LogPublic(
+                    $"[YT] Aggregate restore deferred for user {user.Name}: "
+                    + "a similar row with another id already exists.");
+                return 0;
+            }
+
+            await InvokeMutationAsync(
+                    _addHomeSection!,
+                    user.InternalId,
+                    section,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            var restoredSections = GetCurrentSections(user, cancellationToken);
+            var restored = restoredSections
+                .Select((candidate, index) => (Section: candidate, Index: index))
+                .Where(candidate => string.Equals(
+                    candidate.Section.Id,
+                    backup.SectionId,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+            if (restored.Length != 1 || !MatchesAggregateSnapshot(restored[0].Section, backup))
+            {
+                throw new InvalidOperationException(
+                    "Emby did not retain exactly one unchanged aggregate HomeSection after restore.");
+            }
+
+            var restoredIndex = restored[0].Index;
+            var targetIndex = Math.Min(backup.OriginalIndex, restoredSections.Length - 1);
+            if (_moveHomeSections != null && restoredIndex != targetIndex)
+            {
+                await InvokeMoveAsync(
+                        user.InternalId,
+                        backup.SectionId,
+                        targetIndex,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                var moved = GetCurrentSections(user, cancellationToken)
+                    .Select((candidate, index) => (Section: candidate, Index: index))
+                    .Where(candidate => string.Equals(
+                        candidate.Section.Id,
+                        backup.SectionId,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                if (moved.Length != 1
+                    || moved[0].Index != targetIndex
+                    || !MatchesAggregateSnapshot(moved[0].Section, backup))
+                {
+                    throw new InvalidOperationException(
+                        "Emby did not retain the aggregate section at its restored position.");
+                }
+                restoredIndex = moved[0].Index;
+            }
+
+            TryRemoveAggregateBackup(user);
+            YouTubeChannel.LogPublic(
+                $"[YT] Restored legacy aggregate latest row for user {user.Name}: "
+                + $"{backup.SectionId} (original index {backup.OriginalIndex}, restored index {restoredIndex}).");
+            return 1;
+        }
+
+        private ContentSection[] GetCurrentSections(
+            User user,
+            CancellationToken cancellationToken) =>
+            _userManager.GetHomeSections(user.InternalId, cancellationToken)?.Sections
+            ?? Array.Empty<ContentSection>();
+
+        private static bool IsStrictLegacyAggregate(
+            ContentSection section,
+            AggregateFolderContext context)
+        {
+            if (!HasLegacyAggregateShape(section)
+                || context.AllViewIds.Count == 0
+                || context.YouTubeRootIds.Count == 0)
+            {
+                return false;
+            }
+
+            var excluded = GetRuntimeStringArray(section, "ExcludedFolders");
+            if (excluded == null || excluded.Length == 0)
+                return false;
+
+            var excludedSet = excluded.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (excludedSet.Overlaps(context.YouTubeRootIds))
+                return false;
+
+            var nonYouTubeViewIds = context.AllViewIds
+                .Where(id => !context.YouTubeRootIds.Contains(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            return nonYouTubeViewIds.Count > 0 && excludedSet.SetEquals(nonYouTubeViewIds);
+        }
+
+        private static bool HasLegacyAggregateShape(ContentSection section)
+        {
+            if (string.IsNullOrWhiteSpace(section.Id)
+                || IsManaged(section)
+                || !string.Equals(section.Name, LegacyAggregateName, StringComparison.Ordinal)
+                || !string.Equals(section.SectionType, "items", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var itemTypes = GetRuntimeStringArray(section, "ItemTypes");
+            return itemTypes?.Length == 1
+                   && string.Equals(itemTypes[0], "Episode", StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(
+                       GetRuntimeString(section, "CustomName"),
+                       LegacyAggregateName,
+                       StringComparison.Ordinal)
+                   && string.IsNullOrWhiteSpace(GetRuntimeString(section, "ParentId"))
+                   && string.Equals(GetRuntimeString(section, "SortBy"), "DateCreated", StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(GetRuntimeString(section, "SortOrder"), "Descending", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static object? GetRuntimeProperty(ContentSection section, string propertyName) =>
+            section.GetType()
+                .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
+                ?.GetValue(section);
+
+        private static string? GetRuntimeString(ContentSection section, string propertyName) =>
+            GetRuntimeProperty(section, propertyName) as string;
+
+        private static string[]? GetRuntimeStringArray(ContentSection section, string propertyName) =>
+            GetRuntimeProperty(section, propertyName) is IEnumerable<string> values
+                ? values.ToArray()
+                : null;
+
+        private static bool MatchesAggregateSnapshot(
+            ContentSection section,
+            AggregateBackup backup)
+        {
+            try
+            {
+                return string.Equals(
+                    JsonSerializer.Serialize(section, section.GetType(), BackupJsonOptions),
+                    backup.SectionJson,
+                    StringComparison.Ordinal);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool TryLoadAggregateBackup(
+            User user,
+            out AggregateBackup? backup,
+            out ContentSection? section)
+        {
+            backup = null;
+            section = null;
+            var path = GetAggregateBackupPath(user);
+            if (path == null)
+                return false;
+            if (!File.Exists(path))
+                return true;
+
+            try
+            {
+                backup = JsonSerializer.Deserialize<AggregateBackup>(
+                    File.ReadAllText(path),
+                    BackupJsonOptions);
+                if (backup == null
+                    || string.IsNullOrWhiteSpace(backup.SectionId)
+                    || string.IsNullOrWhiteSpace(backup.SectionJson)
+                    || backup.OriginalIndex < 0)
+                {
+                    throw new InvalidDataException("Backup file is incomplete.");
+                }
+
+                section = JsonSerializer.Deserialize(
+                    backup.SectionJson,
+                    typeof(ContentSection),
+                    BackupJsonOptions) as ContentSection;
+                if (section == null
+                    || !string.Equals(section.Id, backup.SectionId, StringComparison.OrdinalIgnoreCase)
+                    || !HasLegacyAggregateShape(section))
+                {
+                    throw new InvalidDataException("Backup section failed its identity/shape guard.");
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                backup = null;
+                section = null;
+                YouTubeChannel.LogPublic(
+                    $"[YT] Aggregate backup for user {user.Name} could not be read; "
+                    + $"no row will be suppressed or restored ({ex.Message}).");
+                return false;
+            }
+        }
+
+        private bool TryStoreAggregateBackup(User user, ContentSection section, int originalIndex)
+        {
+            var path = GetAggregateBackupPath(user);
+            if (path == null)
+                return false;
+
+            string? tempPath = null;
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                if (File.Exists(path))
+                    throw new IOException("A backup already exists and will not be overwritten.");
+
+                var backup = new AggregateBackup
+                {
+                    SectionId = section.Id,
+                    SectionJson = JsonSerializer.Serialize(
+                        section,
+                        section.GetType(),
+                        BackupJsonOptions),
+                    OriginalIndex = originalIndex,
+                    SavedAtUtc = DateTime.UtcNow
+                };
+                tempPath = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                File.WriteAllText(tempPath, JsonSerializer.Serialize(backup, BackupJsonOptions));
+                File.Move(tempPath, path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate row was not suppressed: backup failed ({ex.Message}).");
+                return false;
+            }
+            finally
+            {
+                try { if (tempPath != null && File.Exists(tempPath)) File.Delete(tempPath); }
+                catch { }
+            }
+        }
+
+        private static void TryRemoveAggregateBackup(User user)
+        {
+            var path = GetAggregateBackupPath(user);
+            if (path == null)
+                return;
+            try { File.Delete(path); }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Restored aggregate backup marker could not be removed for user "
+                    + $"{user.Name} ({ex.Message}).");
+            }
+        }
+
+        private static string? GetAggregateBackupPath(User user) =>
+            string.IsNullOrWhiteSpace(Plugin.DataPath)
+                ? null
+                : Path.Combine(
+                    Plugin.DataPath,
+                    AggregateBackupDirectoryName,
+                    user.InternalId.ToString(CultureInfo.InvariantCulture) + ".json");
 
         private static ContentSection BuildSection(Folder root)
         {
@@ -385,6 +854,44 @@ namespace Emby.YouTubePlugin
                            && parameters[1].ParameterType == payloadType
                            && parameters[2].ParameterType == typeof(CancellationToken);
                 });
+        }
+
+        private static MethodInfo? FindMoveHomeSections() =>
+            typeof(IUserManager).GetMethod(
+                "MoveHomeSections",
+                BindingFlags.Public | BindingFlags.Instance,
+                binder: null,
+                types: new[]
+                {
+                    typeof(long),
+                    typeof(string[]),
+                    typeof(int),
+                    typeof(CancellationToken)
+                },
+                modifiers: null);
+
+        private async Task InvokeMoveAsync(
+            long userId,
+            string sectionId,
+            int newIndex,
+            CancellationToken cancellationToken)
+        {
+            object? result;
+            try
+            {
+                result = _moveHomeSections!.Invoke(
+                    _userManager,
+                    new object[] { userId, new[] { sectionId }, newIndex, cancellationToken });
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                throw new InvalidOperationException(
+                    $"Emby MoveHomeSections failed: {ex.InnerException.Message}",
+                    ex.InnerException);
+            }
+
+            if (result is Task task)
+                await task.ConfigureAwait(false);
         }
 
         private async Task InvokeMutationAsync(
