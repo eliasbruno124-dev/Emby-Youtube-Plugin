@@ -31,7 +31,10 @@ namespace Emby.YouTubePlugin
         private const string ManagedIdPrefix =
             "emby-youtube-b2c3d4e5f6a74b5c9d0e1f2a3b4c5d6e-latest-";
         private const string AggregateBackupDirectoryName = "youtube-home-aggregate-backups";
+        private const string LatestMediaBlockFilterDirectoryName =
+            "youtube-home-latest-media-block-filters";
         private const string LegacyAggregateName = "Neueste YouTube-Videos";
+        private const string LatestMediaBlockSectionType = "latestmediablock";
         private static readonly JsonSerializerOptions BackupJsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -55,9 +58,23 @@ namespace Emby.YouTubePlugin
             public DateTime SavedAtUtc { get; set; }
         }
 
+        private sealed class LatestMediaBlockFilterState
+        {
+            public int Version { get; set; } = 1;
+            public List<LatestMediaBlockFilterEntry> Entries { get; set; } = new();
+        }
+
+        private sealed class LatestMediaBlockFilterEntry
+        {
+            public string SectionId { get; set; } = string.Empty;
+            public List<string> AddedExcludedFolderIds { get; set; } = new();
+            public DateTime SavedAtUtc { get; set; }
+        }
+
         private sealed record AggregateFolderContext(
             HashSet<string> AllViewIds,
-            HashSet<string> YouTubeRootIds);
+            HashSet<string> YouTubeRootIds,
+            string YouTubeViewId);
 
         public YouTubeHomeSectionManager(
             IUserManager userManager,
@@ -262,9 +279,17 @@ namespace Emby.YouTubePlugin
 
             var aggregateSuppressed = 0;
             var aggregateRestored = 0;
+            var latestMediaBlockFiltered = 0;
+            var latestMediaBlockRestored = 0;
             if (enabled && desired.Count > 0 && aggregateContext != null)
             {
                 aggregateSuppressed = await SuppressLegacyAggregateAsync(
+                        user,
+                        aggregateContext,
+                        desired,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                latestMediaBlockFiltered = await FilterLatestMediaBlocksAsync(
                         user,
                         aggregateContext,
                         desired,
@@ -277,19 +302,27 @@ namespace Emby.YouTubePlugin
                         user,
                         cancellationToken)
                     .ConfigureAwait(false);
+                latestMediaBlockRestored = await RestoreLatestMediaBlockAsync(
+                        user,
+                        cancellationToken)
+                    .ConfigureAwait(false);
             }
 
             if (added > 0
                 || updated > 0
                 || removed > 0
                 || aggregateSuppressed > 0
-                || aggregateRestored > 0)
+                || aggregateRestored > 0
+                || latestMediaBlockFiltered > 0
+                || latestMediaBlockRestored > 0)
             {
                 YouTubeChannel.LogPublic(
                     $"[YT] Home rows synchronized for user {user.Name}: "
                     + $"added={added}, updated={updated}, removed={removed}, "
                     + $"aggregateSuppressed={aggregateSuppressed}, "
-                    + $"aggregateRestored={aggregateRestored}.");
+                    + $"aggregateRestored={aggregateRestored}, "
+                    + $"latestMediaBlockFiltered={latestMediaBlockFiltered}, "
+                    + $"latestMediaBlockRestored={latestMediaBlockRestored}.");
             }
         }
 
@@ -329,16 +362,27 @@ namespace Emby.YouTubePlugin
                         && YouTubeChannel.IsSavedChannelRootExternalId(view.ExternalId)))
                 ?? youtubeCandidates[0];
 
-            var allViewIds = dynamicViews
+            // The legacy aggregate was created from the REST /Views surface,
+            // whose UserViewQuery includes Live TV by default. Build its exact
+            // comparison domain separately; excluding Live TV here makes an
+            // otherwise exact ExcludedFolders set fail the strict matcher.
+            var aggregateViews = GetUserViews(
+                user.InternalId,
+                allowDynamicChildren: true,
+                includeLiveTvView: true);
+            var allViewIds = aggregateViews
                 .Select(view => view.GetClientId())
                 .Where(id => !string.IsNullOrWhiteSpace(id))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var youtubeRootIds = dynamicViews
+            var youtubeRootIds = aggregateViews
                 .Where(view => view.ParentId == youtubeView.InternalId)
                 .Select(view => view.GetClientId())
                 .Where(id => !string.IsNullOrWhiteSpace(id))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            aggregateContext = new AggregateFolderContext(allViewIds, youtubeRootIds);
+            aggregateContext = new AggregateFolderContext(
+                allViewIds,
+                youtubeRootIds,
+                youtubeView.GetClientId());
 
             var roots = dynamicViews
                 .Where(view =>
@@ -356,13 +400,16 @@ namespace Emby.YouTubePlugin
             return roots;
         }
 
-        private Folder[] GetUserViews(long userId, bool allowDynamicChildren) =>
+        private Folder[] GetUserViews(
+            long userId,
+            bool allowDynamicChildren,
+            bool includeLiveTvView = false) =>
             _userViewManager.GetUserViews(new UserViewQuery
             {
                 UserId = userId,
                 IncludeExternalContent = true,
                 AllowDynamicChildren = allowDynamicChildren,
-                IncludeLiveTVView = false,
+                IncludeLiveTVView = includeLiveTvView,
                 IncludeHidden = false
             }) ?? Array.Empty<Folder>();
 
@@ -376,17 +423,7 @@ namespace Emby.YouTubePlugin
             // renamed or otherwise changed concurrently must not be deleted
             // based on the stale snapshot taken at the start of this sync.
             var current = GetCurrentSections(user, cancellationToken);
-            var desiredRowsReady = desired.All(pair =>
-            {
-                var live = current
-                    .Where(section => string.Equals(
-                        section.Id,
-                        pair.Key,
-                        StringComparison.OrdinalIgnoreCase))
-                    .ToArray();
-                return live.Length == 1 && !NeedsUpdate(live[0], pair.Value);
-            });
-            if (!desiredRowsReady)
+            if (!AreDesiredRowsReady(current, desired))
             {
                 YouTubeChannel.LogPublic(
                     $"[YT] Legacy aggregate row left unchanged for user {user.Name}: "
@@ -399,7 +436,10 @@ namespace Emby.YouTubePlugin
                 .Where(match => IsStrictLegacyAggregate(match.Section, context))
                 .ToArray();
             if (matches.Length == 0)
+            {
+                LogLegacyAggregateNoMatch(user, current, context);
                 return 0;
+            }
             if (matches.Length > 1)
             {
                 YouTubeChannel.LogPublic(
@@ -472,6 +512,23 @@ namespace Emby.YouTubePlugin
                 $"[YT] Suppressed legacy aggregate latest row for user {user.Name}: "
                 + $"{candidate.Section.Id} (original index {candidate.Index}).");
             return 1;
+        }
+
+        private static bool AreDesiredRowsReady(
+            IEnumerable<ContentSection> current,
+            IReadOnlyDictionary<string, ContentSection> desired)
+        {
+            var sections = current.ToArray();
+            return desired.All(pair =>
+            {
+                var live = sections
+                    .Where(section => string.Equals(
+                        section.Id,
+                        pair.Key,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                return live.Length == 1 && !NeedsUpdate(live[0], pair.Value);
+            });
         }
 
         private async Task<int> RestoreLegacyAggregateAsync(
@@ -572,6 +629,253 @@ namespace Emby.YouTubePlugin
             return 1;
         }
 
+        private async Task<int> FilterLatestMediaBlocksAsync(
+            User user,
+            AggregateFolderContext context,
+            IReadOnlyDictionary<string, ContentSection> desired,
+            CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(context.YouTubeViewId)
+                || !TryLoadLatestMediaBlockFilterState(user, out var state))
+            {
+                return 0;
+            }
+
+            // latestmediablock expands one row per top-level user view. Adding
+            // only the provider id to ExcludedFolders removes Emby's mixed
+            // "Latest YouTube" expansion while preserving its movie/TV rows.
+            var current = GetCurrentSections(user, cancellationToken);
+            if (!AreDesiredRowsReady(current, desired))
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Automatic mixed YouTube latest row left unchanged for user {user.Name}: "
+                    + "not all per-channel rows are present in the HomeSections readback.");
+                return 0;
+            }
+
+            var withoutId = current.Count(section =>
+                IsLatestMediaBlock(section) && string.IsNullOrWhiteSpace(section.Id));
+            if (withoutId > 0)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Automatic latest-media filtering skipped {withoutId} block(s) "
+                    + $"without an id for user {user.Name}.");
+            }
+
+            var filtered = 0;
+            var groups = current
+                .Where(section =>
+                    IsLatestMediaBlock(section) && !string.IsNullOrWhiteSpace(section.Id))
+                .GroupBy(section => section.Id, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            foreach (var group in groups)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (group.Count() != 1)
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] Automatic latest-media block left unchanged for user {user.Name}: "
+                        + $"id {group.Key} occurs {group.Count()} times.");
+                    continue;
+                }
+
+                var section = group.First();
+                var entry = state.Entries.FirstOrDefault(candidate => string.Equals(
+                    candidate.SectionId,
+                    section.Id,
+                    StringComparison.OrdinalIgnoreCase));
+                var excluded = GetRuntimeStringArray(section, "ExcludedFolders")
+                    ?? Array.Empty<string>();
+                var providerAlreadyExcluded = ContainsFolderId(
+                    excluded,
+                    context.YouTubeViewId);
+                var providerOwnedByPlugin = entry != null
+                    && ContainsFolderId(
+                        entry.AddedExcludedFolderIds,
+                        context.YouTubeViewId);
+
+                // A pre-existing exclusion belongs to the user or another
+                // layout tool. Do not journal it and therefore never undo it.
+                if (providerAlreadyExcluded)
+                    continue;
+
+                var stateChanged = false;
+                if (entry == null)
+                {
+                    entry = new LatestMediaBlockFilterEntry
+                    {
+                        SectionId = section.Id,
+                        SavedAtUtc = DateTime.UtcNow
+                    };
+                    state.Entries.Add(entry);
+                    stateChanged = true;
+                }
+                if (!providerOwnedByPlugin)
+                {
+                    entry.AddedExcludedFolderIds.Add(context.YouTubeViewId);
+                    stateChanged = true;
+                }
+
+                // Journal ownership before UpdateHomeSection. A crash between
+                // these operations is convergent: the next sync re-applies the
+                // missing id, while disabling can remove only journalled ids.
+                if (stateChanged && !TrySaveLatestMediaBlockFilterState(user, state))
+                    return filtered;
+
+                var updatedExcluded = AppendFolderId(excluded, context.YouTubeViewId);
+                SetRequiredRuntimeProperty(section, "ExcludedFolders", updatedExcluded);
+                await InvokeMutationAsync(
+                        _updateHomeSection!,
+                        user.InternalId,
+                        section,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+
+                var readback = GetCurrentSections(user, cancellationToken)
+                    .Where(candidate => string.Equals(
+                        candidate.Id,
+                        section.Id,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                if (readback.Length != 1
+                    || !IsLatestMediaBlock(readback[0])
+                    || !ContainsFolderId(
+                        GetRuntimeStringArray(readback[0], "ExcludedFolders")
+                            ?? Array.Empty<string>(),
+                        context.YouTubeViewId))
+                {
+                    throw new InvalidOperationException(
+                        "Emby did not retain the YouTube exclusion on exactly one latest-media block.");
+                }
+
+                YouTubeChannel.LogPublic(
+                    $"[YT] Filtered automatic mixed YouTube latest row for user {user.Name}: "
+                    + $"block={section.Id}, provider={context.YouTubeViewId}.");
+                filtered++;
+            }
+
+            return filtered;
+        }
+
+        private async Task<int> RestoreLatestMediaBlockAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            if (!TryLoadLatestMediaBlockFilterState(user, out var state)
+                || state.Entries.Count == 0)
+            {
+                return 0;
+            }
+
+            var restored = 0;
+            foreach (var entry in state.Entries.ToArray())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var sameId = GetCurrentSections(user, cancellationToken)
+                    .Where(section => string.Equals(
+                        section.Id,
+                        entry.SectionId,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                if (sameId.Length == 0)
+                {
+                    // The user removed the mutation target. Dropping only our
+                    // obsolete journal entry must not recreate that section.
+                    state.Entries.Remove(entry);
+                    if (!TrySaveLatestMediaBlockFilterState(user, state))
+                        return restored;
+                    continue;
+                }
+                if (sameId.Length != 1 || !IsLatestMediaBlock(sameId[0]))
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] Automatic latest-media restore deferred for user {user.Name}: "
+                        + $"id {entry.SectionId} is duplicated or has changed type.");
+                    continue;
+                }
+
+                var section = sameId[0];
+                var currentExcluded = GetRuntimeStringArray(section, "ExcludedFolders")
+                    ?? Array.Empty<string>();
+                var ownedIds = entry.AddedExcludedFolderIds
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var restoredExcluded = currentExcluded
+                    .Where(id => !ownedIds.Contains(id))
+                    .ToArray();
+
+                // A crash after Update but before journal cleanup lands here.
+                // Nothing remains to mutate, so only clear the stale marker.
+                if (restoredExcluded.Length == currentExcluded.Length)
+                {
+                    state.Entries.Remove(entry);
+                    if (!TrySaveLatestMediaBlockFilterState(user, state))
+                        return restored;
+                    continue;
+                }
+
+                SetRequiredRuntimeProperty(section, "ExcludedFolders", restoredExcluded);
+                await InvokeMutationAsync(
+                        _updateHomeSection!,
+                        user.InternalId,
+                        section,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+
+                var readback = GetCurrentSections(user, cancellationToken)
+                    .Where(candidate => string.Equals(
+                        candidate.Id,
+                        entry.SectionId,
+                        StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                var readbackExcluded = readback.Length == 1
+                    ? GetRuntimeStringArray(readback[0], "ExcludedFolders")
+                        ?? Array.Empty<string>()
+                    : Array.Empty<string>();
+                if (readback.Length != 1
+                    || !IsLatestMediaBlock(readback[0])
+                    || readbackExcluded.Any(ownedIds.Contains)
+                    || !readbackExcluded.SequenceEqual(
+                        restoredExcluded,
+                        StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException(
+                        "Emby did not remove only the plugin-owned latest-media exclusions.");
+                }
+
+                state.Entries.Remove(entry);
+                if (!TrySaveLatestMediaBlockFilterState(user, state))
+                    return restored + 1;
+
+                YouTubeChannel.LogPublic(
+                    $"[YT] Restored automatic mixed YouTube latest row for user {user.Name}: "
+                    + $"block={entry.SectionId}, removedExclusions={ownedIds.Count}.");
+                restored++;
+            }
+
+            return restored;
+        }
+
+        private static bool IsLatestMediaBlock(ContentSection section) =>
+            string.Equals(
+                section.SectionType,
+                LatestMediaBlockSectionType,
+                StringComparison.OrdinalIgnoreCase);
+
+        private static bool ContainsFolderId(
+            IEnumerable<string> folderIds,
+            string folderId) =>
+            folderIds.Contains(folderId, StringComparer.OrdinalIgnoreCase);
+
+        private static string[] AppendFolderId(
+            IEnumerable<string> folderIds,
+            string folderId)
+        {
+            var values = folderIds.ToArray();
+            return ContainsFolderId(values, folderId)
+                ? values
+                : values.Append(folderId).ToArray();
+        }
+
         private ContentSection[] GetCurrentSections(
             User user,
             CancellationToken cancellationToken) =>
@@ -600,26 +904,78 @@ namespace Emby.YouTubePlugin
             var nonYouTubeViewIds = context.AllViewIds
                 .Where(id => !context.YouTubeRootIds.Contains(id))
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            return nonYouTubeViewIds.Count > 0 && excludedSet.SetEquals(nonYouTubeViewIds);
+            // Extra ids can be stale, hidden, or no longer materialized. They
+            // only narrow the row and are safe to tolerate. Every current
+            // non-YouTube view must still be excluded, and the overlap guard
+            // above still rejects every current YouTube channel root.
+            return nonYouTubeViewIds.Count > 0
+                   && nonYouTubeViewIds.IsSubsetOf(excludedSet);
+        }
+
+        private static void LogLegacyAggregateNoMatch(
+            User user,
+            IEnumerable<ContentSection> sections,
+            AggregateFolderContext context)
+        {
+            var candidates = sections
+                .Where(section =>
+                    string.Equals(section.Name, LegacyAggregateName, StringComparison.Ordinal)
+                    || string.Equals(
+                        GetRuntimeString(section, "CustomName"),
+                        LegacyAggregateName,
+                        StringComparison.Ordinal))
+                .ToArray();
+            if (candidates.Length == 0)
+                return;
+
+            var expectedExcluded = context.AllViewIds
+                .Where(id => !context.YouTubeRootIds.Contains(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var candidate in candidates)
+            {
+                var excluded = (GetRuntimeStringArray(candidate, "ExcludedFolders")
+                        ?? Array.Empty<string>())
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var customName = GetRuntimeString(candidate, "CustomName");
+                var customNameState = string.IsNullOrWhiteSpace(customName)
+                    ? "missing"
+                    : string.Equals(customName, LegacyAggregateName, StringComparison.Ordinal)
+                        ? "match"
+                        : "different";
+
+                YouTubeChannel.LogPublic(
+                    $"[YT] Legacy aggregate candidate did not match for user {user.Name}: "
+                    + $"id={candidate.Id}, shapeMatch={HasLegacyAggregateShape(candidate)}, "
+                    + $"customName={customNameState}, excluded={excluded.Count}, "
+                    + $"expectedExcluded={expectedExcluded.Count}, "
+                    + $"missingExpected={expectedExcluded.Except(excluded).Count()}, "
+                    + $"unexpectedExcluded={excluded.Except(expectedExcluded).Count()}, "
+                    + $"excludedYouTubeRoots={excluded.Intersect(context.YouTubeRootIds).Count()}.");
+            }
         }
 
         private static bool HasLegacyAggregateShape(ContentSection section)
         {
             if (string.IsNullOrWhiteSpace(section.Id)
                 || IsManaged(section)
-                || !string.Equals(section.Name, LegacyAggregateName, StringComparison.Ordinal)
+                || !string.Equals(
+                    section.Name,
+                    LegacyAggregateName,
+                    StringComparison.Ordinal)
                 || !string.Equals(section.SectionType, "items", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
             var itemTypes = GetRuntimeStringArray(section, "ItemTypes");
+            var customName = GetRuntimeString(section, "CustomName");
             return itemTypes?.Length == 1
                    && string.Equals(itemTypes[0], "Episode", StringComparison.OrdinalIgnoreCase)
-                   && string.Equals(
-                       GetRuntimeString(section, "CustomName"),
-                       LegacyAggregateName,
-                       StringComparison.Ordinal)
+                   && (string.IsNullOrWhiteSpace(customName)
+                       || string.Equals(
+                           customName,
+                           LegacyAggregateName,
+                           StringComparison.Ordinal))
                    && string.IsNullOrWhiteSpace(GetRuntimeString(section, "ParentId"))
                    && string.Equals(GetRuntimeString(section, "SortBy"), "DateCreated", StringComparison.OrdinalIgnoreCase)
                    && string.Equals(GetRuntimeString(section, "SortOrder"), "Descending", StringComparison.OrdinalIgnoreCase);
@@ -652,6 +1008,95 @@ namespace Emby.YouTubePlugin
             catch
             {
                 return false;
+            }
+        }
+
+        private bool TryLoadLatestMediaBlockFilterState(
+            User user,
+            out LatestMediaBlockFilterState state)
+        {
+            state = new LatestMediaBlockFilterState();
+            var path = GetLatestMediaBlockFilterPath(user);
+            if (path == null)
+                return false;
+            if (!File.Exists(path))
+                return true;
+
+            try
+            {
+                state = JsonSerializer.Deserialize<LatestMediaBlockFilterState>(
+                        File.ReadAllText(path),
+                        BackupJsonOptions)
+                    ?? throw new InvalidDataException("Filter state is empty.");
+                if (state.Version != 1 || state.Entries == null)
+                    throw new InvalidDataException("Filter state has an unsupported shape.");
+
+                var sectionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var entry in state.Entries)
+                {
+                    if (entry == null
+                        || string.IsNullOrWhiteSpace(entry.SectionId)
+                        || entry.AddedExcludedFolderIds == null
+                        || entry.AddedExcludedFolderIds.Count == 0
+                        || entry.AddedExcludedFolderIds.Any(string.IsNullOrWhiteSpace)
+                        || !sectionIds.Add(entry.SectionId)
+                        || entry.AddedExcludedFolderIds
+                            .Distinct(StringComparer.OrdinalIgnoreCase)
+                            .Count() != entry.AddedExcludedFolderIds.Count)
+                    {
+                        throw new InvalidDataException(
+                            "Filter state contains an incomplete or duplicate entry.");
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                state = new LatestMediaBlockFilterState();
+                YouTubeChannel.LogPublic(
+                    $"[YT] Automatic latest-media filter state for user {user.Name} "
+                    + $"could not be read; no block will be changed ({ex.Message}).");
+                return false;
+            }
+        }
+
+        private bool TrySaveLatestMediaBlockFilterState(
+            User user,
+            LatestMediaBlockFilterState state)
+        {
+            var path = GetLatestMediaBlockFilterPath(user);
+            if (path == null)
+                return false;
+
+            string? tempPath = null;
+            try
+            {
+                if (state.Entries.Count == 0)
+                {
+                    File.Delete(path);
+                    return true;
+                }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                tempPath = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+                File.WriteAllText(
+                    tempPath,
+                    JsonSerializer.Serialize(state, BackupJsonOptions));
+                File.Move(tempPath, path, overwrite: true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic(
+                    $"[YT] Automatic latest-media filter state for user {user.Name} "
+                    + $"could not be saved; the operation was stopped ({ex.Message}).");
+                return false;
+            }
+            finally
+            {
+                try { if (tempPath != null && File.Exists(tempPath)) File.Delete(tempPath); }
+                catch { }
             }
         }
 
@@ -765,6 +1210,14 @@ namespace Emby.YouTubePlugin
                 : Path.Combine(
                     Plugin.DataPath,
                     AggregateBackupDirectoryName,
+                    user.InternalId.ToString(CultureInfo.InvariantCulture) + ".json");
+
+        private static string? GetLatestMediaBlockFilterPath(User user) =>
+            string.IsNullOrWhiteSpace(Plugin.DataPath)
+                ? null
+                : Path.Combine(
+                    Plugin.DataPath,
+                    LatestMediaBlockFilterDirectoryName,
                     user.InternalId.ToString(CultureInfo.InvariantCulture) + ".json");
 
         private static ContentSection BuildSection(Folder root)
