@@ -14,7 +14,7 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Split channels into Videos and Shorts when those folders have content.
 - Hide Shorts globally if you prefer a long-form-only view.
 - Hide empty playlists, categories, and Shorts folders.
-- Optionally show YouTube root folders as top-level Emby folders instead of one YouTube container.
+- Optionally show YouTube root folders at the top level and, on Emby 4.10+, add one latest-videos home row per saved channel.
 - Track estimated daily YouTube API quota usage.
 
 
@@ -90,7 +90,7 @@ Saved channels open in the cleanest layout the plugin can provide:
 - Empty Shorts folders are hidden.
 - Empty playlists and empty category folders are hidden.
 
-By default, Emby shows one top-level YouTube entry and keeps saved channels inside it. Enable **Show YouTube root folders at Emby's top level** if you want Emby to surface saved channels, playlists, Watch Later, Trending, and Categories as separate top-level folders.
+By default, Emby shows one top-level YouTube entry and keeps saved channels inside it. Enable **Show saved YouTube channels on Emby's home screen** to expose the YouTube root folders at Emby's top level. On Emby 4.10 and newer, the same option also creates one latest-videos home row per saved channel for every user who can access YouTube. Playlists, searches, Trending, and Categories are not turned into home rows. Emby 4.9 keeps the top-level-folder behavior but has no writable HomeSections API, so it cannot create those rows.
 
 Shorts detection uses YouTube metadata such as tags, `#shorts`, and vertical player dimensions. It does not rely on video length alone, because many normal videos are short without being YouTube Shorts.
 

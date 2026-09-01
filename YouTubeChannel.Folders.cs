@@ -144,6 +144,14 @@ namespace Emby.YouTubePlugin
                 .Select(s => s.Trim())
                 .Where(s => s.Length > 0);
 
+        internal static bool HasConfiguredSavedChannels(string? value) =>
+            SplitConfiguredItems(value)
+                .Any(term => IsSupportedHandle(term) || IsSupportedChannelId(term));
+
+        internal static bool IsSavedChannelRootExternalId(string? externalId) =>
+            !string.IsNullOrEmpty(externalId)
+            && externalId.StartsWith($"channel{FolderSeparator}", StringComparison.Ordinal);
+
         private static ChannelItemInfo Folder(string name, string id, string? imageUrl) =>
             new()
             {

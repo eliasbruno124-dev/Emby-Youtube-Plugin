@@ -127,6 +127,13 @@ namespace Emby.YouTubePlugin
             if (!contentChanged)
                 return;
 
+            // Removing the option should remove only the plugin-owned rows
+            // immediately. Enabling it is synchronized once now and once again
+            // after the channel refresh has materialized all saved roots.
+            PluginEntryPoint.RequestHomeSectionSync(
+                "configuration save",
+                TimeSpan.FromSeconds(1));
+
             try { YouTubeApi.InvalidateAllCache(); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation after settings save failed: {ex.Message}"); }
 

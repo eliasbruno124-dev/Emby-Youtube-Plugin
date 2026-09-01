@@ -6,6 +6,7 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Common;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Events;
 using MediaBrowser.Model.Session;
 using System;
 using System.Collections.Concurrent;
@@ -35,6 +36,8 @@ namespace Emby.YouTubePlugin
         private readonly object _playlistFingerprintLock = new();
         private static readonly object PlaylistFingerprintFileLock = new();
         private readonly object _resumeCheckpointFileLock = new();
+        private readonly YouTubeHomeSectionManager _homeSectionManager;
+        private readonly IUserManager _userManager;
         private readonly CancellationTokenSource _lifetimeCts = new();
         private readonly ManualResetEventSlim _pollIdle = new(initialState: true);
         private ILibraryManager? _libraryManager;
@@ -103,12 +106,16 @@ namespace Emby.YouTubePlugin
             ISessionManager sessionManager,
             ILibraryManager libraryManager,
             IUserDataManager userDataManager,
+            IUserManager userManager,
+            IUserViewManager userViewManager,
             IChannelManager channelManager)
         {
             Plugin.InitializeApplicationHost(applicationHost);
             _sessionManager = sessionManager;
             _libraryManager = libraryManager;
             _userDataManager = userDataManager;
+            _userManager = userManager;
+            _homeSectionManager = new YouTubeHomeSectionManager(userManager, userViewManager);
             ChannelRefreshInvoker.Initialize(channelManager);
         }
 
@@ -155,6 +162,51 @@ namespace Emby.YouTubePlugin
                 null,
                 TimeSpan.FromSeconds(10),
                 TimeSpan.FromMinutes(_currentPollMinutes));
+
+            _userManager.UserCreated += OnHomeSectionUserChanged;
+            _userManager.UserPolicyUpdated += OnHomeSectionUserChanged;
+            QueueHomeSectionSync("plugin startup", TimeSpan.FromSeconds(15));
+        }
+
+        private void OnHomeSectionUserChanged(
+            object? sender,
+            GenericEventArgs<User> eventArgs)
+        {
+            // UserPolicyUpdated is raised before Emby finishes persisting its
+            // item-share rows. A short delay makes GetUserViews observe the new
+            // channel access instead of immediately reading the old shares.
+            QueueHomeSectionSync("user access changed", TimeSpan.FromSeconds(2));
+        }
+
+        internal static void RequestHomeSectionSync(
+            string reason,
+            TimeSpan? delay = null)
+        {
+            _current?.QueueHomeSectionSync(reason, delay ?? TimeSpan.Zero);
+        }
+
+        private void QueueHomeSectionSync(string reason, TimeSpan delay)
+        {
+            var cancellationToken = _lifetimeCts.Token;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (delay > TimeSpan.Zero)
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+
+                    await _homeSectionManager.SyncAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    // Normal during plugin unload.
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic(
+                        $"[YT] Home row sync ({reason}) failed: {ex.Message}");
+                }
+            });
         }
 
         private void AttachResumeSeekHook()
@@ -1708,6 +1760,8 @@ namespace Emby.YouTubePlugin
                 _current = null;
             if (_libraryManager != null)
                 _libraryManager.ItemUpdated -= OnItemUpdated;
+            _userManager.UserCreated -= OnHomeSectionUserChanged;
+            _userManager.UserPolicyUpdated -= OnHomeSectionUserChanged;
 
             if (_sessionManager != null)
             {
@@ -1911,13 +1965,22 @@ namespace Emby.YouTubePlugin
                     if (task == null)
                     {
                         YouTubeChannel.LogPublic("[YT] TriggerRefresh: completed (no refresh task)");
+                        PluginEntryPoint.RequestHomeSectionSync("channel refresh completed");
                         return;
                     }
 
                     // From here the continuation owns dropping the gate, when
                     // Emby actually finishes (success, fault or cancel).
                     _ = task.ContinueWith(
-                        _ => Interlocked.Exchange(ref _refreshActive, 0),
+                        completedTask =>
+                        {
+                            Interlocked.Exchange(ref _refreshActive, 0);
+                            if (completedTask.Status == TaskStatus.RanToCompletion)
+                            {
+                                PluginEntryPoint.RequestHomeSectionSync(
+                                    "channel refresh completed");
+                            }
+                        },
                         CancellationToken.None,
                         TaskContinuationOptions.ExecuteSynchronously,
                         TaskScheduler.Default);

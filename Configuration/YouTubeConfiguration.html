@@ -489,9 +489,11 @@
                         <div class="checkboxGroup">
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowRootFoldersAtTopLevel" type="checkbox" />
-                                <span>Show YouTube root folders at Emby's top level — saved channels, auto-refreshed
-                                    playlists, Trending and Categories can appear as separate Emby folders. Leave off
-                                    to keep one YouTube entry with the channel folders inside.</span>
+                                <span>Show saved YouTube channels on Emby's home screen — on Emby 4.10 and newer,
+                                    every saved channel gets its own latest-videos row for each user who can access it.
+                                    The option also exposes YouTube root folders at Emby's top level. On Emby 4.9,
+                                    only the top-level-folder behavior is available because that server version cannot
+                                    write custom home rows. Turning this off removes only rows managed by this plugin.</span>
                             </label>
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowTrending" type="checkbox" />
