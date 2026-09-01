@@ -562,6 +562,14 @@ namespace Emby.YouTubePlugin
                 return source;
             }
 
+            ReplaceOptional(ref patched,
+                "switch(event){case\"youtubePlayerReady\":",
+                "switch(event){case\"youtubeAutoplayBlocked\":ytPluginDiag20260606(\"wv-autoplay-blocked\");break;"
+                    + "case\"youtubeAutoplayRetryMuted\":ytPluginDiag20260606(\"wv-autoplay-retry-muted\");break;"
+                    + "case\"youtubeAutoplayRetryFailed\":ytPluginDiag20260606(\"wv-autoplay-retry-failed\");break;"
+                    + "case\"youtubeAutoplayRecoveredMuted\":ytPluginDiag20260606(\"wv-autoplay-recovered-muted\");break;"
+                    + "case\"youtubePlayerReady\":");
+
             if (!ReplaceRequired(ref patched,
                     "instance.playerData=null,triggerStopped&&_events.default.trigger(instance,\"stopped\",[{}])}",
                     "instance.playerData=null,instance.destroy(),triggerStopped&&_events.default.trigger(instance,\"stopped\",[{}])}",
@@ -893,7 +901,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260823-emby410-player-v11";
+        private const string DashboardPatchRevision = "20260831-emby410-player-v12";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";

@@ -1132,7 +1132,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
-        private const string PluginBuildRevision = "2.0.8.9-caption-off-v11-20260823";
+        private const string PluginBuildRevision = "2.0.8.10-caption-off-v12-20260831";
 
         // Wipes transient caches when the installed plugin version differs
         // from the one we recorded last time. Saves the user from having to
@@ -1195,11 +1195,19 @@ namespace Emby.YouTubePlugin
                             return;
                         }
 
-                        YouTubeChannel.LogPublic("[YT] Triggering post-upgrade channel refresh");
+                        // Hiding Shorts changes the persisted child-item set, so
+                        // refresh those children once after an upgrade. Keep the
+                        // normal bootstrap refresh shallow for all other installs.
+                        var refreshDepth = Plugin.Instance?.Options.ShortsEnabled == false
+                            ? ChannelRefreshInvoker.ContentRefreshDepth
+                            : ChannelRefreshInvoker.RootRefreshDepth;
+
+                        YouTubeChannel.LogPublic(
+                            $"[YT] Triggering post-upgrade channel refresh (depth {refreshDepth})");
                         // Yield to any channel scan Emby is already running near
-                        // startup: this refresh only needs to repopulate the
-                        // wiped caches, which Emby's own scan does anyway.
-                        await ChannelRefreshInvoker.TriggerRefreshAsync(skipIfScanActive: true).ConfigureAwait(false);
+                        // startup; an active scan already runs the new filtering code.
+                        await ChannelRefreshInvoker.TriggerRefreshAsync(
+                            refreshDepth, skipIfScanActive: true).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

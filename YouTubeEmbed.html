@@ -27,6 +27,8 @@
         var captionRetryTimers = [];
         var captionForceBusy = false;
         var initialReadySent = false;
+        var autoplayRetryUsed = false;
+        var autoplayRecoveryReported = false;
 
         function notify(type, data) {
             window.parent.postMessage({ type: type, data: data }, parentOrigin);
@@ -126,6 +128,23 @@
             startStatusTimer();
         }
 
+        function onAutoplayBlocked() {
+            notify("youtubeAutoplayBlocked");
+            if (autoplayRetryUsed || !player) return;
+            autoplayRetryUsed = true;
+            try {
+                if (typeof player.mute === "function") {
+                    player.mute();
+                }
+                if (typeof player.playVideo === "function") {
+                    player.playVideo();
+                    notify("youtubeAutoplayRetryMuted");
+                }
+            } catch (_) {
+                notify("youtubeAutoplayRetryFailed");
+            }
+        }
+
         function createPlayer() {
             player = new YT.Player("player", {
                 height: "100%",
@@ -135,6 +154,7 @@
                 playerVars: makePlayerVars(),
                 events: {
                     onReady: onPlayerReady,
+                    onAutoplayBlocked: onAutoplayBlocked,
                     onApiChange: function (event) {
                         forceCaptionsOff(event.target);
                     },
@@ -142,6 +162,10 @@
                         if (event.data === YT.PlayerState.ENDED) {
                             stopCaptionGuard();
                         } else if (event.data === YT.PlayerState.PLAYING) {
+                            if (autoplayRetryUsed && !autoplayRecoveryReported) {
+                                autoplayRecoveryReported = true;
+                                notify("youtubeAutoplayRecoveredMuted");
+                            }
                             startCaptionGuard(event.target);
                         } else {
                             forceCaptionsOff(event.target);

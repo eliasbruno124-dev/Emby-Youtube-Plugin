@@ -120,9 +120,12 @@ other endpoints share the regular 10,000-unit daily bucket.
   languages you normally watch under YouTube's **Preferred languages** setting;
   YouTube then keeps original audio when it matches one of those languages.
 - YouTube may serve ads in its official embedded player; the plugin does not
-  suppress them. In Emby's Windows WebView path, the YouTube controls remain
-  available and the embedded player is removed deterministically when playback
-  stops or ends, so it cannot remain over the next library item.
+  suppress them. In Emby's server-loaded Windows WebView path, the YouTube
+  controls remain available and the embedded player is removed deterministically
+  when playback stops or ends, so it cannot remain over the next library item.
+  If Chromium blocks the first unmuted autoplay attempt, that WebView path
+  retries once muted; use the visible YouTube controls to restore sound. Bundled
+  Theater/Xbox/Windows player code may not use this server-side compatibility path.
 - The plugin does not download, expose, or pass through YouTube caption tracks.
   During plugin playback, the patched server web players keep the official
   YouTube IFrame caption module disabled, and Emby subtitle-selection commands
