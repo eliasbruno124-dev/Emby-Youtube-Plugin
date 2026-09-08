@@ -405,11 +405,12 @@ namespace Emby.YouTubePlugin
                                 if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                             }
 
-                            var statsParts = new List<string>();
-                            if (viewCount.HasValue) statsParts.Add($"👁 {viewCount:N0}");
-                            if (likeCount.HasValue && Plugin.Instance?.Options.ShowLikeCount == true) statsParts.Add($"👍 {likeCount:N0}");
-                            if (commentCount.HasValue && Plugin.Instance?.Options.ShowCommentCount == true) statsParts.Add($"💬 {commentCount:N0}");
-                            string statsLine = statsParts.Count > 0 ? string.Join("  ·  ", statsParts) : "";
+                            string statsLine = BuildEngagementStatsLine(
+                                viewCount,
+                                likeCount,
+                                commentCount,
+                                Plugin.Instance?.Options.ShowLikeCount == true,
+                                Plugin.Instance?.Options.ShowCommentCount == true);
 
                             string? overview = null;
                             if (!string.IsNullOrWhiteSpace(desc))

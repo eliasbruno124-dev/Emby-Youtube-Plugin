@@ -8,6 +8,7 @@ using MediaBrowser.Model.MediaInfo;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -20,6 +21,25 @@ namespace Emby.YouTubePlugin
     {
         internal static string GetYouTubeWatchUrl(string videoId) =>
             $"https://www.youtube.com/watch?v={videoId}&playsinline=1&enablejsapi=1";
+
+        // Native TV clients do not always have fonts for emoji.
+        internal static string BuildEngagementStatsLine(
+            long? viewCount,
+            long? likeCount,
+            long? commentCount,
+            bool includeLikes,
+            bool includeComments)
+        {
+            var parts = new List<string>();
+            if (viewCount is >= 0)
+                parts.Add($"{viewCount.Value.ToString("N0", CultureInfo.InvariantCulture)} views");
+            if (includeLikes && likeCount is >= 0)
+                parts.Add($"{likeCount.Value.ToString("N0", CultureInfo.InvariantCulture)} likes");
+            if (includeComments && commentCount is >= 0)
+                parts.Add($"{commentCount.Value.ToString("N0", CultureInfo.InvariantCulture)} comments");
+
+            return string.Join(" | ", parts);
+        }
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
         {
@@ -128,13 +148,12 @@ namespace Emby.YouTubePlugin
                     if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                 }
 
-                var statsParts = new List<string>();
-                if (viewCount.HasValue) statsParts.Add($"👁 {viewCount:N0}");
-                if (likeCount.HasValue && Plugin.Instance?.Options.ShowLikeCount == true)
-                    statsParts.Add($"👍 {likeCount:N0}");
-                if (commentCount.HasValue && Plugin.Instance?.Options.ShowCommentCount == true)
-                    statsParts.Add($"💬 {commentCount:N0}");
-                string statsLine = statsParts.Count > 0 ? string.Join("  ·  ", statsParts) : "";
+                string statsLine = BuildEngagementStatsLine(
+                    viewCount,
+                    likeCount,
+                    commentCount,
+                    Plugin.Instance?.Options.ShowLikeCount == true,
+                    Plugin.Instance?.Options.ShowCommentCount == true);
 
                 string? overview = null;
                 if (!string.IsNullOrWhiteSpace(desc))

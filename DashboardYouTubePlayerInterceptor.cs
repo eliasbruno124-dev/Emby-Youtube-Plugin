@@ -15,6 +15,7 @@ namespace Emby.YouTubePlugin
         private const string HarmonyId = "emby.youtubeplugin.dashboard-youtube-player";
         private const string PatchMarker = "ytPluginPatch20260606";
         private const string AppJsPatchMarker = "ytPluginAppJs20260608";
+        private const string VideoOsdPatchMarker = "ytPluginOsdBackStop20260908";
         private static readonly object Sync = new();
         private static object? _harmony;
         private static Type? _harmonyType;
@@ -313,10 +314,40 @@ namespace Emby.YouTubePlugin
             if (normalizedResourceName.EndsWith("app.js", StringComparison.OrdinalIgnoreCase))
                 return PatchAppJs(source);
 
+            if (IsVideoOsdResource(normalizedResourceName))
+                return PatchVideoOsd(source);
+
             if (normalizedResourceName.EndsWith("plugin_webview.js", StringComparison.OrdinalIgnoreCase))
                 return PatchWebViewPlayer(source);
 
             return PatchIframePlayer(source);
+        }
+
+        private static string PatchVideoOsd(string source)
+        {
+            if (source.Contains(VideoOsdPatchMarker, StringComparison.Ordinal))
+                return source;
+
+            // Treat only a navigation away from the OSD as an exit; dialogs and OSD-to-OSD transitions stay untouched.
+            const string pauseStartBefore =
+                "VideoOsd.prototype.onPause=function(options){_baseview.default.prototype.onPause.apply(this,arguments),";
+            const string pauseStartAfter =
+                "VideoOsd.prototype.onPause=function(options){var ytPluginCapturedPlayer=this.currentPlayer,ytPluginIsYoutube=null!=ytPluginCapturedPlayer&&\"youtubeplayer\"===ytPluginCapturedPlayer.id,ytPluginGeneration=null==ytPluginCapturedPlayer?void 0:ytPluginCapturedPlayer.ytGeneration20260908,ytPluginNext=null==options?null:options.newViewInfo,ytPluginPath=(null==ytPluginNext?\"\":ytPluginNext.path||ytPluginNext.contextPath||\"\").split(\"?\")[0].toLowerCase().replace(/^\\/+|\\/+$/g,\"\"),ytPluginGenuineExit=!!ytPluginPath&&!(null!=ytPluginNext.params&&\"true\"===ytPluginNext.params.asDialog)&&\"videoosd/videoosd.html\"!==ytPluginPath;_baseview.default.prototype.onPause.apply(this,arguments),";
+            const string exitGateBefore =
+                "this.enableBackOnStop=!1,this.enableStopOnBack&&\"true\"!==(null==options||null==(statsOverlay=options.newViewInfo)||null==(statsOverlay=statsOverlay.params)?void 0:statsOverlay.asDialog)?";
+            const string exitGateAfter =
+                "this.enableBackOnStop=!1,(ytPluginIsYoutube?ytPluginGenuineExit&&_playbackmanager.default.getCurrentPlayer()===ytPluginCapturedPlayer&&ytPluginCapturedPlayer.ytGeneration20260908===ytPluginGeneration:this.enableStopOnBack)&&\"true\"!==(null==options||null==(statsOverlay=options.newViewInfo)||null==(statsOverlay=statsOverlay.params)?void 0:statsOverlay.asDialog)?";
+            const string stopBefore =
+                "statsOverlay=this.currentPlayer,this.releaseCurrentPlayer(),null!=statsOverlay&&statsOverlay.isLocalPlayer&&_appsettings.default.enableVideoUnderUI()?_approuter.default.setTransparency(\"backdrop\"):statsOverlay&&_playbackmanager.default.stop(statsOverlay)";
+            const string stopAfter =
+                "statsOverlay=this.currentPlayer,this.releaseCurrentPlayer(),ytPluginIsYoutube?statsOverlay===ytPluginCapturedPlayer&&_playbackmanager.default.getCurrentPlayer()===ytPluginCapturedPlayer&&ytPluginCapturedPlayer.ytGeneration20260908===ytPluginGeneration?/*ytPluginOsdBackStop20260908*/_playbackmanager.default.stop(ytPluginCapturedPlayer):void 0:null!=statsOverlay&&statsOverlay.isLocalPlayer&&_appsettings.default.enableVideoUnderUI()?_approuter.default.setTransparency(\"backdrop\"):statsOverlay&&_playbackmanager.default.stop(statsOverlay)";
+
+            var patched = source;
+            return ReplaceRequired(ref patched, pauseStartBefore, pauseStartAfter, "videoosd YouTube Back exit state")
+                   && ReplaceRequired(ref patched, exitGateBefore, exitGateAfter, "videoosd YouTube Back exit gate")
+                   && ReplaceRequired(ref patched, stopBefore, stopAfter, "videoosd YouTube Back stop")
+                ? patched
+                : source;
         }
 
         private static string PatchAppJs(string source)
@@ -363,6 +394,15 @@ namespace Emby.YouTubePlugin
             }
 
             var token = $"?{PluginCacheQueryPart}&ext=.js";
+
+            // The OSD controller is loaded through Emby.importModule, which accepts a normal module URL with a query string.
+            if (!patched.Contains($"videoosd/videoosd.js{token}", StringComparison.Ordinal))
+            {
+                patched = patched.Replace(
+                    "controller:\"videoosd/videoosd.js\",controllerType:\"module\"",
+                    $"controller:\"videoosd/videoosd.js{token}\",controllerType:\"module\"",
+                    StringComparison.Ordinal);
+            }
 
             if (!patched.Contains($"plugin_webview.js{token}", StringComparison.Ordinal))
             {
@@ -933,8 +973,13 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
             return normalized.EndsWith("app.js", StringComparison.OrdinalIgnoreCase)
                    || normalized.EndsWith("modules/youtubeplayer/plugin.js", StringComparison.OrdinalIgnoreCase)
                    || normalized.EndsWith("modules/youtubeplayer/plugin_webview.js", StringComparison.OrdinalIgnoreCase)
+                   || IsVideoOsdResource(normalized)
                    || IsEmbedResource(normalized);
         }
+
+        private static bool IsVideoOsdResource(string? resourceName) =>
+            NormalizeResourceName(resourceName)
+                .EndsWith("videoosd/videoosd.js", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsEmbedResource(string? resourceName) =>
             NormalizeResourceName(resourceName)
@@ -964,7 +1009,7 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260908-player-teardown-v13";
+        private const string DashboardPatchRevision = "20260908-youtube-exit-v14";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
