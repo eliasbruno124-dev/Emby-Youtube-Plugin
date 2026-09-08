@@ -37,8 +37,11 @@ namespace Emby.YouTubePlugin
         private static readonly object PlaylistFingerprintFileLock = new();
         private readonly object _resumeCheckpointFileLock = new();
         private readonly YouTubeHomeSectionManager _homeSectionManager;
+        private readonly YouTubeCaptionOffGuard _captionOffGuard;
         private readonly IUserManager _userManager;
         private readonly CancellationTokenSource _lifetimeCts = new();
+        private readonly CancellationToken _lifetimeToken;
+        private readonly object _resumeDispatchLifetimeGate = new();
         private readonly ManualResetEventSlim _pollIdle = new(initialState: true);
         private ILibraryManager? _libraryManager;
         private ISessionManager? _sessionManager;
@@ -50,12 +53,14 @@ namespace Emby.YouTubePlugin
         private int _resumeCheckpointsDirty;
         private int _disposed;
         private int _bootstrapHashChecked;
+        private long _nextResumeSeekGeneration;
         private bool _playlistFingerprintsDirty;
         private static PluginEntryPoint? _current;
         private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
         private const long ResumeSeekEndGuardTicks = TimeSpan.TicksPerSecond * 10;
         private static readonly TimeSpan ResumeSeekDelay = TimeSpan.FromMilliseconds(1800);
         private static readonly TimeSpan ResumeSeekRetryDelay = TimeSpan.FromMilliseconds(1400);
+        private static readonly TimeSpan FireTvFallbackWindow = TimeSpan.FromSeconds(60);
         // Grace window after a sent seek during which we wait for the client to
         // actually process it. Without this, a Progress event that was emitted
         // BEFORE the seek landed would falsely trigger another jump.
@@ -77,8 +82,20 @@ namespace Emby.YouTubePlugin
             long PositionTicks,
             long RuntimeTicks,
             bool SingleSeekAttempt,
+            bool RequiresObservedProgress,
+            long Generation,
+            string PlaySessionId,
+            ResumeSeekDispatchGate DispatchGate,
+            DateTime EarliestSeekUtc,
+            DateTime ExpiresUtc,
+            bool HasObservedProgress,
+            long ObservedProgressTicks,
             int AttemptsSent,
             DateTime? LastSeekUtc);
+
+        private sealed class ResumeSeekDispatchGate
+        {
+        }
 
         private sealed record ResumeCheckpoint(
             string UserId,
@@ -115,7 +132,9 @@ namespace Emby.YouTubePlugin
             _libraryManager = libraryManager;
             _userDataManager = userDataManager;
             _userManager = userManager;
+            _lifetimeToken = _lifetimeCts.Token;
             _homeSectionManager = new YouTubeHomeSectionManager(userManager, userViewManager);
+            _captionOffGuard = new YouTubeCaptionOffGuard(sessionManager);
             ChannelRefreshInvoker.Initialize(channelManager);
         }
 
@@ -142,6 +161,7 @@ namespace Emby.YouTubePlugin
             AttachImageRepairHook();
             QueueExistingSortNameRepair("startup");
             AttachResumeSeekHook();
+            _captionOffGuard.Start();
 
             try
             {
@@ -267,6 +287,7 @@ namespace Emby.YouTubePlugin
 
                 var runtimeTicks = item.RunTimeTicks.GetValueOrDefault();
                 long positionTicks;
+                var isFireTvOrAndroidTv = IsLikelyFireTvOrAndroidTvSession(session);
 
                 if (PlaybackIntentInterceptor.TryConsume(session.UserId, item.InternalId, session.DeviceId, out var intent))
                 {
@@ -274,6 +295,17 @@ namespace Emby.YouTubePlugin
 
                     if (positionTicks < ResumeSeekMinimumTicks)
                     {
+                        if (isFireTvOrAndroidTv)
+                        {
+                            // A native TV StartTimeTicks=0 is an explicit
+                            // play-from-beginning request, not sufficient
+                            // evidence of a reconnect. Never turn it into a
+                            // delayed TV resume seek from a stale checkpoint.
+                            RemoveResumeCheckpoint(session.UserId, videoId);
+                            YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; TV play from beginning was requested.");
+                            return;
+                        }
+
                         if (TryGetRecentSessionCheckpoint(session.Id, videoId, out var restartCheckpoint))
                         {
                             positionTicks = restartCheckpoint.PositionTicks;
@@ -316,6 +348,10 @@ namespace Emby.YouTubePlugin
                     ResumeSeekMinimumTicks,
                     positionTicks - ResumeSeekEndGuardTicks);
 
+                // LG/webOS players remain URL/player-start only. Fire TV and
+                // Android TV get a single, delayed fallback below, but only
+                // after their own playback progress proves that the native
+                // URL/player start did not take effect.
                 if (ShouldSuppressServerSideResumeSeek(session))
                 {
                     YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {videoId}; TV player will use the URL/player start only.");
@@ -323,6 +359,8 @@ namespace Emby.YouTubePlugin
                 }
 
                 var key = GetResumeSeekKey(e, item);
+                var generation = Interlocked.Increment(ref _nextResumeSeekGeneration);
+                var now = DateTime.UtcNow;
                 var pending = new PendingResumeSeek(
                     key,
                     session.Id,
@@ -331,13 +369,23 @@ namespace Emby.YouTubePlugin
                     item.InternalId,
                     positionTicks,
                     runtimeTicks,
-                    IsLikelyNativeAndroidTabletSession(session),
+                    // TV fallback must never retry: a URL/player-start is
+                    // still preferred and a second seek can disrupt playback.
+                    IsLikelyNativeAndroidTabletSession(session) || isFireTvOrAndroidTv,
+                    isFireTvOrAndroidTv,
+                    generation,
+                    e.PlaySessionId ?? string.Empty,
+                    new ResumeSeekDispatchGate(),
+                    now + ResumeSeekDelay,
+                    isFireTvOrAndroidTv ? now + FireTvFallbackWindow : DateTime.MaxValue,
+                    false,
+                    0,
                     0,
                     null);
 
                 _pendingResumeSeeks[key] = pending;
 
-                SchedulePendingResumeSeek(key, ResumeSeekDelay, "delayed start");
+                SchedulePendingResumeSeek(key, generation, ResumeSeekDelay, "delayed start");
             }
             catch (Exception ex)
             {
@@ -417,7 +465,7 @@ namespace Emby.YouTubePlugin
             foreach (var kvp in _pendingResumeSeeks)
             {
                 if (string.Equals(kvp.Value.SessionId, sessionId, StringComparison.Ordinal))
-                    _pendingResumeSeeks.TryRemove(kvp.Key, out _);
+                    RemovePendingResumeSeek(kvp.Key, kvp.Value);
             }
 
             // The in-flight stamps share the "<sessionId>|..." key prefix. Drop
@@ -445,6 +493,15 @@ namespace Emby.YouTubePlugin
                 var hasPendingSeek = _pendingResumeSeeks.TryGetValue(key, out var pending);
                 var currentTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session);
 
+                if (hasPendingSeek && pending != null && IsPlaybackPaused(e, session))
+                {
+                    // A deliberate pause is not a failed native resume. Do not
+                    // let a delayed task seek after the user has paused.
+                    RemovePendingResumeSeek(key, pending);
+                    hasPendingSeek = false;
+                    pending = null;
+                }
+
                 if (!string.IsNullOrEmpty(videoId))
                 {
                     if (IsYouTubeLiveItem(item))
@@ -452,8 +509,7 @@ namespace Emby.YouTubePlugin
                         RemoveResumeCheckpoint(session?.UserId, videoId);
                         if (hasPendingSeek && pending != null)
                         {
-                            _pendingResumeSeeks.TryRemove(key, out _);
-                            _resumeSeeksInFlight.TryRemove($"{key}|{pending.PositionTicks}", out _);
+                            RemovePendingResumeSeek(key, pending);
                         }
                         return;
                     }
@@ -482,15 +538,61 @@ namespace Emby.YouTubePlugin
                 if (!hasPendingSeek || pending == null)
                     return;
 
+                var rawProgressTicksForPending = e.PlaybackPositionTicks;
                 if (currentTicks >= ResumeSeekMinimumTicks
-                    && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
+                    && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks
+                    && (!pending.RequiresObservedProgress
+                        || rawProgressTicksForPending.HasValue
+                           && rawProgressTicksForPending.Value >= ResumeSeekMinimumTicks
+                           && rawProgressTicksForPending.Value >= pending.PositionTicks - ResumeSeekEndGuardTicks))
                 {
                     // The client is already in the requested area, so the
                     // pending retry is no longer needed.
-                    _pendingResumeSeeks.TryRemove(key, out _);
-                    _resumeSeeksInFlight.TryRemove($"{key}|{pending.PositionTicks}", out _);
+                    RemovePendingResumeSeek(key, pending);
                     _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
                     return;
+                }
+
+                if (pending.RequiresObservedProgress)
+                {
+                    var rawProgressTicks = e.PlaybackPositionTicks;
+                    PendingResumeSeek observed;
+                    if (!rawProgressTicks.HasValue
+                        || rawProgressTicks.Value <= 0
+                        || pending.HasObservedProgress
+                            && rawProgressTicks.Value < pending.ObservedProgressTicks)
+                    {
+                        // A zero or regression revokes eligibility. Never
+                        // replace a raw zero with a stale session position.
+                        observed = pending with
+                        {
+                            HasObservedProgress = false,
+                            ObservedProgressTicks = 0
+                        };
+                    }
+                    else if (HasUsableFireTvFallbackProgress(pending, rawProgressTicks.Value))
+                    {
+                        // This establishes finite media progress only; it does
+                        // not prove that a client has no advertising.
+                        observed = pending with
+                        {
+                            HasObservedProgress = true,
+                            ObservedProgressTicks = rawProgressTicks.Value
+                        };
+                    }
+                    else
+                    {
+                        observed = pending with
+                        {
+                            HasObservedProgress = false,
+                            ObservedProgressTicks = 0
+                        };
+                    }
+
+                    if (TryUpdatePendingResumeSeek(key, pending, observed))
+                        pending = observed;
+                    else
+                        return;
                 }
 
                 // Don't re-issue a seek while the client may still be processing
@@ -504,7 +606,7 @@ namespace Emby.YouTubePlugin
 
                 // Progress can arrive before the delayed task fires. Treat it
                 // as an early retry point while the player is definitely alive.
-                SchedulePendingResumeSeek(key, TimeSpan.Zero, "progress");
+                SchedulePendingResumeSeek(key, pending.Generation, TimeSpan.Zero, "progress");
             }
             catch (Exception ex)
             {
@@ -556,16 +658,67 @@ namespace Emby.YouTubePlugin
             return 0;
         }
 
-        private void SchedulePendingResumeSeek(string key, TimeSpan delay, string reason)
+        private static bool HasUsableFireTvFallbackProgress(
+            PendingResumeSeek pending,
+            long rawProgressTicks)
         {
+            // A real VOD timeline keeps a fallback out of live/unknown-length
+            // sources. A positive raw progress report avoids treating a stale
+            // session-level value as evidence that the native player is ready.
+            return pending.RuntimeTicks > 0
+                   && pending.RuntimeTicks - pending.PositionTicks >= ResumeSeekEndGuardTicks
+                   && rawProgressTicks >= ResumeSeekMinimumTicks
+                   && rawProgressTicks < pending.PositionTicks - ResumeSeekEndGuardTicks
+                   && rawProgressTicks < pending.RuntimeTicks - ResumeSeekEndGuardTicks;
+        }
+
+        private static bool IsPlaybackPaused(PlaybackProgressEventArgs e, SessionInfo? session)
+        {
+            if (GetBooleanProperty(e, "IsPaused"))
+                return true;
+
+            var playState = session?.GetType()
+                .GetProperty("PlayState", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(session);
+            return GetBooleanProperty(playState, "IsPaused");
+        }
+
+        private static bool GetBooleanProperty(object? source, string name)
+        {
+            try
+            {
+                return source?.GetType()
+                    .GetProperty(name, BindingFlags.Instance | BindingFlags.Public)
+                    ?.GetValue(source) is bool value
+                    && value;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsDisposingOrDisposed() =>
+            Volatile.Read(ref _disposed) != 0 || _lifetimeToken.IsCancellationRequested;
+
+        private void SchedulePendingResumeSeek(string key, long generation, TimeSpan delay, string reason)
+        {
+            var cancellationToken = _lifetimeToken;
             _ = Task.Run(async () =>
             {
                 try
                 {
                     if (delay > TimeSpan.Zero)
-                        await Task.Delay(delay).ConfigureAwait(false);
+                        await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
 
-                    await TrySendPendingResumeSeekAsync(key, reason).ConfigureAwait(false);
+                    if (IsDisposingOrDisposed())
+                        return;
+
+                    await TrySendPendingResumeSeekAsync(key, generation, reason).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    // Plugin unload cancels delayed fallback work.
                 }
                 catch (Exception ex)
                 {
@@ -593,78 +746,156 @@ namespace Emby.YouTubePlugin
                 .ConfigureAwait(false);
         }
 
-        private async Task TrySendPendingResumeSeekAsync(string key, string reason)
+        private async Task TrySendPendingResumeSeekAsync(string key, long generation, string reason)
         {
-            if (_sessionManager == null)
+            if (_sessionManager == null || IsDisposingOrDisposed())
                 return;
 
-            if (!_pendingResumeSeeks.TryGetValue(key, out var pending))
+            if (!_pendingResumeSeeks.TryGetValue(key, out var pending)
+                || pending.Generation != generation)
                 return;
 
-            // The user may have switched videos during the delay. Never seek a
-            // session that has already moved on to another item.
-            if (!IsPendingSeekStillCurrent(pending))
-            {
-                YouTubeChannel.LogPublic($"[YT] Resume seek skipped for {pending.VideoId}; session moved to another item.");
-                _pendingResumeSeeks.TryRemove(key, out _);
-                _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
+            var dispatchTask = TryReserveAndBeginResumeSeek(key, generation, pending, out var reserved);
+            if (dispatchTask == null || reserved == null)
                 return;
-            }
-
-            // The initial delayed task and a progress-triggered task can wake
-            // independently. Enforce the post-send quiet period here as well as
-            // in OnPlaybackProgress so the delayed path cannot re-cue a player
-            // that is still applying the first seek.
-            if (pending.LastSeekUtc is { } lastSeekUtc
-                && DateTime.UtcNow - lastSeekUtc < ResumeSeekPostSendGrace)
-            {
-                return;
-            }
-
-            var inFlightKey = $"{key}|{pending.PositionTicks}";
-            var now = DateTime.UtcNow;
-            if (!TryClaimResumeSeekAttempt(inFlightKey, now))
-                return;
-
-            if (TryGetSessionPositionTicks(pending.SessionId, out var currentTicks)
-                && currentTicks >= ResumeSeekMinimumTicks
-                && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
-            {
-                _pendingResumeSeeks.TryRemove(key, out _);
-                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
-                _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
-                return;
-            }
-
-            var maxAttempts = pending.SingleSeekAttempt ? 1 : ResumeSeekMaxAttempts;
-            if (pending.AttemptsSent >= maxAttempts)
-            {
-                _pendingResumeSeeks.TryRemove(key, out _);
-                _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
-                YouTubeChannel.LogPublic($"[YT] Resume seek gave up for {pending.VideoId}; player stayed before the resume point after {pending.AttemptsSent} attempts.");
-                return;
-            }
-
-            _resumeSeeksInFlight[inFlightKey] = now;
 
             try
             {
-                await SendSeekCommandAsync(pending).ConfigureAwait(false);
+                await dispatchTask.ConfigureAwait(false);
 
-                // TryUpdate avoids resurrecting a pending entry that was just
-                // removed (e.g. by PlaybackStopped) — if the slot moved on, the
-                // increment is simply skipped.
-                var updated = pending with
+                if (IsDisposingOrDisposed()
+                    || !_pendingResumeSeeks.TryGetValue(key, out var current)
+                    || current.Generation != reserved.Generation
+                    || !ReferenceEquals(current.DispatchGate, reserved.DispatchGate))
                 {
-                    AttemptsSent = pending.AttemptsSent + 1,
-                    LastSeekUtc = DateTime.UtcNow
-                };
-                _pendingResumeSeeks.TryUpdate(key, updated, pending);
-                YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}, attempt {updated.AttemptsSent}) for {pending.VideoId} to {pending.PositionTicks} ticks.");
+                    return;
+                }
+
+                YouTubeChannel.LogPublic($"[YT] Resume seek sent ({reason}, attempt {reserved.AttemptsSent}) for {reserved.VideoId} to {reserved.PositionTicks} ticks.");
+            }
+            catch (OperationCanceledException) when (IsDisposingOrDisposed())
+            {
+                // The plugin is unloading; do not report a cancelled command
+                // as a failed resume attempt.
             }
             catch (Exception ex)
             {
-                YouTubeChannel.LogPublic($"[YT] Resume seek failed for {pending.VideoId}: {ex.Message}");
+                YouTubeChannel.LogPublic($"[YT] Resume seek failed for {reserved.VideoId}: {ex.Message}");
+            }
+        }
+
+        private Task? TryReserveAndBeginResumeSeek(
+            string key,
+            long generation,
+            PendingResumeSeek expected,
+            out PendingResumeSeek? reserved)
+        {
+            reserved = null;
+            lock (_resumeDispatchLifetimeGate)
+            {
+                lock (expected.DispatchGate)
+                {
+                    if (IsDisposingOrDisposed()
+                        || !_pendingResumeSeeks.TryGetValue(key, out var pending)
+                        || pending.Generation != generation
+                        || !ReferenceEquals(pending.DispatchGate, expected.DispatchGate))
+                        return null;
+
+                    var now = DateTime.UtcNow;
+                    if (!IsPendingSeekStillCurrent(pending)
+                        || pending.RequiresObservedProgress && now >= pending.ExpiresUtc)
+                    {
+                        RemovePendingResumeSeek(key, pending);
+                        return null;
+                    }
+
+                    if (pending.LastSeekUtc is { } lastSeekUtc
+                        && now - lastSeekUtc < ResumeSeekPostSendGrace)
+                        return null;
+
+                    if (pending.RequiresObservedProgress
+                        && (!pending.HasObservedProgress
+                            || pending.ObservedProgressTicks < ResumeSeekMinimumTicks
+                            || now < pending.EarliestSeekUtc))
+                        return null;
+
+                    var inFlightKey = GetResumeSeekInFlightKey(pending);
+                    if (!TryClaimResumeSeekAttempt(inFlightKey, now))
+                        return null;
+
+                    if (!pending.RequiresObservedProgress
+                        && TryGetSessionPositionTicks(pending.SessionId, out var currentTicks)
+                        && currentTicks >= ResumeSeekMinimumTicks
+                        && currentTicks >= pending.PositionTicks - ResumeSeekEndGuardTicks)
+                    {
+                        RemovePendingResumeSeek(key, pending);
+                        _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
+                        return null;
+                    }
+
+                    var maxAttempts = pending.SingleSeekAttempt ? 1 : ResumeSeekMaxAttempts;
+                    if (pending.AttemptsSent >= maxAttempts)
+                    {
+                        RemovePendingResumeSeek(key, pending);
+                        YouTubeChannel.LogPublic($"[YT] Resume seek gave up for {pending.VideoId}; player stayed before the resume point after {pending.AttemptsSent} attempts.");
+                        return null;
+                    }
+
+                    // Count immediately before the synchronous command
+                    // invocation. Progress updates share this gate, so they
+                    // cannot consume the sole attempt between validation and
+                    // dispatch; they may still update freely before this point.
+                    reserved = pending with
+                    {
+                        AttemptsSent = pending.AttemptsSent + 1,
+                        LastSeekUtc = now
+                    };
+                    if (!_pendingResumeSeeks.TryUpdate(key, reserved, pending)
+                        || IsDisposingOrDisposed()
+                        || !IsPendingSeekStillCurrent(reserved))
+                    {
+                        return null;
+                    }
+
+                    return SendSeekCommandAsync(reserved);
+                }
+            }
+        }
+
+        private static string GetResumeSeekInFlightKey(PendingResumeSeek pending) =>
+            $"{pending.Key}|{pending.Generation}|{pending.PositionTicks}";
+
+        private void RemovePendingResumeSeek(string key, PendingResumeSeek pending)
+        {
+            lock (pending.DispatchGate)
+            {
+                if (_pendingResumeSeeks.TryGetValue(key, out var current)
+                    && current.Generation == pending.Generation
+                    && ReferenceEquals(current.DispatchGate, pending.DispatchGate)
+                    && _pendingResumeSeeks.TryRemove(
+                        new KeyValuePair<string, PendingResumeSeek>(key, current)))
+                {
+                    _resumeSeeksInFlight.TryRemove(GetResumeSeekInFlightKey(pending), out _);
+                }
+            }
+        }
+
+        private bool TryUpdatePendingResumeSeek(
+            string key,
+            PendingResumeSeek expected,
+            PendingResumeSeek updated)
+        {
+            lock (expected.DispatchGate)
+            {
+                if (!_pendingResumeSeeks.TryGetValue(key, out var current)
+                    || current.Generation != expected.Generation
+                    || !ReferenceEquals(current.DispatchGate, expected.DispatchGate)
+                    || !Equals(current, expected))
+                {
+                    return false;
+                }
+
+                return _pendingResumeSeeks.TryUpdate(key, updated, current);
             }
         }
 
@@ -690,7 +921,7 @@ namespace Emby.YouTubePlugin
 
         private async Task SendSeekCommandAsync(PendingResumeSeek pending)
         {
-            if (_sessionManager == null)
+            if (_sessionManager == null || IsDisposingOrDisposed())
                 return;
 
             var request = new PlaystateRequest
@@ -704,7 +935,7 @@ namespace Emby.YouTubePlugin
                     pending.SessionId,
                     pending.SessionId,
                     request,
-                    CancellationToken.None)
+                    _lifetimeToken)
                 .ConfigureAwait(false);
         }
 
@@ -812,8 +1043,7 @@ namespace Emby.YouTubePlugin
                 ?.GetValue(source) as string ?? string.Empty;
 
         private static bool ShouldSuppressServerSideResumeSeek(SessionInfo session)
-            => IsLikelyFireTvOrAndroidTvSession(session)
-               || IsLikelyLgOrWebOsSession(session);
+            => IsLikelyLgOrWebOsSession(session);
 
         private static bool IsLikelyNativeAndroidTabletSession(SessionInfo session)
         {
@@ -889,9 +1119,19 @@ namespace Emby.YouTubePlugin
         }
 
         private bool IsPendingSeekStillCurrent(PendingResumeSeek pending)
-            => IsSessionStillOnItem(pending.SessionId, pending.ItemId, "resume seek");
+            => IsSessionStillOnItem(
+                pending.SessionId,
+                pending.UserId,
+                pending.PlaySessionId,
+                pending.ItemId,
+                "resume seek");
 
-        private bool IsSessionStillOnItem(string sessionId, long itemId, string logContext)
+        private bool IsSessionStillOnItem(
+            string sessionId,
+            string? userId,
+            string playSessionId,
+            long itemId,
+            string logContext)
         {
             try
             {
@@ -900,6 +1140,24 @@ namespace Emby.YouTubePlugin
 
                 if (session == null)
                     return false;
+
+                if (string.IsNullOrEmpty(playSessionId)
+                    || !string.Equals(session.UserId, userId, StringComparison.Ordinal)
+                    || IsSessionPaused(session))
+                {
+                    return false;
+                }
+
+                // SessionInfo does not expose PlaySessionId on every supported
+                // Emby build. When it does, require an exact match; otherwise
+                // the immutable pending generation and the Start/Stop cleanup
+                // remain the authority for the event's explicit PlaySessionId.
+                var currentPlaySessionId = GetCurrentPlaySessionId(session);
+                if (!string.IsNullOrEmpty(currentPlaySessionId)
+                    && !string.Equals(currentPlaySessionId, playSessionId, StringComparison.Ordinal))
+                {
+                    return false;
+                }
 
                 var nowPlaying = session.FullNowPlayingItem;
                 if (nowPlaying != null)
@@ -917,6 +1175,26 @@ namespace Emby.YouTubePlugin
                 YouTubeChannel.LogPublic($"[YT] YouTube {logContext} current-item check failed: {ex.Message}");
                 return false;
             }
+        }
+
+        private static string GetCurrentPlaySessionId(SessionInfo session)
+        {
+            var playSessionId = GetStringProperty(session, "PlaySessionId");
+            if (!string.IsNullOrEmpty(playSessionId))
+                return playSessionId;
+
+            var playState = session.GetType()
+                .GetProperty("PlayState", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(session);
+            return GetStringProperty(playState, "PlaySessionId");
+        }
+
+        private static bool IsSessionPaused(SessionInfo session)
+        {
+            var playState = session.GetType()
+                .GetProperty("PlayState", BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(session);
+            return GetBooleanProperty(playState, "IsPaused");
         }
 
         private void TrackResumeCheckpoint(
@@ -1184,7 +1462,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
-        private const string PluginBuildRevision = "2.0.8.10-caption-off-v12-20260831";
+        private const string PluginBuildRevision = "2.0.8.11-resume-player-lifecycle-20260908";
 
         // Wipes transient caches when the installed plugin version differs
         // from the one we recorded last time. Saves the user from having to
@@ -1752,10 +2030,14 @@ namespace Emby.YouTubePlugin
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref _disposed, 1) != 0)
-                return;
+            lock (_resumeDispatchLifetimeGate)
+            {
+                if (Interlocked.Exchange(ref _disposed, 1) != 0)
+                    return;
 
-            _lifetimeCts.Cancel();
+                _lifetimeCts.Cancel();
+            }
+            _captionOffGuard.Dispose();
             if (ReferenceEquals(_current, this))
                 _current = null;
             if (_libraryManager != null)

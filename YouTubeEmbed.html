@@ -29,8 +29,29 @@
         var initialReadySent = false;
         var autoplayRetryUsed = false;
         var autoplayRecoveryReported = false;
+        var disposed = false;
+
+        function disposePlayer() {
+            if (disposed) return;
+            disposed = true;
+            var current = player;
+            player = null;
+            if (reportTimer) window.clearInterval(reportTimer);
+            reportTimer = 0;
+            stopCaptionGuard();
+            try { if (current && current.stopVideo) current.stopVideo(); } catch (_) {}
+            try { if (current && current.destroy) current.destroy(); } catch (_) {}
+            // Removing the frame also stops ads when the player API rejects a
+            // stop command. Late API callbacks cannot recreate the player.
+            var frames = document.querySelectorAll("iframe");
+            for (var i = 0; i < frames.length; i++) {
+                try { frames[i].src = "about:blank"; } catch (_) {}
+                if (frames[i].parentNode) frames[i].parentNode.removeChild(frames[i]);
+            }
+        }
 
         function notify(type, data) {
+            if (disposed) return;
             window.parent.postMessage({ type: type, data: data }, parentOrigin);
         }
 
@@ -59,6 +80,7 @@
         }
 
         function forceCaptionsOff(target) {
+            if (disposed) return;
             var current = target || player;
             if (!current || captionForceBusy) return;
             captionForceBusy = true;
@@ -90,6 +112,7 @@
         }
 
         function startCaptionGuard(target) {
+            if (disposed) return;
             stopCaptionGuard();
             var guardedPlayer = target || player;
             if (!guardedPlayer) return;
@@ -119,6 +142,10 @@
         }
 
         function onPlayerReady(event) {
+            if (disposed) {
+                try { event.target.destroy(); } catch (_) {}
+                return;
+            }
             player = event.target;
             startCaptionGuard(player);
             if (!initialReadySent) {
@@ -129,6 +156,7 @@
         }
 
         function onAutoplayBlocked() {
+            if (disposed) return;
             notify("youtubeAutoplayBlocked");
             if (autoplayRetryUsed || !player) return;
             autoplayRetryUsed = true;
@@ -146,6 +174,7 @@
         }
 
         function createPlayer() {
+            if (disposed) return;
             player = new YT.Player("player", {
                 height: "100%",
                 width: "100%",
@@ -159,6 +188,7 @@
                         forceCaptionsOff(event.target);
                     },
                     onStateChange: function (event) {
+                        if (disposed) return;
                         if (event.data === YT.PlayerState.ENDED) {
                             stopCaptionGuard();
                         } else if (event.data === YT.PlayerState.PLAYING) {
@@ -187,6 +217,7 @@
         }
 
         window.onYouTubeIframeAPIReady = function () {
+            if (disposed) return;
             if (!videoId) {
                 notify("youtubeError", "missing-video-id");
                 return;
@@ -195,6 +226,7 @@
         };
 
         window.addEventListener("message", function (event) {
+            if (disposed) return;
             if (event.origin !== parentOrigin || event.source !== window.parent) return;
             var message = event.data || {};
             if (message.type !== "youtubeCommand") return;
@@ -210,7 +242,8 @@
                     return;
                 }
                 if (message.func === "stopVideo") {
-                    stopCaptionGuard();
+                    disposePlayer();
+                    return;
                 } else if (message.func === "playVideo") {
                     startCaptionGuard(player);
                 }
@@ -220,10 +253,8 @@
             } catch (_) {}
         });
 
-        window.addEventListener("beforeunload", function () {
-            if (reportTimer) window.clearInterval(reportTimer);
-            stopCaptionGuard();
-        });
+        window.addEventListener("beforeunload", disposePlayer);
+        window.addEventListener("pagehide", disposePlayer);
 
         var apiScript = document.createElement("script");
         apiScript.src = "https://www.youtube.com/iframe_api";

@@ -532,8 +532,71 @@ namespace Emby.YouTubePlugin
             if (!PatchCanPlayItem(ref patched, "iframe"))
                 return source;
 
-            return patched;
+            return PatchIframeTeardown(patched);
         }
+
+        private static string PatchIframeTeardown(string source)
+        {
+            // Apply as a unit. An unfamiliar client resource keeps its existing
+            // compatibility patches rather than receiving half a lifecycle fix.
+            var patched = source;
+            var replacements = new (string Before, string After)[]
+            {
+                ("function onEndedInternal(instance,triggerStopped){ytPluginStopCaptionGuard20260822(instance);!function(instance){instance.timeUpdateInterval&&instance.timeUpdateInterval.destroy(),instance.timeUpdateInterval=null}(instance);var resizeListener=instance.resizeListener;resizeListener&&(window.removeEventListener(\"resize\",resizeListener),window.removeEventListener(\"orientationChange\",resizeListener),instance.resizeListener=null),triggerStopped&&_events.default.trigger(instance,\"stopped\",[{}]),instance.currentYoutubePlayer&&instance.currentYoutubePlayer.destroy(),instance.currentYoutubePlayer=null}",
+                 "function onEndedInternal(instance,triggerStopped){ytPluginDisposePlayback20260908(instance,triggerStopped)}"),
+                ("function stopInternal(instance,destroyPlayer,triggerStopped){ytPluginStopCaptionGuard20260822(instance);var currentYoutubePlayer=instance.currentYoutubePlayer;currentYoutubePlayer&&(currentYoutubePlayer.stopVideo&&currentYoutubePlayer.stopVideo(),onEndedInternal(instance,triggerStopped)),destroyPlayer&&instance.destroy()}",
+                 "function stopInternal(instance,destroyPlayer,triggerStopped){ytPluginDisposePlayback20260908(instance,triggerStopped)}"),
+                ("YoutubePlayer.prototype.destroy=function(){ytPluginStopCaptionGuard20260822(this);var dlg=this.videoDialog;dlg&&(this.videoDialog=null,dlg.parentNode.removeChild(dlg))}",
+                 "YoutubePlayer.prototype.destroy=function(){ytPluginDisposePlayback20260908(this,!1)}"),
+                ("function setCurrentSrc(instance,elem,options,signal){return",
+                 "function setCurrentSrc(instance,elem,options,signal){var ytGeneration=(instance.ytGeneration20260908||0)+1;instance.ytGeneration20260908=ytGeneration;return"),
+                ("new Promise(function(resolve,reject){try{null!=signal&&signal.throwIfAborted()}",
+                 "new Promise(function(resolve,reject){instance.ytStartReject20260908=function(){if(reject){var fn=reject;reject=null;resolve=null;var err=new Error(\"YouTube playback stopped\");err.name=\"AbortError\";fn(err)}};instance.ytAbortSignal20260908=signal;instance.ytAbortHandler20260908=function(){instance.ytGeneration20260908===ytGeneration&&ytPluginDisposePlayback20260908(instance,!1)};signal&&signal.addEventListener&&signal.addEventListener(\"abort\",instance.ytAbortHandler20260908,{once:!0});try{null!=signal&&signal.throwIfAborted()}"),
+                ("window.onYouTubeIframeAPIReady=function(){try{",
+                 "window.onYouTubeIframeAPIReady=function(){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog)return;try{"),
+                ("onReady:function(event){if(signal.aborted)",
+                 "onReady:function(event){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog)return;if(signal.aborted)"),
+                ("onStateChange:function(event){ytPluginForceCaptionsOff20260822(event.target);",
+                 "onStateChange:function(event){if(instance.ytGeneration20260908!==ytGeneration)return;ytPluginForceCaptionsOff20260822(event.target);"),
+                ("onApiChange:function(event){ytPluginForceCaptionsOff20260822(event.target)}",
+                 "onApiChange:function(event){instance.ytGeneration20260908===ytGeneration&&ytPluginForceCaptionsOff20260822(event.target)}"),
+                ("onError:function(event){ytPluginStopCaptionGuard20260822(instance);",
+                 "onError:function(event){if(instance.ytGeneration20260908!==ytGeneration)return;ytPluginStopCaptionGuard20260822(instance);")
+            };
+            foreach (var replacement in replacements)
+            {
+                if (!ReplaceRequired(ref patched, replacement.Before, replacement.After, "iframe playback teardown"))
+                    return source;
+            }
+            return patched.Replace("function ytPluginPatch20260606(){return 1}",
+                "function ytPluginPatch20260606(){return 1}" + IframeTeardownHelper, StringComparison.Ordinal);
+        }
+
+        private const string IframeTeardownHelper = @"
+function ytPluginDisposePlayback20260908(instance,triggerStopped){
+    var player=instance.currentYoutubePlayer,dlg=instance.videoDialog,
+        timer=instance.timeUpdateInterval,resize=instance.resizeListener,
+        signal=instance.ytAbortSignal20260908,abort=instance.ytAbortHandler20260908,
+        reject=instance.ytStartReject20260908,active=!!(player||dlg||reject);
+    instance.ytGeneration20260908=(instance.ytGeneration20260908||0)+1;
+    instance.currentYoutubePlayer=null;instance.videoDialog=null;
+    instance.timeUpdateInterval=null;instance.resizeListener=null;
+    instance.ytAbortSignal20260908=null;instance.ytAbortHandler20260908=null;
+    instance.ytStartReject20260908=null;
+    ytPluginStopCaptionGuard20260822(instance);
+    try{signal&&abort&&signal.removeEventListener('abort',abort)}catch(e){}
+    try{timer&&timer.destroy()}catch(e){}
+    try{resize&&(window.removeEventListener('resize',resize),window.removeEventListener('orientationChange',resize))}catch(e){}
+    try{player&&player.stopVideo&&player.stopVideo()}catch(e){}
+    try{player&&player.destroy&&player.destroy()}catch(e){}
+    // Detach even when YouTube rejects stop/destroy during an advertisement.
+    if(dlg){try{var frames=dlg.querySelectorAll('iframe');for(var i=0;i<frames.length;i++)frames[i].src='about:blank'}catch(e){}
+        try{dlg.parentNode&&dlg.parentNode.removeChild(dlg)}catch(e){}}
+    try{reject&&reject()}catch(e){}
+    // Notify only after teardown: a handler may immediately start another item.
+    active&&triggerStopped&&_events.default.trigger(instance,'stopped',[{}]);
+}
+";
 
         private static string PatchWebViewPlayer(string source)
         {
@@ -901,7 +964,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260831-emby410-player-v12";
+        private const string DashboardPatchRevision = "20260908-player-teardown-v13";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";
