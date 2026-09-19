@@ -171,13 +171,50 @@ namespace Emby.YouTubePlugin
 
         internal static bool TryConsume(string? userId, long itemId, string? deviceId, out PlaybackIntent intent)
         {
+            lock (Sync)
+                return TryConsumeCore(userId, itemId, deviceId, out intent, out _);
+        }
+
+        internal static bool TryConsumeForResume(
+            string? userId,
+            long itemId,
+            string? deviceId,
+            out PlaybackIntent intent,
+            out bool ambiguous)
+        {
+            lock (Sync)
+                return TryConsumeCore(userId, itemId, deviceId, out intent, out ambiguous);
+        }
+
+        private static bool TryConsumeCore(
+            string? userId,
+            long itemId,
+            string? deviceId,
+            out PlaybackIntent intent,
+            out bool ambiguous)
+        {
             // PlaybackStart consumes the intent once. If nothing was captured,
             // the caller should avoid guessing and simply leave playback alone.
+            ambiguous = false;
             CleanupExpired();
 
             var normalizedUserId = Normalize(userId);
             var normalizedItemId = itemId.ToString(CultureInfo.InvariantCulture);
             var normalizedDeviceId = Normalize(deviceId);
+
+            // Without a device identifier, two simultaneous requests for the
+            // same item are ambiguous. Do not borrow another player's start.
+            if (string.IsNullOrEmpty(normalizedDeviceId)
+                && Intents.Values.Where(candidate =>
+                        string.Equals(candidate.UserId, normalizedUserId, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(candidate.ItemId, normalizedItemId, StringComparison.OrdinalIgnoreCase)
+                        && DateTime.UtcNow - candidate.CapturedUtc <= IntentTtl)
+                    .Distinct().Take(2).Count() > 1)
+            {
+                ambiguous = true;
+                intent = default!;
+                return false;
+            }
 
             if (TryConsumeKey(MakeKey(normalizedUserId, normalizedItemId, normalizedDeviceId), out intent))
                 return true;
@@ -219,11 +256,21 @@ namespace Emby.YouTubePlugin
             if (Intents.TryRemove(key, out intent!)
                 && DateTime.UtcNow - intent.CapturedUtc <= IntentTtl)
             {
+                RemoveIntentAliases(intent);
                 return true;
             }
 
             intent = default!;
             return false;
+        }
+
+        private static void RemoveIntentAliases(PlaybackIntent consumed)
+        {
+            foreach (var pair in Intents)
+            {
+                if (ReferenceEquals(pair.Value, consumed))
+                    Intents.TryRemove(pair);
+            }
         }
 
         private static bool PatchPublicMethod(
@@ -504,10 +551,13 @@ namespace Emby.YouTubePlugin
 
                 // Store an exact key plus a same-user/item fallback. The short TTL
                 // prevents an abandoned click from influencing later playback.
-                Intents[MakeKey(userId, itemId, deviceId)] = intent;
+                lock (Sync)
+                {
+                    Intents[MakeKey(userId, itemId, deviceId)] = intent;
 
-                if (!string.IsNullOrEmpty(deviceId))
-                    Intents[MakeKey(userId, itemId, string.Empty)] = intent;
+                    if (!string.IsNullOrEmpty(deviceId))
+                        Intents[MakeKey(userId, itemId, string.Empty)] = intent;
+                }
             }
 
             var client = GetRequestValue(serviceRequest, "X-Emby-Client") ?? "unknown";
@@ -1250,6 +1300,7 @@ namespace Emby.YouTubePlugin
 
                 if (DateTime.UtcNow - candidate.CapturedUtc <= IntentTtl)
                 {
+                    RemoveIntentAliases(candidate);
                     intent = candidate;
                     return true;
                 }
@@ -1452,7 +1503,7 @@ namespace Emby.YouTubePlugin
             foreach (var kvp in Intents)
             {
                 if (now - kvp.Value.CapturedUtc > IntentTtl)
-                    Intents.TryRemove(kvp.Key, out _);
+                    Intents.TryRemove(kvp);
             }
         }
 

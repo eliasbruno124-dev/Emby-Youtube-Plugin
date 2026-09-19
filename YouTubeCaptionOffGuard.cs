@@ -24,6 +24,7 @@ namespace Emby.YouTubePlugin
 
         private readonly ISessionManager _sessionManager;
         private readonly ConcurrentDictionary<string, CaptionPlaybackState> _playbacks = new(StringComparer.Ordinal);
+        private readonly object _playbackStartGate = new();
         private readonly CancellationTokenSource _lifetimeCts = new();
         private int _started;
         private int _disposed;
@@ -69,9 +70,24 @@ namespace Emby.YouTubePlugin
                 var session = e.Session;
                 if (session == null || string.IsNullOrEmpty(session.Id) || IsDisposingOrDisposed())
                     return;
-                CancelForSession(session.Id);
-                if (e.Item != null && IsYouTubeItem(e.Item) && IsNativeAndroidOrFireTv(session))
-                    _playbacks[session.Id] = new CaptionPlaybackState(CreateIdentity(e, session, e.Item));
+                lock (_playbackStartGate)
+                {
+                    if (IsDisposingOrDisposed())
+                        return;
+                    if (_playbacks.TryGetValue(session.Id, out var current)
+                        && e.Item != null
+                        && MatchesEvent(current.Identity, e, session, e.Item))
+                    {
+                        // Duplicate starts do not reset the attempt budget or
+                        // revive delayed work for this same playback.
+                        return;
+                    }
+                    CancelForSession(session.Id);
+                    if (e.Item != null && IsYouTubeItem(e.Item) && IsNativeAndroidOrFireTv(session)
+                        && !string.IsNullOrEmpty(e.PlaySessionId)
+                        && !string.IsNullOrEmpty(session.UserId))
+                        _playbacks[session.Id] = new CaptionPlaybackState(CreateIdentity(e, session, e.Item));
+                }
             }
             catch (Exception ex)
             {
@@ -127,9 +143,18 @@ namespace Emby.YouTubePlugin
                         || !_playbacks.TryGetValue(identity.SessionId, out var active)
                         || !ReferenceEquals(active, state)
                         || !IsCurrentIdentity(identity, out var currentSession)
-                        || currentSession == null || !SupportsSetSubtitleStreamIndex(currentSession)
+                        || currentSession == null
                         || state.AttemptsSent >= MaxAttempts
                         || DateTime.UtcNow < state.RetryNotBeforeUtc)
+                        return;
+
+                    if (!YouTubeSessionCommandRouter.TryResolve(
+                            _sessionManager, identity.SessionId, identity.UserId,
+                            identity.ItemId, "GeneralCommand", out var commandSessionId))
+                        return;
+                    var commandSession = _sessionManager.Sessions.FirstOrDefault(s =>
+                        string.Equals(s.Id, commandSessionId, StringComparison.Ordinal));
+                    if (commandSession == null || !SupportsSetSubtitleStreamIndex(commandSession))
                         return;
 
                     // Reserve before dispatch, including failed sends. Pause
@@ -142,11 +167,12 @@ namespace Emby.YouTubePlugin
                     var command = new GeneralCommand
                     {
                         Name = "SetSubtitleStreamIndex",
+                        ControllingUserId = identity.UserId,
                         Arguments = new Dictionary<string, string> { ["Index"] = "-1" }
                     };
                     dispatch = _sessionManager.SendGeneralCommand(
                         identity.SessionId,
-                        identity.SessionId,
+                        commandSessionId,
                         command,
                         _lifetimeCts.Token);
                 }
@@ -155,7 +181,7 @@ namespace Emby.YouTubePlugin
                 if (IsDisposingOrDisposed())
                     return;
 
-                YouTubeChannel.LogPublic("[YT] Caption-off command sent for native YouTube playback.");
+                YouTubeChannel.LogPublic("[YT] Caption-off command dispatched to an active native YouTube control channel; caption visibility is not confirmed.");
             }
             catch (OperationCanceledException) when (IsDisposingOrDisposed())
             {
@@ -338,8 +364,11 @@ namespace Emby.YouTubePlugin
                 _sessionManager.PlaybackStopped -= OnPlaybackStopped;
             }
 
-            foreach (var state in _playbacks.Values)
-                CancelState(state);
+            lock (_playbackStartGate)
+            {
+                foreach (var state in _playbacks.Values)
+                    CancelState(state);
+            }
         }
     }
 }

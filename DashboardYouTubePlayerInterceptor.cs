@@ -16,6 +16,7 @@ namespace Emby.YouTubePlugin
         private const string PatchMarker = "ytPluginPatch20260606";
         private const string AppJsPatchMarker = "ytPluginAppJs20260608";
         private const string VideoOsdPatchMarker = "ytPluginOsdBackStop20260908";
+        private const string PlaybackManagerPatchMarker = "ytPluginCaptionCommand20260919";
         private static readonly object Sync = new();
         private static object? _harmony;
         private static Type? _harmonyType;
@@ -317,6 +318,9 @@ namespace Emby.YouTubePlugin
             if (IsVideoOsdResource(normalizedResourceName))
                 return PatchVideoOsd(source);
 
+            if (IsPlaybackManagerResource(normalizedResourceName))
+                return PatchPlaybackManager(source);
+
             if (normalizedResourceName.EndsWith("plugin_webview.js", StringComparison.OrdinalIgnoreCase))
                 return PatchWebViewPlayer(source);
 
@@ -420,7 +424,43 @@ namespace Emby.YouTubePlugin
                     StringComparison.Ordinal);
             }
 
+            // The playback manager normally stops before it calls a local
+            // player's subtitle setter when no Emby MediaStream exists. Route
+            // only this server-served YouTube player module through a new URL
+            // so a fresh web session cannot reuse the pre-fix module cache.
+            if (!patched.Contains($"playbackmanager.js{token}", StringComparison.Ordinal))
+            {
+                if (!ReplaceRequired(
+                        ref patched,
+                        "getDynamicImport(\"./modules/common/playback/playbackmanager.js\")()",
+                        $"getDynamicImport(\"./modules/common/playback/playbackmanager.js{token}\")()",
+                        "app.js playback-manager cache token"))
+                {
+                    return source;
+                }
+            }
+
             return patched;
+        }
+
+        private static string PatchPlaybackManager(string source)
+        {
+            if (source.Contains(PlaybackManagerPatchMarker, StringComparison.Ordinal))
+                return source;
+
+            const string before =
+                "self.setSubtitleStreamIndex=function(index,player,refreshMediaSource){if((player=player||self._currentPlayer)&&!player.isLocalPlayer)return player.setSubtitleStreamIndex(index,refreshMediaSource);";
+            const string after =
+                "self.setSubtitleStreamIndex=function(index,player,refreshMediaSource){if((player=player||self._currentPlayer)&&\"youtubeplayer\"===player.id&&-1===index&&\"function\"==typeof player.setSubtitleStreamIndex)return/*ytPluginCaptionCommand20260919*/player.setSubtitleStreamIndex(-1,!1);if(player&&!player.isLocalPlayer)return player.setSubtitleStreamIndex(index,refreshMediaSource);";
+
+            var patched = source;
+            return ReplaceRequired(
+                    ref patched,
+                    before,
+                    after,
+                    "playback-manager YouTube caption command")
+                ? patched
+                : source;
         }
 
         private static string PatchIframePlayer(string source)
@@ -469,16 +509,16 @@ namespace Emby.YouTubePlugin
             {
                 if (!ReplaceRequired(ref patched,
                         currentReady,
-                        "}else{ytPluginDiag20260606(\"if-ready\");ytPluginStartCaptionGuard20260822(instance,event.target);startSeconds>0&&event.target.seekTo(startSeconds,!0);event.target.playVideo()}},onStateChange:function(event){",
-                        "iframe 4.10 seek on ready"))
+                        "}else{ytPluginDiag20260606(\"if-ready\");ytPluginStartCaptionGuard20260822(instance,event.target);event.target.playVideo()}},onStateChange:function(event){",
+                        "iframe 4.10 play on ready"))
                 {
                     return source;
                 }
             }
             else if (!ReplaceRequired(ref patched,
                          "):event.target.playVideo()},onStateChange:function(event){",
-                         "):(ytPluginDiag20260606(\"if-ready\"),ytPluginStartCaptionGuard20260822(instance,event.target),startSeconds>0&&event.target.seekTo(startSeconds,!0),event.target.playVideo())},onStateChange:function(event){",
-                         "iframe legacy seek on ready"))
+                         "):(ytPluginDiag20260606(\"if-ready\"),ytPluginStartCaptionGuard20260822(instance,event.target),event.target.playVideo())},onStateChange:function(event){",
+                         "iframe legacy play on ready"))
             {
                 return source;
             }
@@ -589,13 +629,13 @@ namespace Emby.YouTubePlugin
                 ("YoutubePlayer.prototype.destroy=function(){ytPluginStopCaptionGuard20260822(this);var dlg=this.videoDialog;dlg&&(this.videoDialog=null,dlg.parentNode.removeChild(dlg))}",
                  "YoutubePlayer.prototype.destroy=function(){ytPluginDisposePlayback20260908(this,!1)}"),
                 ("function setCurrentSrc(instance,elem,options,signal){return",
-                 "function setCurrentSrc(instance,elem,options,signal){var ytGeneration=(instance.ytGeneration20260908||0)+1;instance.ytGeneration20260908=ytGeneration;return"),
+                 "function setCurrentSrc(instance,elem,options,signal){var ytGeneration=(instance.ytGeneration20260908||0)+1;instance.ytGeneration20260908=ytGeneration;instance.ytApiCreated20260908=0;instance.ytReadyHandled20260908=0;return"),
                 ("new Promise(function(resolve,reject){try{null!=signal&&signal.throwIfAborted()}",
                  "new Promise(function(resolve,reject){instance.ytStartReject20260908=function(){if(reject){var fn=reject;reject=null;resolve=null;var err=new Error(\"YouTube playback stopped\");err.name=\"AbortError\";fn(err)}};instance.ytAbortSignal20260908=signal;instance.ytAbortHandler20260908=function(){instance.ytGeneration20260908===ytGeneration&&ytPluginDisposePlayback20260908(instance,!1)};signal&&signal.addEventListener&&signal.addEventListener(\"abort\",instance.ytAbortHandler20260908,{once:!0});try{null!=signal&&signal.throwIfAborted()}"),
                 ("window.onYouTubeIframeAPIReady=function(){try{",
-                 "window.onYouTubeIframeAPIReady=function(){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog)return;try{"),
+                 "window.onYouTubeIframeAPIReady=function(){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog||instance.ytApiCreated20260908===ytGeneration)return;instance.ytApiCreated20260908=ytGeneration;try{"),
                 ("onReady:function(event){if(signal.aborted)",
-                 "onReady:function(event){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog)return;if(signal.aborted)"),
+                 "onReady:function(event){if(instance.ytGeneration20260908!==ytGeneration||!instance.videoDialog||instance.ytReadyHandled20260908===ytGeneration)return;instance.ytReadyHandled20260908=ytGeneration;if(signal.aborted)"),
                 ("onStateChange:function(event){ytPluginForceCaptionsOff20260822(event.target);",
                  "onStateChange:function(event){if(instance.ytGeneration20260908!==ytGeneration)return;ytPluginForceCaptionsOff20260822(event.target);"),
                 ("onApiChange:function(event){ytPluginForceCaptionsOff20260822(event.target)}",
@@ -707,8 +747,24 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
 
             if (!ReplaceRequired(ref patched,
                     "var _instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");_instance$videoDialog&&sendMessage(_instance$videoDialog,\"playVideo\");break;",
-                    "var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&(startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"));break;",
+                    "var startSeconds=null==lastPlayerData?void 0:lastPlayerData.startTime,_instance$videoDialog=null==(_instance$videoDialog=this.videoDialog)?void 0:_instance$videoDialog.querySelector(\"iframe\");ytPluginDiag20260606(\"wv-ready\"),_instance$videoDialog&&!lastPlayerData.ytReadyHandled20260908&&(lastPlayerData.ytReadyHandled20260908=!0,lastPlayerData.startTime=0,startSeconds>0&&sendMessage(_instance$videoDialog,\"seekTo\",[startSeconds,!0]),sendMessage(_instance$videoDialog,\"playVideo\"));break;",
                     "webview seek on ready"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "case\"youtubeStatus\":lastPlayerData.currentTime=data.currentTime,lastPlayerData.volume=data.volume,lastPlayerData.isMuted=data.isMuted,lastPlayerData.duration=data.duration,_events.default.trigger(this,\"timeupdate\");break;",
+                    "case\"youtubeStatus\":lastPlayerData.currentTime=data.currentTime,lastPlayerData.startTime>0&&data.currentTime>=lastPlayerData.startTime&&(lastPlayerData.startTime=0),lastPlayerData.volume=data.volume,lastPlayerData.isMuted=data.isMuted,lastPlayerData.duration=data.duration,_events.default.trigger(this,\"timeupdate\");break;",
+                    "webview consume start on confirmed progress"))
+            {
+                return source;
+            }
+
+            if (!ReplaceRequired(ref patched,
+                    "YoutubePlayer.prototype.currentTime=function(val){var playerData;if(null==val)return null!=(null==(playerData=this.playerData)?void 0:playerData.currentTime)?1e3*playerData.currentTime:null;(playerData=null==(playerData=this.videoDialog)?void 0:playerData.querySelector(\"iframe\"))&&sendMessage(playerData,\"seekTo\",[val/1e3,!0])},",
+                    "YoutubePlayer.prototype.currentTime=function(val){var playerData;if(null==val)return null!=(null==(playerData=this.playerData)?void 0:playerData.currentTime)?1e3*playerData.currentTime:null;this.playerData&&(this.playerData.startTime=0),(playerData=null==(playerData=this.videoDialog)?void 0:playerData.querySelector(\"iframe\"))&&sendMessage(playerData,\"seekTo\",[val/1e3,!0])},",
+                    "webview cancel start on explicit seek"))
             {
                 return source;
             }
@@ -765,24 +821,6 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
                     "webview pass params"))
             {
                 return source;
-            }
-
-            // Best-effort safety net: the local compatibility embed ignores a
-            // URL start param, so the only lever is postMessage("seekTo"). The
-            // on-ready seek can be dropped while the embed is still cueing, so
-            // re-assert it exactly once when playback first reaches PLAYING.
-            // Non-required: never regress the working seek if Emby changes this line.
-            const string playingMarker = "(lastPlayerData.state=youtubeData)===YT.PlayerState.PLAYING){";
-            if (patched.Contains(playingMarker, StringComparison.Ordinal))
-            {
-                patched = patched.Replace(
-                    playingMarker,
-                    playingMarker
-                        + "ytPluginDiag20260606(\"wv-playing\");"
-                        + "var _ytSeekIf=this.videoDialog&&this.videoDialog.querySelector(\"iframe\");"
-                        + "lastPlayerData.startTime>0&&!lastPlayerData.ytStartSeeked&&_ytSeekIf&&"
-                        + "(lastPlayerData.ytStartSeeked=!0,sendMessage(_ytSeekIf,\"seekTo\",[lastPlayerData.startTime,!0]));",
-                    StringComparison.Ordinal);
             }
 
             ReplaceOptional(ref patched,
@@ -973,6 +1011,7 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
             return normalized.EndsWith("app.js", StringComparison.OrdinalIgnoreCase)
                    || normalized.EndsWith("modules/youtubeplayer/plugin.js", StringComparison.OrdinalIgnoreCase)
                    || normalized.EndsWith("modules/youtubeplayer/plugin_webview.js", StringComparison.OrdinalIgnoreCase)
+                   || IsPlaybackManagerResource(normalized)
                    || IsVideoOsdResource(normalized)
                    || IsEmbedResource(normalized);
         }
@@ -980,6 +1019,10 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
         private static bool IsVideoOsdResource(string? resourceName) =>
             NormalizeResourceName(resourceName)
                 .EndsWith("videoosd/videoosd.js", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsPlaybackManagerResource(string? resourceName) =>
+            NormalizeResourceName(resourceName)
+                .EndsWith("modules/common/playback/playbackmanager.js", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsEmbedResource(string? resourceName) =>
             NormalizeResourceName(resourceName)
@@ -1009,7 +1052,7 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260908-youtube-exit-v14";
+        private const string DashboardPatchRevision = "20260919-youtube-web-caption-route-v15";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";

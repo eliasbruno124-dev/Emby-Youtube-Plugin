@@ -30,6 +30,7 @@
         var autoplayRetryUsed = false;
         var autoplayRecoveryReported = false;
         var disposed = false;
+        var playerCreationStarted = false;
 
         function disposePlayer() {
             if (disposed) return;
@@ -174,7 +175,8 @@
         }
 
         function createPlayer() {
-            if (disposed) return;
+            if (disposed || playerCreationStarted) return;
+            playerCreationStarted = true;
             player = new YT.Player("player", {
                 height: "100%",
                 width: "100%",
