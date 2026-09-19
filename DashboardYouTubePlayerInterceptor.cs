@@ -1024,9 +1024,17 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
             NormalizeResourceName(resourceName)
                 .EndsWith("modules/common/playback/playbackmanager.js", StringComparison.OrdinalIgnoreCase);
 
-        private static bool IsEmbedResource(string? resourceName) =>
-            NormalizeResourceName(resourceName)
-                .EndsWith("modules/youtubeplayer/youtube-embed.html", StringComparison.OrdinalIgnoreCase);
+        private static bool IsEmbedResource(string? resourceName)
+        {
+            var normalized = NormalizeResourceName(resourceName);
+            return normalized.EndsWith("modules/youtubeplayer/youtube-embed.html", StringComparison.OrdinalIgnoreCase)
+                   // Older WebView bundles requested the embedded page by its
+                   // original resource filename. On Linux, letting that legacy
+                   // alias reach Emby's static-file handler produces a 404 and
+                   // FileNotFoundException because it is not a dashboard file.
+                   // Serve the same embedded page before filesystem routing.
+                   || normalized.EndsWith("modules/youtubeplayer/youtubeembed.html", StringComparison.OrdinalIgnoreCase);
+        }
 
         private static string NormalizeResourceName(string? resourceName)
         {
