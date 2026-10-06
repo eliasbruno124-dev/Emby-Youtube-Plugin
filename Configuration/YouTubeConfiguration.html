@@ -403,8 +403,7 @@
                             <label class="inputLabel inputLabelUnfocused" for="txtApiKey">YouTube Data API Key</label>
                             <input is="emby-input" id="txtApiKey" type="password" autocomplete="off" />
                             <div class="fieldDescription">
-                                Required. To create an API key, follow the <strong>Setup Guide</strong> tab once and
-                                then paste the key here.
+                                Required. Create a key using the <strong>Setup Guide</strong>.
                             </div>
                         </div>
                     </div>
@@ -413,33 +412,21 @@
                         <h2 style="margin-top: 0;">Content</h2>
                         <div class="settingsStack">
                             <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="txtSavedItemEntry">My YouTube
-                                    Content</label>
+                                <label class="inputLabel inputLabelUnfocused" for="txtSavedItemEntry">Saved Content</label>
                                 <input id="txtSavedItems" class="hiddenConfigField" type="hidden" />
                                 <div class="entryInputRow">
                                     <input is="emby-input" id="txtSavedItemEntry" type="text" autocomplete="off"
-                                        placeholder="@handle, UC..., public playlist ID, or search text" />
+                                        placeholder="@handle, channel ID, playlist ID, or search text" />
                                     <button is="emby-button" type="button" id="btnAddSavedItem"
                                         class="raised button-submit">
                                         <span>Add</span>
                                     </button>
                                 </div>
                                 <div class="fieldDescription">
-                                    Each entry becomes its own folder in the YouTube channel. Type something into the
-                                    box and click <strong>Add</strong> (or press Enter). Click <strong>×</strong> on a
-                                    chip below to remove it.<br>
-                                    Accepted formats:
-                                    <ul style="margin: 0.4em 0 0 1.2em; padding: 0;">
-                                        <li><strong>@handle</strong> — e.g. <code>@MrBeast</code> (cheap, recommended)
-                                        </li>
-                                        <li><strong>Channel ID</strong> — starts with <code>UC...</code></li>
-                                        <li><strong>Public or unlisted playlist ID</strong> — starts with
-                                            <code>PL...</code>, <code>UU...</code> or <code>OL...</code></li>
-                                        <li><strong>Search text</strong> — plain text that is not an ID-like value, runs
-                                            as a YouTube search (each uncached results page uses one call from the
-                                            separate daily search limit)</li>
-                                    </ul>
-                                    You can paste a comma- or line-separated list to add several at once.
+                                    Use <code>@handles</code>, <code>UC...</code> channel IDs, public/unlisted
+                                    <code>PL...</code>/<code>UU...</code>/<code>OL...</code> playlists, or search text.<br>
+                                    Separate entries with commas or newlines. Enter adds; <strong>×</strong> removes.
+                                    Searches use extra quota.
                                 </div>
                                 <div id="savedItemsList" class="itemList"></div>
                             </div>
@@ -457,11 +444,8 @@
                                     </button>
                                 </div>
                                 <div class="fieldDescription">
-                                    Public or unlisted playlists that should appear as their own top-level folder and be
-                                    checked regularly for new videos. YouTube's private Watch Later and watch-history
-                                    playlists cannot be read through the Data API.<br>
-                                    Each fetched page of up to 50 items uses one regular API unit. A check can fetch up
-                                    to five pages (see <em>poll interval</em> below).
+                                    Checks public/unlisted playlists for new videos. Private Watch Later and history
+                                    playlists are not supported.
                                 </div>
                                 <div id="watchLaterItemsList" class="itemList"></div>
                             </div>
@@ -472,9 +456,7 @@
                                 <input is="emby-input" id="numWatchLaterPollMinutes" type="number" min="1" max="60"
                                     step="1" value="3" />
                                 <div class="fieldDescription">
-                                    How often the plugin checks each auto-refreshed playlist. Default 3 minutes. At that
-                                    interval one playlist uses about 480 regular units per day when it fits on one page,
-                                    or about 2,400 units before retries when all five pages must be fetched.
+                                    Check interval in minutes. Default: 3. Shorter intervals use more API quota.
                                 </div>
                             </div>
                         </div>
@@ -483,42 +465,50 @@
                     <div class="paper-card">
                         <h2 style="margin-top: 0;">Folders</h2>
                         <div class="fieldDescription" style="margin-bottom: 1em;">
-                            Choose which extra folders appear in the YouTube channel root, alongside your saved channels
-                            and playlists.
+                            Choose what appears in YouTube and on Home.
                         </div>
                         <div class="checkboxGroup">
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowRootFoldersAtTopLevel" type="checkbox" />
-                                <span>Show saved YouTube channels on Emby's home screen — on Emby 4.10 and newer,
-                                    every saved channel gets its own latest-videos row for each user who can access it.
-                                    Once those rows are confirmed, combined latest rows are hidden: one uniquely
-                                    recognized legacy <em>Neueste YouTube-Videos</em> row is backed up, and only the
-                                    YouTube provider is filtered out of Emby's automatic <em>Latest Media</em> block.
-                                    Latest movies and shows stay visible. Matching never uses the name alone and never
-                                    touches <em>YouTube weiterschauen</em>, other resume rows, or ambiguous/custom rows.
-                                    Turning this off removes the plugin-managed channel rows, restores the exact legacy
-                                    section and removes only the automatic-block exclusions added by this plugin. The
-                                    option also exposes YouTube root folders at Emby's top level. On Emby 4.9, only the
-                                    top-level-folder behavior is available because that server version cannot write
-                                    custom home rows.</span>
-                            </label>
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowTrending" type="checkbox" />
-                                <span>Show Trending — YouTube's most-popular feed for the selected region. It is normally
-                                    refreshed after six hours; older cached data may be used during an outage.</span>
-                            </label>
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowCategories" type="checkbox" />
-                                <span>Show Categories Browser — a folder with subfolders per YouTube category (Music,
-                                    Gaming, …) showing YouTube's popular feed in each. Discovering non-empty categories
-                                    and refreshing expired feeds uses additional regular API units.</span>
-                            </label>
-                            <label class="checkboxContainer">
-                                <input is="emby-checkbox" id="chkShowShorts" type="checkbox" />
-                                <span>Show Shorts — when off, detected Shorts are filtered from plugin folders. Detection
-                                    combines YouTube metadata, channel Shorts pages and YouTube URL behavior; duration is
-                                    only a safety bound and is never the only signal.</span>
-                            </label>
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkShowRootFoldersAtTopLevel" type="checkbox"
+                                        aria-describedby="homeRowsDescription" />
+                                    <span>Show saved channels on Home</span>
+                                </label>
+                                <div class="fieldDescription" id="homeRowsDescription">
+                                    One latest-videos row per channel on Emby 4.10+. Also shows root folders at the top
+                                    level; Emby 4.9 supports folders only.
+                                </div>
+                            </div>
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkShowTrending" type="checkbox"
+                                        aria-describedby="trendingDescription" />
+                                    <span>Show Trending</span>
+                                </label>
+                                <div class="fieldDescription" id="trendingDescription">
+                                    Popular videos for your selected region. Refreshes every six hours.
+                                </div>
+                            </div>
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkShowCategories" type="checkbox"
+                                        aria-describedby="categoriesDescription" />
+                                    <span>Show Categories</span>
+                                </label>
+                                <div class="fieldDescription" id="categoriesDescription">
+                                    Browse popular videos by category. Uses extra API quota.
+                                </div>
+                            </div>
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkShowShorts" type="checkbox"
+                                        aria-describedby="shortsDescription" />
+                                    <span>Show Shorts</span>
+                                </label>
+                                <div class="fieldDescription" id="shortsDescription">
+                                    Turn off to hide detected Shorts.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -529,8 +519,8 @@
                                 <label class="selectLabel" for="selectTrendingRegion">Trending Region</label>
                                 <select is="emby-select" id="selectTrendingRegion"></select>
                                 <div class="fieldDescription">
-                                    Country used for the Trending and Categories folders. With <em>YouTube default</em>,
-                                    Trending uses YouTube's API default and Categories use the US catalog as a fallback.
+                                    Country for Trending and Categories. <em>YouTube default</em> uses the API default;
+                                    Categories fall back to the US.
                                 </div>
                             </div>
 
@@ -551,8 +541,7 @@
                                     <option value="28">Science &amp; Technology</option>
                                 </select>
                                 <div class="fieldDescription">
-                                    Filter the Trending folder to a single category. <em>All</em> keeps the unfiltered
-                                    trending feed. The Categories Browser (if enabled) is unaffected by this setting.
+                                    Filters Trending only. Choose <em>All</em> for every category.
                                 </div>
                             </div>
 
@@ -565,11 +554,8 @@
                                     <option value="relevance">Relevance</option>
                                 </select>
                                 <div class="fieldDescription">
-                                    Order videos inside each saved channel folder. <strong>Date</strong> shows newest
-                                    first through the low-cost uploads playlist (recommended). <strong>View count</strong>
-                                    is most popular first. <strong>Rating</strong> uses YouTube's rating order.
-                                    <strong>Relevance</strong> is YouTube's default mixed ranking. Every uncached non-date
-                                    results page uses one call from the separate daily <code>search.list</code> limit.
+                                    <strong>Date</strong>: newest first, lowest quota use. Other orders use YouTube search
+                                    and count toward its separate daily limit.
                                 </div>
                             </div>
                         </div>
@@ -577,13 +563,11 @@
                         <div class="checkboxGroup" style="margin-top: 1em;">
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowLikeCount" type="checkbox" />
-                                <span>Show like count in descriptions — appends 👍 N when YouTube provides the statistic.
-                                </span>
+                                <span>Show like count</span>
                             </label>
                             <label class="checkboxContainer">
                                 <input is="emby-checkbox" id="chkShowCommentCount" type="checkbox" />
-                                <span>Show comment count in descriptions — appends 💬 N when YouTube provides the
-                                    statistic. Off by default because protected channels can report 0.</span>
+                                <span>Show comment count</span>
                             </label>
                         </div>
                     </div>
@@ -591,8 +575,7 @@
                     <div class="paper-card">
                         <h2 style="margin-top: 0;">Limits</h2>
                         <div class="fieldDescription" style="margin-bottom: 1em;">
-                            How many videos to load into each folder. Higher values mean more videos to scroll through,
-                            but also slightly slower refreshes and more quota used.
+                            Higher limits use more quota and take longer to refresh.
                         </div>
                         <div class="settingsStack">
                             <div class="inputContainer">
@@ -601,8 +584,7 @@
                                 <input is="emby-input" id="numMaxChannelVideos" type="number" min="1" max="150" step="1"
                                     value="50" />
                                 <div class="fieldDescription">
-                                    Cap on videos loaded per saved channel and per playlist (1–150). Default 50. Higher
-                                    limits fetch more listing and detail pages, so the exact cost depends on the folder.
+                                    Videos per channel or playlist: 1–150. Default: 50.
                                 </div>
                             </div>
                             <div class="inputContainer">
@@ -611,9 +593,8 @@
                                 <input is="emby-input" id="numMaxSearchVideos" type="number" min="1" max="150" step="1"
                                     value="50" />
                                 <div class="fieldDescription">
-                                    Cap on results per search-text entry (1–150). Default 50. Every uncached page of up to
-                                    50 results uses one call from the separate default limit of 100
-                                    <code>search.list</code> calls per day, so prefer @handles or channel IDs.
+                                    Results per search: 1–150. Default: 50. Prefer @handles or channel IDs to save search
+                                    quota.
                                 </div>
                             </div>
                         </div>
@@ -635,7 +616,7 @@
                     </div>
 
                     <p class="fieldDescription" style="margin-top: 1.5em;">
-                        💾 Changes are saved automatically — there is no Save button.
+                        Changes save automatically.
                     </p>
 
                     <p id="youtubeConfigurationStatus" class="fieldDescription"></p>

@@ -6,7 +6,6 @@ namespace Emby.YouTubePlugin
     public partial class YouTubeChannel
     {
         private const string ChannelIdPrefix = "UC";
-        private const int MinChannelIdLength = 20;
         private const string HandlePrefix = "@";
         private const string FolderSeparator = "_x_";
         private const int MaxMetaCacheEntries = 2000;
@@ -42,8 +41,8 @@ namespace Emby.YouTubePlugin
             return id;
         }
 
-        internal static bool IsSupportedPublicPlaylistId(string value) =>
-            value.Length > MinChannelIdLength
+        internal static bool IsSupportedPublicPlaylistId(string? value) =>
+            value is { Length: > 2 }
             && (value.StartsWith("PL", StringComparison.Ordinal)
                 || value.StartsWith("UU", StringComparison.Ordinal)
                 || value.StartsWith("OL", StringComparison.Ordinal))

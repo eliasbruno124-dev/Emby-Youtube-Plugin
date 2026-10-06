@@ -152,6 +152,10 @@ define([
         }
     }
 
+    function isSupportedPlaylistId(item) {
+        return /^(PL|UU|OL)[A-Za-z0-9_-]+$/.test(item);
+    }
+
     function classifySavedItem(item) {
         if (item.indexOf('@') === 0) {
             return item.length > 1 && !/\s/.test(item) ? 'Handle' : 'Invalid ID';
@@ -163,7 +167,7 @@ define([
             return 'Private / unsupported';
         }
         if (item.indexOf('PL') === 0 || item.indexOf('UU') === 0 || item.indexOf('OL') === 0) {
-            return /^(PL|UU|OL)[A-Za-z0-9_-]{19,}$/.test(item) ? 'Playlist' : 'Invalid ID';
+            return isSupportedPlaylistId(item) ? 'Playlist' : 'Invalid ID';
         }
         return 'Search';
     }
@@ -172,7 +176,7 @@ define([
         if (item.indexOf('WL') === 0) {
             return 'Private / unsupported';
         }
-        if (/^(PL|UU|OL)[A-Za-z0-9_-]{19,}$/.test(item)) {
+        if (isSupportedPlaylistId(item)) {
             return 'Playlist';
         }
         return 'Invalid ID';
