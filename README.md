@@ -81,24 +81,6 @@ Handles, channel IDs, and playlist IDs are the best options because they avoid t
 
 The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes its own top-level folder and can be checked regularly for new videos.
 
-## Browsing Behavior
-
-Saved channels open in the cleanest layout the plugin can provide:
-
-- If a channel only has normal videos, Emby opens the video list directly.
-- If Shorts exist, the channel shows subfolders.
-- Empty Shorts folders are hidden.
-- Empty playlists and empty category folders are hidden.
-
-By default, Emby shows one top-level YouTube entry and keeps saved channels inside it. Enable **Show saved YouTube channels on Emby's home screen** to expose the YouTube root folders at Emby's top level. On Emby 4.10 and newer, the same option also creates one latest-videos home row per saved channel for every user who can access YouTube. Playlists, searches, Trending, and Categories are not turned into home rows. Once all channel rows are confirmed, the option also hides mixed latest-video rows so the same videos are not shown again in one combined YouTube row.
-
-After all per-channel rows have been created and confirmed, the plugin can temporarily remove the old combined **Neueste YouTube-Videos** row. This happens only when a fresh HomeSections read finds exactly one row with the verified legacy signature: an `items` section with no parent, `Episode` items sorted by `DateCreated` descending, and an excluded-folder set containing every current non-YouTube view (including Live TV when present) and no current YouTube channel root. Extra stale or no-longer-materialized exclusions are tolerated because they can only narrow the row. The stored name must match exactly; `CustomName` may be absent but must also match when present. The name alone is never sufficient, ambiguous matches are left unchanged, and `resume` rows such as **YouTube weiterschauen** are never touched. Before removal, the complete per-user section and its original position are saved durably. Turning the option off restores the exact original section id and uses Emby's optional move API to return it to the saved position. If a server lacks that move API, the restored row safely remains appended. If another similarly shaped aggregate row already exists, the plugin does not create a duplicate and retains the snapshot for a later safe restore.
-
-Emby's standard `latestmediablock` can independently expand the top-level YouTube provider into another mixed row, usually named **Latest YouTube** or **Neueste YouTube**. While the option is enabled, the plugin keeps that block and all of its movie/TV expansions but adds only the YouTube provider id to its `ExcludedFolders`. A durable per-user journal records only ids actually added by the plugin. Turning the option off removes only those journalled ids, preserving user exclusions, concurrent edits, row order, movie/TV latest rows, and all continue-watching rows.
-
-Emby 4.9 keeps only the top-level-folder behavior. Its API cannot write HomeSections, so it neither creates per-channel rows nor suppresses or restores the legacy combined row.
-
-Shorts detection uses YouTube metadata such as tags, `#shorts`, and vertical player dimensions. It does not rely on video length alone, because many normal videos are short without being YouTube Shorts.
 
 ## Quota
 
@@ -119,7 +101,6 @@ other endpoints share the regular 10,000-unit daily bucket.
 ## Notes
 
 - Uses the official YouTube API and player. Videos are not downloaded or re-encoded.
-- Ads and audio-track selection are handled by YouTube.
 - The plugin requests captions off, but some TV and Android players may ignore this.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.
 - Private account data is not supported. Use channels and playlists accessible with your API key.
