@@ -463,6 +463,29 @@
                     </div>
 
                     <div class="paper-card">
+                        <h2 style="margin-top: 0;">Playback</h2>
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" id="chkDirectPlayback" type="checkbox" />
+                            <span>Use the Emby player</span>
+                        </label>
+                        <div class="fieldDescription">
+                            Plays in Emby, without extra programs. Captions use Emby's subtitle menu.
+                            Browsing uses the YouTube Data API. Resolver updates arrive with plugin updates.
+                            Reopen client apps after changing this option.
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="numDirectMaxHeight">Maximum source height</label>
+                            <input is="emby-input" id="numDirectMaxHeight" type="number" min="144" max="1080" step="1" value="1080" />
+                            <div class="fieldDescription">Source selection is capped at 1080p, including older settings. Lower limits are supported. Emby may transcode for the client; continuous adaptive quality switching is not guaranteed.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="numDirectH264MaxHeight">H.264 output limit</label>
+                            <input is="emby-input" id="numDirectH264MaxHeight" type="number" min="144" max="1080" step="1" value="1080" />
+                            <div class="fieldDescription">Lower this if H.264 encoding is too slow. This cannot raise the source limit. All codecs remain capped at 1080p.</div>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
                         <h2 style="margin-top: 0;">Folders</h2>
                         <div class="fieldDescription" style="margin-bottom: 1em;">
                             Choose what appears in YouTube and on Home.

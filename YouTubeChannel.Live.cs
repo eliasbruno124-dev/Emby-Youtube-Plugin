@@ -64,14 +64,6 @@ namespace Emby.YouTubePlugin
                     var url = $"https://www.youtube.com/channel/{channelId}/streams";
                     var html = await GetShortsPageHtmlAsync(url, cancellationToken).ConfigureAwait(false);
                     if (!IsUsableStreamsPage(html))
-                    {
-                        var fallback = await TryGetShortsPageHtmlWithExternalToolAsync(url, cancellationToken)
-                            .ConfigureAwait(false);
-                        if (IsUsableStreamsPage(fallback))
-                            html = fallback;
-                    }
-
-                    if (!IsUsableStreamsPage(html))
                         throw new InvalidOperationException("YouTube returned a consent, block, or incomplete streams page.");
 
                     ExtractIds(html!, LiveBadgeForwardRegex, idGroup: 1, ids);
@@ -87,7 +79,7 @@ namespace Emby.YouTubePlugin
                 }
                 catch (Exception ex)
                 {
-                    Log($"[YT] Live streams page probe failed for {channelId}: {ex.Message}");
+                    Log($"[YT] Live streams page probe failed for {channelId} ({ex.GetType().Name}).");
                     if (LiveStreamsPageCache.TryGetValue(channelId, out var stale)
                         && (DateTime.UtcNow - stale.CachedAt) < LiveStreamsPageStaleFallbackTtl)
                     {

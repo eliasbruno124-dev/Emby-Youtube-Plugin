@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "flows": [
+    {
+      "id": "startup",
+      "title": "Plugin discovery and lifecycle",
+      "summary": "Emby discovers plugin/providers/services; PluginEntryPoint connects runtime services, hooks, caches, workers and timers. Reflection targets remain runtime capabilities, not build guarantees.",
+      "sources": ["Plugin.cs", "PluginEntryPoint.cs", "EmbeddedDependencyLoader.cs", "Emby.YouTubePlugin.csproj", "ManagedResolver/Upstream.json", "ManagedResolver/License.txt"]
+    },
+    {
+      "id": "configuration",
+      "title": "Settings and refresh",
+      "summary": "The AMD view serializes autosaves to the custom Admin endpoint; Plugin normalizes/persists settings and refreshes only content-affecting changes using shared configuration hashing.",
+      "sources": ["Configuration/YouTubeConfiguration.html", "Configuration/YouTubeConfiguration.js", "Plugin.cs", "PluginConfiguration.cs", "YouTubeConfigSaveService.cs", "PluginEntryPoint.cs", "YouTubeChannel.cs", "GuideImageService.cs"]
+    },
+    {
+      "id": "browsing",
+      "title": "Channel tree and media construction",
+      "summary": "The partial channel routes folder IDs, pages and enriches videos, classifies Shorts/live entries and persists stable watch-page identities. Direct mode replaces playback sources through a dynamic callback. Trending and live folders have distinct aggregate/probe paths.",
+      "sources": ["YouTubeChannel.cs", "YouTubeChannel.State.cs", "YouTubeChannel.Folders.cs", "YouTubeChannel.MediaFolders.cs", "YouTubeChannel.Mapping.cs", "YouTubeChannel.Enrichment.cs", "YouTubeChannel.Aggregates.cs", "YouTubeChannel.Shorts.cs", "YouTubeChannel.Live.cs", "ChannelContentFlags.cs", "FolderIcons.cs", "YouTubeApi.cs", "YouTubeExternalId.cs"]
+    },
+    {
+      "id": "direct-playback",
+      "title": "Native media, bounded quality, compatible audio/video and captions",
+      "summary": "Enabled direct mode resolves VOD media inside Emby through a pinned source-compiled managed adapter, bounded HTTP, shared flights and request backoff. The resolver extracts no executable and uses no subprocess or program updater. The existing Harmony patching library may create its approved temporary native helper; normal Emby settings/cache also remain outside the DLL. A single player snapshot provides HTTPS formats and an optional genuine HLS master; real chapter markers may require one bounded watch-page request. Source/output are capped at1080p and native PlaybackInfo output at6Mbit/s while preserving lower limits. Bounded CDN observations select startup HLS or HTTPS adaptive quality, not continuous client ABR; a denied/invalid HLS master is not bypassed through another path. Native Emby transcoding owns resume and subtitle timing; late corrective seeks and watch-player fallback are disabled. Native encoded output is bounded at30fps with lower and unknown rates preserved; static/copy and unrelated media are untouched. New unspecified subtitle requests default Off before Smart selection while explicit choices and active-session continuations remain native. Canonical external VTT preserves track identity. Exact4.10.2 hooks, actual operating systems and client rendering need separate verification; running HLS URLs are not automatically renewed on expiry.",
+      "sources": ["YouTubeChannel.DirectPlayback.cs", "YouTubeDirectManifest.cs", "YouTubeDirectModels.cs", "YouTubeDirectQualityPolicy.cs", "YouTubeSourceBudget.cs", "YouTubeAdaptiveSourceBudget.cs", "YouTubeDirectSubtitles.cs", "YouTubeCaptionNormalizer.cs", "YouTubeDirectMetadata.cs", "YouTubeChapterSync.cs", "YouTubeStreamResolver.cs", "YouTubeManagedResolver.cs", "YouTubeManagedHttp.cs", "YouTubeRequestBackoff.cs", "YouTubeDirectHttp.cs", "YouTubeDirectRangeProxy.cs", "YouTubeChannel.cs", "YouTubeChannel.Mapping.cs", "YouTubeChannel.Enrichment.cs", "YouTubeChannel.State.cs", "PlaybackIntentInterceptor.cs", "PluginEntryPoint.cs", "YouTubeCaptionOffGuard.cs", "DashboardYouTubePlayerInterceptor.cs", "PluginConfiguration.cs", "ManagedResolver/Upstream.json", "ManagedResolver/Compatibility.cs", "ManagedResolver/License.txt"]
+    },
+    {
+      "id": "direct-av-output",
+      "title": "Native YouTube audio/video compatibility",
+      "summary": "Exact native hooks prefer client-advertised H264 and, for known mono/stereo or unknown layout, existing AAC on independently validated plugin-owned sources. Preferences use local cloned arrays. An output-only channel cap prevents native unknown-layout six-channel fallback while preserving lower bounds, known multichannel, copy eligibility and truthful source metadata. Missing runtime signatures fail visibly; lazy interface assembly resolution is handled at signature binding. Actual encoded frames, audio channels, timeline and unaffected ordinary media require tests separate from source-map freshness.",
+      "sources": ["YouTubeChannel.DirectPlayback.cs", "YouTubeDirectQualityPolicy.cs", "PlaybackIntentInterceptor.cs"]
+    },
+    {
+      "id": "managed-source",
+      "title": "Pinned managed player-response source subset",
+      "summary": "A modified MIT source subset is compiled into the plugin. VideoController uses one fixed player identity; the bounded outer transport validates each request and stops on denial. PlayerResponse supplies original format/caption fields; internal BCL helpers replace excluded external packages. No downloaded player JavaScript, client-identity fallback, subprocess, runtime updater or host-termination package is included. Upstream hashes and explicit modifications are recorded separately from local adapter code.",
+      "sources": ["ManagedResolver/Compatibility.cs", "ManagedResolver/Upstream.json", "ManagedResolver/License.txt", "ManagedResolver/vendored/Videos/VideoController.cs", "ManagedResolver/vendored/Videos/VideoId.cs", "ManagedResolver/vendored/Bridge/PlayerResponse.cs", "ManagedResolver/vendored/Bridge/IStreamData.cs", "ManagedResolver/vendored/Bridge/ThumbnailData.cs", "ManagedResolver/vendored/Utils/Json.cs", "ManagedResolver/vendored/Utils/UrlEx.cs", "ManagedResolver/vendored/Utils/Protobuf.cs", "ManagedResolver/vendored/Exceptions/YoutubeExplodeException.cs", "ManagedResolver/vendored/Exceptions/VideoUnplayableException.cs", "ManagedResolver/vendored/Exceptions/VideoUnavailableException.cs", "YouTubeManagedResolver.cs", "YouTubeManagedHttp.cs"]
+    },
+    {
+      "id": "api-cache",
+      "title": "Requests, cache and quota accounting",
+      "summary": "Endpoint wrappers use memory/disk caches and coalesced misses, then throttled/retried HTTP. Quota accounting occurs on dispatched attempts. Global-memory and targeted-playlist invalidation have different disk behavior.",
+      "sources": ["YouTubeApi.cs", "YouTubeHttpClientFactory.cs", "QuotaTracker.cs", "Plugin.cs"]
+    },
+    {
+      "id": "polling",
+      "title": "Playlist change detection",
+      "summary": "The poller fetches uncached playlist snapshots, persists compact fingerprints and requests a serialized deep refresh for a changed established snapshot; failed fetches are not valid empty snapshots.",
+      "sources": ["PluginEntryPoint.cs", "YouTubeApi.cs", "PluginConfiguration.cs", "YouTubeChannel.State.cs"]
+    },
+    {
+      "id": "playback",
+      "title": "Playback intent, session state and resume",
+      "summary": "Legacy playback interception captures explicit start intent and session events maintain guarded resume state/checkpoints. Commands require exact playback identity and transport. Direct mode bypasses these corrections and uses native resume with video streamcopy disabled.",
+      "sources": ["PlaybackIntentInterceptor.cs", "PluginEntryPoint.cs", "YouTubeSessionCommandRouter.cs", "YouTubeImageProvider.cs", "YouTubeChannel.Mapping.cs"]
+    },
+    {
+      "id": "web-and-captions",
+      "title": "Dashboard player and caption boundaries",
+      "summary": "Outside direct mode dashboard interception rewrites selected external Emby bundles and serves the embedded iframe player. Legacy native caption-off commands do not guarantee visible client behavior; the historical caption metadata source is excluded from compilation. Direct mode serves original resources and native separate subtitle tracks instead.",
+      "sources": ["DashboardYouTubePlayerInterceptor.cs", "YouTubeEmbed.html", "PlaybackIntentInterceptor.cs", "YouTubeCaptionOffGuard.cs", "YouTubeCaptionMetadata.cs", "YouTubeSessionCommandRouter.cs", "Emby.YouTubePlugin.csproj"]
+    },
+    {
+      "id": "home-sections",
+      "title": "Managed Home sections",
+      "summary": "The Home manager derives per-user rows from visible saved channel roots, uses plugin-owned IDs and runtime-discovered mutation APIs, and persists reversible aggregate/filter migration state.",
+      "sources": ["YouTubeHomeSectionManager.cs", "PluginEntryPoint.cs", "PluginConfiguration.cs", "YouTubeChannel.Folders.cs", "YouTubeChannel.cs"]
+    },
+    {
+      "id": "repairs-and-logs",
+      "title": "Artwork, ordering and diagnostics",
+      "summary": "Providers and item-update hooks restore plugin-owned artwork; queued sort/image writes respect shared scan activity. Shared logging tees to a bounded plugin-owned file.",
+      "sources": ["YouTubeImageProvider.cs", "YouTubeEpisodeMetadataProvider.cs", "YouTubeSortNameRepairer.cs", "PluginEntryPoint.cs", "YouTubeChannel.cs", "PluginFileLog.cs"]
+    }
+  ]
+}

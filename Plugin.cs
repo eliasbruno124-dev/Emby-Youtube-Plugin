@@ -118,6 +118,7 @@ namespace Emby.YouTubePlugin
                 StringComparison.Ordinal);
 
             base.SaveConfiguration();
+            PluginEntryPoint.SuppressLegacyPlaybackForDirectMode();
 
             // Update the shared config hash so the polling loop doesn't
             // re-detect this same change and fire a duplicate refresh.
@@ -214,6 +215,13 @@ namespace Emby.YouTubePlugin
             config.MaxChannelVideos = Math.Clamp(config.MaxChannelVideos, 1, 150);
             config.MaxSearchVideos = Math.Clamp(config.MaxSearchVideos, 1, 150);
             config.WatchLaterPollMinutes = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
+            // Playback runs inside Emby. Keep obsolete tool paths inactive;
+            // do not use them to change explicit playback preferences.
+            config.YtDlpPath = string.Empty;
+            config.YtDlpJsRuntimePath = string.Empty;
+            config.YtDlpAutoUpdateEnabled = false;
+            config.DirectPlaybackMaxHeight = YouTubeDirectQualityPolicy.ClampHeight(config.DirectPlaybackMaxHeight);
+            config.DirectPlaybackH264MaxHeight = YouTubeDirectQualityPolicy.ClampHeight(config.DirectPlaybackH264MaxHeight);
             if (config.HideShorts)
             {
                 config.ShowShorts = false;

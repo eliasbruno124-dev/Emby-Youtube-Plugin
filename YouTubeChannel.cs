@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    public partial class YouTubeChannel : IChannel, IHasChannelFeatures
+    public partial class YouTubeChannel : IChannel, IHasChannelFeatures, IRequiresMediaInfoCallback
     {
         private static void Log(string msg) => LogPublic(msg);
         public static void LogPublic(string msg)

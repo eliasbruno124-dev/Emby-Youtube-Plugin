@@ -64,6 +64,11 @@ namespace Emby.YouTubePlugin
         private static int _legacyTabletSourceLogsRemaining = 12;
         private static int _requestSubtitleSuppressLogsRemaining = 16;
 
+        internal static void DiscardCapturedIntents()
+        {
+            lock (Sync) Intents.Clear();
+        }
+
         internal static void Install()
         {
             lock (Sync)
@@ -375,8 +380,87 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private static void PreferNativeYouTubeAudio(object requestDto)
+        {
+            var property = requestDto.GetType().GetProperty("DeviceProfile", BindingFlags.Public | BindingFlags.Instance);
+            if (property?.CanWrite != true || property.GetValue(requestDto) is not DeviceProfile profile
+                || profile.TranscodingProfiles == null) return;
+            TranscodingProfile[]? changed = null;
+            var clone = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            for (var i = 0; i < profile.TranscodingProfiles.Length; i++)
+            {
+                var candidate = profile.TranscodingProfiles[i];
+                if (candidate == null || candidate.Type != DlnaProfileType.Video
+                    || !string.Equals(candidate.Context.ToString(), "Streaming", StringComparison.Ordinal)
+                    || !string.Equals(candidate.Protocol, "hls", StringComparison.OrdinalIgnoreCase)
+                    || string.IsNullOrWhiteSpace(candidate.AudioCodec)) continue;
+                var codecs = candidate.AudioCodec.Split(',').Select(c => c.Trim()).ToArray();
+                if (codecs.Any(c => c.Length == 0)) continue;
+                var index = Array.FindIndex(codecs, c => string.Equals(c, "aac", StringComparison.OrdinalIgnoreCase));
+                if (index < 1) continue;
+                changed ??= (TranscodingProfile[])profile.TranscodingProfiles.Clone();
+                var copy = (TranscodingProfile)clone.Invoke(candidate, null)!;
+                copy.AudioCodec = string.Join(",", new[] { codecs[index] }.Concat(codecs.Take(index)).Concat(codecs.Skip(index + 1)));
+                changed[i] = copy;
+            }
+            if (changed == null) return;
+            // Emby can choose audio before assigning the encoding state's source,
+            // when our source-guarded codec hook cannot apply. Clone each changed
+            // layer; other codec conditions, limits and fields remain unchanged.
+            var local = (DeviceProfile)clone.Invoke(profile, null)!;
+            local.TranscodingProfiles = changed;
+            property.SetValue(requestDto, local);
+        }
+
         private static void SanitizeYouTubePlaybackInfoRequest(object service, object requestDto)
         {
+            if (YouTubeDirectPlayback.Enabled)
+            {
+                // Keep every direct source on Emby's server-owned timeline.
+                // The original.hls path otherwise exposes an upstream master
+                // without the requested start offset or native subtitle map.
+                // Start/audio/subtitle selection stays native; preserve lower
+                // client limits while bounding the native encoded output.
+                var directItemId = Normalize(GetStringProperty(requestDto, "Id"));
+                if (!string.IsNullOrEmpty(TryResolveYouTubeVideoId(directItemId)))
+                {
+                    SetBoolProperty(requestDto, "AllowVideoStreamCopy", false);
+                    SetBoolProperty(requestDto, "EnableDirectPlay", false);
+                    SetBoolProperty(requestDto, "EnableDirectStream", false);
+                    var directQuery = GetServiceRequest(service)?.QueryString;
+                    TrySetRequestCollectionValue(directQuery, "AllowVideoStreamCopy", "false");
+                    TrySetRequestCollectionValue(directQuery, "EnableDirectPlay", "false");
+                    TrySetRequestCollectionValue(directQuery, "EnableDirectStream", "false");
+                    // POST carries a nullable Int64 DTO value; native GET reads
+                    // its query instead. Reconcile both before writing so a
+                    // conflicting larger value cannot override a lower limit.
+                    // Zero/negative/absent/invalid/overflow mean no usable bound.
+                    // Never mutate the client's potentially shared DeviceProfile.
+                    var maximumStreamingBitrate = YouTubeDirectQualityPolicy.ClampStreamingBitrate(
+                        TryReadLongProperty(requestDto, "MaxStreamingBitrate"),
+                        TryReadLong(directQuery?["MaxStreamingBitrate"]));
+                    SetNullableLongProperty(requestDto, "MaxStreamingBitrate", maximumStreamingBitrate);
+                    TrySetRequestCollectionValue(directQuery, "MaxStreamingBitrate",
+                        maximumStreamingBitrate.ToString(CultureInfo.InvariantCulture));
+                    // Null means Emby's automatic language selection, not Off.
+                    // Default only a new playback to Off. An explicit selection
+                    // and the current session's track on a seek/quality switch
+                    // must remain under the user's control.
+                    var subtitle = TryReadIntProperty(requestDto, "SubtitleStreamIndex");
+                    var querySubtitle = TryReadLong(directQuery?["SubtitleStreamIndex"]);
+                    var currentSession = GetStringProperty(requestDto, "CurrentPlaySessionId");
+                    if (string.IsNullOrWhiteSpace(currentSession))
+                        currentSession = directQuery?["CurrentPlaySessionId"];
+                    if (!(subtitle >= -1) && !(querySubtitle >= -1 && querySubtitle <= int.MaxValue)
+                        && string.IsNullOrWhiteSpace(currentSession))
+                    {
+                        SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
+                        TrySetRequestCollectionValue(directQuery, "SubtitleStreamIndex", "-1");
+                    }
+                    PreferNativeYouTubeAudio(requestDto);
+                }
+                return;
+            }
             var serviceRequest = GetServiceRequest(service);
             var itemId = Normalize(GetStringProperty(requestDto, "Id"));
             if (string.IsNullOrEmpty(itemId))
@@ -485,33 +569,60 @@ namespace Emby.YouTubePlugin
 
             // Some native clients authenticate PlaybackInfo but omit UserId
             // from both the DTO and query. Their already registered Emby
-            // session still carries the user. Only accept an unambiguous device
-            // match so a shared/reused device id can never attach the playback
-            // intent to the wrong user.
+            // session still carries the user. Only accept an unambiguous user
+            // across that device's sessions, so paired web/native sessions work
+            // without attaching a shared/reused device to the wrong user.
             var deviceId = Normalize(GetDeviceId(request));
             if (string.IsNullOrEmpty(deviceId))
                 return string.Empty;
 
             var sessionManager = Plugin.ResolveService<ISessionManager>();
-            var candidates = sessionManager?.Sessions
-                .Where(session => session.UserInternalId > 0
-                                  && string.Equals(
-                                      Normalize(session.DeviceId),
-                                      deviceId,
-                                      StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-            if (candidates?.Length != 1)
+            return ResolveUniqueDeviceUserId(sessionManager?.Sessions, deviceId);
+        }
+
+        private static string ResolveUniqueDeviceUserId(IEnumerable<SessionInfo>? sessions, string deviceId)
+        {
+            if (sessions == null || string.IsNullOrEmpty(deviceId))
                 return string.Empty;
 
-            return !string.IsNullOrEmpty(candidates[0].UserId)
-                ? candidates[0].UserId
-                : candidates[0].UserInternalId.ToString(CultureInfo.InvariantCulture);
+            string? userId = null;
+            long userInternalId = 0;
+            foreach (var session in sessions)
+            {
+                if (!string.Equals(Normalize(session.DeviceId), deviceId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Android's web playback and native socket can be separate
+                // sessions for one user. Count identities, not sessions; an
+                // incomplete or conflicting identity is still fail-closed.
+                var candidateUserId = Normalize(session.UserId);
+                if (session.UserInternalId <= 0 || string.IsNullOrEmpty(candidateUserId)
+                    || userId != null
+                       && (!string.Equals(userId, candidateUserId, StringComparison.OrdinalIgnoreCase)
+                           || userInternalId != session.UserInternalId))
+                {
+                    return string.Empty;
+                }
+
+                userId = candidateUserId;
+                userInternalId = session.UserInternalId;
+            }
+
+            return userId ?? string.Empty;
         }
 
         private static void CapturePlaybackInfoPostfix(object __instance, object __0, ref Task<object> __result)
         {
             try
             {
+                if (YouTubeDirectPlayback.Enabled)
+                {
+                    var itemId = Normalize(GetStringProperty(__0, "Id"));
+                    var videoId = TryResolveYouTubeVideoId(itemId);
+                    if (!string.IsNullOrEmpty(videoId) && __result != null)
+                        __result = RequireDirectPlaybackInfoAsync(__result, videoId, itemId);
+                    return;
+                }
                 var context = CapturePlaybackInfo(__instance, __0);
                 if (context != null && __result != null)
                     __result = PatchYouTubePlaybackInfoAsync(__result, context);
@@ -522,8 +633,19 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private static async Task<object> RequireDirectPlaybackInfoAsync(Task<object> responseTask, string videoId, string? itemId)
+        {
+            var response = await responseTask.ConfigureAwait(false);
+            var verified = YouTubeDirectPlayback.RequireDirectPlaybackInfo(response, videoId);
+            YouTubeChapterSync.Synchronize(itemId, videoId);
+            YouTubeChapterSync.ApplyPreferredChapters(verified, itemId, videoId);
+            return verified;
+        }
+
         private static PlaybackInfoPatchContext? CapturePlaybackInfo(object service, object requestDto)
         {
+            if (YouTubeDirectPlayback.Enabled)
+                return null;
             // In Emby 4.9 GET keeps StartTimeTicks in the query string, while
             // POST can carry it directly on the request DTO. Read both.
             var serviceRequest = GetServiceRequest(service);
@@ -610,6 +732,11 @@ namespace Emby.YouTubePlugin
         private static async Task<object> PatchYouTubePlaybackInfoAsync(Task<object> responseTask, PlaybackInfoPatchContext context)
         {
             var response = await responseTask.ConfigureAwait(false);
+            if (YouTubeDirectPlayback.Enabled)
+            {
+                var videoId = TryResolveYouTubeVideoId(context.ItemId);
+                return string.IsNullOrEmpty(videoId) ? response : YouTubeDirectPlayback.RequireDirectPlaybackInfo(response, videoId);
+            }
             try
             {
                 // Resolve the YouTube video id from the library item itself. This
@@ -807,6 +934,8 @@ namespace Emby.YouTubePlugin
             string? youTubeVideoId,
             PlaybackInfoPatchContext context)
         {
+            if (YouTubeDirectPlayback.Enabled)
+                return new PlaybackInfoNormalizationResult(0, 0);
             var mediaSources = response?.GetType()
                 .GetProperty("MediaSources", BindingFlags.Instance | BindingFlags.Public)
                 ?.GetValue(response) as IEnumerable;

@@ -405,20 +405,11 @@ namespace Emby.YouTubePlugin
                                 if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                             }
 
-                            string statsLine = BuildEngagementStatsLine(
-                                viewCount,
-                                likeCount,
-                                commentCount,
-                                Plugin.Instance?.Options.ShowLikeCount == true,
-                                Plugin.Instance?.Options.ShowCommentCount == true);
+                            string? apiOverview = BuildVideoOverview(null, desc, viewCount, likeCount, commentCount);
+                            string? overview = BuildVideoOverview(IsLiveOrUpcomingVideo(detail) ? null : rawId,
+                                desc, viewCount, likeCount, commentCount);
 
-                            string? overview = null;
-                            if (!string.IsNullOrWhiteSpace(desc))
-                                overview = (statsLine.Length > 0 ? statsLine + "\n\n" : "") + desc;
-                            else if (statsLine.Length > 0)
-                                overview = statsLine;
-
-                            if (!string.IsNullOrEmpty(overview))
+                            if (overview != null)
                                 batchItem.Overview = overview;
 
                             // Premiere date.
@@ -458,11 +449,11 @@ namespace Emby.YouTubePlugin
 
                             // Cache the enriched metadata so later folder loads are cheap.
                             MetaCache[batchItem.Id] = new VideoMeta(
-                                overview, premiere, premiere?.Year,
+                                apiOverview, premiere, premiere?.Year,
                                 isLiveOrUpcoming ? null : ts?.Ticks,
                                 batchItem.ImageUrl,
                                 DateTime.UtcNow,
-                                origLang);
+                                origLang, desc, viewCount, likeCount, commentCount, true);
                         }
                     }
                 }
@@ -544,15 +535,31 @@ namespace Emby.YouTubePlugin
 
         private static void ApplyCachedMeta(List<ChannelItemInfo> batch)
         {
+            var now = DateTime.UtcNow;
             foreach (var item in batch)
             {
-                if (!MetaCache.TryGetValue(item.Id, out var cached)) continue;
+                if (!MetaCache.TryGetValue(item.Id, out var cached)
+                    || now - cached.CachedAt >= MetaCacheTtl || now < cached.CachedAt)
+                {
+                    if (cached != null) MetaCache.TryRemove(item.Id, out _);
+                    // ExtractVideos already applied the current projection. Its
+                    // Overview is formatted text, not a raw description to prepend
+                    // statistics to a second time.
+                    if (!item.Id.StartsWith(LivePrefix, StringComparison.Ordinal)
+                        && YouTubeDirectMetadata.TryGet(StripPrefix(item.Id), out var recent)
+                        && recent.DurationTicks.HasValue)
+                        item.RunTimeTicks = recent.DurationTicks;
+                    continue;
+                }
 
                 if (!string.IsNullOrEmpty(cached.ThumbUrl) && string.IsNullOrEmpty(item.ImageUrl))
                     item.ImageUrl = cached.ThumbUrl;
 
-                if (!string.IsNullOrEmpty(cached.Overview))
-                    item.Overview = cached.Overview;
+                var overview = cached.HasEngagementMetadata
+                    ? BuildVideoOverview(item.Id.StartsWith(LivePrefix, StringComparison.Ordinal) ? null : StripPrefix(item.Id),
+                        cached.Description, cached.ViewCount, cached.LikeCount, cached.CommentCount)
+                    : cached.Overview;
+                if (overview != null) item.Overview = overview;
 
                 if (cached.Premiere.HasValue && !item.PremiereDate.HasValue)
                 {
@@ -561,8 +568,12 @@ namespace Emby.YouTubePlugin
                 }
                 if (cached.Year.HasValue && !item.ProductionYear.HasValue)
                     item.ProductionYear = cached.Year;
-                if (cached.RuntimeTicks.HasValue && !item.RunTimeTicks.HasValue)
-                    item.RunTimeTicks = cached.RuntimeTicks;
+                if (!item.Id.StartsWith(LivePrefix, StringComparison.Ordinal))
+                {
+                    var runtime = YouTubeDirectMetadata.TryGet(StripPrefix(item.Id), out var direct)
+                        ? direct.DurationTicks ?? cached.RuntimeTicks : cached.RuntimeTicks;
+                    if (runtime.HasValue) item.RunTimeTicks = runtime;
+                }
             }
         }
     }

@@ -42,6 +42,35 @@ namespace Emby.YouTubePlugin
 
         public int WatchLaterPollMinutes { get; set; } = 3;
 
+        public bool DirectPlaybackEnabled { get; set; } = true;
+
+        // Legacy serialized paths are ignored by the in-process resolver and
+        // cleared on save. Retain the properties only for old configuration files.
+        public string YtDlpPath { get; set; } = "";
+
+        // Legacy flag is ignored. Resolver updates ship with the plugin DLL.
+        public bool YtDlpAutoUpdateEnabled { get; set; } = false;
+
+        public string YtDlpJsRuntimePath { get; set; } = "";
+
+        private int _directPlaybackMaxHeight = YouTubeDirectQualityPolicy.MaximumHeight;
+
+        // Clamp on assignment as well as save: deserializing an old 2160p
+        // setting must never expose it to playback before the next user save.
+        public int DirectPlaybackMaxHeight
+        {
+            get => _directPlaybackMaxHeight;
+            set => _directPlaybackMaxHeight = YouTubeDirectQualityPolicy.ClampHeight(value);
+        }
+
+        private int _directPlaybackH264MaxHeight = YouTubeDirectQualityPolicy.MaximumHeight;
+
+        public int DirectPlaybackH264MaxHeight
+        {
+            get => _directPlaybackH264MaxHeight;
+            set => _directPlaybackH264MaxHeight = YouTubeDirectQualityPolicy.ClampHeight(value);
+        }
+
         public string Donate { get; set; } = "https://paypal.me/eliasbruno123";
 
         [XmlIgnore]

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "excludedDirectories": [".git", ".unlazy", ".vs", "bin", "obj", "node_modules", "scripts", "tests"],
+  "excludedFiles": [],
+  "generatedOutputs": ["docs/CODE_MAP.md", "docs/code-map.json", "docs/code-map.manifest.json"],
+  "reviewFile": "docs/code-map.review.json",
+  "flowFile": "docs/code-map.flows.json",
+  "guideFile": "docs/CODE_GUIDE.md",
+  "pluginProject": "Emby.YouTubePlugin.csproj"
+}

@@ -1,0 +1,118 @@
+{
+  "project": "YoutubeExplode",
+  "version": "6.6.3",
+  "commit": "d8b1928bf32802c43532465f4d202d066ce77667",
+  "repository": "https://github.com/Tyrrrz/YoutubeExplode",
+  "sourceArchive": "https://codeload.github.com/Tyrrrz/YoutubeExplode/tar.gz/refs/tags/6.6.3",
+  "archiveSha256": "13a4f3a252be5bf380a8b9035a100d0c6af7d65086c65e093822b3bb23b43dd1",
+  "license": "MIT",
+  "licenseFile": "License.txt",
+  "licenseSha256": "0be76f79072fad21b789198003de6d29f04af9f7c96ef9185d407508ad5d167f",
+  "integration": "Pinned modified source subset compiled into the plugin; not the unmodified NuGet package.",
+  "excluded": [
+    "Deorcify",
+    "PowerKit",
+    "AngleSharp",
+    "JsonExtensions",
+    "PolyShim",
+    "Lazy.Fody",
+    "JavaScript player downloads",
+    "Android/TV fallback clients",
+    "stream download APIs",
+    "process/native helpers"
+  ],
+  "files": [
+    {
+      "path": "vendored/Videos/VideoController.cs",
+      "upstreamSha256": "228956b9c4a30b67149863f3dbc7c66733b461aa21ad666b1d45b66bc98c2b5d",
+      "sourceSubsetSha256": "83311b65c71bc7a6d5135318cf624778f38f4f4f87d7996264a3d73aeda90c3f",
+      "sha256": "83311b65c71bc7a6d5135318cf624778f38f4f4f87d7996264a3d73aeda90c3f",
+      "patches": [
+        "exclude-unused-watch-page-html-api",
+        "remove-android-and-age-bypassing-tv-client",
+        "fixed-visionos-no-fallback",
+        "content-racy-check-flags-false"
+      ]
+    },
+    {
+      "path": "vendored/Videos/VideoId.cs",
+      "upstreamSha256": "b5a11b417de45ad1e2d0c32a07028d48697fe80069f5d16a3a0e7c2b5afb0090",
+      "sourceSubsetSha256": "b5a11b417de45ad1e2d0c32a07028d48697fe80069f5d16a3a0e7c2b5afb0090",
+      "sha256": "b5a11b417de45ad1e2d0c32a07028d48697fe80069f5d16a3a0e7c2b5afb0090",
+      "patches": []
+    },
+    {
+      "path": "vendored/Bridge/PlayerResponse.cs",
+      "upstreamSha256": "7275f7f86feeb5cfe9fc69553e4061719232d442ce29a4e36756d1ab651dee86",
+      "sourceSubsetSha256": "fa111d82d083685d0646c7b3578907404ccec10c1b036ee03a745da5e383694b",
+      "sha256": "58414136eaf4ae306d4efa109fc1bc9aa95a6cd094e4e65a614b21510679f547",
+      "patches": [
+        "remove-build-time-lazy-weaver-annotations-no-property-caching",
+        "lower-static-numeric-extensions-to-explicit-csharp12-helpers",
+        "expose-internal-single-player-json-snapshot"
+      ]
+    },
+    {
+      "path": "vendored/Bridge/IStreamData.cs",
+      "upstreamSha256": "52b727fdc0aa9f0553297bbcb06c7bc87ce2205859a645775780cae81c4b50c4",
+      "sourceSubsetSha256": "52b727fdc0aa9f0553297bbcb06c7bc87ce2205859a645775780cae81c4b50c4",
+      "sha256": "52b727fdc0aa9f0553297bbcb06c7bc87ce2205859a645775780cae81c4b50c4",
+      "patches": []
+    },
+    {
+      "path": "vendored/Bridge/ThumbnailData.cs",
+      "upstreamSha256": "1d9eee979cdc5ae8bf8eb62332ebfe48c037f3b8ccabe1d28e290e4e2a36782d",
+      "sourceSubsetSha256": "fb7cee52035b49d9bc198eff4e6e20d14f1b67dc529064711e12ba267ef9507d",
+      "sha256": "fb7cee52035b49d9bc198eff4e6e20d14f1b67dc529064711e12ba267ef9507d",
+      "patches": [
+        "remove-build-time-lazy-weaver-annotations-no-property-caching"
+      ]
+    },
+    {
+      "path": "vendored/Utils/Json.cs",
+      "upstreamSha256": "34a0b0e321942f41e1e8a63becf33b5a936df45cdb005510ad2e4c52b56c8fa1",
+      "sourceSubsetSha256": "34a0b0e321942f41e1e8a63becf33b5a936df45cdb005510ad2e4c52b56c8fa1",
+      "sha256": "fad600c08a0a82268533a88448e64265a158b60ce49bf0edafb4012a3ef3f48b",
+      "patches": [
+        "import-internal-bcl-helper-extensions-explicitly"
+      ]
+    },
+    {
+      "path": "vendored/Utils/UrlEx.cs",
+      "upstreamSha256": "3922170c51229da5553e49c915934f9912af3634cd9568c7b7d4902b48bc041b",
+      "sourceSubsetSha256": "3922170c51229da5553e49c915934f9912af3634cd9568c7b7d4902b48bc041b",
+      "sha256": "3922170c51229da5553e49c915934f9912af3634cd9568c7b7d4902b48bc041b",
+      "patches": []
+    },
+    {
+      "path": "vendored/Utils/Protobuf.cs",
+      "upstreamSha256": "e8971411d6e4f52be07af6e6c2dbfbe1c64802771c231648a4c316a7435f6dcf",
+      "sourceSubsetSha256": "e8971411d6e4f52be07af6e6c2dbfbe1c64802771c231648a4c316a7435f6dcf",
+      "sha256": "fda74021789efa44b726b8d33d0d15b775b3a771f2f4c8bf51b1fb5714f1073f",
+      "patches": [
+        "bound-protobuf-length-and-varint-overflow-before-indexing"
+      ]
+    },
+    {
+      "path": "vendored/Exceptions/YoutubeExplodeException.cs",
+      "upstreamSha256": "20cff54bc11a57c28cd5da4db1d6b88bfdccbc9bbb6f3f7dede7bb50deba83fe",
+      "sourceSubsetSha256": "20cff54bc11a57c28cd5da4db1d6b88bfdccbc9bbb6f3f7dede7bb50deba83fe",
+      "sha256": "20cff54bc11a57c28cd5da4db1d6b88bfdccbc9bbb6f3f7dede7bb50deba83fe",
+      "patches": []
+    },
+    {
+      "path": "vendored/Exceptions/VideoUnplayableException.cs",
+      "upstreamSha256": "6a491f86c0fb96841dfb38b08c63b34a6372eb736fc2709220283e0ac9019a23",
+      "sourceSubsetSha256": "6a491f86c0fb96841dfb38b08c63b34a6372eb736fc2709220283e0ac9019a23",
+      "sha256": "6a491f86c0fb96841dfb38b08c63b34a6372eb736fc2709220283e0ac9019a23",
+      "patches": []
+    },
+    {
+      "path": "vendored/Exceptions/VideoUnavailableException.cs",
+      "upstreamSha256": "1057cd19b95ce34bd398dff052da0afec6833b17b5e815b10dfbed7db0354195",
+      "sourceSubsetSha256": "1057cd19b95ce34bd398dff052da0afec6833b17b5e815b10dfbed7db0354195",
+      "sha256": "1057cd19b95ce34bd398dff052da0afec6833b17b5e815b10dfbed7db0354195",
+      "patches": []
+    }
+  ]
+}

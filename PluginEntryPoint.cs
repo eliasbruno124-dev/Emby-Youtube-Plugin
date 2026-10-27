@@ -57,6 +57,29 @@ namespace Emby.YouTubePlugin
         private long _nextResumeSeekGeneration;
         private bool _playlistFingerprintsDirty;
         private static PluginEntryPoint? _current;
+
+        // Called both when enabling the option and before direct resolution.
+        // Retire delayed legacy work without deleting durable user history.
+        internal static void SuppressLegacyPlaybackForDirectMode() => _current?.SkipLegacyPlayback();
+
+        private bool SkipLegacyPlayback()
+        {
+            if (!YouTubeDirectPlayback.Enabled) return false;
+            lock (_resumeDispatchLifetimeGate)
+            {
+                _pendingResumeSeeks.Clear();
+                _resumeSeeksInFlight.Clear();
+                _resumeSeekTerminals.Clear();
+                _lastResumeProgressBySession.Clear();
+                _resumeTrackingFloorsBySession.Clear();
+                _lastResumeCheckpointFlushByKey.Clear();
+                PlaybackIntentInterceptor.DiscardCapturedIntents();
+                Interlocked.Exchange(ref _resumeCheckpointsDirty, 0);
+                _resumeCheckpointSaveTimer?.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                _captionOffGuard.SuspendForDirectPlayback();
+            }
+            return true;
+        }
         private const long ResumeSeekMinimumTicks = TimeSpan.TicksPerSecond * 5;
         // This is a readiness signal, not a resume position. Fire TV can
         // expose a genuine content timeline around one second before it reaches
@@ -115,7 +138,15 @@ namespace Emby.YouTubePlugin
         {
         }
 
-        private sealed record ResumeSeekTerminal(string? UserId, DateTime UpdatedUtc, bool Active, string Reason);
+        private sealed record ResumeSeekTerminal(string? UserId, DateTime UpdatedUtc, bool Active, string Reason)
+        {
+            // Persistence protection outlives the one-shot dispatch window, but
+            // belongs to this exact playback identity, never just its session.
+            public string? ProtectedVideoId { get; init; }
+            public long ProtectedPositionTicks { get; init; }
+        }
+
+        private enum ResumePlaybackStatus { NotReady, Current, Superseded }
 
         private sealed record ResumeCheckpoint(
             string UserId,
@@ -172,6 +203,7 @@ namespace Emby.YouTubePlugin
             // Capture PlaybackInfo before PlaybackStart so resume and
             // "play from beginning" can be told apart reliably.
             EmbeddedDependencyLoader.Register();
+            YouTubeDirectSeekCompatibility.Install();
             PlaybackIntentInterceptor.Install();
             DashboardYouTubePlayerInterceptor.Install();
             YouTubeChannel.LoadShortsProbeCache();
@@ -281,6 +313,7 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackStartCore(object? sender, PlaybackProgressEventArgs e)
         {
+            if (SkipLegacyPlayback()) return;
             try
             {
                 if (_sessionManager == null)
@@ -380,6 +413,7 @@ namespace Emby.YouTubePlugin
                 _resumeTrackingFloorsBySession[session.Id] = Math.Max(
                     ResumeSeekMinimumTicks,
                     positionTicks - ResumeSeekEndGuardTicks);
+                SetResumeProtection(key, session.UserId, videoId, positionTicks);
 
                 // LG/webOS players remain URL/player-start only. Fire TV and
                 // Android TV get one guarded fallback below, but only after
@@ -453,6 +487,7 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackStoppedCore(object? sender, PlaybackStopEventArgs e)
         {
+            if (SkipLegacyPlayback()) return;
             var item = e.Item;
             var session = e.Session;
             var sessionId = session?.Id;
@@ -460,6 +495,15 @@ namespace Emby.YouTubePlugin
             var stopKey = item == null || session == null
                 ? null
                 : GetResumeSeekKey(session.Id, session.UserId, e.PlaySessionId, item.InternalId);
+            // Retired/unknown events must not resurrect a checkpoint after its
+            // final Stop, even when no replacement playback is active anymore.
+            if (string.IsNullOrEmpty(stopKey)
+                || string.IsNullOrEmpty(e.PlaySessionId)
+                || string.IsNullOrEmpty(session?.UserId)
+                || !IsResumePlaybackReservationCurrent(stopKey, session.UserId))
+            {
+                return;
+            }
             var isStaleStop = !string.IsNullOrEmpty(sessionId)
                               && !string.IsNullOrEmpty(stopKey)
                               && HasOtherActiveResumePlayback(sessionId, stopKey);
@@ -501,7 +545,7 @@ namespace Emby.YouTubePlugin
                         }
                         else
                         {
-                            RestoreProtectedNativeResumePosition(item, session, videoId);
+                            RestoreProtectedNativeResumePosition(item, session, videoId, stopKey);
                         }
                     }
                     else
@@ -509,7 +553,7 @@ namespace Emby.YouTubePlugin
                         // Emby itself can persist a beginning/ad report while
                         // the fallback is pending. Reassert the original
                         // checkpoint, but never track that unconfirmed value.
-                        RestoreProtectedNativeResumePosition(item, session, videoId);
+                        RestoreProtectedNativeResumePosition(item, session, videoId, stopKey);
                     }
 
                     SaveResumeCheckpoints();
@@ -609,6 +653,26 @@ namespace Emby.YouTubePlugin
             && terminal.Active
             && string.Equals(terminal.UserId, userId, StringComparison.Ordinal);
 
+        private void SetResumeProtection(string key, string? userId, string? videoId, long positionTicks)
+        {
+            if (_resumeSeekTerminals.TryGetValue(key, out var current)
+                && current.Active
+                && string.Equals(current.UserId, userId, StringComparison.Ordinal))
+            {
+                _resumeSeekTerminals.TryUpdate(key, current with
+                {
+                    ProtectedVideoId = videoId,
+                    ProtectedPositionTicks = positionTicks
+                }, current);
+            }
+        }
+
+        private void ClearResumeProtection(string key, string? userId, string sessionId)
+        {
+            SetResumeProtection(key, userId, null, 0);
+            _resumeTrackingFloorsBySession.TryRemove(sessionId, out _);
+        }
+
         private bool HasOtherActiveResumePlayback(string sessionId, string key)
         {
             var prefix = sessionId + "|";
@@ -634,11 +698,15 @@ namespace Emby.YouTubePlugin
                         return;
                     }
 
-                    _resumeSeekTerminals[key] = new ResumeSeekTerminal(
-                        pending.UserId,
-                        DateTime.UtcNow,
-                        Active: true,
-                        reason);
+                    var terminal = _resumeSeekTerminals.TryGetValue(key, out var existing)
+                        ? existing
+                        : new ResumeSeekTerminal(pending.UserId, DateTime.UtcNow, true, reason);
+                    _resumeSeekTerminals[key] = terminal with
+                    {
+                        UpdatedUtc = DateTime.UtcNow,
+                        Active = true,
+                        Reason = reason
+                    };
                     RemovePendingResumeSeek(key, current);
                 }
             }
@@ -746,6 +814,7 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackProgressCore(object? sender, PlaybackProgressEventArgs e)
         {
+            if (SkipLegacyPlayback()) return;
             try
             {
                 var item = e.Item;
@@ -755,24 +824,42 @@ namespace Emby.YouTubePlugin
 
                 var videoId = YouTubeImageProvider.TryGetVideoId(item);
                 var key = GetResumeSeekKey(e, item);
-                if (session != null
-                    && !string.IsNullOrEmpty(session.Id)
-                    && HasOtherActiveResumePlayback(session.Id, key))
+                if (session == null
+                    || string.IsNullOrEmpty(session.Id)
+                    || string.IsNullOrEmpty(session.UserId)
+                    || string.IsNullOrEmpty(e.PlaySessionId)
+                    || !IsResumePlaybackReservationCurrent(key, session.UserId)
+                    || HasOtherActiveResumePlayback(session.Id, key))
                 {
-                    // An out-of-order progress event from the old play session
-                    // must not write its position over the current playback.
+                    // Only an active exact identity may persist progress. This
+                    // also rejects delayed events after its final Stop.
                     return;
                 }
                 var hasPendingSeek = _pendingResumeSeeks.TryGetValue(key, out var pending);
                 var currentTicks = GetPlaybackPositionTicks(e.PlaybackPositionTicks, session);
                 var now = DateTime.UtcNow;
 
+                // Optional compatibility signal only: the current Emby SDK's
+                // progress event has no SeekPositionTicks. TimeUpdate and
+                // IsAutomated=false alone cannot prove a deliberate seek.
+                var reportedSeekTicks = GetLongProperty(e, "SeekPositionTicks");
+                if (!string.IsNullOrEmpty(videoId)
+                    && ApplyReportedManualSeek(key, session, videoId, reportedSeekTicks))
+                {
+                    // The explicit seek destination outranks a queued pre-seek
+                    // position report. Never infer this intent from raw zero.
+                    currentTicks = reportedSeekTicks!.Value;
+                    hasPendingSeek = false;
+                    pending = null;
+                }
+
                 if (hasPendingSeek && pending != null && IsPlaybackPaused(e, session))
                 {
                     // A deliberate pause is not a failed native resume. Do not
                     // let a delayed task seek after the user has paused.
                     TerminalizePendingResumeSeek(key, pending, "paused");
-                    _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
+                    // Pause cancels automatic control, not the protection of
+                    // an as-yet unconfirmed resume target from start/ad time.
                     hasPendingSeek = false;
                     pending = null;
                 }
@@ -807,48 +894,33 @@ namespace Emby.YouTubePlugin
                         // never on a stale session-level position. Only this
                         // proof releases the protected checkpoint normally.
                         TerminalizePendingResumeSeek(key, pending, "confirmed");
-                        _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
+                        ClearResumeProtection(key, pending.UserId, pending.SessionId);
                         YouTubeChannel.LogPublic($"[YT] Resume seek confirmed for {pending.VideoId} at {(pending.IsFireTvFallback ? "raw" : "reported")} position {(pending.IsFireTvFallback ? rawProgressTicks!.Value : currentTicks)} ticks.");
                         hasPendingSeek = false;
                         pending = null;
                     }
                     else if (pending.RequiresObservedProgress)
                     {
-                        if (IsReportedManualSeek(e, out var seeksToBeginning))
+                        var observed = ObserveFireTvFallbackProgress(
+                            pending,
+                            rawProgressTicks,
+                            now,
+                            out var manualDiscontinuity);
+                        if (manualDiscontinuity)
                         {
-                            if (seeksToBeginning)
+                            if (rawProgressTicks == 0)
                                 currentTicks = 0;
-                            CancelPendingResumeSeekForManualPosition(
-                                key,
-                                pending,
-                                "reported seek event",
-                                clearResumeCheckpoint: seeksToBeginning);
+                            CancelPendingResumeSeekForManualPosition(key, pending, "progress discontinuity");
                             hasPendingSeek = false;
                             pending = null;
                         }
+                        else if (TryUpdatePendingResumeSeek(key, pending, observed))
+                        {
+                            pending = observed;
+                        }
                         else
                         {
-                            var observed = ObserveFireTvFallbackProgress(
-                                pending,
-                                rawProgressTicks,
-                                now,
-                                out var manualDiscontinuity);
-                            if (manualDiscontinuity)
-                            {
-                                if (rawProgressTicks == 0)
-                                    currentTicks = 0;
-                                CancelPendingResumeSeekForManualPosition(key, pending, "progress discontinuity");
-                                hasPendingSeek = false;
-                                pending = null;
-                            }
-                            else if (TryUpdatePendingResumeSeek(key, pending, observed))
-                            {
-                                pending = observed;
-                            }
-                            else
-                            {
-                                return;
-                            }
+                            return;
                         }
                     }
                 }
@@ -861,12 +933,13 @@ namespace Emby.YouTubePlugin
                 {
                     if (!string.IsNullOrEmpty(videoId))
                     {
-                        if (CanTrackPlaybackPosition(session?.Id, currentTicks))
+                        if (CanTrackPlaybackPosition(session.Id, currentTicks))
                         {
+                            ClearResumeProtection(key, session.UserId, session.Id);
                             var runtimeTicksForCheckpoint = item.RunTimeTicks.GetValueOrDefault();
                             TrackResumeCheckpoint(
-                                session?.Id,
-                                session?.UserId,
+                                session.Id,
+                                session.UserId,
                                 videoId,
                                 currentTicks,
                                 runtimeTicksForCheckpoint);
@@ -878,13 +951,13 @@ namespace Emby.YouTubePlugin
                         }
                         else
                         {
-                            RestoreProtectedNativeResumePosition(item, session, videoId);
+                            RestoreProtectedNativeResumePosition(item, session, videoId, key);
                         }
                     }
                 }
                 else if (!string.IsNullOrEmpty(videoId))
                 {
-                    RestoreProtectedNativeResumePosition(item, session, videoId);
+                    RestoreProtectedNativeResumePosition(item, session, videoId, key);
                 }
 
                 if (!hasPendingSeek || pending == null)
@@ -1117,8 +1190,27 @@ namespace Emby.YouTubePlugin
         {
             var seekPosition = GetLongProperty(e, "SeekPositionTicks");
             seeksToBeginning = seekPosition.HasValue
+                               && seekPosition.Value >= 0
                                && seekPosition.Value < ResumeSeekMinimumTicks;
-            return seekPosition.HasValue;
+            return seekPosition.HasValue && seekPosition.Value >= 0;
+        }
+
+        private bool ApplyReportedManualSeek(
+            string key, SessionInfo session, string videoId, long? seekPositionTicks)
+        {
+            if (!seekPositionTicks.HasValue || seekPositionTicks.Value < 0
+                || !IsResumePlaybackReservationCurrent(key, session.UserId))
+                return false;
+
+            if (_pendingResumeSeeks.TryGetValue(key, out var pending))
+                TerminalizePendingResumeSeek(key, pending, "reported seek event");
+
+            // This is independent of pending dispatch: a user can seek after
+            // its timeout, one-shot budget, pause or confirmation as well.
+            ClearResumeProtection(key, session.UserId, session.Id);
+            if (seekPositionTicks.Value < ResumeSeekMinimumTicks)
+                RemoveResumeCheckpoint(session.UserId, videoId);
+            return true;
         }
 
         private static long? GetLongProperty(object? source, string name)
@@ -1148,7 +1240,7 @@ namespace Emby.YouTubePlugin
             bool clearResumeCheckpoint = false)
         {
             TerminalizePendingResumeSeek(key, pending, reason);
-            _resumeTrackingFloorsBySession.TryRemove(pending.SessionId, out _);
+            ClearResumeProtection(key, pending.UserId, pending.SessionId);
             if (clearResumeCheckpoint)
                 RemoveResumeCheckpoint(pending.UserId, pending.VideoId);
             YouTubeChannel.LogPublic($"[YT] Resume seek cancelled for {pending.VideoId}; {reason} keeps the client position authoritative.");
@@ -1196,6 +1288,7 @@ namespace Emby.YouTubePlugin
 
         private void SchedulePendingResumeSeek(string key, long generation, TimeSpan delay, string reason)
         {
+            if (SkipLegacyPlayback()) return;
             var cancellationToken = _lifetimeToken;
             _ = Task.Run(async () =>
             {
@@ -1222,7 +1315,7 @@ namespace Emby.YouTubePlugin
 
         private async Task SendPlaystateCommandAsync(string sessionId, string? userId, PlaystateCommand commandType)
         {
-            if (_sessionManager == null)
+            if (SkipLegacyPlayback() || _sessionManager == null)
                 return;
 
             var request = new PlaystateRequest
@@ -1241,7 +1334,7 @@ namespace Emby.YouTubePlugin
 
         private async Task TrySendPendingResumeSeekAsync(string key, long generation, string reason)
         {
-            if (_sessionManager == null || IsDisposingOrDisposed())
+            if (SkipLegacyPlayback() || _sessionManager == null || IsDisposingOrDisposed())
                 return;
 
             if (!_pendingResumeSeeks.TryGetValue(key, out var pending)
@@ -1290,6 +1383,7 @@ namespace Emby.YouTubePlugin
             reserved = null;
             lock (_resumeDispatchLifetimeGate)
             {
+                if (SkipLegacyPlayback()) return null;
                 lock (expected.DispatchGate)
                 {
                     if (IsDisposingOrDisposed()
@@ -1299,7 +1393,8 @@ namespace Emby.YouTubePlugin
                         return null;
 
                     var now = DateTime.UtcNow;
-                    if (!IsPendingSeekStillCurrent(pending))
+                    var playbackStatus = GetResumePlaybackStatus(pending);
+                    if (playbackStatus == ResumePlaybackStatus.Superseded)
                     {
                         TerminalizePendingResumeSeek(key, pending, "playback identity changed");
                         return null;
@@ -1311,6 +1406,9 @@ namespace Emby.YouTubePlugin
                         YouTubeChannel.LogPublic($"[YT] Resume seek fallback window expired for {pending.VideoId} after {pending.AttemptsSent} dispatched attempts.");
                         return null;
                     }
+
+                    if (playbackStatus == ResumePlaybackStatus.NotReady)
+                        return null;
 
                     // A scheduled continuation is only a chance to examine
                     // recent, raw client progress. It must never turn an old
@@ -1387,9 +1485,26 @@ namespace Emby.YouTubePlugin
                         return null;
                     }
 
-                    if (IsDisposingOrDisposed() || !IsPendingSeekStillCurrent(reserved))
+                    if (IsDisposingOrDisposed())
                     {
                         RemovePendingResumeSeek(key, reserved);
+                        return null;
+                    }
+
+                    playbackStatus = GetResumePlaybackStatus(reserved);
+                    if (playbackStatus == ResumePlaybackStatus.NotReady)
+                    {
+                        // Session DTOs are mutable outside our event lock. If
+                        // readiness vanished during routing, no command was
+                        // invoked and the one-shot budget must remain intact.
+                        _pendingResumeSeeks.TryUpdate(key, pending, reserved);
+                        _resumeSeeksInFlight.TryRemove(inFlightKey, out _);
+                        reserved = null;
+                        return null;
+                    }
+                    if (playbackStatus == ResumePlaybackStatus.Superseded)
+                    {
+                        TerminalizePendingResumeSeek(key, reserved, "playback identity changed");
                         return null;
                     }
 
@@ -1475,7 +1590,7 @@ namespace Emby.YouTubePlugin
 
         private async Task SendSeekCommandAsync(PendingResumeSeek pending, string commandSessionId)
         {
-            if (_sessionManager == null || IsDisposingOrDisposed())
+            if (SkipLegacyPlayback() || _sessionManager == null || IsDisposingOrDisposed())
                 return;
 
             var request = new PlaystateRequest
@@ -1532,7 +1647,7 @@ namespace Emby.YouTubePlugin
             long positionTicks,
             UserDataSaveReason reason)
         {
-            if (_userDataManager == null
+            if (YouTubeDirectPlayback.Enabled || _userDataManager == null
                 || session == null
                 || session.UserInternalId <= 0
                 || positionTicks < ResumeSeekMinimumTicks)
@@ -1563,20 +1678,29 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private void RestoreProtectedNativeResumePosition(BaseItem item, SessionInfo? session, string videoId)
+        private long GetProtectedResumePosition(string key, string? userId, string videoId)
         {
-            if (session == null || session.UserInternalId <= 0)
+            if (_resumeSeekTerminals.TryGetValue(key, out var current)
+                && current.Active
+                && string.Equals(current.UserId, userId, StringComparison.Ordinal)
+                && string.Equals(current.ProtectedVideoId, videoId, StringComparison.Ordinal)
+                && current.ProtectedPositionTicks >= ResumeSeekMinimumTicks)
+            {
+                return current.ProtectedPositionTicks;
+            }
+
+            return TryGetResumeCheckpoint(userId, videoId, out var checkpoint)
+                ? checkpoint.PositionTicks
+                : 0;
+        }
+
+        private void RestoreProtectedNativeResumePosition(
+            BaseItem item, SessionInfo? session, string videoId, string key)
+        {
+            if (YouTubeDirectPlayback.Enabled || session == null || session.UserInternalId <= 0)
                 return;
 
-            var positionTicks = 0L;
-            if (TryGetResumeCheckpoint(session.UserId, videoId, out var checkpoint))
-            {
-                positionTicks = checkpoint.PositionTicks;
-            }
-            else if (_resumeTrackingFloorsBySession.TryGetValue(session.Id, out var floorTicks))
-            {
-                positionTicks = floorTicks + ResumeSeekEndGuardTicks;
-            }
+            var positionTicks = GetProtectedResumePosition(key, session.UserId, videoId);
 
             if (positionTicks >= ResumeSeekMinimumTicks)
             {
@@ -1672,35 +1796,26 @@ namespace Emby.YouTubePlugin
             return value.Substring(0, maxLength) + "...";
         }
 
-        private bool IsPendingSeekStillCurrent(PendingResumeSeek pending)
-            => IsSessionStillOnItem(
-                pending.SessionId,
-                pending.UserId,
-                pending.PlaySessionId,
-                pending.ItemId,
-                "resume seek");
-
-        private bool IsSessionStillOnItem(
-            string sessionId,
-            string? userId,
-            string playSessionId,
-            long itemId,
-            string logContext)
+        private ResumePlaybackStatus GetResumePlaybackStatus(PendingResumeSeek pending)
         {
             try
             {
                 var session = _sessionManager?.Sessions
-                    .FirstOrDefault(s => string.Equals(s.Id, sessionId, StringComparison.Ordinal));
+                    .FirstOrDefault(s => string.Equals(s.Id, pending.SessionId, StringComparison.Ordinal));
 
                 if (session == null)
-                    return false;
+                    return ResumePlaybackStatus.NotReady;
 
-                if (string.IsNullOrEmpty(playSessionId)
-                    || !string.Equals(session.UserId, userId, StringComparison.Ordinal)
+                if (string.IsNullOrEmpty(pending.PlaySessionId)
+                    || !string.IsNullOrEmpty(session.UserId)
+                       && !string.Equals(session.UserId, pending.UserId, StringComparison.Ordinal)
                     || IsSessionPaused(session))
                 {
-                    return false;
+                    return ResumePlaybackStatus.Superseded;
                 }
+
+                if (string.IsNullOrEmpty(session.UserId))
+                    return ResumePlaybackStatus.NotReady;
 
                 // SessionInfo does not expose PlaySessionId on every supported
                 // Emby build. When it does, require an exact match; otherwise
@@ -1708,26 +1823,22 @@ namespace Emby.YouTubePlugin
                 // remain the authority for the event's explicit PlaySessionId.
                 var currentPlaySessionId = GetCurrentPlaySessionId(session);
                 if (!string.IsNullOrEmpty(currentPlaySessionId)
-                    && !string.Equals(currentPlaySessionId, playSessionId, StringComparison.Ordinal))
+                    && !string.Equals(currentPlaySessionId, pending.PlaySessionId, StringComparison.Ordinal))
                 {
-                    return false;
+                    return ResumePlaybackStatus.Superseded;
                 }
 
-                var nowPlaying = session.FullNowPlayingItem;
-                if (nowPlaying != null)
-                    return itemId <= 0 || nowPlaying.InternalId == itemId;
-
-                // Some session DTOs only expose the public item id.
-                var dtoId = session.NowPlayingItem?.Id;
-                if (itemId <= 0)
-                    return !string.IsNullOrEmpty(dtoId);
-
-                return long.TryParse(dtoId, out var parsedId) && parsedId == itemId;
+                return YouTubeSessionCommandRouter.MatchPlaybackItem(session, pending.ItemId) switch
+                {
+                    YouTubeSessionCommandRouter.PlaybackItemMatch.Match => ResumePlaybackStatus.Current,
+                    YouTubeSessionCommandRouter.PlaybackItemMatch.Mismatch => ResumePlaybackStatus.Superseded,
+                    _ => ResumePlaybackStatus.NotReady
+                };
             }
             catch (Exception ex)
             {
-                YouTubeChannel.LogPublic($"[YT] YouTube {logContext} current-item check failed: {ex.Message}");
-                return false;
+                YouTubeChannel.LogPublic($"[YT] YouTube resume seek current-item check unavailable: {ex.Message}");
+                return ResumePlaybackStatus.NotReady;
             }
         }
 
@@ -1759,7 +1870,7 @@ namespace Emby.YouTubePlugin
             long runtimeTicks,
             bool forceSave = false)
         {
-            if (string.IsNullOrWhiteSpace(videoId))
+            if (YouTubeDirectPlayback.Enabled || string.IsNullOrWhiteSpace(videoId))
                 return;
 
             CleanupRecentSessionCheckpoints();
@@ -1879,6 +1990,7 @@ namespace Emby.YouTubePlugin
 
         private void RemoveResumeCheckpoint(string? userId, string? videoId)
         {
+            if (YouTubeDirectPlayback.Enabled) return;
             var normalizedUserId = NormalizeResumeComponent(userId);
             var normalizedVideoId = NormalizeResumeComponent(videoId);
             if (string.IsNullOrEmpty(normalizedUserId) || string.IsNullOrEmpty(normalizedVideoId))
@@ -1894,6 +2006,7 @@ namespace Emby.YouTubePlugin
 
         private void LoadResumeCheckpoints()
         {
+            if (YouTubeDirectPlayback.Enabled) return;
             try
             {
                 var path = ResumeCheckpointPath;
@@ -1934,6 +2047,7 @@ namespace Emby.YouTubePlugin
 
         private void MarkResumeCheckpointsDirty()
         {
+            if (YouTubeDirectPlayback.Enabled) return;
             Interlocked.Exchange(ref _resumeCheckpointsDirty, 1);
 
             lock (_resumeCheckpointFileLock)
@@ -1945,6 +2059,17 @@ namespace Emby.YouTubePlugin
 
         private void SaveResumeCheckpoints()
         {
+            if (YouTubeDirectPlayback.Enabled) return;
+            // Claim dirty state and capture its snapshot under the same lock as
+            // the commit. Atomic replacement alone cannot prevent an older
+            // concurrently captured snapshot from overwriting a newer one.
+            lock (_resumeCheckpointFileLock)
+                SaveResumeCheckpointsLocked();
+        }
+
+        private void SaveResumeCheckpointsLocked()
+        {
+            if (YouTubeDirectPlayback.Enabled) return;
             if (Interlocked.Exchange(ref _resumeCheckpointsDirty, 0) == 0)
                 return;
 
@@ -1975,17 +2100,14 @@ namespace Emby.YouTubePlugin
                     Directory.CreateDirectory(dir);
 
                 var json = JsonSerializer.Serialize(snapshot);
-                lock (_resumeCheckpointFileLock)
-                {
-                    // Write to a sibling temp file and replace atomically so a
-                    // crash mid-write never leaves a truncated/corrupt JSON.
-                    var tempPath = path + ".tmp";
-                    File.WriteAllText(tempPath, json);
-                    if (File.Exists(path))
-                        File.Replace(tempPath, path, null);
-                    else
-                        File.Move(tempPath, path);
-                }
+                // Write to a sibling temp file and replace atomically so a
+                // crash mid-write never leaves a truncated/corrupt JSON.
+                var tempPath = path + ".tmp";
+                File.WriteAllText(tempPath, json);
+                if (File.Exists(path))
+                    File.Replace(tempPath, path, null);
+                else
+                    File.Move(tempPath, path);
             }
             catch (Exception ex)
             {
@@ -2016,7 +2138,7 @@ namespace Emby.YouTubePlugin
         private static string PluginVersionStampPath =>
             Path.Combine(Plugin.DataPath ?? Path.GetTempPath(), "youtube-plugin-version.txt");
 
-        private const string PluginBuildRevision = "2.0.8.11-resume-player-lifecycle-20260908";
+        private const string PluginBuildRevision = "resume-identity-persistence-20261026";
 
         // Wipes transient caches when the installed plugin version differs
         // from the one we recorded last time. Saves the user from having to
@@ -2567,6 +2689,7 @@ namespace Emby.YouTubePlugin
                 (c.ApiKey ?? "").Trim(),
                 (c.SavedItems ?? "").Trim(),
                 (c.WatchLaterPlaylist ?? "").Trim(),
+                c.DirectPlaybackEnabled ? "direct" : "legacy",
                 c.ShowRootFoldersAtTopLevel ? "1" : "0",
                 c.ShowTrending ? "1" : "0",
                 c.ShowCategories ? "1" : "0",
@@ -2594,6 +2717,8 @@ namespace Emby.YouTubePlugin
                 _resumeSeekTerminals.Clear();
                 _resumeSeeksInFlight.Clear();
             }
+            try { YouTubeDirectRangeProxy.Shutdown(); }
+            catch { YouTubeChannel.LogPublic("[YT] Native range input shutdown did not complete cleanly."); }
             _captionOffGuard.Dispose();
             if (ReferenceEquals(_current, this))
                 _current = null;
@@ -2621,6 +2746,7 @@ namespace Emby.YouTubePlugin
                 _lifetimeCts.Dispose();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
+            YouTubeDirectSeekCompatibility.Uninstall();
         }
     }
 
