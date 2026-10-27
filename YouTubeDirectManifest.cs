@@ -14,11 +14,18 @@ namespace Emby.YouTubePlugin
     internal sealed record YouTubeHlsSelection(
         string Content, Uri VideoUri, Uri? AudioUri, int Width, int Height,
         int Bitrate, float? FrameRate, string VideoCodec, string AudioCodec,
-        int? AudioChannels, string? AudioLanguage);
+        int? AudioChannels, string? AudioLanguage)
+    {
+        internal string? VideoContent { get; init; }
+        internal IReadOnlyList<YouTubeHlsAudioTrack> AudioTracks { get; init; } = Array.Empty<YouTubeHlsAudioTrack>();
+    }
+
+    internal sealed record YouTubeHlsAudioTrack(string Key, string Content, string Name,
+        string? Language, int? Channels, bool IsDefault);
 
     // Parses a bounded upstream master, never arbitrary client input. The output
-    // has one video variant and one matching audio rendition, so Emby receives
-    // one timeline and its ordinary start/seek processing covers both streams.
+    // has one video variant. Real alternate audio renditions are represented
+    // separately so native selection maps only the requested language.
     internal static class YouTubeDirectManifest
     {
         internal const int MaximumMasterBytes = 512 * 1024;
@@ -112,7 +119,8 @@ namespace Emby.YouTubePlugin
             if (group.Length > 0)
             {
                 rendition = audio.Where(a => Value(a, "GROUP-ID") == group)
-                    .OrderByDescending(a => Value(a, "DEFAULT") == "YES")
+                    .OrderByDescending(a => YouTubeAudioTracks.HasExplicitOriginalLabel(Value(a, "NAME")))
+                    .ThenByDescending(a => Value(a, "DEFAULT") == "YES")
                     .ThenByDescending(a => Value(a, "AUTOSELECT") == "YES")
                     .ThenBy(a => Value(a, "NAME"), StringComparer.Ordinal).FirstOrDefault();
                 if (rendition == null || Value(rendition, "NAME").Length == 0 || Value(rendition, "URI").Length == 0)
@@ -150,10 +158,54 @@ namespace Emby.YouTubePlugin
             int? channels = null;
             if (rendition != null && int.TryParse(Value(rendition, "CHANNELS").Split('/')[0], NumberStyles.None, CultureInfo.InvariantCulture, out var count) && count is > 0 and <= 32)
                 channels = count;
+            var tracks = new List<YouTubeHlsAudioTrack>();
+            string? videoContent = null;
+            if (rendition != null)
+            {
+                var groupTracks = audio.Where(a => Value(a, "GROUP-ID") == group)
+                    .OrderByDescending(a => YouTubeAudioTracks.HasExplicitOriginalLabel(Value(a, "NAME")))
+                    .ThenByDescending(a => Value(a, "DEFAULT") == "YES")
+                    .ThenByDescending(a => Value(a, "AUTOSELECT") == "YES")
+                    .ThenBy(a => Value(a, "LANGUAGE"), StringComparer.Ordinal)
+                    .ThenBy(a => Value(a, "NAME"), StringComparer.Ordinal).ToArray();
+                foreach (var track in groupTracks)
+                {
+                    string name = Value(track, "NAME"), language = Value(track, "LANGUAGE");
+                    if (name.Length == 0 || Value(track, "URI").Length == 0)
+                        throw new InvalidOperationException("HLS audio rendition has no stable identity or input.");
+                    var uri = Resolve(Value(track, "URI"), masterUri, validateUri);
+                    string key = "hls:" + group + "\n" + language + "\n" + name;
+                    int? trackChannels = int.TryParse(Value(track, "CHANNELS").Split('/')[0], NumberStyles.None,
+                        CultureInfo.InvariantCulture, out var trackCount) && trackCount is > 0 and <= 32 ? trackCount : null;
+                    // The parent's total BANDWIDTH is a conservative bound for
+                    // this audio-only wrapper, not an invented audio measurement.
+                    var content = "#EXTM3U\n#EXT-X-VERSION:6\n#EXT-X-STREAM-INF:BANDWIDTH="
+                        + selected.Bitrate.ToString(CultureInfo.InvariantCulture) + ",CODECS="
+                        + Quote(codecs.Single(codec => AudioCodec(codec) != null)) + "\n" + uri.AbsoluteUri + "\n";
+                    tracks.Add(new(key, content, YouTubeAudioTracks.Clean(name),
+                        language.Length == 0 ? null : language, trackChannels, Value(track, "DEFAULT") == "YES"));
+                }
+                var collisions = tracks.GroupBy(track => YouTubeAudioTracks.Index(track.Key))
+                    .Where(items => items.Count() > 1).Select(items => items.Key).ToHashSet();
+                tracks = tracks.Where(track => !collisions.Contains(YouTubeAudioTracks.Index(track.Key)))
+                    .Take(YouTubeAudioTracks.MaximumTracks).ToList();
+                if (tracks.Count == 0) throw new InvalidOperationException("HLS audio track identities are ambiguous.");
+                // Exactly one native default; DEFAULT is not proof of Original.
+                tracks = tracks.Select((track, index) => track with { IsDefault = index == 0 }).ToList();
+                videoContent = "#EXTM3U\n#EXT-X-VERSION:6\n#EXT-X-STREAM-INF:BANDWIDTH="
+                    + selected.Bitrate.ToString(CultureInfo.InvariantCulture) + ",RESOLUTION="
+                    + selected.Width.ToString(CultureInfo.InvariantCulture) + "x" + selected.Height.ToString(CultureInfo.InvariantCulture)
+                    + ",CODECS=" + Quote(codecs.Single(codec => VideoCodec(codec) != null))
+                    + (FrameRate(selected.Attributes) is { } rate ? ",FRAME-RATE=" + rate.ToString(CultureInfo.InvariantCulture) : "")
+                    + (range.Length > 0 ? ",VIDEO-RANGE=" + range : "") + "\n" + selected.Uri.AbsoluteUri + "\n";
+            }
             return new YouTubeHlsSelection(output.ToString(), selected.Uri, audioUri,
                 selected.Width, selected.Height, selected.Bitrate, FrameRate(selected.Attributes),
                 videoCodecs[0]!, audioCodecs[0]!, channels,
-                rendition == null || Value(rendition, "LANGUAGE").Length == 0 ? null : Value(rendition, "LANGUAGE"));
+                rendition == null || Value(rendition, "LANGUAGE").Length == 0 ? null : Value(rendition, "LANGUAGE"))
+            {
+                VideoContent = videoContent, AudioTracks = tracks
+            };
         }
 
         internal static Dictionary<string, string> ParseAttributes(string input)

@@ -23,7 +23,7 @@ namespace Emby.YouTubePlugin
         private const double MaximumDuration = 31 * 24 * 60 * 60;
         private static readonly Regex LanguagePattern = new("\\A[A-Za-z0-9][A-Za-z0-9_-]{0,79}\\z", RegexOptions.CultureInvariant);
         private static readonly Regex IdentityPattern = new("\\A[A-Za-z0-9_.-]{1,60}\\z", RegexOptions.CultureInvariant);
-        private static readonly Regex InitialDataPattern = new(@"(?:var\s+)?ytInitialData\s*=\s*", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+        private static readonly Regex InitialDataPattern = new(@"(?:(?:var\s+)?\bytInitialData|\bwindow\s*\[\s*(?:""ytInitialData""|'ytInitialData')\s*\])\s*=\s*", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
         private static Func<HttpClient> _transportFactory = YouTubeDirectHttp.CreateResolverClient;
 
         internal static async Task<byte[]> ResolveAsync(string videoId, CancellationToken cancellationToken)
@@ -154,6 +154,21 @@ namespace Emby.YouTubePlugin
                         if (data.VideoFramerate is int fps && fps is > 0 and <= 1000) format["fps"] = fps;
                         if (data.AudioLanguageCode is string language && LanguagePattern.IsMatch(language)) format["language"] = language;
                         if (data.IsAudioLanguageDefault is bool isDefault) format["language_preference"] = isDefault ? 1 : 0;
+                        var audioTrack = Property(entry, "audioTrack");
+                        if (Text(audioTrack, "id") is string audioId) format["audio_track_id"] = audioId;
+                        if (data.AudioLanguageName is string audioName)
+                        {
+                            // Classify the original provider label before UI
+                            // cleaning/truncation can create an apparent suffix.
+                            format["audio_track_name"] = YouTubeAudioTracks.Clean(audioName);
+                            format["audio_has_original_label"] = YouTubeAudioTracks.HasExplicitOriginalLabel(audioName);
+                        }
+                        if (data.IsAudioLanguageDefault is bool defaultAudio) format["audio_is_default"] = defaultAudio;
+                        var originalAudio = Boolean(audioTrack, "audioIsOriginal") ?? Boolean(audioTrack, "isOriginal");
+                        if (originalAudio.HasValue) format["audio_is_original"] = originalAudio.Value;
+                        var dubbedAudio = Boolean(audioTrack, "audioIsAutoDubbed") ?? Boolean(audioTrack, "isAutoDubbed");
+                        if (dubbedAudio.HasValue) format["audio_is_auto_dubbed"] = dubbedAudio.Value;
+                        if (Boolean(entry, "isDrc") is bool drc) format["audio_is_drc"] = drc;
                         if (Integer(entry, "audioChannels") is int channels && channels is > 0 and <= 64) format["audio_channels"] = channels;
                         if (CanonicalLong(Text(entry, "audioSampleRate"), allowZero: false) is long rate && rate <= 768000)
                             format["asr"] = (int)rate;
@@ -245,12 +260,12 @@ namespace Emby.YouTubePlugin
                 {
                     var marker = property.Value;
                     if (property.Name == "chapterRenderer" && marker.ValueKind == JsonValueKind.Object
-                        && Long(marker, "timeRangeStartMillis") is long millis)
+                        && ChapterTime(marker, "timeRangeStartMillis") is long millis)
                         Add(millis, Title(Property(marker, "title")));
                     else if (knownPanel && property.Name == "macroMarkersListItemRenderer" && marker.ValueKind == JsonValueKind.Object)
                     {
                         var watch = Property(Property(marker, "onTap"), "watchEndpoint");
-                        if (Long(watch, "startTimeSeconds") is long seconds && seconds <= long.MaxValue / 1000)
+                        if (ChapterTime(watch, "startTimeSeconds") is long seconds && seconds <= long.MaxValue / 1000)
                             Add(seconds * 1000, Title(Property(marker, "title")));
                     }
                     Visit(marker, depth + 1, knownPanel);
@@ -309,6 +324,12 @@ namespace Emby.YouTubePlugin
         private static bool? Boolean(JsonElement value, string name) => Property(value, name).ValueKind switch { JsonValueKind.True => true, JsonValueKind.False => false, _ => null };
         private static int? Integer(JsonElement value, string name) => Property(value, name) is var found && found.ValueKind == JsonValueKind.Number && found.TryGetInt32(out int number) ? number : null;
         private static long? Long(JsonElement value, string name) => Property(value, name) is var found && found.ValueKind == JsonValueKind.Number && found.TryGetInt64(out long number) ? number : null;
+        private static long? ChapterTime(JsonElement value, string name)
+        {
+            var found = Property(value, name);
+            return found.ValueKind == JsonValueKind.String ? CanonicalLong(found.GetString(), true)
+                : Long(value, name) is >= 0 and var number ? number : null;
+        }
         private static long? CanonicalLong(string? value, bool allowZero) => value != null && value.Length is > 0 and <= 19
             && value.All(ch => ch is >= '0' and <= '9') && (value.Length == 1 || value[0] != '0')
             && long.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out long number) && (allowZero || number > 0) ? number : null;

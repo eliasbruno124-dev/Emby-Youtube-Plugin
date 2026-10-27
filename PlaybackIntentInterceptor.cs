@@ -141,6 +141,11 @@ namespace Emby.YouTubePlugin
 
                     _harmony = harmony;
                     _harmonyType = harmonyType;
+                    YouTubeChapterDtoInterceptor.Install(harmony, harmonyMethodType);
+                    var subtitlePatches = YouTubeSubtitleDelivery.Install(harmony, harmonyMethodType);
+                    YouTubeChannel.LogPublic(subtitlePatches > 0
+                        ? "[YT] Native subtitle rendering installed (" + subtitlePatches + " patches)."
+                        : "[YT] Native subtitle rendering unavailable; external subtitle delivery retained.");
                     YouTubeChannel.LogPublic($"[YT] Playback intent interceptor installed ({patched} patches).");
                 }
                 catch (Exception ex)
@@ -419,8 +424,8 @@ namespace Emby.YouTubePlugin
                 // Keep every direct source on Emby's server-owned timeline.
                 // The original.hls path otherwise exposes an upstream master
                 // without the requested start offset or native subtitle map.
-                // Start/audio/subtitle selection stays native; preserve lower
-                // client limits while bounding the native encoded output.
+                // Start/audio/subtitle selection and output bitrate stay native.
+                // The client and main Emby settings own the output budget.
                 var directItemId = Normalize(GetStringProperty(requestDto, "Id"));
                 if (!string.IsNullOrEmpty(TryResolveYouTubeVideoId(directItemId)))
                 {
@@ -431,33 +436,19 @@ namespace Emby.YouTubePlugin
                     TrySetRequestCollectionValue(directQuery, "AllowVideoStreamCopy", "false");
                     TrySetRequestCollectionValue(directQuery, "EnableDirectPlay", "false");
                     TrySetRequestCollectionValue(directQuery, "EnableDirectStream", "false");
-                    // POST carries a nullable Int64 DTO value; native GET reads
-                    // its query instead. Reconcile both before writing so a
-                    // conflicting larger value cannot override a lower limit.
-                    // Zero/negative/absent/invalid/overflow mean no usable bound.
-                    // Never mutate the client's potentially shared DeviceProfile.
-                    var maximumStreamingBitrate = YouTubeDirectQualityPolicy.ClampStreamingBitrate(
-                        TryReadLongProperty(requestDto, "MaxStreamingBitrate"),
-                        TryReadLong(directQuery?["MaxStreamingBitrate"]));
-                    SetNullableLongProperty(requestDto, "MaxStreamingBitrate", maximumStreamingBitrate);
-                    TrySetRequestCollectionValue(directQuery, "MaxStreamingBitrate",
-                        maximumStreamingBitrate.ToString(CultureInfo.InvariantCulture));
                     // Null means Emby's automatic language selection, not Off.
-                    // Default only a new playback to Off. An explicit selection
-                    // and the current session's track on a seek/quality switch
-                    // must remain under the user's control.
-                    var subtitle = TryReadIntProperty(requestDto, "SubtitleStreamIndex");
-                    var querySubtitle = TryReadLong(directQuery?["SubtitleStreamIndex"]);
-                    var currentSession = GetStringProperty(requestDto, "CurrentPlaySessionId");
-                    if (string.IsNullOrWhiteSpace(currentSession))
-                        currentSession = directQuery?["CurrentPlaySessionId"];
-                    if (!(subtitle >= -1) && !(querySubtitle >= -1 && querySubtitle <= int.MaxValue)
-                        && string.IsNullOrWhiteSpace(currentSession))
+                    // Clients also send positive indices for automatic or
+                    // remembered choices. Start every new playback Off, even
+                    // when the client supplied one. Once playback is running,
+                    // CurrentPlaySessionId distinguishes a manual track switch
+                    // or seek/quality change; leave that selection untouched.
+                    if (IsNewNativePlayback(requestDto, GetServiceRequest(service)))
                     {
                         SetNullableIntProperty(requestDto, "SubtitleStreamIndex", -1);
                         TrySetRequestCollectionValue(directQuery, "SubtitleStreamIndex", "-1");
                     }
                     PreferNativeYouTubeAudio(requestDto);
+                    YouTubeSubtitleDelivery.PreferNativeRendering(requestDto);
                 }
                 return;
             }
@@ -521,6 +512,14 @@ namespace Emby.YouTubePlugin
                     audioQueryChanged,
                     isNativeAndroidTablet);
             }
+        }
+
+        private static bool IsNewNativePlayback(object requestDto, IRequest? request)
+        {
+            var currentSession = GetStringProperty(requestDto, "CurrentPlaySessionId");
+            if (string.IsNullOrWhiteSpace(currentSession))
+                currentSession = request?.QueryString["CurrentPlaySessionId"];
+            return string.IsNullOrWhiteSpace(currentSession);
         }
 
         private static void LogPlaybackInfoSubtitleSuppressed(
@@ -620,7 +619,8 @@ namespace Emby.YouTubePlugin
                     var itemId = Normalize(GetStringProperty(__0, "Id"));
                     var videoId = TryResolveYouTubeVideoId(itemId);
                     if (!string.IsNullOrEmpty(videoId) && __result != null)
-                        __result = RequireDirectPlaybackInfoAsync(__result, videoId, itemId);
+                        __result = RequireDirectPlaybackInfoAsync(__result, videoId, itemId,
+                            IsNewNativePlayback(__0, GetServiceRequest(__instance)));
                     return;
                 }
                 var context = CapturePlaybackInfo(__instance, __0);
@@ -633,13 +633,38 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static async Task<object> RequireDirectPlaybackInfoAsync(Task<object> responseTask, string videoId, string? itemId)
+        private static async Task<object> RequireDirectPlaybackInfoAsync(Task<object> responseTask, string videoId, string? itemId, bool defaultSubtitlesOff)
         {
             var response = await responseTask.ConfigureAwait(false);
             var verified = YouTubeDirectPlayback.RequireDirectPlaybackInfo(response, videoId);
+            if (defaultSubtitlesOff)
+                DefaultInitialNativeSubtitlesOff(verified);
             YouTubeChapterSync.Synchronize(itemId, videoId);
             YouTubeChapterSync.ApplyPreferredChapters(verified, itemId, videoId);
             return verified;
+        }
+
+        private static void DefaultInitialNativeSubtitlesOff(object response)
+        {
+            // GET metadata applies the account's automatic language preference
+            // after the request prefix. Keep its displayed default consistent
+            // with a new POST start. Clone sources: a shared/cached object must
+            // not reset another player's manually selected subtitle.
+            var property = response.GetType().GetProperty("MediaSources", BindingFlags.Public | BindingFlags.Instance);
+            if (property?.GetValue(response) is not IEnumerable original)
+                return;
+            var clone = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            var sources = original.Cast<object>().OfType<MediaSourceInfo>().Select(source =>
+            {
+                var local = (MediaSourceInfo)clone.Invoke(source, null)!;
+                local.DefaultSubtitleStreamIndex = -1;
+                return local;
+            }).ToArray();
+            if (property.CanWrite && property.PropertyType.IsAssignableFrom(typeof(MediaSourceInfo[])))
+                property.SetValue(response, sources);
+            else if (property.CanWrite && property.PropertyType.IsAssignableFrom(typeof(List<MediaSourceInfo>)))
+                property.SetValue(response, sources.ToList());
+            else throw new InvalidOperationException("Native subtitle default projection is unavailable.");
         }
 
         private static PlaybackInfoPatchContext? CapturePlaybackInfo(object service, object requestDto)

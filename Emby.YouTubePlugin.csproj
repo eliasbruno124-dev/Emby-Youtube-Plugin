@@ -10,9 +10,9 @@
     <LangVersion>12.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.10.4</Version>
-    <AssemblyVersion>2.0.10.4</AssemblyVersion>
-    <FileVersion>2.0.10.4</FileVersion>
+    <Version>2.0.11.0</Version>
+    <AssemblyVersion>2.0.11.0</AssemblyVersion>
+    <FileVersion>2.0.11.0</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <HarmonyPackageVersion>2.4.2</HarmonyPackageVersion>
   </PropertyGroup>

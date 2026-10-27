@@ -19,7 +19,10 @@ namespace Emby.YouTubePlugin
     internal static class YouTubeDirectRangeProxy
     {
         private const int ChunkBytes = 4 * 1024 * 1024;
-        private const int MaximumEntries = 128;
+        // Each selectable audio language owns a capability, but only the
+        // selected one performs IO. Bound metadata separately from the
+        // unchanged request slots and chunk buffers.
+        private const int MaximumEntries = 1024;
         private const long MaximumFileBytes = 1L << 40;
         private static readonly object Gate = new();
         private static readonly SemaphoreSlim RequestSlots = new(16, 16);

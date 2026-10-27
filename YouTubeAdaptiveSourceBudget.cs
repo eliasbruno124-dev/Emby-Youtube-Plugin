@@ -11,7 +11,10 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    internal sealed record YouTubeAdaptiveSelection(JsonElement Video, JsonElement? Audio);
+    internal sealed record YouTubeAdaptiveSelection(JsonElement Video, JsonElement? Audio)
+    {
+        internal IReadOnlyList<JsonElement> AudioTracks { get; init; } = Array.Empty<JsonElement>();
+    }
 
     // A bounded startup observation of the server-to-CDN route, not continuous
     // ABR, a measurement of the client connection or a stall-free guarantee.
@@ -60,14 +63,28 @@ namespace Emby.YouTubePlugin
                 .Where(group => group.Count() == 1).Select(group => group.First());
             var inputs = unique.Select(format => ReadInput(format, commonHeaders, duration, resolved.ExpiresUtc))
                 .Where(input => input != null).Cast<Input>().ToArray();
-            var audio = inputs.Where(input => input.VideoCodec.Length == 0 && input.AudioCodec == "aac")
-                .OrderByDescending(input => Number(input.Format, "language_preference") ?? 0)
-                .ThenByDescending(input => input.Bitrate ?? 0)
-                .ThenBy(input => Text(input.Format, "format_id"), StringComparer.Ordinal).FirstOrDefault();
+            var audioTracks = inputs.Where(input => input.VideoCodec.Length == 0 && input.AudioCodec == "aac")
+                .GroupBy(input => YouTubeAudioTracks.Key(input.Format), StringComparer.Ordinal)
+                .Select(group => group.OrderBy(input => YouTubeAudioTracks.Flag(input.Format, "audio_is_drc") == true)
+                    .ThenByDescending(input => input.Bitrate ?? 0)
+                    .ThenBy(input => Text(input.Format, "format_id"), StringComparer.Ordinal).First())
+                .OrderByDescending(input => YouTubeAudioTracks.IsOriginal(input.Format))
+                .ThenByDescending(input => YouTubeAudioTracks.IsDefault(input.Format))
+                .ThenBy(input => YouTubeAudioTracks.Key(input.Format), StringComparer.Ordinal)
+                .Take(YouTubeAudioTracks.MaximumTracks).ToArray();
+            var collidingIndices = audioTracks.GroupBy(input => YouTubeAudioTracks.Index(YouTubeAudioTracks.Key(input.Format)))
+                .Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet();
+            audioTracks = audioTracks.Where(input => !collidingIndices.Contains(YouTubeAudioTracks.Index(YouTubeAudioTracks.Key(input.Format)))).ToArray();
+            var audio = audioTracks.FirstOrDefault();
+            // Any exposed language may be selected later. Account for the most
+            // expensive rendition, never sum mutually exclusive languages or
+            // call an unknown audio cost zero.
+            double? audioCost = audioTracks.Length == 0 || audioTracks.Any(input => !input.Bitrate.HasValue)
+                ? null : audioTracks.Max(input => input.Bitrate!.Value);
             var choices = inputs.Where(input => input.Height > 0 && input.Height <= maximumHeight
                     && input.VideoCodec.Length > 0 && (input.AudioCodec == "aac" || input.AudioCodec.Length == 0 && audio != null))
-                .Select(input => new Choice(input, input.AudioCodec.Length == 0 ? audio : null,
-                    input.AudioCodec.Length == 0 ? input.Bitrate + audio!.Bitrate : input.Bitrate)).ToArray();
+                .Select(input => new Choice(input, audio,
+                    audio != null ? input.Bitrate + audioCost : input.Bitrate)).ToArray();
             if (choices.Length == 0) throw Failure();
             // Prefer broadly native AVC/AAC over CPU-expensive AV1 even when an
             // AV1 representation advertises a higher resolution or frame rate.
@@ -76,7 +93,7 @@ namespace Emby.YouTubePlugin
                 .OrderByDescending(choice => choice.Video.Height)
                 .ThenByDescending(choice => Number(choice.Video.Format, "fps") is > 0 and <= YouTubeDirectQualityPolicy.MaximumFrameRate)
                 .ThenByDescending(choice => Number(choice.Video.Format, "fps") ?? 0)
-                .ThenBy(choice => choice.Audio != null)
+                .ThenBy(choice => choice.Audio != null && choice.Video.AudioCodec.Length > 0)
                 .ThenBy(choice => choice.Bitrate ?? double.MaxValue)
                 .ThenBy(choice => Text(choice.Video.Format, "format_id"), StringComparer.Ordinal).ToArray();
             var lowest = eligible.OrderBy(choice => choice.Video.Height)
@@ -90,7 +107,7 @@ namespace Emby.YouTubePlugin
             if (observation.Denied) throw Failure();
             var selected = observation.Bitrate is { } budget
                 ? eligible.FirstOrDefault(choice => choice.Bitrate is > 0
-                        && choice.Bitrate <= Math.Min(budget, YouTubeDirectQualityPolicy.MaximumStreamingBitrate))
+                        && choice.Bitrate <= budget)
                     ?? eligible.Where(choice => choice.Bitrate is > 0).OrderBy(choice => choice.Bitrate)
                         .ThenBy(choice => choice.Video.Height).FirstOrDefault() ?? fallback
                 : fallback;
@@ -98,9 +115,12 @@ namespace Emby.YouTubePlugin
             // queued, even if the route's short observation remains useful.
             if (resolved.ExpiresUtc <= DateTime.UtcNow.AddSeconds(5)
                 || ReadInput(selected.Video.Format, commonHeaders, duration, resolved.ExpiresUtc) == null
-                || selected.Audio != null && ReadInput(selected.Audio.Format, commonHeaders, duration, resolved.ExpiresUtc) == null)
+                || selected.Audio != null && audioTracks.Any(track => ReadInput(track.Format, commonHeaders, duration, resolved.ExpiresUtc) == null))
                 throw Failure();
-            return new YouTubeAdaptiveSelection(selected.Video.Format, selected.Audio?.Format);
+            return new YouTubeAdaptiveSelection(selected.Video.Format, selected.Audio?.Format)
+            {
+                AudioTracks = selected.Audio == null ? Array.Empty<JsonElement>() : audioTracks.Select(track => track.Format).ToArray()
+            };
         }
 
         private static Input? ReadInput(JsonElement format, IReadOnlyDictionary<string, string> headers,
@@ -121,7 +141,8 @@ namespace Emby.YouTubePlugin
             foreach (string field in new[] { "width", "height", "audio_channels", "asr" })
                 if (format.TryGetProperty(field, out var value) && value.ValueKind != JsonValueKind.Null
                     && (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var _))) return null;
-            if (Text(format, "language").Length > 80 || video.Length > 128 || audio.Length > 128) return null;
+            if (Text(format, "language").Length > 80 || Text(format, "audio_track_id").Length > 128
+                || Text(format, "audio_track_name").Length > 1024 || video.Length > 128 || audio.Length > 128) return null;
             var uri = YouTubeDirectHttp.ValidateMediaUri(Text(format, "url"));
             long? declared = null, expiry = null;
             foreach (string part in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))

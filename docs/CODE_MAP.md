@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 97 files; 7341 syntax declarations/HTML anchors.
+Scope: 101 files; 7768 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -16,8 +16,8 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [.gitignore](#file-bc37d034bad56458) | Repository support | 0 |
 | [AGENTS.md](#file-a54ff182c7e8acf5) | Documentation/resource | 0 |
 | [ChannelContentFlags.cs](#file-3fbcb901338e79fb) | Plugin Compile source (SDK default) | 29 |
-| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 50 |
-| [Configuration/YouTubeConfiguration.js](#file-44888eb7c4d56aef) | EmbeddedResource | 357 |
+| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 48 |
+| [Configuration/YouTubeConfiguration.js](#file-44888eb7c4d56aef) | EmbeddedResource | 349 |
 | [Configuration/guide/step1.png](#file-5f31de67e5ef8dbe) | EmbeddedResource | 0 |
 | [Configuration/guide/step2.png](#file-ed44b448e7d3eaa3) | EmbeddedResource | 0 |
 | [Configuration/guide/step34.png](#file-8b116519690d79c6) | EmbeddedResource | 0 |
@@ -47,20 +47,21 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [ManagedResolver/vendored/Utils/UrlEx.cs](#file-e3e506b64848f0af) | Plugin Compile source (SDK default) | 36 |
 | [ManagedResolver/vendored/Videos/VideoController.cs](#file-3d45031c9e99dad6) | Plugin Compile source (SDK default) | 28 |
 | [ManagedResolver/vendored/Videos/VideoId.cs](#file-c4d93fe674f77ff2) | Plugin Compile source (SDK default) | 40 |
-| [PlaybackIntentInterceptor.cs](#file-6ff472c354325e8c) | Plugin Compile source (SDK default) | 475 |
+| [PlaybackIntentInterceptor.cs](#file-6ff472c354325e8c) | Plugin Compile source (SDK default) | 486 |
 | [Plugin.cs](#file-5a2f4e90167632d0) | Plugin Compile source (SDK default) | 78 |
 | [PluginConfiguration.cs](#file-224cbfdbaba3a683) | Plugin Compile source (SDK default) | 87 |
 | [PluginEntryPoint.cs](#file-d27f2eafc5169b60) | Plugin Compile source (SDK default) | 693 |
 | [PluginFileLog.cs](#file-adad5fbc257fb6bf) | Plugin Compile source (SDK default) | 19 |
 | [QuotaTracker.cs](#file-942e26b5e5820665) | Plugin Compile source (SDK default) | 113 |
 | [README.md](#file-b335630551682c19) | Documentation/resource | 0 |
-| [YouTubeAdaptiveSourceBudget.cs](#file-03de83be30141261) | Plugin Compile source (SDK default) | 195 |
+| [YouTubeAdaptiveSourceBudget.cs](#file-03de83be30141261) | Plugin Compile source (SDK default) | 227 |
 | [YouTubeApi.cs](#file-7011a74936995935) | Plugin Compile source (SDK default) | 377 |
+| [YouTubeAudioTracks.cs](#file-cf7aa53825fc61a7) | Plugin Compile source (SDK default) | 33 |
 | [YouTubeCaptionMetadata.cs](#file-914fdb518473aaa9) | C# source excluded from plugin Compile | 102 |
 | [YouTubeCaptionNormalizer.cs](#file-179571d4992d8567) | Plugin Compile source (SDK default) | 89 |
 | [YouTubeCaptionOffGuard.cs](#file-1dd14218ee040c7f) | Plugin Compile source (SDK default) | 121 |
 | [YouTubeChannel.Aggregates.cs](#file-f2ed4ae35969d6d0) | Plugin Compile source (SDK default) | 27 |
-| [YouTubeChannel.DirectPlayback.cs](#file-d1cc636f42c38fb0) | Plugin Compile source (SDK default) | 363 |
+| [YouTubeChannel.DirectPlayback.cs](#file-d1cc636f42c38fb0) | Plugin Compile source (SDK default) | 392 |
 | [YouTubeChannel.Enrichment.cs](#file-d51ff2da196617b0) | Plugin Compile source (SDK default) | 130 |
 | [YouTubeChannel.Folders.cs](#file-3cf86b8d83708a69) | Plugin Compile source (SDK default) | 108 |
 | [YouTubeChannel.Live.cs](#file-fd75d22d5169819c) | Plugin Compile source (SDK default) | 30 |
@@ -69,13 +70,15 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannel.Shorts.cs](#file-b6bd071cf0a75be9) | Plugin Compile source (SDK default) | 148 |
 | [YouTubeChannel.State.cs](#file-bd6961656d4c3822) | Plugin Compile source (SDK default) | 52 |
 | [YouTubeChannel.cs](#file-aa77154cbf6e5636) | Plugin Compile source (SDK default) | 47 |
-| [YouTubeChapterSync.cs](#file-90d85cea05c050fd) | Plugin Compile source (SDK default) | 75 |
+| [YouTubeChapterDtoInterceptor.cs](#file-59ad88b2f7a15737) | Plugin Compile source (SDK default) | 46 |
+| [YouTubeChapterSync.cs](#file-90d85cea05c050fd) | Plugin Compile source (SDK default) | 135 |
 | [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 117 |
+| [YouTubeDescriptionChapters.cs](#file-879f815509e709e7) | Plugin Compile source (SDK default) | 21 |
 | [YouTubeDirectHttp.cs](#file-1922be3cbc99a179) | Plugin Compile source (SDK default) | 181 |
-| [YouTubeDirectManifest.cs](#file-5a4b4574992dd577) | Plugin Compile source (SDK default) | 148 |
+| [YouTubeDirectManifest.cs](#file-5a4b4574992dd577) | Plugin Compile source (SDK default) | 203 |
 | [YouTubeDirectMetadata.cs](#file-5ec1b64fd6d6c34f) | Plugin Compile source (SDK default) | 136 |
 | [YouTubeDirectModels.cs](#file-db78dbee2ac97cd9) | Plugin Compile source (SDK default) | 5 |
-| [YouTubeDirectQualityPolicy.cs](#file-2b6757d8b9192715) | Plugin Compile source (SDK default) | 12 |
+| [YouTubeDirectQualityPolicy.cs](#file-2b6757d8b9192715) | Plugin Compile source (SDK default) | 7 |
 | [YouTubeDirectRangeProxy.cs](#file-538c7a88a964bb3f) | Plugin Compile source (SDK default) | 198 |
 | [YouTubeDirectSubtitles.cs](#file-8dd75b168cf4c866) | Plugin Compile source (SDK default) | 198 |
 | [YouTubeEmbed.html](#file-39b78aa97731c824) | EmbeddedResource | 71 |
@@ -85,12 +88,13 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeHttpClientFactory.cs](#file-086dc9043b3c2586) | Plugin Compile source (SDK default) | 26 |
 | [YouTubeImageProvider.cs](#file-7d33b8b54f4ebb57) | Plugin Compile source (SDK default) | 84 |
 | [YouTubeManagedHttp.cs](#file-bc134ac40739676b) | Plugin Compile source (SDK default) | 88 |
-| [YouTubeManagedResolver.cs](#file-d1109fcde8c29d7a) | Plugin Compile source (SDK default) | 182 |
+| [YouTubeManagedResolver.cs](#file-d1109fcde8c29d7a) | Plugin Compile source (SDK default) | 194 |
 | [YouTubeRequestBackoff.cs](#file-7a9c7096d206cd40) | Plugin Compile source (SDK default) | 27 |
 | [YouTubeSessionCommandRouter.cs](#file-8ca449cb8064e640) | Plugin Compile source (SDK default) | 36 |
 | [YouTubeSortNameRepairer.cs](#file-ff64b0c5af701f8e) | Plugin Compile source (SDK default) | 57 |
 | [YouTubeSourceBudget.cs](#file-28aab84e271eec1a) | Plugin Compile source (SDK default) | 92 |
 | [YouTubeStreamResolver.cs](#file-a5337fff5b60437f) | Plugin Compile source (SDK default) | 146 |
+| [YouTubeSubtitleDelivery.cs](#file-8b85a2815c8e321e) | Plugin Compile source (SDK default) | 143 |
 | [docs/CODE_GUIDE.md](#file-8a63fe1dcd96b301) | Documentation/resource | 0 |
 | [docs/CODE_MAP_MAINTENANCE.md](#file-24c05485c45ad84d) | Documentation/resource | 0 |
 | [docs/code-map.flows.json](#file-31e2cff7937d621c) | Documentation/resource | 0 |
@@ -170,27 +174,27 @@ Plugin Compile source (SDK default); 1538 bytes; 52 lines.
 <a id="file-3265de6859f23663"></a>
 ## [Configuration/YouTubeConfiguration.html](../Configuration/YouTubeConfiguration.html)
 
-EmbeddedResource; 37233 bytes; 756 lines.
+EmbeddedResource; 36026 bytes; 745 lines.
 
 Resource/controller references:
 
 - Line [1](../Configuration/YouTubeConfiguration.html#L1): data-controller = `configurationpage?name=YouTubeConfigurationjs`
 - Line [345](../Configuration/YouTubeConfiguration.html#L345): href = `#`
 - Line [347](../Configuration/YouTubeConfiguration.html#L347): href = `#`
-- Line [633](../Configuration/YouTubeConfiguration.html#L633): href = `https://paypal.me/eliasbruno123`
-- Line [635](../Configuration/YouTubeConfiguration.html#L635): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
-- Line [649](../Configuration/YouTubeConfiguration.html#L649): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
-- Line [676](../Configuration/YouTubeConfiguration.html#L676): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
-- Line [679](../Configuration/YouTubeConfiguration.html#L679): href = `https://console.cloud.google.com/apis/credentials`
-- Line [691](../Configuration/YouTubeConfiguration.html#L691): data-guide-image = `step1.png`
-- Line [700](../Configuration/YouTubeConfiguration.html#L700): data-guide-image = `step2.png`
-- Line [710](../Configuration/YouTubeConfiguration.html#L710): data-guide-image = `step34.png`
-- Line [719](../Configuration/YouTubeConfiguration.html#L719): data-guide-image = `step5.png`
-- Line [739](../Configuration/YouTubeConfiguration.html#L739): data-guide-image = `step7.png`
-- Line [749](../Configuration/YouTubeConfiguration.html#L749): data-guide-image = `step8.png`
+- Line [622](../Configuration/YouTubeConfiguration.html#L622): href = `https://paypal.me/eliasbruno123`
+- Line [624](../Configuration/YouTubeConfiguration.html#L624): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
+- Line [638](../Configuration/YouTubeConfiguration.html#L638): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
+- Line [665](../Configuration/YouTubeConfiguration.html#L665): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
+- Line [668](../Configuration/YouTubeConfiguration.html#L668): href = `https://console.cloud.google.com/apis/credentials`
+- Line [680](../Configuration/YouTubeConfiguration.html#L680): data-guide-image = `step1.png`
+- Line [689](../Configuration/YouTubeConfiguration.html#L689): data-guide-image = `step2.png`
+- Line [699](../Configuration/YouTubeConfiguration.html#L699): data-guide-image = `step34.png`
+- Line [708](../Configuration/YouTubeConfiguration.html#L708): data-guide-image = `step5.png`
+- Line [728](../Configuration/YouTubeConfiguration.html#L728): data-guide-image = `step7.png`
+- Line [738](../Configuration/YouTubeConfiguration.html#L738): data-guide-image = `step8.png`
 
 <details>
-<summary>All 50 declarations / anchors</summary>
+<summary>All 48 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -221,39 +225,37 @@ Resource/controller references:
 | dom-id | div.watchLaterItemsList | [450:33](../Configuration/YouTubeConfiguration.html#L450) |
 | dom-id | input.numWatchLaterPollMinutes | [456:33](../Configuration/YouTubeConfiguration.html#L456) |
 | dom-id | input.chkDirectPlayback | [468:29](../Configuration/YouTubeConfiguration.html#L468) |
-| dom-id | input.numDirectMaxHeight | [478:29](../Configuration/YouTubeConfiguration.html#L478) |
-| dom-id | input.numDirectH264MaxHeight | [483:29](../Configuration/YouTubeConfiguration.html#L483) |
-| dom-id | input.chkShowRootFoldersAtTopLevel | [496:37](../Configuration/YouTubeConfiguration.html#L496) |
-| dom-id | div.homeRowsDescription | [500:33](../Configuration/YouTubeConfiguration.html#L500) |
-| dom-id | input.chkShowTrending | [507:37](../Configuration/YouTubeConfiguration.html#L507) |
-| dom-id | div.trendingDescription | [511:33](../Configuration/YouTubeConfiguration.html#L511) |
-| dom-id | input.chkShowCategories | [517:37](../Configuration/YouTubeConfiguration.html#L517) |
-| dom-id | div.categoriesDescription | [521:33](../Configuration/YouTubeConfiguration.html#L521) |
-| dom-id | input.chkShowShorts | [527:37](../Configuration/YouTubeConfiguration.html#L527) |
-| dom-id | div.shortsDescription | [531:33](../Configuration/YouTubeConfiguration.html#L531) |
-| dom-id | select.selectTrendingRegion | [543:33](../Configuration/YouTubeConfiguration.html#L543) |
-| dom-id | select.selectTrendingCategory | [552:33](../Configuration/YouTubeConfiguration.html#L552) |
-| dom-id | select.selectChannelSortBy | [573:33](../Configuration/YouTubeConfiguration.html#L573) |
-| dom-id | input.chkShowLikeCount | [588:33](../Configuration/YouTubeConfiguration.html#L588) |
-| dom-id | input.chkShowCommentCount | [592:33](../Configuration/YouTubeConfiguration.html#L592) |
-| dom-id | input.numMaxChannelVideos | [607:33](../Configuration/YouTubeConfiguration.html#L607) |
-| dom-id | input.numMaxSearchVideos | [616:33](../Configuration/YouTubeConfiguration.html#L616) |
-| dom-id | a.btnDonate | [633:29](../Configuration/YouTubeConfiguration.html#L633) |
-| dom-id | p.youtubeConfigurationStatus | [645:21](../Configuration/YouTubeConfiguration.html#L645) |
-| dom-id | div.ytPluginCredits | [647:21](../Configuration/YouTubeConfiguration.html#L647) |
-| dom-id | span.ytPluginVersion | [661:47](../Configuration/YouTubeConfiguration.html#L661) |
-| dom-id | span.ytUpdateBadge | [662:25](../Configuration/YouTubeConfiguration.html#L662) |
-| dom-id | div.setupGuidePage | [669:13](../Configuration/YouTubeConfiguration.html#L669) |
+| dom-id | input.chkShowRootFoldersAtTopLevel | [485:37](../Configuration/YouTubeConfiguration.html#L485) |
+| dom-id | div.homeRowsDescription | [489:33](../Configuration/YouTubeConfiguration.html#L489) |
+| dom-id | input.chkShowTrending | [496:37](../Configuration/YouTubeConfiguration.html#L496) |
+| dom-id | div.trendingDescription | [500:33](../Configuration/YouTubeConfiguration.html#L500) |
+| dom-id | input.chkShowCategories | [506:37](../Configuration/YouTubeConfiguration.html#L506) |
+| dom-id | div.categoriesDescription | [510:33](../Configuration/YouTubeConfiguration.html#L510) |
+| dom-id | input.chkShowShorts | [516:37](../Configuration/YouTubeConfiguration.html#L516) |
+| dom-id | div.shortsDescription | [520:33](../Configuration/YouTubeConfiguration.html#L520) |
+| dom-id | select.selectTrendingRegion | [532:33](../Configuration/YouTubeConfiguration.html#L532) |
+| dom-id | select.selectTrendingCategory | [541:33](../Configuration/YouTubeConfiguration.html#L541) |
+| dom-id | select.selectChannelSortBy | [562:33](../Configuration/YouTubeConfiguration.html#L562) |
+| dom-id | input.chkShowLikeCount | [577:33](../Configuration/YouTubeConfiguration.html#L577) |
+| dom-id | input.chkShowCommentCount | [581:33](../Configuration/YouTubeConfiguration.html#L581) |
+| dom-id | input.numMaxChannelVideos | [596:33](../Configuration/YouTubeConfiguration.html#L596) |
+| dom-id | input.numMaxSearchVideos | [605:33](../Configuration/YouTubeConfiguration.html#L605) |
+| dom-id | a.btnDonate | [622:29](../Configuration/YouTubeConfiguration.html#L622) |
+| dom-id | p.youtubeConfigurationStatus | [634:21](../Configuration/YouTubeConfiguration.html#L634) |
+| dom-id | div.ytPluginCredits | [636:21](../Configuration/YouTubeConfiguration.html#L636) |
+| dom-id | span.ytPluginVersion | [650:47](../Configuration/YouTubeConfiguration.html#L650) |
+| dom-id | span.ytUpdateBadge | [651:25](../Configuration/YouTubeConfiguration.html#L651) |
+| dom-id | div.setupGuidePage | [658:13](../Configuration/YouTubeConfiguration.html#L658) |
 
 </details>
 
 <a id="file-44888eb7c4d56aef"></a>
 ## [Configuration/YouTubeConfiguration.js](../Configuration/YouTubeConfiguration.js)
 
-EmbeddedResource; 38224 bytes; 917 lines.
+EmbeddedResource; 37074 bytes; 900 lines.
 
 <details>
-<summary>All 357 declarations / anchors</summary>
+<summary>All 349 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -263,357 +265,349 @@ EmbeddedResource; 38224 bytes; 917 lines.
 | parameter | define callback@113.toast | [8:33](../Configuration/YouTubeConfiguration.js#L8) |
 | variable | define callback@113.pluginId | [11:11](../Configuration/YouTubeConfiguration.js#L11) |
 | variable | define callback@113.defaultDonateUrl | [12:11](../Configuration/YouTubeConfiguration.js#L12) |
-| variable | define callback@113.directMinimumHeight | [13:11](../Configuration/YouTubeConfiguration.js#L13) |
-| variable | define callback@113.directMaximumHeight | [14:11](../Configuration/YouTubeConfiguration.js#L14) |
-| function | define callback@113.client | [15:5](../Configuration/YouTubeConfiguration.js#L15) |
-| function | define callback@113.field | [19:5](../Configuration/YouTubeConfiguration.js#L19) |
-| parameter | define callback@113.field.view | [19:20](../Configuration/YouTubeConfiguration.js#L19) |
-| parameter | define callback@113.field.id | [19:26](../Configuration/YouTubeConfiguration.js#L19) |
-| function | define callback@113.value | [23:5](../Configuration/YouTubeConfiguration.js#L23) |
-| parameter | define callback@113.value.view | [23:20](../Configuration/YouTubeConfiguration.js#L23) |
-| parameter | define callback@113.value.id | [23:26](../Configuration/YouTubeConfiguration.js#L23) |
-| variable | define callback@113.value.el | [24:15](../Configuration/YouTubeConfiguration.js#L24) |
-| function | define callback@113.setValue | [28:5](../Configuration/YouTubeConfiguration.js#L28) |
-| parameter | define callback@113.setValue.view | [28:23](../Configuration/YouTubeConfiguration.js#L28) |
-| parameter | define callback@113.setValue.id | [28:29](../Configuration/YouTubeConfiguration.js#L28) |
-| parameter | define callback@113.setValue.val | [28:33](../Configuration/YouTubeConfiguration.js#L28) |
-| variable | define callback@113.setValue.el | [29:15](../Configuration/YouTubeConfiguration.js#L29) |
-| function | define callback@113.checked | [35:5](../Configuration/YouTubeConfiguration.js#L35) |
-| parameter | define callback@113.checked.view | [35:22](../Configuration/YouTubeConfiguration.js#L35) |
-| parameter | define callback@113.checked.id | [35:28](../Configuration/YouTubeConfiguration.js#L35) |
-| variable | define callback@113.checked.el | [36:15](../Configuration/YouTubeConfiguration.js#L36) |
-| function | define callback@113.setChecked | [40:5](../Configuration/YouTubeConfiguration.js#L40) |
-| parameter | define callback@113.setChecked.view | [40:25](../Configuration/YouTubeConfiguration.js#L40) |
-| parameter | define callback@113.setChecked.id | [40:31](../Configuration/YouTubeConfiguration.js#L40) |
-| parameter | define callback@113.setChecked.val | [40:35](../Configuration/YouTubeConfiguration.js#L40) |
-| variable | define callback@113.setChecked.el | [41:15](../Configuration/YouTubeConfiguration.js#L41) |
-| function | define callback@113.numberValue | [47:5](../Configuration/YouTubeConfiguration.js#L47) |
-| parameter | define callback@113.numberValue.view | [47:26](../Configuration/YouTubeConfiguration.js#L47) |
-| parameter | define callback@113.numberValue.id | [47:32](../Configuration/YouTubeConfiguration.js#L47) |
-| parameter | define callback@113.numberValue.fallback | [47:36](../Configuration/YouTubeConfiguration.js#L47) |
-| parameter | define callback@113.numberValue.min | [47:46](../Configuration/YouTubeConfiguration.js#L47) |
-| parameter | define callback@113.numberValue.max | [47:51](../Configuration/YouTubeConfiguration.js#L47) |
-| variable | define callback@113.numberValue.parsed | [48:13](../Configuration/YouTubeConfiguration.js#L48) |
-| function | define callback@113.clampDirectHeight | [55:5](../Configuration/YouTubeConfiguration.js#L55) |
-| parameter | define callback@113.clampDirectHeight.rawValue | [55:32](../Configuration/YouTubeConfiguration.js#L55) |
-| parameter | define callback@113.clampDirectHeight.fallbackValue | [55:42](../Configuration/YouTubeConfiguration.js#L55) |
-| variable | define callback@113.clampDirectHeight.parsed | [56:15](../Configuration/YouTubeConfiguration.js#L56) |
-| variable | define callback@113.clampDirectHeight.fallback | [57:15](../Configuration/YouTubeConfiguration.js#L57) |
-| variable | define callback@113.clampDirectHeight.height | [60:15](../Configuration/YouTubeConfiguration.js#L60) |
-| function | define callback@113.setStatus | [66:5](../Configuration/YouTubeConfiguration.js#L66) |
-| parameter | define callback@113.setStatus.view | [66:24](../Configuration/YouTubeConfiguration.js#L66) |
-| parameter | define callback@113.setStatus.text | [66:30](../Configuration/YouTubeConfiguration.js#L66) |
-| function | define callback@113.setText | [70:5](../Configuration/YouTubeConfiguration.js#L70) |
-| parameter | define callback@113.setText.view | [70:22](../Configuration/YouTubeConfiguration.js#L70) |
-| parameter | define callback@113.setText.id | [70:28](../Configuration/YouTubeConfiguration.js#L70) |
-| parameter | define callback@113.setText.text | [70:32](../Configuration/YouTubeConfiguration.js#L70) |
-| variable | define callback@113.setText.el | [71:15](../Configuration/YouTubeConfiguration.js#L71) |
-| function | define callback@113.splitEntries | [77:5](../Configuration/YouTubeConfiguration.js#L77) |
-| parameter | define callback@113.splitEntries.text | [77:27](../Configuration/YouTubeConfiguration.js#L77) |
-| function | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map callback@2324 | [80:18](../Configuration/YouTubeConfiguration.js#L80) |
-| parameter | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map callback@2324.item | [80:18](../Configuration/YouTubeConfiguration.js#L80) |
-| function | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map(item =&gt; item.trim())             .filter callback@2365 | [81:21](../Configuration/YouTubeConfiguration.js#L81) |
-| parameter | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map(item =&gt; item.trim())             .filter callback@2365.item | [81:21](../Configuration/YouTubeConfiguration.js#L81) |
-| function | define callback@113.uniqueEntries | [84:5](../Configuration/YouTubeConfiguration.js#L84) |
-| parameter | define callback@113.uniqueEntries.entries | [84:28](../Configuration/YouTubeConfiguration.js#L84) |
-| variable | define callback@113.uniqueEntries.seen | [85:15](../Configuration/YouTubeConfiguration.js#L85) |
-| variable | define callback@113.uniqueEntries.result | [86:15](../Configuration/YouTubeConfiguration.js#L86) |
-| function | define callback@113.uniqueEntries.entries.forEach callback@2520 | [88:25](../Configuration/YouTubeConfiguration.js#L88) |
-| parameter | define callback@113.uniqueEntries.entries.forEach callback@2520.item | [88:25](../Configuration/YouTubeConfiguration.js#L88) |
-| function | define callback@113.setConfigurationControlsDisabled | [98:5](../Configuration/YouTubeConfiguration.js#L98) |
-| parameter | define callback@113.setConfigurationControlsDisabled.view | [98:47](../Configuration/YouTubeConfiguration.js#L98) |
-| parameter | define callback@113.setConfigurationControlsDisabled.disabled | [98:53](../Configuration/YouTubeConfiguration.js#L98) |
-| variable | define callback@113.setConfigurationControlsDisabled.form | [99:15](../Configuration/YouTubeConfiguration.js#L99) |
-| function | define callback@113.setConfigurationControlsDisabled.form.querySelectorAll('input, select, textarea, button').forEach callback@2947 | [103:74](../Configuration/YouTubeConfiguration.js#L103) |
-| parameter | define callback@113.setConfigurationControlsDisabled.form.querySelectorAll('input, select, textarea, button').forEach callback@2947.control | [103:74](../Configuration/YouTubeConfiguration.js#L103) |
-| function | define callback@113.formatNumber | [108:5](../Configuration/YouTubeConfiguration.js#L108) |
-| parameter | define callback@113.formatNumber.n | [108:27](../Configuration/YouTubeConfiguration.js#L108) |
-| variable | define callback@113.formatNumber.value | [109:15](../Configuration/YouTubeConfiguration.js#L109) |
-| catch-variable | define callback@113.formatNumber.e | [111:16](../Configuration/YouTubeConfiguration.js#L111) |
-| function | define callback@113.formatResetCountdown | [114:5](../Configuration/YouTubeConfiguration.js#L114) |
-| parameter | define callback@113.formatResetCountdown.seconds | [114:35](../Configuration/YouTubeConfiguration.js#L114) |
-| variable | define callback@113.formatResetCountdown.total | [115:15](../Configuration/YouTubeConfiguration.js#L115) |
-| variable | define callback@113.formatResetCountdown.h | [117:15](../Configuration/YouTubeConfiguration.js#L117) |
-| variable | define callback@113.formatResetCountdown.m | [118:15](../Configuration/YouTubeConfiguration.js#L118) |
-| function | define callback@113.renderQuotaBucket | [123:5](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.view | [123:32](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.prefix | [123:38](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.usedValue | [123:46](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.limitValue | [123:57](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.lifetimeValue | [123:69](../Configuration/YouTubeConfiguration.js#L123) |
-| parameter | define callback@113.renderQuotaBucket.unit | [123:84](../Configuration/YouTubeConfiguration.js#L123) |
-| variable | define callback@113.renderQuotaBucket.used | [124:15](../Configuration/YouTubeConfiguration.js#L124) |
-| variable | define callback@113.renderQuotaBucket.limit | [125:15](../Configuration/YouTubeConfiguration.js#L125) |
-| variable | define callback@113.renderQuotaBucket.lifetime | [126:15](../Configuration/YouTubeConfiguration.js#L126) |
-| variable | define callback@113.renderQuotaBucket.pct | [127:15](../Configuration/YouTubeConfiguration.js#L127) |
-| variable | define callback@113.renderQuotaBucket.bar | [134:15](../Configuration/YouTubeConfiguration.js#L134) |
-| variable | define callback@113.renderQuotaBucket.fill | [135:15](../Configuration/YouTubeConfiguration.js#L135) |
-| function | define callback@113.renderQuota | [144:5](../Configuration/YouTubeConfiguration.js#L144) |
-| parameter | define callback@113.renderQuota.view | [144:26](../Configuration/YouTubeConfiguration.js#L144) |
-| parameter | define callback@113.renderQuota.config | [144:32](../Configuration/YouTubeConfiguration.js#L144) |
-| variable | define callback@113.renderQuota.resetSec | [160:15](../Configuration/YouTubeConfiguration.js#L160) |
-| variable | define callback@113.renderQuota.reset | [161:15](../Configuration/YouTubeConfiguration.js#L161) |
-| function | define callback@113.isSupportedPlaylistId | [168:5](../Configuration/YouTubeConfiguration.js#L168) |
-| parameter | define callback@113.isSupportedPlaylistId.item | [168:36](../Configuration/YouTubeConfiguration.js#L168) |
-| function | define callback@113.classifySavedItem | [172:5](../Configuration/YouTubeConfiguration.js#L172) |
-| parameter | define callback@113.classifySavedItem.item | [172:32](../Configuration/YouTubeConfiguration.js#L172) |
-| function | define callback@113.classifyAutoPlaylistItem | [188:5](../Configuration/YouTubeConfiguration.js#L188) |
-| parameter | define callback@113.classifyAutoPlaylistItem.item | [188:39](../Configuration/YouTubeConfiguration.js#L188) |
-| function | define callback@113.setDonateButton | [198:5](../Configuration/YouTubeConfiguration.js#L198) |
-| parameter | define callback@113.setDonateButton.view | [198:30](../Configuration/YouTubeConfiguration.js#L198) |
-| variable | define callback@113.setDonateButton.button | [199:15](../Configuration/YouTubeConfiguration.js#L199) |
-| function | define callback@113.pluginUrl | [205:5](../Configuration/YouTubeConfiguration.js#L205) |
-| parameter | define callback@113.pluginUrl.path | [205:24](../Configuration/YouTubeConfiguration.js#L205) |
-| variable | define callback@113.pluginUrl.apiClient | [206:15](../Configuration/YouTubeConfiguration.js#L206) |
-| function | define callback@113.setGuideImages | [214:5](../Configuration/YouTubeConfiguration.js#L214) |
-| parameter | define callback@113.setGuideImages.view | [214:29](../Configuration/YouTubeConfiguration.js#L214) |
-| variable | define callback@113.setGuideImages.images | [215:15](../Configuration/YouTubeConfiguration.js#L215) |
-| function | define callback@113.setGuideImages.images.forEach callback@6811 | [216:24](../Configuration/YouTubeConfiguration.js#L216) |
-| parameter | define callback@113.setGuideImages.images.forEach callback@6811.img | [216:24](../Configuration/YouTubeConfiguration.js#L216) |
-| variable | define callback@113.setGuideImages.images.forEach callback@6811.name | [217:19](../Configuration/YouTubeConfiguration.js#L217) |
-| function | define callback@113.populateTrendingRegions | [224:5](../Configuration/YouTubeConfiguration.js#L224) |
-| parameter | define callback@113.populateTrendingRegions.view | [224:38](../Configuration/YouTubeConfiguration.js#L224) |
-| parameter | define callback@113.populateTrendingRegions.regionResult | [224:44](../Configuration/YouTubeConfiguration.js#L224) |
-| parameter | define callback@113.populateTrendingRegions.selectedValue | [224:58](../Configuration/YouTubeConfiguration.js#L224) |
-| variable | define callback@113.populateTrendingRegions.select | [225:15](../Configuration/YouTubeConfiguration.js#L225) |
-| variable | define callback@113.populateTrendingRegions.selected | [230:15](../Configuration/YouTubeConfiguration.js#L230) |
-| variable | define callback@113.populateTrendingRegions.lookupSucceeded | [231:15](../Configuration/YouTubeConfiguration.js#L231) |
-| variable | define callback@113.populateTrendingRegions.regions | [232:15](../Configuration/YouTubeConfiguration.js#L232) |
-| variable | define callback@113.populateTrendingRegions.defaultOption | [235:15](../Configuration/YouTubeConfiguration.js#L235) |
-| variable | define callback@113.populateTrendingRegions.normalized | [240:15](../Configuration/YouTubeConfiguration.js#L240) |
-| function | define callback@113.populateTrendingRegions.normalized.forEach callback@7804 | [241:28](../Configuration/YouTubeConfiguration.js#L241) |
-| parameter | define callback@113.populateTrendingRegions.normalized.forEach callback@7804.region | [241:28](../Configuration/YouTubeConfiguration.js#L241) |
-| variable | define callback@113.populateTrendingRegions.normalized.forEach callback@7804.option | [242:19](../Configuration/YouTubeConfiguration.js#L242) |
-| variable | define callback@113.populateTrendingRegions.selectedIsSupported | [248:15](../Configuration/YouTubeConfiguration.js#L248) |
-| function | define callback@113.populateTrendingRegions.normalized.some callback@8095 | [248:53](../Configuration/YouTubeConfiguration.js#L248) |
-| parameter | define callback@113.populateTrendingRegions.normalized.some callback@8095.region | [248:53](../Configuration/YouTubeConfiguration.js#L248) |
-| variable | define callback@113.populateTrendingRegions.savedOption | [250:19](../Configuration/YouTubeConfiguration.js#L250) |
-| function | define callback@113.fetchTrendingRegions | [259:5](../Configuration/YouTubeConfiguration.js#L259) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient | [259:35](../Configuration/YouTubeConfiguration.js#L259) |
-| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955 | [268:17](../Configuration/YouTubeConfiguration.js#L268) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.payload | [268:17](../Configuration/YouTubeConfiguration.js#L268) |
-| catch-variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.e | [271:24](../Configuration/YouTubeConfiguration.js#L271) |
-| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source | [274:19](../Configuration/YouTubeConfiguration.js#L274) |
-| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.seen | [278:19](../Configuration/YouTubeConfiguration.js#L278) |
-| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.regions | [279:19](../Configuration/YouTubeConfiguration.js#L279) |
-| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map callback@9442 | [279:40](../Configuration/YouTubeConfiguration.js#L279) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map callback@9442.region | [279:40](../Configuration/YouTubeConfiguration.js#L279) |
-| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter callback@9661 | [282:24](../Configuration/YouTubeConfiguration.js#L282) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter callback@9661.region | [282:24](../Configuration/YouTubeConfiguration.js#L282) |
-| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9909 | [288:21](../Configuration/YouTubeConfiguration.js#L288) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9909.a | [288:22](../Configuration/YouTubeConfiguration.js#L288) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8955.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9909.b | [288:25](../Configuration/YouTubeConfiguration.js#L288) |
-| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then(payload =&gt; {             if (typeof payload === 'string') {                 try { payload = JSON.parse(payload); }                 catch (e) { return { LookupSucceeded: false, Regions: [] }; }             }              const source = (payload && (payload.Regions \|\| payload.regions)) \|\| [];             if (!Array.isArray(source)) {                 return { LookupSucceeded: false, Regions: [] };             }             const seen = new Set();             const regions = source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort((a, b) =&gt; a.Name.localeCompare(b.Name));             return {                 LookupSucceeded: !!(payload && (payload.LookupSucceeded \|\| payload.lookupSucceeded))                     && regions.length &gt; 0,                 Regions: regions             };         }).catch callback@10180 | [294:18](../Configuration/YouTubeConfiguration.js#L294) |
-| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then(payload =&gt; {             if (typeof payload === 'string') {                 try { payload = JSON.parse(payload); }                 catch (e) { return { LookupSucceeded: false, Regions: [] }; }             }              const source = (payload && (payload.Regions \|\| payload.regions)) \|\| [];             if (!Array.isArray(source)) {                 return { LookupSucceeded: false, Regions: [] };             }             const seen = new Set();             const regions = source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort((a, b) =&gt; a.Name.localeCompare(b.Name));             return {                 LookupSucceeded: !!(payload && (payload.LookupSucceeded \|\| payload.lookupSucceeded))                     && regions.length &gt; 0,                 Regions: regions             };         }).catch callback@10180.error | [294:18](../Configuration/YouTubeConfiguration.js#L294) |
-| function | define callback@113.bindTabNavigation | [300:5](../Configuration/YouTubeConfiguration.js#L300) |
-| parameter | define callback@113.bindTabNavigation.view | [300:32](../Configuration/YouTubeConfiguration.js#L300) |
-| variable | define callback@113.bindTabNavigation.navButtons | [301:15](../Configuration/YouTubeConfiguration.js#L301) |
-| variable | define callback@113.bindTabNavigation.pages | [302:15](../Configuration/YouTubeConfiguration.js#L302) |
-| function | define callback@113.bindTabNavigation.navButtons.forEach callback@10622 | [307:28](../Configuration/YouTubeConfiguration.js#L307) |
-| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button | [307:28](../Configuration/YouTubeConfiguration.js#L307) |
-| function | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679 | [308:46](../Configuration/YouTubeConfiguration.js#L308) |
-| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.e | [308:46](../Configuration/YouTubeConfiguration.js#L308) |
-| variable | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.target | [310:23](../Configuration/YouTubeConfiguration.js#L310) |
-| function | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.navButtons.forEach callback@10825 | [312:36](../Configuration/YouTubeConfiguration.js#L312) |
-| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.navButtons.forEach callback@10825.item | [312:36](../Configuration/YouTubeConfiguration.js#L312) |
-| function | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.Object.keys(pages).forEach callback@10973 | [315:44](../Configuration/YouTubeConfiguration.js#L315) |
-| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@10622.button.addEventListener callback@10679.Object.keys(pages).forEach callback@10973.key | [315:44](../Configuration/YouTubeConfiguration.js#L315) |
-| function | define callback@113.showToast | [328:5](../Configuration/YouTubeConfiguration.js#L328) |
-| parameter | define callback@113.showToast.type | [328:24](../Configuration/YouTubeConfiguration.js#L328) |
-| parameter | define callback@113.showToast.text | [328:30](../Configuration/YouTubeConfiguration.js#L328) |
-| function | define callback@113.compareVersions | [337:5](../Configuration/YouTubeConfiguration.js#L337) |
-| parameter | define callback@113.compareVersions.a | [337:30](../Configuration/YouTubeConfiguration.js#L337) |
-| parameter | define callback@113.compareVersions.b | [337:33](../Configuration/YouTubeConfiguration.js#L337) |
-| variable | define callback@113.compareVersions.norm | [338:15](../Configuration/YouTubeConfiguration.js#L338) |
-| function | define callback@113.compareVersions.norm | [338:22](../Configuration/YouTubeConfiguration.js#L338) |
-| parameter | define callback@113.compareVersions.norm.v | [338:22](../Configuration/YouTubeConfiguration.js#L338) |
-| function | define callback@113.compareVersions.norm.String(v \|\| '').replace(/^v/i, '').split('.').map callback@11717 | [338:77](../Configuration/YouTubeConfiguration.js#L338) |
-| parameter | define callback@113.compareVersions.norm.String(v \|\| '').replace(/^v/i, '').split('.').map callback@11717.n | [338:77](../Configuration/YouTubeConfiguration.js#L338) |
-| variable | define callback@113.compareVersions.av | [339:15](../Configuration/YouTubeConfiguration.js#L339) |
-| variable | define callback@113.compareVersions.bv | [340:15](../Configuration/YouTubeConfiguration.js#L340) |
-| variable | define callback@113.compareVersions.len | [341:15](../Configuration/YouTubeConfiguration.js#L341) |
-| variable | define callback@113.compareVersions.i | [342:18](../Configuration/YouTubeConfiguration.js#L342) |
-| variable | define callback@113.compareVersions.d | [343:19](../Configuration/YouTubeConfiguration.js#L343) |
-| function | define callback@113.fetchLatestGithubVersion | [351:5](../Configuration/YouTubeConfiguration.js#L351) |
-| variable | define callback@113.fetchLatestGithubVersion.cacheKey | [352:15](../Configuration/YouTubeConfiguration.js#L352) |
-| variable | define callback@113.fetchLatestGithubVersion.cached | [356:19](../Configuration/YouTubeConfiguration.js#L356) |
-| catch-variable | define callback@113.fetchLatestGithubVersion.e | [360:18](../Configuration/YouTubeConfiguration.js#L360) |
-| variable | define callback@113.fetchLatestGithubVersion.repo | [362:15](../Configuration/YouTubeConfiguration.js#L362) |
-| variable | define callback@113.fetchLatestGithubVersion.headers | [363:15](../Configuration/YouTubeConfiguration.js#L363) |
-| variable | define callback@113.fetchLatestGithubVersion.opts | [364:15](../Configuration/YouTubeConfiguration.js#L364) |
-| variable | define callback@113.fetchLatestGithubVersion.bust | [365:15](../Configuration/YouTubeConfiguration.js#L365) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then callback@13242 | [371:19](../Configuration/YouTubeConfiguration.js#L371) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then callback@13242.r | [371:19](../Configuration/YouTubeConfiguration.js#L371) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then callback@13472 | [378:19](../Configuration/YouTubeConfiguration.js#L378) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then callback@13472.json | [378:19](../Configuration/YouTubeConfiguration.js#L378) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch callback@13537 | [379:20](../Configuration/YouTubeConfiguration.js#L379) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch callback@13537.err | [379:20](../Configuration/YouTubeConfiguration.js#L379) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630 | [380:19](../Configuration/YouTubeConfiguration.js#L380) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.tag | [380:19](../Configuration/YouTubeConfiguration.js#L380) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then callback@13814 | [383:27](../Configuration/YouTubeConfiguration.js#L383) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then callback@13814.r | [383:27](../Configuration/YouTubeConfiguration.js#L383) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13869 | [384:27](../Configuration/YouTubeConfiguration.js#L384) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13869.arr | [384:27](../Configuration/YouTubeConfiguration.js#L384) |
-| variable | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13869.pick | [387:31](../Configuration/YouTubeConfiguration.js#L387) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13869.arr.find callback@14084 | [387:47](../Configuration/YouTubeConfiguration.js#L387) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13869.arr.find callback@14084.x | [387:47](../Configuration/YouTubeConfiguration.js#L387) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch callback@14232 | [390:28](../Configuration/YouTubeConfiguration.js#L390) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@13630.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch callback@14232.err | [390:28](../Configuration/YouTubeConfiguration.js#L390) |
-| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@14343 | [392:19](../Configuration/YouTubeConfiguration.js#L392) |
-| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@14343.tag | [392:19](../Configuration/YouTubeConfiguration.js#L392) |
-| catch-variable | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@14343.e | [398:109](../Configuration/YouTubeConfiguration.js#L398) |
-| function | define callback@113.renderPluginCredits | [403:5](../Configuration/YouTubeConfiguration.js#L403) |
-| parameter | define callback@113.renderPluginCredits.view | [403:34](../Configuration/YouTubeConfiguration.js#L403) |
-| parameter | define callback@113.renderPluginCredits.apiClient | [403:40](../Configuration/YouTubeConfiguration.js#L403) |
-| variable | define callback@113.renderPluginCredits.versionEl | [404:15](../Configuration/YouTubeConfiguration.js#L404) |
-| variable | define callback@113.renderPluginCredits.badgeEl | [405:15](../Configuration/YouTubeConfiguration.js#L405) |
-| variable | define callback@113.renderPluginCredits.showUpdateBadge | [408:15](../Configuration/YouTubeConfiguration.js#L408) |
-| function | define callback@113.renderPluginCredits.showUpdateBadge | [408:33](../Configuration/YouTubeConfiguration.js#L408) |
-| parameter | define callback@113.renderPluginCredits.showUpdateBadge.latest | [408:34](../Configuration/YouTubeConfiguration.js#L408) |
-| variable | define callback@113.renderPluginCredits.finish | [415:15](../Configuration/YouTubeConfiguration.js#L415) |
-| function | define callback@113.renderPluginCredits.finish | [415:24](../Configuration/YouTubeConfiguration.js#L415) |
-| parameter | define callback@113.renderPluginCredits.finish.currentVersion | [415:25](../Configuration/YouTubeConfiguration.js#L415) |
-| function | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@15622 | [418:45](../Configuration/YouTubeConfiguration.js#L418) |
-| parameter | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@15622.latest | [418:45](../Configuration/YouTubeConfiguration.js#L418) |
-| variable | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@15622.cmp | [424:23](../Configuration/YouTubeConfiguration.js#L424) |
-| variable | define callback@113.renderPluginCredits.findPlugin | [430:15](../Configuration/YouTubeConfiguration.js#L430) |
-| function | define callback@113.renderPluginCredits.findPlugin | [430:28](../Configuration/YouTubeConfiguration.js#L430) |
-| parameter | define callback@113.renderPluginCredits.findPlugin.plugins | [430:29](../Configuration/YouTubeConfiguration.js#L430) |
-| variable | define callback@113.renderPluginCredits.findPlugin.wantA | [434:19](../Configuration/YouTubeConfiguration.js#L434) |
-| variable | define callback@113.renderPluginCredits.findPlugin.wantB | [435:19](../Configuration/YouTubeConfiguration.js#L435) |
-| variable | define callback@113.renderPluginCredits.findPlugin.byId | [436:19](../Configuration/YouTubeConfiguration.js#L436) |
-| function | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16527 | [436:39](../Configuration/YouTubeConfiguration.js#L436) |
-| parameter | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16527.p | [436:39](../Configuration/YouTubeConfiguration.js#L436) |
-| variable | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16527.id | [437:23](../Configuration/YouTubeConfiguration.js#L437) |
-| function | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16796 | [442:33](../Configuration/YouTubeConfiguration.js#L442) |
-| parameter | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16796.p | [442:33](../Configuration/YouTubeConfiguration.js#L442) |
-| function | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@17056 | [448:50](../Configuration/YouTubeConfiguration.js#L448) |
-| parameter | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@17056.plugins | [448:50](../Configuration/YouTubeConfiguration.js#L448) |
-| variable | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@17056.me | [449:23](../Configuration/YouTubeConfiguration.js#L449) |
-| function | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@17180 | [451:16](../Configuration/YouTubeConfiguration.js#L451) |
-| parameter | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@17180.err | [451:16](../Configuration/YouTubeConfiguration.js#L451) |
-| class | define callback@113.anonymous-class@17331 | [457:12](../Configuration/YouTubeConfiguration.js#L457) |
-| method | define callback@113.anonymous-class@17331.constructor | [458:9](../Configuration/YouTubeConfiguration.js#L458) |
-| parameter | define callback@113.anonymous-class@17331.constructor.view | [458:21](../Configuration/YouTubeConfiguration.js#L458) |
-| parameter | define callback@113.anonymous-class@17331.constructor.params | [458:27](../Configuration/YouTubeConfiguration.js#L458) |
-| method | define callback@113.anonymous-class@17331.onResume | [473:9](../Configuration/YouTubeConfiguration.js#L473) |
-| parameter | define callback@113.anonymous-class@17331.onResume.options | [473:18](../Configuration/YouTubeConfiguration.js#L473) |
-| method | define callback@113.anonymous-class@17331.bindEventListeners | [483:9](../Configuration/YouTubeConfiguration.js#L483) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.view | [483:28](../Configuration/YouTubeConfiguration.js#L483) |
-| variable | define callback@113.anonymous-class@17331.bindEventListeners.form | [491:19](../Configuration/YouTubeConfiguration.js#L491) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@18580 | [493:49](../Configuration/YouTubeConfiguration.js#L493) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@18580.e | [493:50](../Configuration/YouTubeConfiguration.js#L493) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@19173 | [504:49](../Configuration/YouTubeConfiguration.js#L504) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@19256 | [505:48](../Configuration/YouTubeConfiguration.js#L505) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@19256.e | [505:49](../Configuration/YouTubeConfiguration.js#L505) |
-| variable | define callback@113.anonymous-class@17331.bindEventListeners.form.addEventListener callback@19256.id | [509:27](../Configuration/YouTubeConfiguration.js#L509) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@19938 | [522:17](../Configuration/YouTubeConfiguration.js#L522) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@19977 | [523:17](../Configuration/YouTubeConfiguration.js#L523) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@19977.value | [523:17](../Configuration/YouTubeConfiguration.js#L523) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20032 | [524:17](../Configuration/YouTubeConfiguration.js#L524) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20032.item | [524:17](../Configuration/YouTubeConfiguration.js#L524) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20081 | [525:17](../Configuration/YouTubeConfiguration.js#L525) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20081.item | [525:17](../Configuration/YouTubeConfiguration.js#L525) |
-| variable | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20081.kind | [526:27](../Configuration/YouTubeConfiguration.js#L526) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20515 | [536:17](../Configuration/YouTubeConfiguration.js#L536) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20559 | [537:17](../Configuration/YouTubeConfiguration.js#L537) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20559.value | [537:17](../Configuration/YouTubeConfiguration.js#L537) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20619 | [538:17](../Configuration/YouTubeConfiguration.js#L538) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20619.item | [538:17](../Configuration/YouTubeConfiguration.js#L538) |
-| function | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20675 | [539:17](../Configuration/YouTubeConfiguration.js#L539) |
-| parameter | define callback@113.anonymous-class@17331.bindEventListeners.this.bindEntryControls callback@20675.item | [539:17](../Configuration/YouTubeConfiguration.js#L539) |
-| method | define callback@113.anonymous-class@17331.bindEntryControls | [543:9](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.view | [543:27](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.inputId | [543:33](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.buttonId | [543:42](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.listId | [543:52](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.getItems | [543:60](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.setItems | [543:70](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.classify | [543:80](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.validate | [543:90](../Configuration/YouTubeConfiguration.js#L543) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.invalidMessage | [543:100](../Configuration/YouTubeConfiguration.js#L543) |
-| variable | define callback@113.anonymous-class@17331.bindEntryControls.input | [544:19](../Configuration/YouTubeConfiguration.js#L544) |
-| variable | define callback@113.anonymous-class@17331.bindEntryControls.button | [545:19](../Configuration/YouTubeConfiguration.js#L545) |
-| variable | define callback@113.anonymous-class@17331.bindEntryControls.add | [546:19](../Configuration/YouTubeConfiguration.js#L546) |
-| function | define callback@113.anonymous-class@17331.bindEntryControls.add | [546:25](../Configuration/YouTubeConfiguration.js#L546) |
-| variable | define callback@113.anonymous-class@17331.bindEntryControls.add.newItems | [547:23](../Configuration/YouTubeConfiguration.js#L547) |
-| variable | define callback@113.anonymous-class@17331.bindEntryControls.add.acceptedItems | [552:23](../Configuration/YouTubeConfiguration.js#L552) |
-| function | define callback@113.anonymous-class@17331.bindEntryControls.input.addEventListener callback@22162 | [573:51](../Configuration/YouTubeConfiguration.js#L573) |
-| parameter | define callback@113.anonymous-class@17331.bindEntryControls.input.addEventListener callback@22162.e | [573:51](../Configuration/YouTubeConfiguration.js#L573) |
-| method | define callback@113.anonymous-class@17331.renderEntryList | [582:9](../Configuration/YouTubeConfiguration.js#L582) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.view | [582:25](../Configuration/YouTubeConfiguration.js#L582) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.listId | [582:31](../Configuration/YouTubeConfiguration.js#L582) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.getItems | [582:39](../Configuration/YouTubeConfiguration.js#L582) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.setItems | [582:49](../Configuration/YouTubeConfiguration.js#L582) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.classify | [582:59](../Configuration/YouTubeConfiguration.js#L582) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.list | [583:19](../Configuration/YouTubeConfiguration.js#L583) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.items | [589:19](../Configuration/YouTubeConfiguration.js#L589) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.empty | [592:23](../Configuration/YouTubeConfiguration.js#L592) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.header | [599:19](../Configuration/YouTubeConfiguration.js#L599) |
-| function | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265 | [606:27](../Configuration/YouTubeConfiguration.js#L606) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.item | [606:27](../Configuration/YouTubeConfiguration.js#L606) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.chip | [607:23](../Configuration/YouTubeConfiguration.js#L607) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.text | [610:23](../Configuration/YouTubeConfiguration.js#L610) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.badge | [615:23](../Configuration/YouTubeConfiguration.js#L615) |
-| variable | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.remove | [620:23](../Configuration/YouTubeConfiguration.js#L620) |
-| function | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.remove.addEventListener callback@24154 | [626:50](../Configuration/YouTubeConfiguration.js#L626) |
-| function | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.remove.addEventListener callback@24154.getItems().filter callback@24209 | [627:48](../Configuration/YouTubeConfiguration.js#L627) |
-| parameter | define callback@113.anonymous-class@17331.renderEntryList.items.forEach callback@23265.remove.addEventListener callback@24154.getItems().filter callback@24209.existing | [627:48](../Configuration/YouTubeConfiguration.js#L627) |
-| method | define callback@113.anonymous-class@17331.syncEntryFields | [638:9](../Configuration/YouTubeConfiguration.js#L638) |
-| parameter | define callback@113.anonymous-class@17331.syncEntryFields.view | [638:25](../Configuration/YouTubeConfiguration.js#L638) |
-| method | define callback@113.anonymous-class@17331.renderAllEntryLists | [643:9](../Configuration/YouTubeConfiguration.js#L643) |
-| parameter | define callback@113.anonymous-class@17331.renderAllEntryLists.view | [643:29](../Configuration/YouTubeConfiguration.js#L643) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@24899 | [647:17](../Configuration/YouTubeConfiguration.js#L647) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@24938 | [648:17](../Configuration/YouTubeConfiguration.js#L648) |
-| parameter | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@24938.value | [648:17](../Configuration/YouTubeConfiguration.js#L648) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@24993 | [649:17](../Configuration/YouTubeConfiguration.js#L649) |
-| parameter | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@24993.item | [649:17](../Configuration/YouTubeConfiguration.js#L649) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@25139 | [654:17](../Configuration/YouTubeConfiguration.js#L654) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@25183 | [655:17](../Configuration/YouTubeConfiguration.js#L655) |
-| parameter | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@25183.value | [655:17](../Configuration/YouTubeConfiguration.js#L655) |
-| function | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@25243 | [656:17](../Configuration/YouTubeConfiguration.js#L656) |
-| parameter | define callback@113.anonymous-class@17331.renderAllEntryLists.this.renderEntryList callback@25243.item | [656:17](../Configuration/YouTubeConfiguration.js#L656) |
-| method | define callback@113.anonymous-class@17331.refreshTrendingRegions | [659:9](../Configuration/YouTubeConfiguration.js#L659) |
-| parameter | define callback@113.anonymous-class@17331.refreshTrendingRegions.view | [659:32](../Configuration/YouTubeConfiguration.js#L659) |
-| parameter | define callback@113.anonymous-class@17331.refreshTrendingRegions.apiClient | [659:38](../Configuration/YouTubeConfiguration.js#L659) |
-| parameter | define callback@113.anonymous-class@17331.refreshTrendingRegions.loadRevision | [659:49](../Configuration/YouTubeConfiguration.js#L659) |
-| parameter | define callback@113.anonymous-class@17331.refreshTrendingRegions.apiKeyAtRequest | [659:63](../Configuration/YouTubeConfiguration.js#L659) |
-| variable | define callback@113.anonymous-class@17331.refreshTrendingRegions.lookupRevision | [660:19](../Configuration/YouTubeConfiguration.js#L660) |
-| variable | define callback@113.anonymous-class@17331.refreshTrendingRegions.selectedBeforeLookup | [661:19](../Configuration/YouTubeConfiguration.js#L661) |
-| function | define callback@113.anonymous-class@17331.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25653 | [664:57](../Configuration/YouTubeConfiguration.js#L664) |
-| parameter | define callback@113.anonymous-class@17331.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25653.regionResult | [664:57](../Configuration/YouTubeConfiguration.js#L664) |
-| variable | define callback@113.anonymous-class@17331.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25653.displayResult | [677:23](../Configuration/YouTubeConfiguration.js#L677) |
-| variable | define callback@113.anonymous-class@17331.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25653.resetUnsupported | [680:23](../Configuration/YouTubeConfiguration.js#L680) |
-| method | define callback@113.anonymous-class@17331.loadData | [691:9](../Configuration/YouTubeConfiguration.js#L691) |
-| parameter | define callback@113.anonymous-class@17331.loadData.view | [691:18](../Configuration/YouTubeConfiguration.js#L691) |
-| variable | define callback@113.anonymous-class@17331.loadData.apiClient | [694:19](../Configuration/YouTubeConfiguration.js#L694) |
-| variable | define callback@113.anonymous-class@17331.loadData.loadRevision | [712:19](../Configuration/YouTubeConfiguration.js#L712) |
-| variable | define callback@113.anonymous-class@17331.loadData.requestWhenIdle | [713:19](../Configuration/YouTubeConfiguration.js#L713) |
-| function | define callback@113.anonymous-class@17331.loadData.requestWhenIdle | [713:37](../Configuration/YouTubeConfiguration.js#L713) |
-| variable | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.saveRevisionAtRequest | [722:23](../Configuration/YouTubeConfiguration.js#L722) |
-| function | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@28199 | [724:65](../Configuration/YouTubeConfiguration.js#L724) |
-| parameter | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@28199.loadedConfig | [724:65](../Configuration/YouTubeConfiguration.js#L724) |
-| variable | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@28199.config | [737:27](../Configuration/YouTubeConfiguration.js#L737) |
-| variable | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@28199.resetFromKnownRegions | [748:27](../Configuration/YouTubeConfiguration.js#L748) |
-| function | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31814 | [781:20](../Configuration/YouTubeConfiguration.js#L781) |
-| parameter | define callback@113.anonymous-class@17331.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31814.error | [781:20](../Configuration/YouTubeConfiguration.js#L781) |
-| method | define callback@113.anonymous-class@17331.saveData | [801:9](../Configuration/YouTubeConfiguration.js#L801) |
-| parameter | define callback@113.anonymous-class@17331.saveData.view | [801:18](../Configuration/YouTubeConfiguration.js#L801) |
-| variable | define callback@113.anonymous-class@17331.saveData.apiClient | [802:19](../Configuration/YouTubeConfiguration.js#L802) |
-| variable | define callback@113.anonymous-class@17331.saveData.config | [808:19](../Configuration/YouTubeConfiguration.js#L808) |
-| method | define callback@113.anonymous-class@17331.flushSaveQueue | [858:9](../Configuration/YouTubeConfiguration.js#L858) |
-| variable | define callback@113.anonymous-class@17331.flushSaveQueue.pending | [863:19](../Configuration/YouTubeConfiguration.js#L863) |
-| variable | define callback@113.anonymous-class@17331.flushSaveQueue.view | [870:19](../Configuration/YouTubeConfiguration.js#L870) |
-| function | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36523 | [877:21](../Configuration/YouTubeConfiguration.js#L877) |
-| variable | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36523.savedApiKey | [882:27](../Configuration/YouTubeConfiguration.js#L882) |
-| function | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@37066 | [887:16](../Configuration/YouTubeConfiguration.js#L887) |
-| parameter | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@37066.error | [887:16](../Configuration/YouTubeConfiguration.js#L887) |
-| function | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37424 | [893:21](../Configuration/YouTubeConfiguration.js#L893) |
-| function | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37530 | [896:16](../Configuration/YouTubeConfiguration.js#L896) |
-| parameter | define callback@113.anonymous-class@17331.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37530.error | [896:16](../Configuration/YouTubeConfiguration.js#L896) |
-| method | define callback@113.anonymous-class@17331.scheduleAutoSave | [903:9](../Configuration/YouTubeConfiguration.js#L903) |
-| parameter | define callback@113.anonymous-class@17331.scheduleAutoSave.view | [903:26](../Configuration/YouTubeConfiguration.js#L903) |
-| function | define callback@113.anonymous-class@17331.scheduleAutoSave.setTimeout callback@38082 | [911:46](../Configuration/YouTubeConfiguration.js#L911) |
+| function | define callback@113.client | [13:5](../Configuration/YouTubeConfiguration.js#L13) |
+| function | define callback@113.field | [17:5](../Configuration/YouTubeConfiguration.js#L17) |
+| parameter | define callback@113.field.view | [17:20](../Configuration/YouTubeConfiguration.js#L17) |
+| parameter | define callback@113.field.id | [17:26](../Configuration/YouTubeConfiguration.js#L17) |
+| function | define callback@113.value | [21:5](../Configuration/YouTubeConfiguration.js#L21) |
+| parameter | define callback@113.value.view | [21:20](../Configuration/YouTubeConfiguration.js#L21) |
+| parameter | define callback@113.value.id | [21:26](../Configuration/YouTubeConfiguration.js#L21) |
+| variable | define callback@113.value.el | [22:15](../Configuration/YouTubeConfiguration.js#L22) |
+| function | define callback@113.setValue | [26:5](../Configuration/YouTubeConfiguration.js#L26) |
+| parameter | define callback@113.setValue.view | [26:23](../Configuration/YouTubeConfiguration.js#L26) |
+| parameter | define callback@113.setValue.id | [26:29](../Configuration/YouTubeConfiguration.js#L26) |
+| parameter | define callback@113.setValue.val | [26:33](../Configuration/YouTubeConfiguration.js#L26) |
+| variable | define callback@113.setValue.el | [27:15](../Configuration/YouTubeConfiguration.js#L27) |
+| function | define callback@113.checked | [33:5](../Configuration/YouTubeConfiguration.js#L33) |
+| parameter | define callback@113.checked.view | [33:22](../Configuration/YouTubeConfiguration.js#L33) |
+| parameter | define callback@113.checked.id | [33:28](../Configuration/YouTubeConfiguration.js#L33) |
+| variable | define callback@113.checked.el | [34:15](../Configuration/YouTubeConfiguration.js#L34) |
+| function | define callback@113.setChecked | [38:5](../Configuration/YouTubeConfiguration.js#L38) |
+| parameter | define callback@113.setChecked.view | [38:25](../Configuration/YouTubeConfiguration.js#L38) |
+| parameter | define callback@113.setChecked.id | [38:31](../Configuration/YouTubeConfiguration.js#L38) |
+| parameter | define callback@113.setChecked.val | [38:35](../Configuration/YouTubeConfiguration.js#L38) |
+| variable | define callback@113.setChecked.el | [39:15](../Configuration/YouTubeConfiguration.js#L39) |
+| function | define callback@113.numberValue | [45:5](../Configuration/YouTubeConfiguration.js#L45) |
+| parameter | define callback@113.numberValue.view | [45:26](../Configuration/YouTubeConfiguration.js#L45) |
+| parameter | define callback@113.numberValue.id | [45:32](../Configuration/YouTubeConfiguration.js#L45) |
+| parameter | define callback@113.numberValue.fallback | [45:36](../Configuration/YouTubeConfiguration.js#L45) |
+| parameter | define callback@113.numberValue.min | [45:46](../Configuration/YouTubeConfiguration.js#L45) |
+| parameter | define callback@113.numberValue.max | [45:51](../Configuration/YouTubeConfiguration.js#L45) |
+| variable | define callback@113.numberValue.parsed | [46:13](../Configuration/YouTubeConfiguration.js#L46) |
+| function | define callback@113.setStatus | [53:5](../Configuration/YouTubeConfiguration.js#L53) |
+| parameter | define callback@113.setStatus.view | [53:24](../Configuration/YouTubeConfiguration.js#L53) |
+| parameter | define callback@113.setStatus.text | [53:30](../Configuration/YouTubeConfiguration.js#L53) |
+| function | define callback@113.setText | [57:5](../Configuration/YouTubeConfiguration.js#L57) |
+| parameter | define callback@113.setText.view | [57:22](../Configuration/YouTubeConfiguration.js#L57) |
+| parameter | define callback@113.setText.id | [57:28](../Configuration/YouTubeConfiguration.js#L57) |
+| parameter | define callback@113.setText.text | [57:32](../Configuration/YouTubeConfiguration.js#L57) |
+| variable | define callback@113.setText.el | [58:15](../Configuration/YouTubeConfiguration.js#L58) |
+| function | define callback@113.splitEntries | [64:5](../Configuration/YouTubeConfiguration.js#L64) |
+| parameter | define callback@113.splitEntries.text | [64:27](../Configuration/YouTubeConfiguration.js#L64) |
+| function | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map callback@1674 | [67:18](../Configuration/YouTubeConfiguration.js#L67) |
+| parameter | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map callback@1674.item | [67:18](../Configuration/YouTubeConfiguration.js#L67) |
+| function | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map(item =&gt; item.trim())             .filter callback@1715 | [68:21](../Configuration/YouTubeConfiguration.js#L68) |
+| parameter | define callback@113.splitEntries.(text \|\| '')             .split(/[,\n\r;]+/)             .map(item =&gt; item.trim())             .filter callback@1715.item | [68:21](../Configuration/YouTubeConfiguration.js#L68) |
+| function | define callback@113.uniqueEntries | [71:5](../Configuration/YouTubeConfiguration.js#L71) |
+| parameter | define callback@113.uniqueEntries.entries | [71:28](../Configuration/YouTubeConfiguration.js#L71) |
+| variable | define callback@113.uniqueEntries.seen | [72:15](../Configuration/YouTubeConfiguration.js#L72) |
+| variable | define callback@113.uniqueEntries.result | [73:15](../Configuration/YouTubeConfiguration.js#L73) |
+| function | define callback@113.uniqueEntries.entries.forEach callback@1870 | [75:25](../Configuration/YouTubeConfiguration.js#L75) |
+| parameter | define callback@113.uniqueEntries.entries.forEach callback@1870.item | [75:25](../Configuration/YouTubeConfiguration.js#L75) |
+| function | define callback@113.setConfigurationControlsDisabled | [85:5](../Configuration/YouTubeConfiguration.js#L85) |
+| parameter | define callback@113.setConfigurationControlsDisabled.view | [85:47](../Configuration/YouTubeConfiguration.js#L85) |
+| parameter | define callback@113.setConfigurationControlsDisabled.disabled | [85:53](../Configuration/YouTubeConfiguration.js#L85) |
+| variable | define callback@113.setConfigurationControlsDisabled.form | [86:15](../Configuration/YouTubeConfiguration.js#L86) |
+| function | define callback@113.setConfigurationControlsDisabled.form.querySelectorAll('input, select, textarea, button').forEach callback@2297 | [90:74](../Configuration/YouTubeConfiguration.js#L90) |
+| parameter | define callback@113.setConfigurationControlsDisabled.form.querySelectorAll('input, select, textarea, button').forEach callback@2297.control | [90:74](../Configuration/YouTubeConfiguration.js#L90) |
+| function | define callback@113.formatNumber | [95:5](../Configuration/YouTubeConfiguration.js#L95) |
+| parameter | define callback@113.formatNumber.n | [95:27](../Configuration/YouTubeConfiguration.js#L95) |
+| variable | define callback@113.formatNumber.value | [96:15](../Configuration/YouTubeConfiguration.js#L96) |
+| catch-variable | define callback@113.formatNumber.e | [98:16](../Configuration/YouTubeConfiguration.js#L98) |
+| function | define callback@113.formatResetCountdown | [101:5](../Configuration/YouTubeConfiguration.js#L101) |
+| parameter | define callback@113.formatResetCountdown.seconds | [101:35](../Configuration/YouTubeConfiguration.js#L101) |
+| variable | define callback@113.formatResetCountdown.total | [102:15](../Configuration/YouTubeConfiguration.js#L102) |
+| variable | define callback@113.formatResetCountdown.h | [104:15](../Configuration/YouTubeConfiguration.js#L104) |
+| variable | define callback@113.formatResetCountdown.m | [105:15](../Configuration/YouTubeConfiguration.js#L105) |
+| function | define callback@113.renderQuotaBucket | [110:5](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.view | [110:32](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.prefix | [110:38](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.usedValue | [110:46](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.limitValue | [110:57](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.lifetimeValue | [110:69](../Configuration/YouTubeConfiguration.js#L110) |
+| parameter | define callback@113.renderQuotaBucket.unit | [110:84](../Configuration/YouTubeConfiguration.js#L110) |
+| variable | define callback@113.renderQuotaBucket.used | [111:15](../Configuration/YouTubeConfiguration.js#L111) |
+| variable | define callback@113.renderQuotaBucket.limit | [112:15](../Configuration/YouTubeConfiguration.js#L112) |
+| variable | define callback@113.renderQuotaBucket.lifetime | [113:15](../Configuration/YouTubeConfiguration.js#L113) |
+| variable | define callback@113.renderQuotaBucket.pct | [114:15](../Configuration/YouTubeConfiguration.js#L114) |
+| variable | define callback@113.renderQuotaBucket.bar | [121:15](../Configuration/YouTubeConfiguration.js#L121) |
+| variable | define callback@113.renderQuotaBucket.fill | [122:15](../Configuration/YouTubeConfiguration.js#L122) |
+| function | define callback@113.renderQuota | [131:5](../Configuration/YouTubeConfiguration.js#L131) |
+| parameter | define callback@113.renderQuota.view | [131:26](../Configuration/YouTubeConfiguration.js#L131) |
+| parameter | define callback@113.renderQuota.config | [131:32](../Configuration/YouTubeConfiguration.js#L131) |
+| variable | define callback@113.renderQuota.resetSec | [147:15](../Configuration/YouTubeConfiguration.js#L147) |
+| variable | define callback@113.renderQuota.reset | [148:15](../Configuration/YouTubeConfiguration.js#L148) |
+| function | define callback@113.isSupportedPlaylistId | [155:5](../Configuration/YouTubeConfiguration.js#L155) |
+| parameter | define callback@113.isSupportedPlaylistId.item | [155:36](../Configuration/YouTubeConfiguration.js#L155) |
+| function | define callback@113.classifySavedItem | [159:5](../Configuration/YouTubeConfiguration.js#L159) |
+| parameter | define callback@113.classifySavedItem.item | [159:32](../Configuration/YouTubeConfiguration.js#L159) |
+| function | define callback@113.classifyAutoPlaylistItem | [175:5](../Configuration/YouTubeConfiguration.js#L175) |
+| parameter | define callback@113.classifyAutoPlaylistItem.item | [175:39](../Configuration/YouTubeConfiguration.js#L175) |
+| function | define callback@113.setDonateButton | [185:5](../Configuration/YouTubeConfiguration.js#L185) |
+| parameter | define callback@113.setDonateButton.view | [185:30](../Configuration/YouTubeConfiguration.js#L185) |
+| variable | define callback@113.setDonateButton.button | [186:15](../Configuration/YouTubeConfiguration.js#L186) |
+| function | define callback@113.pluginUrl | [192:5](../Configuration/YouTubeConfiguration.js#L192) |
+| parameter | define callback@113.pluginUrl.path | [192:24](../Configuration/YouTubeConfiguration.js#L192) |
+| variable | define callback@113.pluginUrl.apiClient | [193:15](../Configuration/YouTubeConfiguration.js#L193) |
+| function | define callback@113.setGuideImages | [201:5](../Configuration/YouTubeConfiguration.js#L201) |
+| parameter | define callback@113.setGuideImages.view | [201:29](../Configuration/YouTubeConfiguration.js#L201) |
+| variable | define callback@113.setGuideImages.images | [202:15](../Configuration/YouTubeConfiguration.js#L202) |
+| function | define callback@113.setGuideImages.images.forEach callback@6161 | [203:24](../Configuration/YouTubeConfiguration.js#L203) |
+| parameter | define callback@113.setGuideImages.images.forEach callback@6161.img | [203:24](../Configuration/YouTubeConfiguration.js#L203) |
+| variable | define callback@113.setGuideImages.images.forEach callback@6161.name | [204:19](../Configuration/YouTubeConfiguration.js#L204) |
+| function | define callback@113.populateTrendingRegions | [211:5](../Configuration/YouTubeConfiguration.js#L211) |
+| parameter | define callback@113.populateTrendingRegions.view | [211:38](../Configuration/YouTubeConfiguration.js#L211) |
+| parameter | define callback@113.populateTrendingRegions.regionResult | [211:44](../Configuration/YouTubeConfiguration.js#L211) |
+| parameter | define callback@113.populateTrendingRegions.selectedValue | [211:58](../Configuration/YouTubeConfiguration.js#L211) |
+| variable | define callback@113.populateTrendingRegions.select | [212:15](../Configuration/YouTubeConfiguration.js#L212) |
+| variable | define callback@113.populateTrendingRegions.selected | [217:15](../Configuration/YouTubeConfiguration.js#L217) |
+| variable | define callback@113.populateTrendingRegions.lookupSucceeded | [218:15](../Configuration/YouTubeConfiguration.js#L218) |
+| variable | define callback@113.populateTrendingRegions.regions | [219:15](../Configuration/YouTubeConfiguration.js#L219) |
+| variable | define callback@113.populateTrendingRegions.defaultOption | [222:15](../Configuration/YouTubeConfiguration.js#L222) |
+| variable | define callback@113.populateTrendingRegions.normalized | [227:15](../Configuration/YouTubeConfiguration.js#L227) |
+| function | define callback@113.populateTrendingRegions.normalized.forEach callback@7154 | [228:28](../Configuration/YouTubeConfiguration.js#L228) |
+| parameter | define callback@113.populateTrendingRegions.normalized.forEach callback@7154.region | [228:28](../Configuration/YouTubeConfiguration.js#L228) |
+| variable | define callback@113.populateTrendingRegions.normalized.forEach callback@7154.option | [229:19](../Configuration/YouTubeConfiguration.js#L229) |
+| variable | define callback@113.populateTrendingRegions.selectedIsSupported | [235:15](../Configuration/YouTubeConfiguration.js#L235) |
+| function | define callback@113.populateTrendingRegions.normalized.some callback@7445 | [235:53](../Configuration/YouTubeConfiguration.js#L235) |
+| parameter | define callback@113.populateTrendingRegions.normalized.some callback@7445.region | [235:53](../Configuration/YouTubeConfiguration.js#L235) |
+| variable | define callback@113.populateTrendingRegions.savedOption | [237:19](../Configuration/YouTubeConfiguration.js#L237) |
+| function | define callback@113.fetchTrendingRegions | [246:5](../Configuration/YouTubeConfiguration.js#L246) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient | [246:35](../Configuration/YouTubeConfiguration.js#L246) |
+| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305 | [255:17](../Configuration/YouTubeConfiguration.js#L255) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.payload | [255:17](../Configuration/YouTubeConfiguration.js#L255) |
+| catch-variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.e | [258:24](../Configuration/YouTubeConfiguration.js#L258) |
+| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source | [261:19](../Configuration/YouTubeConfiguration.js#L261) |
+| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.seen | [265:19](../Configuration/YouTubeConfiguration.js#L265) |
+| variable | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.regions | [266:19](../Configuration/YouTubeConfiguration.js#L266) |
+| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map callback@8792 | [266:40](../Configuration/YouTubeConfiguration.js#L266) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map callback@8792.region | [266:40](../Configuration/YouTubeConfiguration.js#L266) |
+| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter callback@9011 | [269:24](../Configuration/YouTubeConfiguration.js#L269) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter callback@9011.region | [269:24](../Configuration/YouTubeConfiguration.js#L269) |
+| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9259 | [275:21](../Configuration/YouTubeConfiguration.js#L275) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9259.a | [275:22](../Configuration/YouTubeConfiguration.js#L275) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then callback@8305.source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort callback@9259.b | [275:25](../Configuration/YouTubeConfiguration.js#L275) |
+| function | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then(payload =&gt; {             if (typeof payload === 'string') {                 try { payload = JSON.parse(payload); }                 catch (e) { return { LookupSucceeded: false, Regions: [] }; }             }              const source = (payload && (payload.Regions \|\| payload.regions)) \|\| [];             if (!Array.isArray(source)) {                 return { LookupSucceeded: false, Regions: [] };             }             const seen = new Set();             const regions = source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort((a, b) =&gt; a.Name.localeCompare(b.Name));             return {                 LookupSucceeded: !!(payload && (payload.LookupSucceeded \|\| payload.lookupSucceeded))                     && regions.length &gt; 0,                 Regions: regions             };         }).catch callback@9530 | [281:18](../Configuration/YouTubeConfiguration.js#L281) |
+| parameter | define callback@113.fetchTrendingRegions.apiClient.ajax({             type: 'GET',             url: apiClient.getUrl('YouTubePlugin/Regions'),             dataType: 'json'         }).then(payload =&gt; {             if (typeof payload === 'string') {                 try { payload = JSON.parse(payload); }                 catch (e) { return { LookupSucceeded: false, Regions: [] }; }             }              const source = (payload && (payload.Regions \|\| payload.regions)) \|\| [];             if (!Array.isArray(source)) {                 return { LookupSucceeded: false, Regions: [] };             }             const seen = new Set();             const regions = source.map(region =&gt; ({                 Code: String((region && (region.Code \|\| region.code)) \|\| '').trim().toUpperCase(),                 Name: String((region && (region.Name \|\| region.name)) \|\| '').trim()             })).filter(region =&gt; {                 if (!/^[A-Z]{2}$/.test(region.Code) \|\| !region.Name \|\| seen.has(region.Code)) {                     return false;                 }                 seen.add(region.Code);                 return true;             }).sort((a, b) =&gt; a.Name.localeCompare(b.Name));             return {                 LookupSucceeded: !!(payload && (payload.LookupSucceeded \|\| payload.lookupSucceeded))                     && regions.length &gt; 0,                 Regions: regions             };         }).catch callback@9530.error | [281:18](../Configuration/YouTubeConfiguration.js#L281) |
+| function | define callback@113.bindTabNavigation | [287:5](../Configuration/YouTubeConfiguration.js#L287) |
+| parameter | define callback@113.bindTabNavigation.view | [287:32](../Configuration/YouTubeConfiguration.js#L287) |
+| variable | define callback@113.bindTabNavigation.navButtons | [288:15](../Configuration/YouTubeConfiguration.js#L288) |
+| variable | define callback@113.bindTabNavigation.pages | [289:15](../Configuration/YouTubeConfiguration.js#L289) |
+| function | define callback@113.bindTabNavigation.navButtons.forEach callback@9972 | [294:28](../Configuration/YouTubeConfiguration.js#L294) |
+| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button | [294:28](../Configuration/YouTubeConfiguration.js#L294) |
+| function | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029 | [295:46](../Configuration/YouTubeConfiguration.js#L295) |
+| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.e | [295:46](../Configuration/YouTubeConfiguration.js#L295) |
+| variable | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.target | [297:23](../Configuration/YouTubeConfiguration.js#L297) |
+| function | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.navButtons.forEach callback@10175 | [299:36](../Configuration/YouTubeConfiguration.js#L299) |
+| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.navButtons.forEach callback@10175.item | [299:36](../Configuration/YouTubeConfiguration.js#L299) |
+| function | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.Object.keys(pages).forEach callback@10323 | [302:44](../Configuration/YouTubeConfiguration.js#L302) |
+| parameter | define callback@113.bindTabNavigation.navButtons.forEach callback@9972.button.addEventListener callback@10029.Object.keys(pages).forEach callback@10323.key | [302:44](../Configuration/YouTubeConfiguration.js#L302) |
+| function | define callback@113.showToast | [315:5](../Configuration/YouTubeConfiguration.js#L315) |
+| parameter | define callback@113.showToast.type | [315:24](../Configuration/YouTubeConfiguration.js#L315) |
+| parameter | define callback@113.showToast.text | [315:30](../Configuration/YouTubeConfiguration.js#L315) |
+| function | define callback@113.compareVersions | [324:5](../Configuration/YouTubeConfiguration.js#L324) |
+| parameter | define callback@113.compareVersions.a | [324:30](../Configuration/YouTubeConfiguration.js#L324) |
+| parameter | define callback@113.compareVersions.b | [324:33](../Configuration/YouTubeConfiguration.js#L324) |
+| variable | define callback@113.compareVersions.norm | [325:15](../Configuration/YouTubeConfiguration.js#L325) |
+| function | define callback@113.compareVersions.norm | [325:22](../Configuration/YouTubeConfiguration.js#L325) |
+| parameter | define callback@113.compareVersions.norm.v | [325:22](../Configuration/YouTubeConfiguration.js#L325) |
+| function | define callback@113.compareVersions.norm.String(v \|\| '').replace(/^v/i, '').split('.').map callback@11067 | [325:77](../Configuration/YouTubeConfiguration.js#L325) |
+| parameter | define callback@113.compareVersions.norm.String(v \|\| '').replace(/^v/i, '').split('.').map callback@11067.n | [325:77](../Configuration/YouTubeConfiguration.js#L325) |
+| variable | define callback@113.compareVersions.av | [326:15](../Configuration/YouTubeConfiguration.js#L326) |
+| variable | define callback@113.compareVersions.bv | [327:15](../Configuration/YouTubeConfiguration.js#L327) |
+| variable | define callback@113.compareVersions.len | [328:15](../Configuration/YouTubeConfiguration.js#L328) |
+| variable | define callback@113.compareVersions.i | [329:18](../Configuration/YouTubeConfiguration.js#L329) |
+| variable | define callback@113.compareVersions.d | [330:19](../Configuration/YouTubeConfiguration.js#L330) |
+| function | define callback@113.fetchLatestGithubVersion | [338:5](../Configuration/YouTubeConfiguration.js#L338) |
+| variable | define callback@113.fetchLatestGithubVersion.cacheKey | [339:15](../Configuration/YouTubeConfiguration.js#L339) |
+| variable | define callback@113.fetchLatestGithubVersion.cached | [343:19](../Configuration/YouTubeConfiguration.js#L343) |
+| catch-variable | define callback@113.fetchLatestGithubVersion.e | [347:18](../Configuration/YouTubeConfiguration.js#L347) |
+| variable | define callback@113.fetchLatestGithubVersion.repo | [349:15](../Configuration/YouTubeConfiguration.js#L349) |
+| variable | define callback@113.fetchLatestGithubVersion.headers | [350:15](../Configuration/YouTubeConfiguration.js#L350) |
+| variable | define callback@113.fetchLatestGithubVersion.opts | [351:15](../Configuration/YouTubeConfiguration.js#L351) |
+| variable | define callback@113.fetchLatestGithubVersion.bust | [352:15](../Configuration/YouTubeConfiguration.js#L352) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then callback@12592 | [358:19](../Configuration/YouTubeConfiguration.js#L358) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then callback@12592.r | [358:19](../Configuration/YouTubeConfiguration.js#L358) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then callback@12822 | [365:19](../Configuration/YouTubeConfiguration.js#L365) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then callback@12822.json | [365:19](../Configuration/YouTubeConfiguration.js#L365) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch callback@12887 | [366:20](../Configuration/YouTubeConfiguration.js#L366) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch callback@12887.err | [366:20](../Configuration/YouTubeConfiguration.js#L366) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980 | [367:19](../Configuration/YouTubeConfiguration.js#L367) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.tag | [367:19](../Configuration/YouTubeConfiguration.js#L367) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then callback@13164 | [370:27](../Configuration/YouTubeConfiguration.js#L370) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then callback@13164.r | [370:27](../Configuration/YouTubeConfiguration.js#L370) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13219 | [371:27](../Configuration/YouTubeConfiguration.js#L371) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13219.arr | [371:27](../Configuration/YouTubeConfiguration.js#L371) |
+| variable | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13219.pick | [374:31](../Configuration/YouTubeConfiguration.js#L374) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13219.arr.find callback@13434 | [374:47](../Configuration/YouTubeConfiguration.js#L374) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then callback@13219.arr.find callback@13434.x | [374:47](../Configuration/YouTubeConfiguration.js#L374) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch callback@13582 | [377:28](../Configuration/YouTubeConfiguration.js#L377) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then callback@12980.fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch callback@13582.err | [377:28](../Configuration/YouTubeConfiguration.js#L377) |
+| function | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@13693 | [379:19](../Configuration/YouTubeConfiguration.js#L379) |
+| parameter | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@13693.tag | [379:19](../Configuration/YouTubeConfiguration.js#L379) |
+| catch-variable | define callback@113.fetchLatestGithubVersion.fetch('https://api.github.com/repos/' + repo + '/releases/latest' + bust, opts)             .then(r =&gt; {                 if (!r.ok) {                     console.log('[YT] /releases/latest returned', r.status);                     return null;                 }                 return r.json();             })             .then(json =&gt; json && (json.tag_name \|\| json.name))             .catch(err =&gt; { console.log('[YT] /releases/latest failed', err); return null; })             .then(tag =&gt; {                 if (tag) return tag;                 return fetch('https://api.github.com/repos/' + repo + '/releases' + bust + '&per_page=5', opts)                     .then(r =&gt; r.ok ? r.json() : null)                     .then(arr =&gt; {                         if (!Array.isArray(arr) \|\| arr.length === 0) return null;                         // Prefer non-draft, anything else if all are drafts.                         const pick = arr.find(x =&gt; x && !x.draft) \|\| arr[0];                         return pick.tag_name \|\| pick.name \|\| null;                     })                     .catch(err =&gt; { console.log('[YT] /releases fallback failed', err); return null; });             })             .then callback@13693.e | [385:109](../Configuration/YouTubeConfiguration.js#L385) |
+| function | define callback@113.renderPluginCredits | [390:5](../Configuration/YouTubeConfiguration.js#L390) |
+| parameter | define callback@113.renderPluginCredits.view | [390:34](../Configuration/YouTubeConfiguration.js#L390) |
+| parameter | define callback@113.renderPluginCredits.apiClient | [390:40](../Configuration/YouTubeConfiguration.js#L390) |
+| variable | define callback@113.renderPluginCredits.versionEl | [391:15](../Configuration/YouTubeConfiguration.js#L391) |
+| variable | define callback@113.renderPluginCredits.badgeEl | [392:15](../Configuration/YouTubeConfiguration.js#L392) |
+| variable | define callback@113.renderPluginCredits.showUpdateBadge | [395:15](../Configuration/YouTubeConfiguration.js#L395) |
+| function | define callback@113.renderPluginCredits.showUpdateBadge | [395:33](../Configuration/YouTubeConfiguration.js#L395) |
+| parameter | define callback@113.renderPluginCredits.showUpdateBadge.latest | [395:34](../Configuration/YouTubeConfiguration.js#L395) |
+| variable | define callback@113.renderPluginCredits.finish | [402:15](../Configuration/YouTubeConfiguration.js#L402) |
+| function | define callback@113.renderPluginCredits.finish | [402:24](../Configuration/YouTubeConfiguration.js#L402) |
+| parameter | define callback@113.renderPluginCredits.finish.currentVersion | [402:25](../Configuration/YouTubeConfiguration.js#L402) |
+| function | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@14972 | [405:45](../Configuration/YouTubeConfiguration.js#L405) |
+| parameter | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@14972.latest | [405:45](../Configuration/YouTubeConfiguration.js#L405) |
+| variable | define callback@113.renderPluginCredits.finish.fetchLatestGithubVersion().then callback@14972.cmp | [411:23](../Configuration/YouTubeConfiguration.js#L411) |
+| variable | define callback@113.renderPluginCredits.findPlugin | [417:15](../Configuration/YouTubeConfiguration.js#L417) |
+| function | define callback@113.renderPluginCredits.findPlugin | [417:28](../Configuration/YouTubeConfiguration.js#L417) |
+| parameter | define callback@113.renderPluginCredits.findPlugin.plugins | [417:29](../Configuration/YouTubeConfiguration.js#L417) |
+| variable | define callback@113.renderPluginCredits.findPlugin.wantA | [421:19](../Configuration/YouTubeConfiguration.js#L421) |
+| variable | define callback@113.renderPluginCredits.findPlugin.wantB | [422:19](../Configuration/YouTubeConfiguration.js#L422) |
+| variable | define callback@113.renderPluginCredits.findPlugin.byId | [423:19](../Configuration/YouTubeConfiguration.js#L423) |
+| function | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@15877 | [423:39](../Configuration/YouTubeConfiguration.js#L423) |
+| parameter | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@15877.p | [423:39](../Configuration/YouTubeConfiguration.js#L423) |
+| variable | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@15877.id | [424:23](../Configuration/YouTubeConfiguration.js#L424) |
+| function | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16146 | [429:33](../Configuration/YouTubeConfiguration.js#L429) |
+| parameter | define callback@113.renderPluginCredits.findPlugin.plugins.find callback@16146.p | [429:33](../Configuration/YouTubeConfiguration.js#L429) |
+| function | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@16406 | [435:50](../Configuration/YouTubeConfiguration.js#L435) |
+| parameter | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@16406.plugins | [435:50](../Configuration/YouTubeConfiguration.js#L435) |
+| variable | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@16406.me | [436:23](../Configuration/YouTubeConfiguration.js#L436) |
+| function | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@16530 | [438:16](../Configuration/YouTubeConfiguration.js#L438) |
+| parameter | define callback@113.renderPluginCredits.apiClient.getInstalledPlugins().then callback@16530.err | [438:16](../Configuration/YouTubeConfiguration.js#L438) |
+| class | define callback@113.anonymous-class@16681 | [444:12](../Configuration/YouTubeConfiguration.js#L444) |
+| method | define callback@113.anonymous-class@16681.constructor | [445:9](../Configuration/YouTubeConfiguration.js#L445) |
+| parameter | define callback@113.anonymous-class@16681.constructor.view | [445:21](../Configuration/YouTubeConfiguration.js#L445) |
+| parameter | define callback@113.anonymous-class@16681.constructor.params | [445:27](../Configuration/YouTubeConfiguration.js#L445) |
+| method | define callback@113.anonymous-class@16681.onResume | [460:9](../Configuration/YouTubeConfiguration.js#L460) |
+| parameter | define callback@113.anonymous-class@16681.onResume.options | [460:18](../Configuration/YouTubeConfiguration.js#L460) |
+| method | define callback@113.anonymous-class@16681.bindEventListeners | [470:9](../Configuration/YouTubeConfiguration.js#L470) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.view | [470:28](../Configuration/YouTubeConfiguration.js#L470) |
+| variable | define callback@113.anonymous-class@16681.bindEventListeners.form | [478:19](../Configuration/YouTubeConfiguration.js#L478) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@17930 | [480:49](../Configuration/YouTubeConfiguration.js#L480) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@17930.e | [480:50](../Configuration/YouTubeConfiguration.js#L480) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@18523 | [491:49](../Configuration/YouTubeConfiguration.js#L491) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@18606 | [492:48](../Configuration/YouTubeConfiguration.js#L492) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@18606.e | [492:49](../Configuration/YouTubeConfiguration.js#L492) |
+| variable | define callback@113.anonymous-class@16681.bindEventListeners.form.addEventListener callback@18606.id | [496:27](../Configuration/YouTubeConfiguration.js#L496) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19288 | [509:17](../Configuration/YouTubeConfiguration.js#L509) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19327 | [510:17](../Configuration/YouTubeConfiguration.js#L510) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19327.value | [510:17](../Configuration/YouTubeConfiguration.js#L510) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19382 | [511:17](../Configuration/YouTubeConfiguration.js#L511) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19382.item | [511:17](../Configuration/YouTubeConfiguration.js#L511) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19431 | [512:17](../Configuration/YouTubeConfiguration.js#L512) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19431.item | [512:17](../Configuration/YouTubeConfiguration.js#L512) |
+| variable | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19431.kind | [513:27](../Configuration/YouTubeConfiguration.js#L513) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19865 | [523:17](../Configuration/YouTubeConfiguration.js#L523) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19909 | [524:17](../Configuration/YouTubeConfiguration.js#L524) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19909.value | [524:17](../Configuration/YouTubeConfiguration.js#L524) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19969 | [525:17](../Configuration/YouTubeConfiguration.js#L525) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@19969.item | [525:17](../Configuration/YouTubeConfiguration.js#L525) |
+| function | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@20025 | [526:17](../Configuration/YouTubeConfiguration.js#L526) |
+| parameter | define callback@113.anonymous-class@16681.bindEventListeners.this.bindEntryControls callback@20025.item | [526:17](../Configuration/YouTubeConfiguration.js#L526) |
+| method | define callback@113.anonymous-class@16681.bindEntryControls | [530:9](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.view | [530:27](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.inputId | [530:33](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.buttonId | [530:42](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.listId | [530:52](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.getItems | [530:60](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.setItems | [530:70](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.classify | [530:80](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.validate | [530:90](../Configuration/YouTubeConfiguration.js#L530) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.invalidMessage | [530:100](../Configuration/YouTubeConfiguration.js#L530) |
+| variable | define callback@113.anonymous-class@16681.bindEntryControls.input | [531:19](../Configuration/YouTubeConfiguration.js#L531) |
+| variable | define callback@113.anonymous-class@16681.bindEntryControls.button | [532:19](../Configuration/YouTubeConfiguration.js#L532) |
+| variable | define callback@113.anonymous-class@16681.bindEntryControls.add | [533:19](../Configuration/YouTubeConfiguration.js#L533) |
+| function | define callback@113.anonymous-class@16681.bindEntryControls.add | [533:25](../Configuration/YouTubeConfiguration.js#L533) |
+| variable | define callback@113.anonymous-class@16681.bindEntryControls.add.newItems | [534:23](../Configuration/YouTubeConfiguration.js#L534) |
+| variable | define callback@113.anonymous-class@16681.bindEntryControls.add.acceptedItems | [539:23](../Configuration/YouTubeConfiguration.js#L539) |
+| function | define callback@113.anonymous-class@16681.bindEntryControls.input.addEventListener callback@21512 | [560:51](../Configuration/YouTubeConfiguration.js#L560) |
+| parameter | define callback@113.anonymous-class@16681.bindEntryControls.input.addEventListener callback@21512.e | [560:51](../Configuration/YouTubeConfiguration.js#L560) |
+| method | define callback@113.anonymous-class@16681.renderEntryList | [569:9](../Configuration/YouTubeConfiguration.js#L569) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.view | [569:25](../Configuration/YouTubeConfiguration.js#L569) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.listId | [569:31](../Configuration/YouTubeConfiguration.js#L569) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.getItems | [569:39](../Configuration/YouTubeConfiguration.js#L569) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.setItems | [569:49](../Configuration/YouTubeConfiguration.js#L569) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.classify | [569:59](../Configuration/YouTubeConfiguration.js#L569) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.list | [570:19](../Configuration/YouTubeConfiguration.js#L570) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.items | [576:19](../Configuration/YouTubeConfiguration.js#L576) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.empty | [579:23](../Configuration/YouTubeConfiguration.js#L579) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.header | [586:19](../Configuration/YouTubeConfiguration.js#L586) |
+| function | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615 | [593:27](../Configuration/YouTubeConfiguration.js#L593) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.item | [593:27](../Configuration/YouTubeConfiguration.js#L593) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.chip | [594:23](../Configuration/YouTubeConfiguration.js#L594) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.text | [597:23](../Configuration/YouTubeConfiguration.js#L597) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.badge | [602:23](../Configuration/YouTubeConfiguration.js#L602) |
+| variable | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.remove | [607:23](../Configuration/YouTubeConfiguration.js#L607) |
+| function | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.remove.addEventListener callback@23504 | [613:50](../Configuration/YouTubeConfiguration.js#L613) |
+| function | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.remove.addEventListener callback@23504.getItems().filter callback@23559 | [614:48](../Configuration/YouTubeConfiguration.js#L614) |
+| parameter | define callback@113.anonymous-class@16681.renderEntryList.items.forEach callback@22615.remove.addEventListener callback@23504.getItems().filter callback@23559.existing | [614:48](../Configuration/YouTubeConfiguration.js#L614) |
+| method | define callback@113.anonymous-class@16681.syncEntryFields | [625:9](../Configuration/YouTubeConfiguration.js#L625) |
+| parameter | define callback@113.anonymous-class@16681.syncEntryFields.view | [625:25](../Configuration/YouTubeConfiguration.js#L625) |
+| method | define callback@113.anonymous-class@16681.renderAllEntryLists | [630:9](../Configuration/YouTubeConfiguration.js#L630) |
+| parameter | define callback@113.anonymous-class@16681.renderAllEntryLists.view | [630:29](../Configuration/YouTubeConfiguration.js#L630) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24249 | [634:17](../Configuration/YouTubeConfiguration.js#L634) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24288 | [635:17](../Configuration/YouTubeConfiguration.js#L635) |
+| parameter | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24288.value | [635:17](../Configuration/YouTubeConfiguration.js#L635) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24343 | [636:17](../Configuration/YouTubeConfiguration.js#L636) |
+| parameter | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24343.item | [636:17](../Configuration/YouTubeConfiguration.js#L636) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24489 | [641:17](../Configuration/YouTubeConfiguration.js#L641) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24533 | [642:17](../Configuration/YouTubeConfiguration.js#L642) |
+| parameter | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24533.value | [642:17](../Configuration/YouTubeConfiguration.js#L642) |
+| function | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24593 | [643:17](../Configuration/YouTubeConfiguration.js#L643) |
+| parameter | define callback@113.anonymous-class@16681.renderAllEntryLists.this.renderEntryList callback@24593.item | [643:17](../Configuration/YouTubeConfiguration.js#L643) |
+| method | define callback@113.anonymous-class@16681.refreshTrendingRegions | [646:9](../Configuration/YouTubeConfiguration.js#L646) |
+| parameter | define callback@113.anonymous-class@16681.refreshTrendingRegions.view | [646:32](../Configuration/YouTubeConfiguration.js#L646) |
+| parameter | define callback@113.anonymous-class@16681.refreshTrendingRegions.apiClient | [646:38](../Configuration/YouTubeConfiguration.js#L646) |
+| parameter | define callback@113.anonymous-class@16681.refreshTrendingRegions.loadRevision | [646:49](../Configuration/YouTubeConfiguration.js#L646) |
+| parameter | define callback@113.anonymous-class@16681.refreshTrendingRegions.apiKeyAtRequest | [646:63](../Configuration/YouTubeConfiguration.js#L646) |
+| variable | define callback@113.anonymous-class@16681.refreshTrendingRegions.lookupRevision | [647:19](../Configuration/YouTubeConfiguration.js#L647) |
+| variable | define callback@113.anonymous-class@16681.refreshTrendingRegions.selectedBeforeLookup | [648:19](../Configuration/YouTubeConfiguration.js#L648) |
+| function | define callback@113.anonymous-class@16681.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25003 | [651:57](../Configuration/YouTubeConfiguration.js#L651) |
+| parameter | define callback@113.anonymous-class@16681.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25003.regionResult | [651:57](../Configuration/YouTubeConfiguration.js#L651) |
+| variable | define callback@113.anonymous-class@16681.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25003.displayResult | [664:23](../Configuration/YouTubeConfiguration.js#L664) |
+| variable | define callback@113.anonymous-class@16681.refreshTrendingRegions.fetchTrendingRegions(apiClient).then callback@25003.resetUnsupported | [667:23](../Configuration/YouTubeConfiguration.js#L667) |
+| method | define callback@113.anonymous-class@16681.loadData | [678:9](../Configuration/YouTubeConfiguration.js#L678) |
+| parameter | define callback@113.anonymous-class@16681.loadData.view | [678:18](../Configuration/YouTubeConfiguration.js#L678) |
+| variable | define callback@113.anonymous-class@16681.loadData.apiClient | [681:19](../Configuration/YouTubeConfiguration.js#L681) |
+| variable | define callback@113.anonymous-class@16681.loadData.loadRevision | [699:19](../Configuration/YouTubeConfiguration.js#L699) |
+| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle | [700:19](../Configuration/YouTubeConfiguration.js#L700) |
+| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle | [700:37](../Configuration/YouTubeConfiguration.js#L700) |
+| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.saveRevisionAtRequest | [709:23](../Configuration/YouTubeConfiguration.js#L709) |
+| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549 | [711:65](../Configuration/YouTubeConfiguration.js#L711) |
+| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.loadedConfig | [711:65](../Configuration/YouTubeConfiguration.js#L711) |
+| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.config | [724:27](../Configuration/YouTubeConfiguration.js#L724) |
+| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.resetFromKnownRegions | [735:27](../Configuration/YouTubeConfiguration.js#L735) |
+| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@30938 | [766:20](../Configuration/YouTubeConfiguration.js#L766) |
+| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@30938.error | [766:20](../Configuration/YouTubeConfiguration.js#L766) |
+| method | define callback@113.anonymous-class@16681.saveData | [786:9](../Configuration/YouTubeConfiguration.js#L786) |
+| parameter | define callback@113.anonymous-class@16681.saveData.view | [786:18](../Configuration/YouTubeConfiguration.js#L786) |
+| variable | define callback@113.anonymous-class@16681.saveData.apiClient | [787:19](../Configuration/YouTubeConfiguration.js#L787) |
+| variable | define callback@113.anonymous-class@16681.saveData.config | [793:19](../Configuration/YouTubeConfiguration.js#L793) |
+| method | define callback@113.anonymous-class@16681.flushSaveQueue | [841:9](../Configuration/YouTubeConfiguration.js#L841) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending | [846:19](../Configuration/YouTubeConfiguration.js#L846) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.view | [853:19](../Configuration/YouTubeConfiguration.js#L853) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@35373 | [860:21](../Configuration/YouTubeConfiguration.js#L860) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@35373.savedApiKey | [865:27](../Configuration/YouTubeConfiguration.js#L865) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@35916 | [870:16](../Configuration/YouTubeConfiguration.js#L870) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@35916.error | [870:16](../Configuration/YouTubeConfiguration.js#L870) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@36274 | [876:21](../Configuration/YouTubeConfiguration.js#L876) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@36380 | [879:16](../Configuration/YouTubeConfiguration.js#L879) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@36380.error | [879:16](../Configuration/YouTubeConfiguration.js#L879) |
+| method | define callback@113.anonymous-class@16681.scheduleAutoSave | [886:9](../Configuration/YouTubeConfiguration.js#L886) |
+| parameter | define callback@113.anonymous-class@16681.scheduleAutoSave.view | [886:26](../Configuration/YouTubeConfiguration.js#L886) |
+| function | define callback@113.anonymous-class@16681.scheduleAutoSave.setTimeout callback@36932 | [894:46](../Configuration/YouTubeConfiguration.js#L894) |
 
 </details>
 
@@ -1582,10 +1576,10 @@ Plugin Compile source (SDK default); 3892 bytes; 111 lines.
 <a id="file-6ff472c354325e8c"></a>
 ## [PlaybackIntentInterceptor.cs](../PlaybackIntentInterceptor.cs)
 
-Plugin Compile source (SDK default); 73326 bytes; 1649 lines.
+Plugin Compile source (SDK default); 74684 bytes; 1674 lines.
 
 <details>
-<summary>All 475 declarations / anchors</summary>
+<summary>All 486 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -1638,432 +1632,443 @@ Plugin Compile source (SDK default); 73326 bytes; 1649 lines.
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.postfix | [112:25](../PlaybackIntentInterceptor.cs#L112) |
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.harmony | [113:25](../PlaybackIntentInterceptor.cs#L113) |
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.patched | [120:25](../PlaybackIntentInterceptor.cs#L120) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.ex | [146:23](../PlaybackIntentInterceptor.cs#L146) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall | [153:9](../PlaybackIntentInterceptor.cs#L153) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll | [161:25](../PlaybackIntentInterceptor.cs#L161) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll.anonymous@7239 | [162:41](../PlaybackIntentInterceptor.cs#L162) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll.anonymous@7239.m | [162:41](../PlaybackIntentInterceptor.cs#L162) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.ex | [170:23](../PlaybackIntentInterceptor.cs#L170) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume | [177:9](../PlaybackIntentInterceptor.cs#L177) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.userId | [177:41](../PlaybackIntentInterceptor.cs#L177) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.itemId | [177:57](../PlaybackIntentInterceptor.cs#L177) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.deviceId | [177:70](../PlaybackIntentInterceptor.cs#L177) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.intent | [177:88](../PlaybackIntentInterceptor.cs#L177) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume | [183:9](../PlaybackIntentInterceptor.cs#L183) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.userId | [184:13](../PlaybackIntentInterceptor.cs#L184) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.itemId | [185:13](../PlaybackIntentInterceptor.cs#L185) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.deviceId | [186:13](../PlaybackIntentInterceptor.cs#L186) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.intent | [187:13](../PlaybackIntentInterceptor.cs#L187) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.ambiguous | [188:13](../PlaybackIntentInterceptor.cs#L188) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore | [194:9](../PlaybackIntentInterceptor.cs#L194) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.userId | [195:13](../PlaybackIntentInterceptor.cs#L195) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.itemId | [196:13](../PlaybackIntentInterceptor.cs#L196) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.deviceId | [197:13](../PlaybackIntentInterceptor.cs#L197) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.intent | [198:13](../PlaybackIntentInterceptor.cs#L198) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.ambiguous | [199:13](../PlaybackIntentInterceptor.cs#L199) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedUserId | [206:17](../PlaybackIntentInterceptor.cs#L206) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedItemId | [207:17](../PlaybackIntentInterceptor.cs#L207) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedDeviceId | [208:17](../PlaybackIntentInterceptor.cs#L208) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.anonymous@9335 | [213:41](../PlaybackIntentInterceptor.cs#L213) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.anonymous@9335.candidate | [213:41](../PlaybackIntentInterceptor.cs#L213) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.kvp | [235:13](../PlaybackIntentInterceptor.cs#L235) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.kvp.candidate | [237:21](../PlaybackIntentInterceptor.cs#L237) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey | [259:9](../PlaybackIntentInterceptor.cs#L259) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey.key | [259:43](../PlaybackIntentInterceptor.cs#L259) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey.intent | [259:55](../PlaybackIntentInterceptor.cs#L259) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases | [272:9](../PlaybackIntentInterceptor.cs#L272) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases.consumed | [272:49](../PlaybackIntentInterceptor.cs#L272) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases.pair | [274:13](../PlaybackIntentInterceptor.cs#L274) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod | [281:9](../PlaybackIntentInterceptor.cs#L281) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.harmony | [282:13](../PlaybackIntentInterceptor.cs#L282) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.prefix | [283:13](../PlaybackIntentInterceptor.cs#L283) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.postfix | [284:13](../PlaybackIntentInterceptor.cs#L284) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.serviceType | [285:13](../PlaybackIntentInterceptor.cs#L285) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.methodName | [286:13](../PlaybackIntentInterceptor.cs#L286) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.requestTypeName | [287:13](../PlaybackIntentInterceptor.cs#L287) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.requestType | [289:17](../PlaybackIntentInterceptor.cs#L289) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.method | [297:17](../PlaybackIntentInterceptor.cs#L297) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch | [314:9](../PlaybackIntentInterceptor.cs#L314) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.harmony | [314:48](../PlaybackIntentInterceptor.cs#L314) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.original | [314:64](../PlaybackIntentInterceptor.cs#L314) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.prefix | [314:85](../PlaybackIntentInterceptor.cs#L314) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.postfix | [314:100](../PlaybackIntentInterceptor.cs#L314) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod | [316:17](../PlaybackIntentInterceptor.cs#L316) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349 | [318:33](../PlaybackIntentInterceptor.cs#L318) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.m | [318:33](../PlaybackIntentInterceptor.cs#L318) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.parameters | [323:25](../PlaybackIntentInterceptor.cs#L323) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.anonymous@13700 | [326:46](../PlaybackIntentInterceptor.cs#L326) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.anonymous@13700.p | [326:46](../PlaybackIntentInterceptor.cs#L326) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.anonymous@13819 | [327:46](../PlaybackIntentInterceptor.cs#L327) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13349.anonymous@13819.p | [327:46](../PlaybackIntentInterceptor.cs#L327) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchParameters | [333:17](../PlaybackIntentInterceptor.cs#L333) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.args | [334:17](../PlaybackIntentInterceptor.cs#L334) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.i | [336:22](../PlaybackIntentInterceptor.cs#L336) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType | [349:9](../PlaybackIntentInterceptor.cs#L349) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.fullName | [349:45](../PlaybackIntentInterceptor.cs#L349) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.assembly | [352:13](../PlaybackIntentInterceptor.cs#L352) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.assembly.type | [354:23](../PlaybackIntentInterceptor.cs#L354) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix | [371:9](../PlaybackIntentInterceptor.cs#L371) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.__instance | [371:56](../PlaybackIntentInterceptor.cs#L371) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.__0 | [371:75](../PlaybackIntentInterceptor.cs#L371) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.ex | [377:19](../PlaybackIntentInterceptor.cs#L377) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio | [383:9](../PlaybackIntentInterceptor.cs#L383) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.requestDto | [383:54](../PlaybackIntentInterceptor.cs#L383) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.property | [385:17](../PlaybackIntentInterceptor.cs#L385) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.profile | [386:98](../PlaybackIntentInterceptor.cs#L386) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.changed | [388:35](../PlaybackIntentInterceptor.cs#L388) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.clone | [389:17](../PlaybackIntentInterceptor.cs#L389) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.i | [390:22](../PlaybackIntentInterceptor.cs#L390) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.candidate | [392:21](../PlaybackIntentInterceptor.cs#L392) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs | [397:21](../PlaybackIntentInterceptor.cs#L397) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs.anonymous@16904 | [397:69](../PlaybackIntentInterceptor.cs#L397) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs.anonymous@16904.c | [397:69](../PlaybackIntentInterceptor.cs#L397) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.anonymous@16961 | [398:32](../PlaybackIntentInterceptor.cs#L398) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.anonymous@16961.c | [398:32](../PlaybackIntentInterceptor.cs#L398) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index | [399:21](../PlaybackIntentInterceptor.cs#L399) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index.anonymous@17044 | [399:53](../PlaybackIntentInterceptor.cs#L399) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index.anonymous@17044.c | [399:53](../PlaybackIntentInterceptor.cs#L399) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.copy | [402:21](../PlaybackIntentInterceptor.cs#L402) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.local | [410:17](../PlaybackIntentInterceptor.cs#L410) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest | [415:9](../PlaybackIntentInterceptor.cs#L415) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.service | [415:64](../PlaybackIntentInterceptor.cs#L415) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.requestDto | [415:80](../PlaybackIntentInterceptor.cs#L415) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.directItemId | [424:21](../PlaybackIntentInterceptor.cs#L424) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.directQuery | [430:25](../PlaybackIntentInterceptor.cs#L430) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.maximumStreamingBitrate | [439:25](../PlaybackIntentInterceptor.cs#L439) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.subtitle | [449:25](../PlaybackIntentInterceptor.cs#L449) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.querySubtitle | [450:25](../PlaybackIntentInterceptor.cs#L450) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.currentSession | [451:25](../PlaybackIntentInterceptor.cs#L451) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.serviceRequest | [464:17](../PlaybackIntentInterceptor.cs#L464) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.itemId | [465:17](../PlaybackIntentInterceptor.cs#L465) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.videoId | [469:17](../PlaybackIntentInterceptor.cs#L469) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.previousAudioDtoValue | [487:17](../PlaybackIntentInterceptor.cs#L487) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.previousAudioQueryValue | [488:17](../PlaybackIntentInterceptor.cs#L488) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.audioDtoChanged | [489:17](../PlaybackIntentInterceptor.cs#L489) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.audioQueryChanged | [490:17](../PlaybackIntentInterceptor.cs#L490) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.currentDtoValue | [494:17](../PlaybackIntentInterceptor.cs#L494) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.currentQueryValue | [495:17](../PlaybackIntentInterceptor.cs#L495) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.dtoChanged | [496:17](../PlaybackIntentInterceptor.cs#L496) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.queryChanged | [497:17](../PlaybackIntentInterceptor.cs#L497) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.isNativeAndroidTablet | [499:17](../PlaybackIntentInterceptor.cs#L499) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed | [526:9](../PlaybackIntentInterceptor.cs#L526) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.request | [527:13](../PlaybackIntentInterceptor.cs#L527) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.itemId | [528:13](../PlaybackIntentInterceptor.cs#L528) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.videoId | [529:13](../PlaybackIntentInterceptor.cs#L529) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousDtoValue | [530:13](../PlaybackIntentInterceptor.cs#L530) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousQueryValue | [531:13](../PlaybackIntentInterceptor.cs#L531) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.dtoChanged | [532:13](../PlaybackIntentInterceptor.cs#L532) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.queryChanged | [533:13](../PlaybackIntentInterceptor.cs#L533) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioDtoValue | [534:13](../PlaybackIntentInterceptor.cs#L534) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioQueryValue | [535:13](../PlaybackIntentInterceptor.cs#L535) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.audioDtoChanged | [536:13](../PlaybackIntentInterceptor.cs#L536) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.audioQueryChanged | [537:13](../PlaybackIntentInterceptor.cs#L537) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.isNativeAndroidTablet | [538:13](../PlaybackIntentInterceptor.cs#L538) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.client | [544:17](../PlaybackIntentInterceptor.cs#L544) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.deviceName | [545:17](../PlaybackIntentInterceptor.cs#L545) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.userAgent | [546:17](../PlaybackIntentInterceptor.cs#L546) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousDtoText | [547:17](../PlaybackIntentInterceptor.cs#L547) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioDtoText | [550:17](../PlaybackIntentInterceptor.cs#L550) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.clientKind | [553:17](../PlaybackIntentInterceptor.cs#L553) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId | [558:9](../PlaybackIntentInterceptor.cs#L558) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.request | [558:52](../PlaybackIntentInterceptor.cs#L558) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.requestDto | [558:71](../PlaybackIntentInterceptor.cs#L558) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.userId | [560:17](../PlaybackIntentInterceptor.cs#L560) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.deviceId | [575:17](../PlaybackIntentInterceptor.cs#L575) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.sessionManager | [579:17](../PlaybackIntentInterceptor.cs#L579) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId | [583:9](../PlaybackIntentInterceptor.cs#L583) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.sessions | [583:57](../PlaybackIntentInterceptor.cs#L583) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.deviceId | [583:93](../PlaybackIntentInterceptor.cs#L583) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.userId | [588:21](../PlaybackIntentInterceptor.cs#L588) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.userInternalId | [589:18](../PlaybackIntentInterceptor.cs#L589) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.session | [590:13](../PlaybackIntentInterceptor.cs#L590) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.session.candidateUserId | [598:21](../PlaybackIntentInterceptor.cs#L598) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix | [614:9](../PlaybackIntentInterceptor.cs#L614) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__instance | [614:56](../PlaybackIntentInterceptor.cs#L614) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__0 | [614:75](../PlaybackIntentInterceptor.cs#L614) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__result | [614:87](../PlaybackIntentInterceptor.cs#L614) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.itemId | [620:25](../PlaybackIntentInterceptor.cs#L620) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.videoId | [621:25](../PlaybackIntentInterceptor.cs#L621) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.subtitlePatches | [145:25](../PlaybackIntentInterceptor.cs#L145) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Install.ex | [151:23](../PlaybackIntentInterceptor.cs#L151) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall | [158:9](../PlaybackIntentInterceptor.cs#L158) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll | [166:25](../PlaybackIntentInterceptor.cs#L166) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll.anonymous@7708 | [167:41](../PlaybackIntentInterceptor.cs#L167) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.unpatchAll.anonymous@7708.m | [167:41](../PlaybackIntentInterceptor.cs#L167) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.Uninstall.ex | [175:23](../PlaybackIntentInterceptor.cs#L175) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume | [182:9](../PlaybackIntentInterceptor.cs#L182) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.userId | [182:41](../PlaybackIntentInterceptor.cs#L182) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.itemId | [182:57](../PlaybackIntentInterceptor.cs#L182) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.deviceId | [182:70](../PlaybackIntentInterceptor.cs#L182) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsume.intent | [182:88](../PlaybackIntentInterceptor.cs#L182) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume | [188:9](../PlaybackIntentInterceptor.cs#L188) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.userId | [189:13](../PlaybackIntentInterceptor.cs#L189) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.itemId | [190:13](../PlaybackIntentInterceptor.cs#L190) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.deviceId | [191:13](../PlaybackIntentInterceptor.cs#L191) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.intent | [192:13](../PlaybackIntentInterceptor.cs#L192) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeForResume.ambiguous | [193:13](../PlaybackIntentInterceptor.cs#L193) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore | [199:9](../PlaybackIntentInterceptor.cs#L199) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.userId | [200:13](../PlaybackIntentInterceptor.cs#L200) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.itemId | [201:13](../PlaybackIntentInterceptor.cs#L201) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.deviceId | [202:13](../PlaybackIntentInterceptor.cs#L202) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.intent | [203:13](../PlaybackIntentInterceptor.cs#L203) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.ambiguous | [204:13](../PlaybackIntentInterceptor.cs#L204) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedUserId | [211:17](../PlaybackIntentInterceptor.cs#L211) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedItemId | [212:17](../PlaybackIntentInterceptor.cs#L212) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.normalizedDeviceId | [213:17](../PlaybackIntentInterceptor.cs#L213) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.anonymous@9804 | [218:41](../PlaybackIntentInterceptor.cs#L218) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.anonymous@9804.candidate | [218:41](../PlaybackIntentInterceptor.cs#L218) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.kvp | [240:13](../PlaybackIntentInterceptor.cs#L240) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCore.kvp.candidate | [242:21](../PlaybackIntentInterceptor.cs#L242) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey | [264:9](../PlaybackIntentInterceptor.cs#L264) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey.key | [264:43](../PlaybackIntentInterceptor.cs#L264) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeKey.intent | [264:55](../PlaybackIntentInterceptor.cs#L264) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases | [277:9](../PlaybackIntentInterceptor.cs#L277) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases.consumed | [277:49](../PlaybackIntentInterceptor.cs#L277) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.RemoveIntentAliases.pair | [279:13](../PlaybackIntentInterceptor.cs#L279) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod | [286:9](../PlaybackIntentInterceptor.cs#L286) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.harmony | [287:13](../PlaybackIntentInterceptor.cs#L287) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.prefix | [288:13](../PlaybackIntentInterceptor.cs#L288) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.postfix | [289:13](../PlaybackIntentInterceptor.cs#L289) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.serviceType | [290:13](../PlaybackIntentInterceptor.cs#L290) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.methodName | [291:13](../PlaybackIntentInterceptor.cs#L291) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.requestTypeName | [292:13](../PlaybackIntentInterceptor.cs#L292) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.requestType | [294:17](../PlaybackIntentInterceptor.cs#L294) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchPublicMethod.method | [302:17](../PlaybackIntentInterceptor.cs#L302) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch | [319:9](../PlaybackIntentInterceptor.cs#L319) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.harmony | [319:48](../PlaybackIntentInterceptor.cs#L319) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.original | [319:64](../PlaybackIntentInterceptor.cs#L319) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.prefix | [319:85](../PlaybackIntentInterceptor.cs#L319) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.postfix | [319:100](../PlaybackIntentInterceptor.cs#L319) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod | [321:17](../PlaybackIntentInterceptor.cs#L321) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818 | [323:33](../PlaybackIntentInterceptor.cs#L323) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.m | [323:33](../PlaybackIntentInterceptor.cs#L323) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.parameters | [328:25](../PlaybackIntentInterceptor.cs#L328) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.anonymous@14169 | [331:46](../PlaybackIntentInterceptor.cs#L331) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.anonymous@14169.p | [331:46](../PlaybackIntentInterceptor.cs#L331) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.anonymous@14288 | [332:46](../PlaybackIntentInterceptor.cs#L332) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchMethod.anonymous@13818.anonymous@14288.p | [332:46](../PlaybackIntentInterceptor.cs#L332) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.patchParameters | [338:17](../PlaybackIntentInterceptor.cs#L338) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.args | [339:17](../PlaybackIntentInterceptor.cs#L339) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.InvokeHarmonyPatch.i | [341:22](../PlaybackIntentInterceptor.cs#L341) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType | [354:9](../PlaybackIntentInterceptor.cs#L354) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.fullName | [354:45](../PlaybackIntentInterceptor.cs#L354) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.assembly | [357:13](../PlaybackIntentInterceptor.cs#L357) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.FindLoadedType.assembly.type | [359:23](../PlaybackIntentInterceptor.cs#L359) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix | [376:9](../PlaybackIntentInterceptor.cs#L376) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.__instance | [376:56](../PlaybackIntentInterceptor.cs#L376) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.__0 | [376:75](../PlaybackIntentInterceptor.cs#L376) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizePlaybackInfoPrefix.ex | [382:19](../PlaybackIntentInterceptor.cs#L382) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio | [388:9](../PlaybackIntentInterceptor.cs#L388) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.requestDto | [388:54](../PlaybackIntentInterceptor.cs#L388) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.property | [390:17](../PlaybackIntentInterceptor.cs#L390) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.profile | [391:98](../PlaybackIntentInterceptor.cs#L391) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.changed | [393:35](../PlaybackIntentInterceptor.cs#L393) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.clone | [394:17](../PlaybackIntentInterceptor.cs#L394) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.i | [395:22](../PlaybackIntentInterceptor.cs#L395) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.candidate | [397:21](../PlaybackIntentInterceptor.cs#L397) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs | [402:21](../PlaybackIntentInterceptor.cs#L402) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs.anonymous@17373 | [402:69](../PlaybackIntentInterceptor.cs#L402) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.codecs.anonymous@17373.c | [402:69](../PlaybackIntentInterceptor.cs#L402) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.anonymous@17430 | [403:32](../PlaybackIntentInterceptor.cs#L403) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.anonymous@17430.c | [403:32](../PlaybackIntentInterceptor.cs#L403) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index | [404:21](../PlaybackIntentInterceptor.cs#L404) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index.anonymous@17513 | [404:53](../PlaybackIntentInterceptor.cs#L404) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.index.anonymous@17513.c | [404:53](../PlaybackIntentInterceptor.cs#L404) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.copy | [407:21](../PlaybackIntentInterceptor.cs#L407) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PreferNativeYouTubeAudio.local | [415:17](../PlaybackIntentInterceptor.cs#L415) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest | [420:9](../PlaybackIntentInterceptor.cs#L420) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.service | [420:64](../PlaybackIntentInterceptor.cs#L420) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.requestDto | [420:80](../PlaybackIntentInterceptor.cs#L420) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.directItemId | [429:21](../PlaybackIntentInterceptor.cs#L429) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.directQuery | [435:25](../PlaybackIntentInterceptor.cs#L435) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.serviceRequest | [455:17](../PlaybackIntentInterceptor.cs#L455) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.itemId | [456:17](../PlaybackIntentInterceptor.cs#L456) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.videoId | [460:17](../PlaybackIntentInterceptor.cs#L460) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.previousAudioDtoValue | [478:17](../PlaybackIntentInterceptor.cs#L478) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.previousAudioQueryValue | [479:17](../PlaybackIntentInterceptor.cs#L479) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.audioDtoChanged | [480:17](../PlaybackIntentInterceptor.cs#L480) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.audioQueryChanged | [481:17](../PlaybackIntentInterceptor.cs#L481) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.currentDtoValue | [485:17](../PlaybackIntentInterceptor.cs#L485) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.currentQueryValue | [486:17](../PlaybackIntentInterceptor.cs#L486) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.dtoChanged | [487:17](../PlaybackIntentInterceptor.cs#L487) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.queryChanged | [488:17](../PlaybackIntentInterceptor.cs#L488) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SanitizeYouTubePlaybackInfoRequest.isNativeAndroidTablet | [490:17](../PlaybackIntentInterceptor.cs#L490) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsNewNativePlayback | [517:9](../PlaybackIntentInterceptor.cs#L517) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsNewNativePlayback.requestDto | [517:49](../PlaybackIntentInterceptor.cs#L517) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsNewNativePlayback.request | [517:68](../PlaybackIntentInterceptor.cs#L517) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsNewNativePlayback.currentSession | [519:17](../PlaybackIntentInterceptor.cs#L519) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed | [525:9](../PlaybackIntentInterceptor.cs#L525) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.request | [526:13](../PlaybackIntentInterceptor.cs#L526) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.itemId | [527:13](../PlaybackIntentInterceptor.cs#L527) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.videoId | [528:13](../PlaybackIntentInterceptor.cs#L528) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousDtoValue | [529:13](../PlaybackIntentInterceptor.cs#L529) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousQueryValue | [530:13](../PlaybackIntentInterceptor.cs#L530) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.dtoChanged | [531:13](../PlaybackIntentInterceptor.cs#L531) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.queryChanged | [532:13](../PlaybackIntentInterceptor.cs#L532) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioDtoValue | [533:13](../PlaybackIntentInterceptor.cs#L533) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioQueryValue | [534:13](../PlaybackIntentInterceptor.cs#L534) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.audioDtoChanged | [535:13](../PlaybackIntentInterceptor.cs#L535) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.audioQueryChanged | [536:13](../PlaybackIntentInterceptor.cs#L536) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.isNativeAndroidTablet | [537:13](../PlaybackIntentInterceptor.cs#L537) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.client | [543:17](../PlaybackIntentInterceptor.cs#L543) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.deviceName | [544:17](../PlaybackIntentInterceptor.cs#L544) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.userAgent | [545:17](../PlaybackIntentInterceptor.cs#L545) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousDtoText | [546:17](../PlaybackIntentInterceptor.cs#L546) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.previousAudioDtoText | [549:17](../PlaybackIntentInterceptor.cs#L549) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoSubtitleSuppressed.clientKind | [552:17](../PlaybackIntentInterceptor.cs#L552) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId | [557:9](../PlaybackIntentInterceptor.cs#L557) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.request | [557:52](../PlaybackIntentInterceptor.cs#L557) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.requestDto | [557:71](../PlaybackIntentInterceptor.cs#L557) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.userId | [559:17](../PlaybackIntentInterceptor.cs#L559) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.deviceId | [574:17](../PlaybackIntentInterceptor.cs#L574) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveRequestUserId.sessionManager | [578:17](../PlaybackIntentInterceptor.cs#L578) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId | [582:9](../PlaybackIntentInterceptor.cs#L582) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.sessions | [582:57](../PlaybackIntentInterceptor.cs#L582) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.deviceId | [582:93](../PlaybackIntentInterceptor.cs#L582) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.userId | [587:21](../PlaybackIntentInterceptor.cs#L587) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.userInternalId | [588:18](../PlaybackIntentInterceptor.cs#L588) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.session | [589:13](../PlaybackIntentInterceptor.cs#L589) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveUniqueDeviceUserId.session.candidateUserId | [597:21](../PlaybackIntentInterceptor.cs#L597) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix | [613:9](../PlaybackIntentInterceptor.cs#L613) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__instance | [613:56](../PlaybackIntentInterceptor.cs#L613) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__0 | [613:75](../PlaybackIntentInterceptor.cs#L613) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.__result | [613:87](../PlaybackIntentInterceptor.cs#L613) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.itemId | [619:25](../PlaybackIntentInterceptor.cs#L619) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.videoId | [620:25](../PlaybackIntentInterceptor.cs#L620) |
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.context | [626:21](../PlaybackIntentInterceptor.cs#L626) |
 | catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfoPostfix.ex | [630:19](../PlaybackIntentInterceptor.cs#L630) |
 | method | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync | [636:9](../PlaybackIntentInterceptor.cs#L636) |
 | parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.responseTask | [636:74](../PlaybackIntentInterceptor.cs#L636) |
 | parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.videoId | [636:101](../PlaybackIntentInterceptor.cs#L636) |
 | parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.itemId | [636:117](../PlaybackIntentInterceptor.cs#L636) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.defaultSubtitlesOff | [636:133](../PlaybackIntentInterceptor.cs#L636) |
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.response | [638:17](../PlaybackIntentInterceptor.cs#L638) |
 | local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.RequireDirectPlaybackInfoAsync.verified | [639:17](../PlaybackIntentInterceptor.cs#L639) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo | [645:9](../PlaybackIntentInterceptor.cs#L645) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.service | [645:70](../PlaybackIntentInterceptor.cs#L645) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.requestDto | [645:86](../PlaybackIntentInterceptor.cs#L645) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.serviceRequest | [651:17](../PlaybackIntentInterceptor.cs#L651) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.itemId | [652:17](../PlaybackIntentInterceptor.cs#L652) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.userId | [653:17](../PlaybackIntentInterceptor.cs#L653) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.isPlayback | [657:17](../PlaybackIntentInterceptor.cs#L657) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.startTimeTicks | [661:17](../PlaybackIntentInterceptor.cs#L661) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.hasStartTimeTicks | [663:17](../PlaybackIntentInterceptor.cs#L663) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.effectiveStartTimeTicks | [664:17](../PlaybackIntentInterceptor.cs#L664) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.deviceId | [671:21](../PlaybackIntentInterceptor.cs#L671) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.intent | [672:21](../PlaybackIntentInterceptor.cs#L672) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.client | [685:17](../PlaybackIntentInterceptor.cs#L685) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.deviceName | [686:17](../PlaybackIntentInterceptor.cs#L686) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.userAgent | [687:17](../PlaybackIntentInterceptor.cs#L687) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.ipAddress | [688:17](../PlaybackIntentInterceptor.cs#L688) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.maxBitrate | [692:17](../PlaybackIntentInterceptor.cs#L692) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture | [708:9](../PlaybackIntentInterceptor.cs#L708) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.request | [708:52](../PlaybackIntentInterceptor.cs#L708) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.itemId | [708:71](../PlaybackIntentInterceptor.cs#L708) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.startTimeTicks | [708:86](../PlaybackIntentInterceptor.cs#L708) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyIos | [713:17](../PlaybackIntentInterceptor.cs#L713) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyNativeAndroid | [714:17](../PlaybackIntentInterceptor.cs#L714) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyNativeTheater | [715:17](../PlaybackIntentInterceptor.cs#L715) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.client | [720:17](../PlaybackIntentInterceptor.cs#L720) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.deviceName | [721:17](../PlaybackIntentInterceptor.cs#L721) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.maxBitrate | [722:17](../PlaybackIntentInterceptor.cs#L722) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.clientKind | [723:17](../PlaybackIntentInterceptor.cs#L723) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync | [732:9](../PlaybackIntentInterceptor.cs#L732) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.responseTask | [732:73](../PlaybackIntentInterceptor.cs#L732) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.context | [732:100](../PlaybackIntentInterceptor.cs#L732) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.response | [734:17](../PlaybackIntentInterceptor.cs#L734) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.videoId | [737:21](../PlaybackIntentInterceptor.cs#L737) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.youTubeVideoId | [746:21](../PlaybackIntentInterceptor.cs#L746) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.normalized | [747:21](../PlaybackIntentInterceptor.cs#L747) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.ex | [764:19](../PlaybackIntentInterceptor.cs#L764) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization | [772:9](../PlaybackIntentInterceptor.cs#L772) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.context | [772:58](../PlaybackIntentInterceptor.cs#L772) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.result | [772:92](../PlaybackIntentInterceptor.cs#L772) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.clientKind | [778:17](../PlaybackIntentInterceptor.cs#L778) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.nativePart | [785:17](../PlaybackIntentInterceptor.cs#L785) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime | [792:9](../PlaybackIntentInterceptor.cs#L792) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.response | [793:13](../PlaybackIntentInterceptor.cs#L793) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.startTimeTicks | [794:13](../PlaybackIntentInterceptor.cs#L794) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.includePlayerHints | [795:13](../PlaybackIntentInterceptor.cs#L795) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSources | [797:17](../PlaybackIntentInterceptor.cs#L797) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.changed | [803:17](../PlaybackIntentInterceptor.cs#L803) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.seconds | [804:17](../PlaybackIntentInterceptor.cs#L804) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource | [805:13](../PlaybackIntentInterceptor.cs#L805) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.pathProp | [810:21](../PlaybackIntentInterceptor.cs#L810) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.path | [815:21](../PlaybackIntentInterceptor.cs#L815) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.stampedPath | [816:21](../PlaybackIntentInterceptor.cs#L816) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ShouldSuppressYouTubeStartStamp | [835:9](../PlaybackIntentInterceptor.cs#L835) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ShouldSuppressYouTubeStartStamp.context | [835:61](../PlaybackIntentInterceptor.cs#L835) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTablet | [838:9](../PlaybackIntentInterceptor.cs#L838) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTablet.context | [838:57](../PlaybackIntentInterceptor.cs#L838) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest | [861:9](../PlaybackIntentInterceptor.cs#L861) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.request | [861:64](../PlaybackIntentInterceptor.cs#L861) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.client | [866:17](../PlaybackIntentInterceptor.cs#L866) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.deviceName | [867:17](../PlaybackIntentInterceptor.cs#L867) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.userAgent | [868:17](../PlaybackIntentInterceptor.cs#L868) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv | [886:9](../PlaybackIntentInterceptor.cs#L886) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.client | [887:13](../PlaybackIntentInterceptor.cs#L887) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.deviceName | [888:13](../PlaybackIntentInterceptor.cs#L888) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.userAgent | [889:13](../PlaybackIntentInterceptor.cs#L889) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl | [903:9](../PlaybackIntentInterceptor.cs#L903) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl.videoId | [903:60](../PlaybackIntentInterceptor.cs#L903) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl.context | [903:76](../PlaybackIntentInterceptor.cs#L903) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource | [911:9](../PlaybackIntentInterceptor.cs#L911) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource.context | [911:64](../PlaybackIntentInterceptor.cs#L911) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource.videoId | [911:98](../PlaybackIntentInterceptor.cs#L911) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed | [921:9](../PlaybackIntentInterceptor.cs#L921) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed.context | [921:60](../PlaybackIntentInterceptor.cs#L921) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed.seconds | [927:17](../PlaybackIntentInterceptor.cs#L927) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources | [932:9](../PlaybackIntentInterceptor.cs#L932) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.response | [933:13](../PlaybackIntentInterceptor.cs#L933) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.youTubeVideoId | [934:13](../PlaybackIntentInterceptor.cs#L934) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.context | [935:13](../PlaybackIntentInterceptor.cs#L935) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSources | [939:17](../PlaybackIntentInterceptor.cs#L939) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.changed | [945:17](../PlaybackIntentInterceptor.cs#L945) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.nativeDirectPlayDisabled | [946:17](../PlaybackIntentInterceptor.cs#L946) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource | [947:13](../PlaybackIntentInterceptor.cs#L947) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.pathProp | [952:21](../PlaybackIntentInterceptor.cs#L952) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.path | [954:21](../PlaybackIntentInterceptor.cs#L954) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.videoId | [960:21](../PlaybackIntentInterceptor.cs#L960) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.mediaSourceChanged | [971:21](../PlaybackIntentInterceptor.cs#L971) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.normalizedPath | [977:25](../PlaybackIntentInterceptor.cs#L977) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId | [1055:9](../PlaybackIntentInterceptor.cs#L1055) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.itemId | [1055:57](../PlaybackIntentInterceptor.cs#L1055) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.library | [1062:21](../PlaybackIntentInterceptor.cs#L1062) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.item | [1066:21](../PlaybackIntentInterceptor.cs#L1066) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.ex | [1069:19](../PlaybackIntentInterceptor.cs#L1069) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem | [1076:9](../PlaybackIntentInterceptor.cs#L1076) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.library | [1076:50](../PlaybackIntentInterceptor.cs#L1076) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.itemId | [1076:75](../PlaybackIntentInterceptor.cs#L1076) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods | [1080:17](../PlaybackIntentInterceptor.cs#L1080) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods.anonymous@51956 | [1082:24](../PlaybackIntentInterceptor.cs#L1082) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods.anonymous@51956.m | [1082:24](../PlaybackIntentInterceptor.cs#L1082) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.numericId | [1085:99](../PlaybackIntentInterceptor.cs#L1085) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod | [1087:21](../PlaybackIntentInterceptor.cs#L1087) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod.anonymous@52228 | [1087:57](../PlaybackIntentInterceptor.cs#L1087) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod.anonymous@52228.m | [1087:57](../PlaybackIntentInterceptor.cs#L1087) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidId | [1092:47](../PlaybackIntentInterceptor.cs#L1092) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod | [1094:21](../PlaybackIntentInterceptor.cs#L1094) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod.anonymous@52561 | [1094:57](../PlaybackIntentInterceptor.cs#L1094) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod.anonymous@52561.m | [1094:57](../PlaybackIntentInterceptor.cs#L1094) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod | [1099:17](../PlaybackIntentInterceptor.cs#L1099) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod.anonymous@52820 | [1099:55](../PlaybackIntentInterceptor.cs#L1099) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod.anonymous@52820.m | [1099:55](../PlaybackIntentInterceptor.cs#L1099) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId | [1106:9](../PlaybackIntentInterceptor.cs#L1106) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId.value | [1106:54](../PlaybackIntentInterceptor.cs#L1106) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId.match | [1111:17](../PlaybackIntentInterceptor.cs#L1111) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl | [1115:9](../PlaybackIntentInterceptor.cs#L1115) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.path | [1116:13](../PlaybackIntentInterceptor.cs#L1116) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.startSeconds | [1117:13](../PlaybackIntentInterceptor.cs#L1117) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.includePlayerHints | [1118:13](../PlaybackIntentInterceptor.cs#L1118) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.uri | [1121:67](../PlaybackIntentInterceptor.cs#L1121) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts | [1127:17](../PlaybackIntentInterceptor.cs#L1127) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@53868 | [1129:24](../PlaybackIntentInterceptor.cs#L1129) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@53868.p | [1129:24](../PlaybackIntentInterceptor.cs#L1129) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@53868.keyEnd | [1131:25](../PlaybackIntentInterceptor.cs#L1131) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@53868.key | [1132:25](../PlaybackIntentInterceptor.cs#L1132) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.secondsText | [1157:21](../PlaybackIntentInterceptor.cs#L1157) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.builder | [1162:17](../PlaybackIntentInterceptor.cs#L1162) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull | [1170:9](../PlaybackIntentInterceptor.cs#L1170) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.source | [1170:53](../PlaybackIntentInterceptor.cs#L1170) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.name | [1170:68](../PlaybackIntentInterceptor.cs#L1170) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.prop | [1172:17](../PlaybackIntentInterceptor.cs#L1172) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem | [1183:9](../PlaybackIntentInterceptor.cs#L1183) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.itemId | [1183:47](../PlaybackIntentInterceptor.cs#L1183) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.library | [1190:21](../PlaybackIntentInterceptor.cs#L1190) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.item | [1191:21](../PlaybackIntentInterceptor.cs#L1191) |
-| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.ex | [1197:19](../PlaybackIntentInterceptor.cs#L1197) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull | [1204:9](../PlaybackIntentInterceptor.cs#L1204) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.source | [1204:47](../PlaybackIntentInterceptor.cs#L1204) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.name | [1204:62](../PlaybackIntentInterceptor.cs#L1204) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.prop | [1206:17](../PlaybackIntentInterceptor.cs#L1206) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty | [1223:9](../PlaybackIntentInterceptor.cs#L1223) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.source | [1223:47](../PlaybackIntentInterceptor.cs#L1223) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.name | [1223:62](../PlaybackIntentInterceptor.cs#L1223) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.prop | [1225:17](../PlaybackIntentInterceptor.cs#L1225) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.list | [1226:53](../PlaybackIntentInterceptor.cs#L1226) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeHost | [1240:9](../PlaybackIntentInterceptor.cs#L1240) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeHost.host | [1240:43](../PlaybackIntentInterceptor.cs#L1240) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty | [1245:9](../PlaybackIntentInterceptor.cs#L1245) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.source | [1245:53](../PlaybackIntentInterceptor.cs#L1245) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.name | [1245:68](../PlaybackIntentInterceptor.cs#L1245) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.value | [1245:81](../PlaybackIntentInterceptor.cs#L1245) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.prop | [1247:17](../PlaybackIntentInterceptor.cs#L1247) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty | [1255:9](../PlaybackIntentInterceptor.cs#L1255) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.source | [1255:52](../PlaybackIntentInterceptor.cs#L1255) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.name | [1255:67](../PlaybackIntentInterceptor.cs#L1255) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.value | [1255:80](../PlaybackIntentInterceptor.cs#L1255) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.prop | [1257:17](../PlaybackIntentInterceptor.cs#L1257) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.current | [1267:17](../PlaybackIntentInterceptor.cs#L1267) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.currentInt | [1268:32](../PlaybackIntentInterceptor.cs#L1268) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty | [1278:9](../PlaybackIntentInterceptor.cs#L1278) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.source | [1278:45](../PlaybackIntentInterceptor.cs#L1278) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.name | [1278:60](../PlaybackIntentInterceptor.cs#L1278) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.value | [1278:73](../PlaybackIntentInterceptor.cs#L1278) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.prop | [1280:17](../PlaybackIntentInterceptor.cs#L1280) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.current | [1287:17](../PlaybackIntentInterceptor.cs#L1287) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.currentBool | [1288:33](../PlaybackIntentInterceptor.cs#L1288) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty | [1295:9](../PlaybackIntentInterceptor.cs#L1295) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.source | [1295:47](../PlaybackIntentInterceptor.cs#L1295) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.name | [1295:62](../PlaybackIntentInterceptor.cs#L1295) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.value | [1295:75](../PlaybackIntentInterceptor.cs#L1295) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.prop | [1297:17](../PlaybackIntentInterceptor.cs#L1297) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.current | [1301:17](../PlaybackIntentInterceptor.cs#L1301) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.currentInt | [1304:36](../PlaybackIntentInterceptor.cs#L1304) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.currentLong | [1313:37](../PlaybackIntentInterceptor.cs#L1313) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetServiceRequest | [1323:9](../PlaybackIntentInterceptor.cs#L1323) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetServiceRequest.service | [1323:52](../PlaybackIntentInterceptor.cs#L1323) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetDeviceId | [1330:9](../PlaybackIntentInterceptor.cs#L1330) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetDeviceId.request | [1330:44](../PlaybackIntentInterceptor.cs#L1330) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue | [1345:9](../PlaybackIntentInterceptor.cs#L1345) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue.request | [1345:48](../PlaybackIntentInterceptor.cs#L1345) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue.name | [1345:67](../PlaybackIntentInterceptor.cs#L1345) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue | [1353:9](../PlaybackIntentInterceptor.cs#L1353) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.collection | [1353:58](../PlaybackIntentInterceptor.cs#L1353) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.name | [1353:78](../PlaybackIntentInterceptor.cs#L1353) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.value | [1353:91](../PlaybackIntentInterceptor.cs#L1353) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.collectionType | [1360:21](../PlaybackIntentInterceptor.cs#L1360) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer | [1361:21](../PlaybackIntentInterceptor.cs#L1361) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@62403 | [1363:37](../PlaybackIntentInterceptor.cs#L1363) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@62403.p | [1363:37](../PlaybackIntentInterceptor.cs#L1363) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@62403.indexParameters | [1365:29](../PlaybackIntentInterceptor.cs#L1365) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.current | [1372:25](../PlaybackIntentInterceptor.cs#L1372) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod | [1383:21](../PlaybackIntentInterceptor.cs#L1383) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@63326 | [1385:37](../PlaybackIntentInterceptor.cs#L1385) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@63326.m | [1385:37](../PlaybackIntentInterceptor.cs#L1385) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@63326.parameters | [1390:29](../PlaybackIntentInterceptor.cs#L1390) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey | [1410:9](../PlaybackIntentInterceptor.cs#L1410) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.key | [1411:13](../PlaybackIntentInterceptor.cs#L1411) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.deviceId | [1412:13](../PlaybackIntentInterceptor.cs#L1412) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.intent | [1413:13](../PlaybackIntentInterceptor.cs#L1413) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.candidate | [1415:53](../PlaybackIntentInterceptor.cs#L1415) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue | [1444:9](../PlaybackIntentInterceptor.cs#L1444) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.collection | [1444:61](../PlaybackIntentInterceptor.cs#L1444) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.name | [1444:81](../PlaybackIntentInterceptor.cs#L1444) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.dictionary | [1451:47](../PlaybackIntentInterceptor.cs#L1451) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.collectionType | [1460:21](../PlaybackIntentInterceptor.cs#L1460) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer | [1461:21](../PlaybackIntentInterceptor.cs#L1461) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@66089 | [1463:37](../PlaybackIntentInterceptor.cs#L1463) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@66089.p | [1463:37](../PlaybackIntentInterceptor.cs#L1463) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@66089.indexParameters | [1465:29](../PlaybackIntentInterceptor.cs#L1465) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.current | [1470:21](../PlaybackIntentInterceptor.cs#L1470) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod | [1474:21](../PlaybackIntentInterceptor.cs#L1474) |
-| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@66718 | [1476:37](../PlaybackIntentInterceptor.cs#L1476) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@66718.m | [1476:37](../PlaybackIntentInterceptor.cs#L1476) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@66718.parameters | [1481:29](../PlaybackIntentInterceptor.cs#L1481) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient | [1499:9](../PlaybackIntentInterceptor.cs#L1499) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.request | [1499:47](../PlaybackIntentInterceptor.cs#L1499) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.deviceName | [1501:17](../PlaybackIntentInterceptor.cs#L1501) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.userAgent | [1502:17](../PlaybackIntentInterceptor.cs#L1502) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient | [1511:9](../PlaybackIntentInterceptor.cs#L1511) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient.request | [1511:57](../PlaybackIntentInterceptor.cs#L1511) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient.client | [1513:17](../PlaybackIntentInterceptor.cs#L1513) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient | [1517:9](../PlaybackIntentInterceptor.cs#L1517) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.request | [1517:57](../PlaybackIntentInterceptor.cs#L1517) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.client | [1519:17](../PlaybackIntentInterceptor.cs#L1519) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.deviceName | [1520:17](../PlaybackIntentInterceptor.cs#L1520) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.userAgent | [1521:17](../PlaybackIntentInterceptor.cs#L1521) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyBrowserEngineClient | [1538:9](../PlaybackIntentInterceptor.cs#L1538) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyBrowserEngineClient.userAgent | [1538:57](../PlaybackIntentInterceptor.cs#L1538) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase | [1548:9](../PlaybackIntentInterceptor.cs#L1548) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase.value | [1548:48](../PlaybackIntentInterceptor.cs#L1548) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase.needle | [1548:63](../PlaybackIntentInterceptor.cs#L1548) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten | [1552:9](../PlaybackIntentInterceptor.cs#L1552) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten.value | [1552:39](../PlaybackIntentInterceptor.cs#L1552) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten.maxLength | [1552:53](../PlaybackIntentInterceptor.cs#L1552) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty | [1560:9](../PlaybackIntentInterceptor.cs#L1560) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty.source | [1560:50](../PlaybackIntentInterceptor.cs#L1560) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty.name | [1560:65](../PlaybackIntentInterceptor.cs#L1560) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty | [1567:9](../PlaybackIntentInterceptor.cs#L1567) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.source | [1567:50](../PlaybackIntentInterceptor.cs#L1567) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.name | [1567:65](../PlaybackIntentInterceptor.cs#L1567) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.value | [1569:17](../PlaybackIntentInterceptor.cs#L1569) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty | [1575:9](../PlaybackIntentInterceptor.cs#L1575) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.source | [1575:48](../PlaybackIntentInterceptor.cs#L1575) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.name | [1575:63](../PlaybackIntentInterceptor.cs#L1575) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.value | [1577:17](../PlaybackIntentInterceptor.cs#L1577) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt | [1583:9](../PlaybackIntentInterceptor.cs#L1583) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.value | [1583:40](../PlaybackIntentInterceptor.cs#L1583) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.intValue | [1587:21](../PlaybackIntentInterceptor.cs#L1587) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.longValue | [1588:22](../PlaybackIntentInterceptor.cs#L1588) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.text | [1589:24](../PlaybackIntentInterceptor.cs#L1589) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.parsed | [1589:113](../PlaybackIntentInterceptor.cs#L1589) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong | [1594:9](../PlaybackIntentInterceptor.cs#L1594) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.value | [1594:42](../PlaybackIntentInterceptor.cs#L1594) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.longValue | [1598:22](../PlaybackIntentInterceptor.cs#L1598) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.intValue | [1599:21](../PlaybackIntentInterceptor.cs#L1599) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.text | [1600:24](../PlaybackIntentInterceptor.cs#L1600) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.parsed | [1600:114](../PlaybackIntentInterceptor.cs#L1600) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty | [1605:9](../PlaybackIntentInterceptor.cs#L1605) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.source | [1605:50](../PlaybackIntentInterceptor.cs#L1605) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.name | [1605:65](../PlaybackIntentInterceptor.cs#L1605) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.value | [1607:17](../PlaybackIntentInterceptor.cs#L1607) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool | [1613:9](../PlaybackIntentInterceptor.cs#L1613) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.value | [1613:42](../PlaybackIntentInterceptor.cs#L1613) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.boolValue | [1617:22](../PlaybackIntentInterceptor.cs#L1617) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.text | [1618:24](../PlaybackIntentInterceptor.cs#L1618) |
-| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.parsed | [1618:62](../PlaybackIntentInterceptor.cs#L1618) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired | [1623:9](../PlaybackIntentInterceptor.cs#L1623) |
-| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired.now | [1627:17](../PlaybackIntentInterceptor.cs#L1627) |
-| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired.kvp | [1632:13](../PlaybackIntentInterceptor.cs#L1632) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey | [1639:9](../PlaybackIntentInterceptor.cs#L1639) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.userId | [1639:39](../PlaybackIntentInterceptor.cs#L1639) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.itemId | [1639:54](../PlaybackIntentInterceptor.cs#L1639) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.deviceId | [1639:69](../PlaybackIntentInterceptor.cs#L1639) |
-| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Normalize | [1644:9](../PlaybackIntentInterceptor.cs#L1644) |
-| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Normalize.value | [1644:41](../PlaybackIntentInterceptor.cs#L1644) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff | [647:9](../PlaybackIntentInterceptor.cs#L647) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.response | [647:62](../PlaybackIntentInterceptor.cs#L647) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.property | [653:17](../PlaybackIntentInterceptor.cs#L653) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.original | [654:65](../PlaybackIntentInterceptor.cs#L654) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.clone | [656:17](../PlaybackIntentInterceptor.cs#L656) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.sources | [657:17](../PlaybackIntentInterceptor.cs#L657) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.sources.anonymous@31243 | [657:84](../PlaybackIntentInterceptor.cs#L657) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.sources.anonymous@31243.source | [657:84](../PlaybackIntentInterceptor.cs#L657) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.DefaultInitialNativeSubtitlesOff.sources.anonymous@31243.local | [659:21](../PlaybackIntentInterceptor.cs#L659) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo | [670:9](../PlaybackIntentInterceptor.cs#L670) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.service | [670:70](../PlaybackIntentInterceptor.cs#L670) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.requestDto | [670:86](../PlaybackIntentInterceptor.cs#L670) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.serviceRequest | [676:17](../PlaybackIntentInterceptor.cs#L676) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.itemId | [677:17](../PlaybackIntentInterceptor.cs#L677) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.userId | [678:17](../PlaybackIntentInterceptor.cs#L678) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.isPlayback | [682:17](../PlaybackIntentInterceptor.cs#L682) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.startTimeTicks | [686:17](../PlaybackIntentInterceptor.cs#L686) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.hasStartTimeTicks | [688:17](../PlaybackIntentInterceptor.cs#L688) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.effectiveStartTimeTicks | [689:17](../PlaybackIntentInterceptor.cs#L689) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.deviceId | [696:21](../PlaybackIntentInterceptor.cs#L696) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.intent | [697:21](../PlaybackIntentInterceptor.cs#L697) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.client | [710:17](../PlaybackIntentInterceptor.cs#L710) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.deviceName | [711:17](../PlaybackIntentInterceptor.cs#L711) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.userAgent | [712:17](../PlaybackIntentInterceptor.cs#L712) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.ipAddress | [713:17](../PlaybackIntentInterceptor.cs#L713) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CapturePlaybackInfo.maxBitrate | [717:17](../PlaybackIntentInterceptor.cs#L717) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture | [733:9](../PlaybackIntentInterceptor.cs#L733) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.request | [733:52](../PlaybackIntentInterceptor.cs#L733) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.itemId | [733:71](../PlaybackIntentInterceptor.cs#L733) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.startTimeTicks | [733:86](../PlaybackIntentInterceptor.cs#L733) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyIos | [738:17](../PlaybackIntentInterceptor.cs#L738) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyNativeAndroid | [739:17](../PlaybackIntentInterceptor.cs#L739) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.isLikelyNativeTheater | [740:17](../PlaybackIntentInterceptor.cs#L740) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.client | [745:17](../PlaybackIntentInterceptor.cs#L745) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.deviceName | [746:17](../PlaybackIntentInterceptor.cs#L746) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.maxBitrate | [747:17](../PlaybackIntentInterceptor.cs#L747) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoCapture.clientKind | [748:17](../PlaybackIntentInterceptor.cs#L748) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync | [757:9](../PlaybackIntentInterceptor.cs#L757) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.responseTask | [757:73](../PlaybackIntentInterceptor.cs#L757) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.context | [757:100](../PlaybackIntentInterceptor.cs#L757) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.response | [759:17](../PlaybackIntentInterceptor.cs#L759) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.videoId | [762:21](../PlaybackIntentInterceptor.cs#L762) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.youTubeVideoId | [771:21](../PlaybackIntentInterceptor.cs#L771) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.normalized | [772:21](../PlaybackIntentInterceptor.cs#L772) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubePlaybackInfoAsync.ex | [789:19](../PlaybackIntentInterceptor.cs#L789) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization | [797:9](../PlaybackIntentInterceptor.cs#L797) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.context | [797:58](../PlaybackIntentInterceptor.cs#L797) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.result | [797:92](../PlaybackIntentInterceptor.cs#L797) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.clientKind | [803:17](../PlaybackIntentInterceptor.cs#L803) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogPlaybackInfoNormalization.nativePart | [810:17](../PlaybackIntentInterceptor.cs#L810) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime | [817:9](../PlaybackIntentInterceptor.cs#L817) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.response | [818:13](../PlaybackIntentInterceptor.cs#L818) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.startTimeTicks | [819:13](../PlaybackIntentInterceptor.cs#L819) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.includePlayerHints | [820:13](../PlaybackIntentInterceptor.cs#L820) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSources | [822:17](../PlaybackIntentInterceptor.cs#L822) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.changed | [828:17](../PlaybackIntentInterceptor.cs#L828) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.seconds | [829:17](../PlaybackIntentInterceptor.cs#L829) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource | [830:13](../PlaybackIntentInterceptor.cs#L830) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.pathProp | [835:21](../PlaybackIntentInterceptor.cs#L835) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.path | [840:21](../PlaybackIntentInterceptor.cs#L840) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.StampYouTubeStartTime.mediaSource.stampedPath | [841:21](../PlaybackIntentInterceptor.cs#L841) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ShouldSuppressYouTubeStartStamp | [860:9](../PlaybackIntentInterceptor.cs#L860) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ShouldSuppressYouTubeStartStamp.context | [860:61](../PlaybackIntentInterceptor.cs#L860) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTablet | [863:9](../PlaybackIntentInterceptor.cs#L863) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTablet.context | [863:57](../PlaybackIntentInterceptor.cs#L863) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest | [886:9](../PlaybackIntentInterceptor.cs#L886) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.request | [886:64](../PlaybackIntentInterceptor.cs#L886) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.client | [891:17](../PlaybackIntentInterceptor.cs#L891) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.deviceName | [892:17](../PlaybackIntentInterceptor.cs#L892) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidTabletRequest.userAgent | [893:17](../PlaybackIntentInterceptor.cs#L893) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv | [911:9](../PlaybackIntentInterceptor.cs#L911) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.client | [912:13](../PlaybackIntentInterceptor.cs#L912) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.deviceName | [913:13](../PlaybackIntentInterceptor.cs#L913) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyFireTvOrAndroidTv.userAgent | [914:13](../PlaybackIntentInterceptor.cs#L914) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl | [928:9](../PlaybackIntentInterceptor.cs#L928) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl.videoId | [928:60](../PlaybackIntentInterceptor.cs#L928) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetContextualYouTubeWatchUrl.context | [928:76](../PlaybackIntentInterceptor.cs#L928) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource | [936:9](../PlaybackIntentInterceptor.cs#L936) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource.context | [936:64](../PlaybackIntentInterceptor.cs#L936) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogNativeAndroidTabletLegacySource.videoId | [936:98](../PlaybackIntentInterceptor.cs#L936) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed | [946:9](../PlaybackIntentInterceptor.cs#L946) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed.context | [946:60](../PlaybackIntentInterceptor.cs#L946) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.LogYouTubeStartStampSuppressed.seconds | [952:17](../PlaybackIntentInterceptor.cs#L952) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources | [957:9](../PlaybackIntentInterceptor.cs#L957) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.response | [958:13](../PlaybackIntentInterceptor.cs#L958) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.youTubeVideoId | [959:13](../PlaybackIntentInterceptor.cs#L959) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.context | [960:13](../PlaybackIntentInterceptor.cs#L960) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSources | [964:17](../PlaybackIntentInterceptor.cs#L964) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.changed | [970:17](../PlaybackIntentInterceptor.cs#L970) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.nativeDirectPlayDisabled | [971:17](../PlaybackIntentInterceptor.cs#L971) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource | [972:13](../PlaybackIntentInterceptor.cs#L972) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.pathProp | [977:21](../PlaybackIntentInterceptor.cs#L977) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.path | [979:21](../PlaybackIntentInterceptor.cs#L979) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.videoId | [985:21](../PlaybackIntentInterceptor.cs#L985) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.mediaSourceChanged | [996:21](../PlaybackIntentInterceptor.cs#L996) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.NormalizeYouTubeMediaSources.mediaSource.normalizedPath | [1002:25](../PlaybackIntentInterceptor.cs#L1002) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId | [1080:9](../PlaybackIntentInterceptor.cs#L1080) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.itemId | [1080:57](../PlaybackIntentInterceptor.cs#L1080) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.library | [1087:21](../PlaybackIntentInterceptor.cs#L1087) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.item | [1091:21](../PlaybackIntentInterceptor.cs#L1091) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryResolveYouTubeVideoId.ex | [1094:19](../PlaybackIntentInterceptor.cs#L1094) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem | [1101:9](../PlaybackIntentInterceptor.cs#L1101) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.library | [1101:50](../PlaybackIntentInterceptor.cs#L1101) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.itemId | [1101:75](../PlaybackIntentInterceptor.cs#L1101) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods | [1105:17](../PlaybackIntentInterceptor.cs#L1105) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods.anonymous@53314 | [1107:24](../PlaybackIntentInterceptor.cs#L1107) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.methods.anonymous@53314.m | [1107:24](../PlaybackIntentInterceptor.cs#L1107) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.numericId | [1110:99](../PlaybackIntentInterceptor.cs#L1110) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod | [1112:21](../PlaybackIntentInterceptor.cs#L1112) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod.anonymous@53586 | [1112:57](../PlaybackIntentInterceptor.cs#L1112) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.longMethod.anonymous@53586.m | [1112:57](../PlaybackIntentInterceptor.cs#L1112) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidId | [1117:47](../PlaybackIntentInterceptor.cs#L1117) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod | [1119:21](../PlaybackIntentInterceptor.cs#L1119) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod.anonymous@53919 | [1119:57](../PlaybackIntentInterceptor.cs#L1119) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.guidMethod.anonymous@53919.m | [1119:57](../PlaybackIntentInterceptor.cs#L1119) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod | [1124:17](../PlaybackIntentInterceptor.cs#L1124) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod.anonymous@54178 | [1124:55](../PlaybackIntentInterceptor.cs#L1124) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ResolveBaseItem.stringMethod.anonymous@54178.m | [1124:55](../PlaybackIntentInterceptor.cs#L1124) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId | [1131:9](../PlaybackIntentInterceptor.cs#L1131) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId.value | [1131:54](../PlaybackIntentInterceptor.cs#L1131) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ExtractYouTubeVideoId.match | [1136:17](../PlaybackIntentInterceptor.cs#L1136) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl | [1140:9](../PlaybackIntentInterceptor.cs#L1140) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.path | [1141:13](../PlaybackIntentInterceptor.cs#L1141) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.startSeconds | [1142:13](../PlaybackIntentInterceptor.cs#L1142) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.includePlayerHints | [1143:13](../PlaybackIntentInterceptor.cs#L1143) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.uri | [1146:67](../PlaybackIntentInterceptor.cs#L1146) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts | [1152:17](../PlaybackIntentInterceptor.cs#L1152) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@55226 | [1154:24](../PlaybackIntentInterceptor.cs#L1154) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@55226.p | [1154:24](../PlaybackIntentInterceptor.cs#L1154) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@55226.keyEnd | [1156:25](../PlaybackIntentInterceptor.cs#L1156) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.queryParts.anonymous@55226.key | [1157:25](../PlaybackIntentInterceptor.cs#L1157) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.secondsText | [1182:21](../PlaybackIntentInterceptor.cs#L1182) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.PatchYouTubeUrl.builder | [1187:17](../PlaybackIntentInterceptor.cs#L1187) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull | [1195:9](../PlaybackIntentInterceptor.cs#L1195) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.source | [1195:53](../PlaybackIntentInterceptor.cs#L1195) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.name | [1195:68](../PlaybackIntentInterceptor.cs#L1195) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetStringPropertyToNull.prop | [1197:17](../PlaybackIntentInterceptor.cs#L1197) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem | [1208:9](../PlaybackIntentInterceptor.cs#L1208) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.itemId | [1208:47](../PlaybackIntentInterceptor.cs#L1208) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.library | [1215:21](../PlaybackIntentInterceptor.cs#L1215) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.item | [1216:21](../PlaybackIntentInterceptor.cs#L1216) |
+| catch-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeLiveItem.ex | [1222:19](../PlaybackIntentInterceptor.cs#L1222) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull | [1229:9](../PlaybackIntentInterceptor.cs#L1229) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.source | [1229:47](../PlaybackIntentInterceptor.cs#L1229) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.name | [1229:62](../PlaybackIntentInterceptor.cs#L1229) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetPropertyToNull.prop | [1231:17](../PlaybackIntentInterceptor.cs#L1231) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty | [1248:9](../PlaybackIntentInterceptor.cs#L1248) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.source | [1248:47](../PlaybackIntentInterceptor.cs#L1248) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.name | [1248:62](../PlaybackIntentInterceptor.cs#L1248) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.prop | [1250:17](../PlaybackIntentInterceptor.cs#L1250) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.ClearListProperty.list | [1251:53](../PlaybackIntentInterceptor.cs#L1251) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeHost | [1265:9](../PlaybackIntentInterceptor.cs#L1265) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsYouTubeHost.host | [1265:43](../PlaybackIntentInterceptor.cs#L1265) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty | [1270:9](../PlaybackIntentInterceptor.cs#L1270) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.source | [1270:53](../PlaybackIntentInterceptor.cs#L1270) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.name | [1270:68](../PlaybackIntentInterceptor.cs#L1270) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.value | [1270:81](../PlaybackIntentInterceptor.cs#L1270) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableLongProperty.prop | [1272:17](../PlaybackIntentInterceptor.cs#L1272) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty | [1280:9](../PlaybackIntentInterceptor.cs#L1280) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.source | [1280:52](../PlaybackIntentInterceptor.cs#L1280) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.name | [1280:67](../PlaybackIntentInterceptor.cs#L1280) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.value | [1280:80](../PlaybackIntentInterceptor.cs#L1280) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.prop | [1282:17](../PlaybackIntentInterceptor.cs#L1282) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.current | [1292:17](../PlaybackIntentInterceptor.cs#L1292) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNullableIntProperty.currentInt | [1293:32](../PlaybackIntentInterceptor.cs#L1293) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty | [1303:9](../PlaybackIntentInterceptor.cs#L1303) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.source | [1303:45](../PlaybackIntentInterceptor.cs#L1303) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.name | [1303:60](../PlaybackIntentInterceptor.cs#L1303) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.value | [1303:73](../PlaybackIntentInterceptor.cs#L1303) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.prop | [1305:17](../PlaybackIntentInterceptor.cs#L1305) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.current | [1312:17](../PlaybackIntentInterceptor.cs#L1312) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetBoolProperty.currentBool | [1313:33](../PlaybackIntentInterceptor.cs#L1313) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty | [1320:9](../PlaybackIntentInterceptor.cs#L1320) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.source | [1320:47](../PlaybackIntentInterceptor.cs#L1320) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.name | [1320:62](../PlaybackIntentInterceptor.cs#L1320) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.value | [1320:75](../PlaybackIntentInterceptor.cs#L1320) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.prop | [1322:17](../PlaybackIntentInterceptor.cs#L1322) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.current | [1326:17](../PlaybackIntentInterceptor.cs#L1326) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.currentInt | [1329:36](../PlaybackIntentInterceptor.cs#L1329) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.SetNumberProperty.currentLong | [1338:37](../PlaybackIntentInterceptor.cs#L1338) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetServiceRequest | [1348:9](../PlaybackIntentInterceptor.cs#L1348) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetServiceRequest.service | [1348:52](../PlaybackIntentInterceptor.cs#L1348) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetDeviceId | [1355:9](../PlaybackIntentInterceptor.cs#L1355) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetDeviceId.request | [1355:44](../PlaybackIntentInterceptor.cs#L1355) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue | [1370:9](../PlaybackIntentInterceptor.cs#L1370) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue.request | [1370:48](../PlaybackIntentInterceptor.cs#L1370) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetRequestValue.name | [1370:67](../PlaybackIntentInterceptor.cs#L1370) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue | [1378:9](../PlaybackIntentInterceptor.cs#L1378) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.collection | [1378:58](../PlaybackIntentInterceptor.cs#L1378) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.name | [1378:78](../PlaybackIntentInterceptor.cs#L1378) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.value | [1378:91](../PlaybackIntentInterceptor.cs#L1378) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.collectionType | [1385:21](../PlaybackIntentInterceptor.cs#L1385) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer | [1386:21](../PlaybackIntentInterceptor.cs#L1386) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@63761 | [1388:37](../PlaybackIntentInterceptor.cs#L1388) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@63761.p | [1388:37](../PlaybackIntentInterceptor.cs#L1388) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.indexer.anonymous@63761.indexParameters | [1390:29](../PlaybackIntentInterceptor.cs#L1390) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.current | [1397:25](../PlaybackIntentInterceptor.cs#L1397) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod | [1408:21](../PlaybackIntentInterceptor.cs#L1408) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@64684 | [1410:37](../PlaybackIntentInterceptor.cs#L1410) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@64684.m | [1410:37](../PlaybackIntentInterceptor.cs#L1410) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TrySetRequestCollectionValue.setMethod.anonymous@64684.parameters | [1415:29](../PlaybackIntentInterceptor.cs#L1415) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey | [1435:9](../PlaybackIntentInterceptor.cs#L1435) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.key | [1436:13](../PlaybackIntentInterceptor.cs#L1436) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.deviceId | [1437:13](../PlaybackIntentInterceptor.cs#L1437) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.intent | [1438:13](../PlaybackIntentInterceptor.cs#L1438) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryConsumeCompatibleKey.candidate | [1440:53](../PlaybackIntentInterceptor.cs#L1440) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue | [1469:9](../PlaybackIntentInterceptor.cs#L1469) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.collection | [1469:61](../PlaybackIntentInterceptor.cs#L1469) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.name | [1469:81](../PlaybackIntentInterceptor.cs#L1469) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.dictionary | [1476:47](../PlaybackIntentInterceptor.cs#L1476) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.collectionType | [1485:21](../PlaybackIntentInterceptor.cs#L1485) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer | [1486:21](../PlaybackIntentInterceptor.cs#L1486) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@67447 | [1488:37](../PlaybackIntentInterceptor.cs#L1488) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@67447.p | [1488:37](../PlaybackIntentInterceptor.cs#L1488) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.indexer.anonymous@67447.indexParameters | [1490:29](../PlaybackIntentInterceptor.cs#L1490) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.current | [1495:21](../PlaybackIntentInterceptor.cs#L1495) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod | [1499:21](../PlaybackIntentInterceptor.cs#L1499) |
+| anonymous-function | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@68076 | [1501:37](../PlaybackIntentInterceptor.cs#L1501) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@68076.m | [1501:37](../PlaybackIntentInterceptor.cs#L1501) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryRemoveRequestCollectionValue.removeMethod.anonymous@68076.parameters | [1506:29](../PlaybackIntentInterceptor.cs#L1506) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient | [1524:9](../PlaybackIntentInterceptor.cs#L1524) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.request | [1524:47](../PlaybackIntentInterceptor.cs#L1524) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.deviceName | [1526:17](../PlaybackIntentInterceptor.cs#L1526) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyIosClient.userAgent | [1527:17](../PlaybackIntentInterceptor.cs#L1527) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient | [1536:9](../PlaybackIntentInterceptor.cs#L1536) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient.request | [1536:57](../PlaybackIntentInterceptor.cs#L1536) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeAndroidClient.client | [1538:17](../PlaybackIntentInterceptor.cs#L1538) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient | [1542:9](../PlaybackIntentInterceptor.cs#L1542) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.request | [1542:57](../PlaybackIntentInterceptor.cs#L1542) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.client | [1544:17](../PlaybackIntentInterceptor.cs#L1544) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.deviceName | [1545:17](../PlaybackIntentInterceptor.cs#L1545) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyNativeTheaterClient.userAgent | [1546:17](../PlaybackIntentInterceptor.cs#L1546) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyBrowserEngineClient | [1563:9](../PlaybackIntentInterceptor.cs#L1563) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.IsLikelyBrowserEngineClient.userAgent | [1563:57](../PlaybackIntentInterceptor.cs#L1563) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase | [1573:9](../PlaybackIntentInterceptor.cs#L1573) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase.value | [1573:48](../PlaybackIntentInterceptor.cs#L1573) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.ContainsIgnoreCase.needle | [1573:63](../PlaybackIntentInterceptor.cs#L1573) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten | [1577:9](../PlaybackIntentInterceptor.cs#L1577) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten.value | [1577:39](../PlaybackIntentInterceptor.cs#L1577) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Shorten.maxLength | [1577:53](../PlaybackIntentInterceptor.cs#L1577) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty | [1585:9](../PlaybackIntentInterceptor.cs#L1585) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty.source | [1585:50](../PlaybackIntentInterceptor.cs#L1585) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.GetStringProperty.name | [1585:65](../PlaybackIntentInterceptor.cs#L1585) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty | [1592:9](../PlaybackIntentInterceptor.cs#L1592) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.source | [1592:50](../PlaybackIntentInterceptor.cs#L1592) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.name | [1592:65](../PlaybackIntentInterceptor.cs#L1592) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLongProperty.value | [1594:17](../PlaybackIntentInterceptor.cs#L1594) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty | [1600:9](../PlaybackIntentInterceptor.cs#L1600) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.source | [1600:48](../PlaybackIntentInterceptor.cs#L1600) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.name | [1600:63](../PlaybackIntentInterceptor.cs#L1600) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadIntProperty.value | [1602:17](../PlaybackIntentInterceptor.cs#L1602) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt | [1608:9](../PlaybackIntentInterceptor.cs#L1608) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.value | [1608:40](../PlaybackIntentInterceptor.cs#L1608) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.intValue | [1612:21](../PlaybackIntentInterceptor.cs#L1612) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.longValue | [1613:22](../PlaybackIntentInterceptor.cs#L1613) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.text | [1614:24](../PlaybackIntentInterceptor.cs#L1614) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadInt.parsed | [1614:113](../PlaybackIntentInterceptor.cs#L1614) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong | [1619:9](../PlaybackIntentInterceptor.cs#L1619) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.value | [1619:42](../PlaybackIntentInterceptor.cs#L1619) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.longValue | [1623:22](../PlaybackIntentInterceptor.cs#L1623) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.intValue | [1624:21](../PlaybackIntentInterceptor.cs#L1624) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.text | [1625:24](../PlaybackIntentInterceptor.cs#L1625) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadLong.parsed | [1625:114](../PlaybackIntentInterceptor.cs#L1625) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty | [1630:9](../PlaybackIntentInterceptor.cs#L1630) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.source | [1630:50](../PlaybackIntentInterceptor.cs#L1630) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.name | [1630:65](../PlaybackIntentInterceptor.cs#L1630) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBoolProperty.value | [1632:17](../PlaybackIntentInterceptor.cs#L1632) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool | [1638:9](../PlaybackIntentInterceptor.cs#L1638) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.value | [1638:42](../PlaybackIntentInterceptor.cs#L1638) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.boolValue | [1642:22](../PlaybackIntentInterceptor.cs#L1642) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.text | [1643:24](../PlaybackIntentInterceptor.cs#L1643) |
+| pattern-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.TryReadBool.parsed | [1643:62](../PlaybackIntentInterceptor.cs#L1643) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired | [1648:9](../PlaybackIntentInterceptor.cs#L1648) |
+| local-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired.now | [1652:17](../PlaybackIntentInterceptor.cs#L1652) |
+| iteration-variable | Emby.YouTubePlugin.PlaybackIntentInterceptor.CleanupExpired.kvp | [1657:13](../PlaybackIntentInterceptor.cs#L1657) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey | [1664:9](../PlaybackIntentInterceptor.cs#L1664) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.userId | [1664:39](../PlaybackIntentInterceptor.cs#L1664) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.itemId | [1664:54](../PlaybackIntentInterceptor.cs#L1664) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.MakeKey.deviceId | [1664:69](../PlaybackIntentInterceptor.cs#L1664) |
+| method | Emby.YouTubePlugin.PlaybackIntentInterceptor.Normalize | [1669:9](../PlaybackIntentInterceptor.cs#L1669) |
+| parameter | Emby.YouTubePlugin.PlaybackIntentInterceptor.Normalize.value | [1669:41](../PlaybackIntentInterceptor.cs#L1669) |
 
 </details>
 
@@ -3130,10 +3135,10 @@ Documentation/resource; 4849 bytes; 121 lines.
 <a id="file-03de83be30141261"></a>
 ## [YouTubeAdaptiveSourceBudget.cs](../YouTubeAdaptiveSourceBudget.cs)
 
-Plugin Compile source (SDK default); 15996 bytes; 235 lines.
+Plugin Compile source (SDK default); 17601 bytes; 256 lines.
 
 <details>
-<summary>All 195 declarations / anchors</summary>
+<summary>All 227 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -3141,197 +3146,229 @@ Plugin Compile source (SDK default); 15996 bytes; 235 lines.
 | type | Emby.YouTubePlugin.YouTubeAdaptiveSelection | [14:5](../YouTubeAdaptiveSourceBudget.cs#L14) |
 | parameter | Emby.YouTubePlugin.YouTubeAdaptiveSelection.Video | [14:53](../YouTubeAdaptiveSourceBudget.cs#L14) |
 | parameter | Emby.YouTubePlugin.YouTubeAdaptiveSelection.Audio | [14:72](../YouTubeAdaptiveSourceBudget.cs#L14) |
-| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget | [19:5](../YouTubeAdaptiveSourceBudget.cs#L19) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumProbeBytes | [21:28](../YouTubeAdaptiveSourceBudget.cs#L21) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MinimumProbeBytes | [22:28](../YouTubeAdaptiveSourceBudget.cs#L22) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeDeadlineMilliseconds | [23:28](../YouTubeAdaptiveSourceBudget.cs#L23) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumCacheEntries | [24:28](../YouTubeAdaptiveSourceBudget.cs#L24) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumPendingProbes | [25:28](../YouTubeAdaptiveSourceBudget.cs#L25) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumParallelProbes | [26:28](../YouTubeAdaptiveSourceBudget.cs#L26) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.FallbackMaximumHeight | [27:28](../YouTubeAdaptiveSourceBudget.cs#L27) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ThroughputHeadroom | [28:31](../YouTubeAdaptiveSourceBudget.cs#L28) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumFileBytes | [29:28](../YouTubeAdaptiveSourceBudget.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Gate | [30:40](../YouTubeAdaptiveSourceBudget.cs#L30) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Cache | [31:71](../YouTubeAdaptiveSourceBudget.cs#L31) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeSlots | [32:47](../YouTubeAdaptiveSourceBudget.cs#L32) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._pendingProbes | [33:28](../YouTubeAdaptiveSourceBudget.cs#L33) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._clockMilliseconds | [34:35](../YouTubeAdaptiveSourceBudget.cs#L34) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._clockMilliseconds.anonymous@1547 | [34:56](../YouTubeAdaptiveSourceBudget.cs#L34) |
-| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._fetchRange | [35:121](../YouTubeAdaptiveSourceBudget.cs#L35) |
-| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input | [38:9](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Format | [38:37](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Uri | [38:57](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Length | [38:66](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Height | [38:79](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.VideoCodec | [38:91](../YouTubeAdaptiveSourceBudget.cs#L38) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.AudioCodec | [39:13](../YouTubeAdaptiveSourceBudget.cs#L39) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Bitrate | [39:32](../YouTubeAdaptiveSourceBudget.cs#L39) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Headers | [39:49](../YouTubeAdaptiveSourceBudget.cs#L39) |
-| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice | [40:9](../YouTubeAdaptiveSourceBudget.cs#L40) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Video | [40:38](../YouTubeAdaptiveSourceBudget.cs#L40) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Audio | [40:51](../YouTubeAdaptiveSourceBudget.cs#L40) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Bitrate | [40:65](../YouTubeAdaptiveSourceBudget.cs#L40) |
-| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput | [41:9](../YouTubeAdaptiveSourceBudget.cs#L41) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Uri | [41:42](../YouTubeAdaptiveSourceBudget.cs#L41) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Length | [41:51](../YouTubeAdaptiveSourceBudget.cs#L41) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Headers | [41:64](../YouTubeAdaptiveSourceBudget.cs#L41) |
-| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation | [42:9](../YouTubeAdaptiveSourceBudget.cs#L42) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.Bitrate | [42:43](../YouTubeAdaptiveSourceBudget.cs#L42) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.Denied | [42:60](../YouTubeAdaptiveSourceBudget.cs#L42) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.ExpiresAt | [42:73](../YouTubeAdaptiveSourceBudget.cs#L42) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync | [44:9](../YouTubeAdaptiveSourceBudget.cs#L44) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.resolved | [44:74](../YouTubeAdaptiveSourceBudget.cs#L44) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.headers | [45:13](../YouTubeAdaptiveSourceBudget.cs#L45) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.maximumHeight | [45:58](../YouTubeAdaptiveSourceBudget.cs#L45) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.cancellationToken | [45:77](../YouTubeAdaptiveSourceBudget.cs#L45) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@2694 | [50:41](../YouTubeAdaptiveSourceBudget.cs#L50) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@2694.c | [50:41](../YouTubeAdaptiveSourceBudget.cs#L50) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.formats | [52:73](../YouTubeAdaptiveSourceBudget.cs#L52) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.commonHeaders | [56:17](../YouTubeAdaptiveSourceBudget.cs#L56) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.duration | [57:17](../YouTubeAdaptiveSourceBudget.cs#L57) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique | [59:17](../YouTubeAdaptiveSourceBudget.cs#L59) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3384 | [59:59](../YouTubeAdaptiveSourceBudget.cs#L59) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3384.f | [59:59](../YouTubeAdaptiveSourceBudget.cs#L59) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3458 | [60:24](../YouTubeAdaptiveSourceBudget.cs#L60) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3458.group | [60:24](../YouTubeAdaptiveSourceBudget.cs#L60) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3494 | [60:60](../YouTubeAdaptiveSourceBudget.cs#L60) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3494.group | [60:60](../YouTubeAdaptiveSourceBudget.cs#L60) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs | [61:17](../YouTubeAdaptiveSourceBudget.cs#L61) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3558 | [61:40](../YouTubeAdaptiveSourceBudget.cs#L61) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3558.format | [61:40](../YouTubeAdaptiveSourceBudget.cs#L61) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3656 | [62:24](../YouTubeAdaptiveSourceBudget.cs#L62) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3656.input | [62:24](../YouTubeAdaptiveSourceBudget.cs#L62) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio | [63:17](../YouTubeAdaptiveSourceBudget.cs#L63) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3742 | [63:38](../YouTubeAdaptiveSourceBudget.cs#L63) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3742.input | [63:38](../YouTubeAdaptiveSourceBudget.cs#L63) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3845 | [64:36](../YouTubeAdaptiveSourceBudget.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3845.input | [64:36](../YouTubeAdaptiveSourceBudget.cs#L64) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3938 | [65:35](../YouTubeAdaptiveSourceBudget.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3938.input | [65:35](../YouTubeAdaptiveSourceBudget.cs#L65) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3991 | [66:25](../YouTubeAdaptiveSourceBudget.cs#L66) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio.anonymous@3991.input | [66:25](../YouTubeAdaptiveSourceBudget.cs#L66) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices | [67:17](../YouTubeAdaptiveSourceBudget.cs#L67) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@4114 | [67:40](../YouTubeAdaptiveSourceBudget.cs#L67) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@4114.input | [67:40](../YouTubeAdaptiveSourceBudget.cs#L67) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@4329 | [69:25](../YouTubeAdaptiveSourceBudget.cs#L69) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@4329.input | [69:25](../YouTubeAdaptiveSourceBudget.cs#L69) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec | [74:17](../YouTubeAdaptiveSourceBudget.cs#L74) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec.anonymous@4763 | [74:37](../YouTubeAdaptiveSourceBudget.cs#L74) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec.anonymous@4763.choice | [74:37](../YouTubeAdaptiveSourceBudget.cs#L74) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible | [75:17](../YouTubeAdaptiveSourceBudget.cs#L75) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@4857 | [75:42](../YouTubeAdaptiveSourceBudget.cs#L75) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@4857.choice | [75:42](../YouTubeAdaptiveSourceBudget.cs#L75) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@4953 | [76:36](../YouTubeAdaptiveSourceBudget.cs#L76) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@4953.choice | [76:36](../YouTubeAdaptiveSourceBudget.cs#L76) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5018 | [77:35](../YouTubeAdaptiveSourceBudget.cs#L77) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5018.choice | [77:35](../YouTubeAdaptiveSourceBudget.cs#L77) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5156 | [78:35](../YouTubeAdaptiveSourceBudget.cs#L78) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5156.choice | [78:35](../YouTubeAdaptiveSourceBudget.cs#L78) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5231 | [79:25](../YouTubeAdaptiveSourceBudget.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5231.choice | [79:25](../YouTubeAdaptiveSourceBudget.cs#L79) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5287 | [80:25](../YouTubeAdaptiveSourceBudget.cs#L80) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5287.choice | [80:25](../YouTubeAdaptiveSourceBudget.cs#L80) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5356 | [81:25](../YouTubeAdaptiveSourceBudget.cs#L81) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@5356.choice | [81:25](../YouTubeAdaptiveSourceBudget.cs#L81) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest | [82:17](../YouTubeAdaptiveSourceBudget.cs#L82) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@5483 | [82:43](../YouTubeAdaptiveSourceBudget.cs#L82) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@5483.choice | [82:43](../YouTubeAdaptiveSourceBudget.cs#L82) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@5538 | [83:25](../YouTubeAdaptiveSourceBudget.cs#L83) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@5538.choice | [83:25](../YouTubeAdaptiveSourceBudget.cs#L83) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback | [84:17](../YouTubeAdaptiveSourceBudget.cs#L84) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback.anonymous@5643 | [84:52](../YouTubeAdaptiveSourceBudget.cs#L84) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback.anonymous@5643.choice | [84:52](../YouTubeAdaptiveSourceBudget.cs#L84) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.preferred | [87:17](../YouTubeAdaptiveSourceBudget.cs#L87) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.observation | [88:17](../YouTubeAdaptiveSourceBudget.cs#L88) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected | [91:17](../YouTubeAdaptiveSourceBudget.cs#L91) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.budget | [91:55](../YouTubeAdaptiveSourceBudget.cs#L91) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6275 | [92:43](../YouTubeAdaptiveSourceBudget.cs#L92) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6275.choice | [92:43](../YouTubeAdaptiveSourceBudget.cs#L92) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6460 | [94:39](../YouTubeAdaptiveSourceBudget.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6460.choice | [94:39](../YouTubeAdaptiveSourceBudget.cs#L94) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6501 | [94:80](../YouTubeAdaptiveSourceBudget.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6501.choice | [94:80](../YouTubeAdaptiveSourceBudget.cs#L94) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6559 | [95:33](../YouTubeAdaptiveSourceBudget.cs#L95) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@6559.choice | [95:33](../YouTubeAdaptiveSourceBudget.cs#L95) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput | [106:9](../YouTubeAdaptiveSourceBudget.cs#L106) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.format | [106:41](../YouTubeAdaptiveSourceBudget.cs#L106) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.headers | [106:61](../YouTubeAdaptiveSourceBudget.cs#L106) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.duration | [107:13](../YouTubeAdaptiveSourceBudget.cs#L107) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.expiresUtc | [107:31](../YouTubeAdaptiveSourceBudget.cs#L107) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.id | [110:20](../YouTubeAdaptiveSourceBudget.cs#L110) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.extension | [110:52](../YouTubeAdaptiveSourceBudget.cs#L110) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.anonymous@7663 | [111:50](../YouTubeAdaptiveSourceBudget.cs#L111) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.anonymous@7663.c | [111:50](../YouTubeAdaptiveSourceBudget.cs#L111) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.size | [113:63](../YouTubeAdaptiveSourceBudget.cs#L113) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.length | [114:47](../YouTubeAdaptiveSourceBudget.cs#L114) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.video | [115:20](../YouTubeAdaptiveSourceBudget.cs#L115) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.audio | [115:52](../YouTubeAdaptiveSourceBudget.cs#L115) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.videoCodec | [116:20](../YouTubeAdaptiveSourceBudget.cs#L116) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.audioCodec | [117:20](../YouTubeAdaptiveSourceBudget.cs#L117) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.height | [119:18](../YouTubeAdaptiveSourceBudget.cs#L119) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.width | [119:54](../YouTubeAdaptiveSourceBudget.cs#L119) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.field | [121:13](../YouTubeAdaptiveSourceBudget.cs#L121) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.field.value | [122:58](../YouTubeAdaptiveSourceBudget.cs#L122) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.uri | [125:17](../YouTubeAdaptiveSourceBudget.cs#L125) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.declared | [126:19](../YouTubeAdaptiveSourceBudget.cs#L126) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.expiry | [126:36](../YouTubeAdaptiveSourceBudget.cs#L126) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part | [127:13](../YouTubeAdaptiveSourceBudget.cs#L127) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.pieces | [129:21](../YouTubeAdaptiveSourceBudget.cs#L129) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.name | [130:24](../YouTubeAdaptiveSourceBudget.cs#L130) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.anonymous@9641 | [133:38](../YouTubeAdaptiveSourceBudget.cs#L133) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.anonymous@9641.c | [133:38](../YouTubeAdaptiveSourceBudget.cs#L133) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.parsed | [134:108](../YouTubeAdaptiveSourceBudget.cs#L134) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.safeHeaders | [150:17](../YouTubeAdaptiveSourceBudget.cs#L150) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.local | [151:63](../YouTubeAdaptiveSourceBudget.cs#L151) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.header | [152:17](../YouTubeAdaptiveSourceBudget.cs#L152) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.bitrate | [156:21](../YouTubeAdaptiveSourceBudget.cs#L156) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation | [162:9](../YouTubeAdaptiveSourceBudget.cs#L162) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.input | [162:57](../YouTubeAdaptiveSourceBudget.cs#L162) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.route | [164:20](../YouTubeAdaptiveSourceBudget.cs#L164) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity | [166:20](../YouTubeAdaptiveSourceBudget.cs#L166) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@11656 | [166:86](../YouTubeAdaptiveSourceBudget.cs#L166) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@11656.pair | [166:86](../YouTubeAdaptiveSourceBudget.cs#L166) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@11732 | [167:25](../YouTubeAdaptiveSourceBudget.cs#L167) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@11732.pair | [167:25](../YouTubeAdaptiveSourceBudget.cs#L167) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.key | [168:17](../YouTubeAdaptiveSourceBudget.cs#L168) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.now | [171:22](../YouTubeAdaptiveSourceBudget.cs#L171) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry | [172:17](../YouTubeAdaptiveSourceBudget.cs#L172) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry.anonymous@12021 | [172:51](../YouTubeAdaptiveSourceBudget.cs#L172) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry.anonymous@12021.entry | [172:51](../YouTubeAdaptiveSourceBudget.cs#L172) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.existing | [174:52](../YouTubeAdaptiveSourceBudget.cs#L174) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest | [177:25](../YouTubeAdaptiveSourceBudget.cs#L177) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@12360 | [177:46](../YouTubeAdaptiveSourceBudget.cs#L177) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@12360.entry | [177:46](../YouTubeAdaptiveSourceBudget.cs#L177) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@12439 | [178:34](../YouTubeAdaptiveSourceBudget.cs#L178) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@12439.entry | [178:34](../YouTubeAdaptiveSourceBudget.cs#L178) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.pending | [182:35](../YouTubeAdaptiveSourceBudget.cs#L182) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync | [196:9](../YouTubeAdaptiveSourceBudget.cs#L196) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.input | [196:61](../YouTubeAdaptiveSourceBudget.cs#L196) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.acquired | [198:18](../YouTubeAdaptiveSourceBudget.cs#L198) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.deadline | [199:23](../YouTubeAdaptiveSourceBudget.cs#L199) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.count | [205:21](../YouTubeAdaptiveSourceBudget.cs#L205) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.watch | [207:21](../YouTubeAdaptiveSourceBudget.cs#L207) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.bytes | [208:21](../YouTubeAdaptiveSourceBudget.cs#L208) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.rate | [212:24](../YouTubeAdaptiveSourceBudget.cs#L212) |
-| catch-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.error | [216:19](../YouTubeAdaptiveSourceBudget.cs#L216) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Fallback | [224:9](../YouTubeAdaptiveSourceBudget.cs#L224) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.CodecPreference | [225:9](../YouTubeAdaptiveSourceBudget.cs#L225) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.CodecPreference.codec | [225:44](../YouTubeAdaptiveSourceBudget.cs#L225) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text | [226:9](../YouTubeAdaptiveSourceBudget.cs#L226) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.value | [226:36](../YouTubeAdaptiveSourceBudget.cs#L226) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.field | [226:55](../YouTubeAdaptiveSourceBudget.cs#L226) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.item | [227:52](../YouTubeAdaptiveSourceBudget.cs#L227) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number | [228:9](../YouTubeAdaptiveSourceBudget.cs#L228) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.value | [228:39](../YouTubeAdaptiveSourceBudget.cs#L228) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.field | [228:58](../YouTubeAdaptiveSourceBudget.cs#L228) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.item | [229:52](../YouTubeAdaptiveSourceBudget.cs#L229) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.number | [230:42](../YouTubeAdaptiveSourceBudget.cs#L230) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer | [231:9](../YouTubeAdaptiveSourceBudget.cs#L231) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.value | [231:37](../YouTubeAdaptiveSourceBudget.cs#L231) |
-| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.field | [231:56](../YouTubeAdaptiveSourceBudget.cs#L231) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.item | [232:52](../YouTubeAdaptiveSourceBudget.cs#L232) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.number | [232:128](../YouTubeAdaptiveSourceBudget.cs#L232) |
-| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Failure | [233:9](../YouTubeAdaptiveSourceBudget.cs#L233) |
+| property | Emby.YouTubePlugin.YouTubeAdaptiveSelection.AudioTracks | [16:9](../YouTubeAdaptiveSourceBudget.cs#L16) |
+| accessor | Emby.YouTubePlugin.YouTubeAdaptiveSelection.AudioTracks.get | [16:59](../YouTubeAdaptiveSourceBudget.cs#L16) |
+| accessor | Emby.YouTubePlugin.YouTubeAdaptiveSelection.AudioTracks.init | [16:64](../YouTubeAdaptiveSourceBudget.cs#L16) |
+| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget | [22:5](../YouTubeAdaptiveSourceBudget.cs#L22) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumProbeBytes | [24:28](../YouTubeAdaptiveSourceBudget.cs#L24) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MinimumProbeBytes | [25:28](../YouTubeAdaptiveSourceBudget.cs#L25) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeDeadlineMilliseconds | [26:28](../YouTubeAdaptiveSourceBudget.cs#L26) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumCacheEntries | [27:28](../YouTubeAdaptiveSourceBudget.cs#L27) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumPendingProbes | [28:28](../YouTubeAdaptiveSourceBudget.cs#L28) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumParallelProbes | [29:28](../YouTubeAdaptiveSourceBudget.cs#L29) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.FallbackMaximumHeight | [30:28](../YouTubeAdaptiveSourceBudget.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ThroughputHeadroom | [31:31](../YouTubeAdaptiveSourceBudget.cs#L31) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MaximumFileBytes | [32:28](../YouTubeAdaptiveSourceBudget.cs#L32) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Gate | [33:40](../YouTubeAdaptiveSourceBudget.cs#L33) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Cache | [34:71](../YouTubeAdaptiveSourceBudget.cs#L34) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeSlots | [35:47](../YouTubeAdaptiveSourceBudget.cs#L35) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._pendingProbes | [36:28](../YouTubeAdaptiveSourceBudget.cs#L36) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._clockMilliseconds | [37:35](../YouTubeAdaptiveSourceBudget.cs#L37) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._clockMilliseconds.anonymous@1659 | [37:56](../YouTubeAdaptiveSourceBudget.cs#L37) |
+| field | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget._fetchRange | [38:121](../YouTubeAdaptiveSourceBudget.cs#L38) |
+| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input | [41:9](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Format | [41:37](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Uri | [41:57](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Length | [41:66](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Height | [41:79](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.VideoCodec | [41:91](../YouTubeAdaptiveSourceBudget.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.AudioCodec | [42:13](../YouTubeAdaptiveSourceBudget.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Bitrate | [42:32](../YouTubeAdaptiveSourceBudget.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Input.Headers | [42:49](../YouTubeAdaptiveSourceBudget.cs#L42) |
+| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice | [43:9](../YouTubeAdaptiveSourceBudget.cs#L43) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Video | [43:38](../YouTubeAdaptiveSourceBudget.cs#L43) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Audio | [43:51](../YouTubeAdaptiveSourceBudget.cs#L43) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Choice.Bitrate | [43:65](../YouTubeAdaptiveSourceBudget.cs#L43) |
+| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput | [44:9](../YouTubeAdaptiveSourceBudget.cs#L44) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Uri | [44:42](../YouTubeAdaptiveSourceBudget.cs#L44) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Length | [44:51](../YouTubeAdaptiveSourceBudget.cs#L44) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ProbeInput.Headers | [44:64](../YouTubeAdaptiveSourceBudget.cs#L44) |
+| type | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation | [45:9](../YouTubeAdaptiveSourceBudget.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.Bitrate | [45:43](../YouTubeAdaptiveSourceBudget.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.Denied | [45:60](../YouTubeAdaptiveSourceBudget.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Observation.ExpiresAt | [45:73](../YouTubeAdaptiveSourceBudget.cs#L45) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync | [47:9](../YouTubeAdaptiveSourceBudget.cs#L47) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.resolved | [47:74](../YouTubeAdaptiveSourceBudget.cs#L47) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.headers | [48:13](../YouTubeAdaptiveSourceBudget.cs#L48) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.maximumHeight | [48:58](../YouTubeAdaptiveSourceBudget.cs#L48) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.cancellationToken | [48:77](../YouTubeAdaptiveSourceBudget.cs#L48) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@2806 | [53:41](../YouTubeAdaptiveSourceBudget.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@2806.c | [53:41](../YouTubeAdaptiveSourceBudget.cs#L53) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.formats | [55:73](../YouTubeAdaptiveSourceBudget.cs#L55) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.commonHeaders | [59:17](../YouTubeAdaptiveSourceBudget.cs#L59) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.duration | [60:17](../YouTubeAdaptiveSourceBudget.cs#L60) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique | [62:17](../YouTubeAdaptiveSourceBudget.cs#L62) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3496 | [62:59](../YouTubeAdaptiveSourceBudget.cs#L62) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3496.f | [62:59](../YouTubeAdaptiveSourceBudget.cs#L62) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3570 | [63:24](../YouTubeAdaptiveSourceBudget.cs#L63) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3570.group | [63:24](../YouTubeAdaptiveSourceBudget.cs#L63) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3606 | [63:60](../YouTubeAdaptiveSourceBudget.cs#L63) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.unique.anonymous@3606.group | [63:60](../YouTubeAdaptiveSourceBudget.cs#L63) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs | [64:17](../YouTubeAdaptiveSourceBudget.cs#L64) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3670 | [64:40](../YouTubeAdaptiveSourceBudget.cs#L64) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3670.format | [64:40](../YouTubeAdaptiveSourceBudget.cs#L64) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3768 | [65:24](../YouTubeAdaptiveSourceBudget.cs#L65) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.inputs.anonymous@3768.input | [65:24](../YouTubeAdaptiveSourceBudget.cs#L65) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks | [66:17](../YouTubeAdaptiveSourceBudget.cs#L66) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@3860 | [66:44](../YouTubeAdaptiveSourceBudget.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@3860.input | [66:44](../YouTubeAdaptiveSourceBudget.cs#L66) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@3953 | [67:26](../YouTubeAdaptiveSourceBudget.cs#L67) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@3953.input | [67:26](../YouTubeAdaptiveSourceBudget.cs#L67) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048 | [68:25](../YouTubeAdaptiveSourceBudget.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.group | [68:25](../YouTubeAdaptiveSourceBudget.cs#L68) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4071 | [68:48](../YouTubeAdaptiveSourceBudget.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4071.input | [68:48](../YouTubeAdaptiveSourceBudget.cs#L68) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4181 | [69:39](../YouTubeAdaptiveSourceBudget.cs#L69) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4181.input | [69:39](../YouTubeAdaptiveSourceBudget.cs#L69) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4238 | [70:29](../YouTubeAdaptiveSourceBudget.cs#L70) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4048.anonymous@4238.input | [70:29](../YouTubeAdaptiveSourceBudget.cs#L70) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4348 | [71:36](../YouTubeAdaptiveSourceBudget.cs#L71) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4348.input | [71:36](../YouTubeAdaptiveSourceBudget.cs#L71) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4436 | [72:35](../YouTubeAdaptiveSourceBudget.cs#L72) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4436.input | [72:35](../YouTubeAdaptiveSourceBudget.cs#L72) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4513 | [73:25](../YouTubeAdaptiveSourceBudget.cs#L73) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioTracks.anonymous@4513.input | [73:25](../YouTubeAdaptiveSourceBudget.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices | [75:17](../YouTubeAdaptiveSourceBudget.cs#L75) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4706 | [75:56](../YouTubeAdaptiveSourceBudget.cs#L75) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4706.input | [75:56](../YouTubeAdaptiveSourceBudget.cs#L75) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4802 | [76:24](../YouTubeAdaptiveSourceBudget.cs#L76) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4802.group | [76:24](../YouTubeAdaptiveSourceBudget.cs#L76) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4837 | [76:59](../YouTubeAdaptiveSourceBudget.cs#L76) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.collidingIndices.anonymous@4837.group | [76:59](../YouTubeAdaptiveSourceBudget.cs#L76) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@4914 | [77:45](../YouTubeAdaptiveSourceBudget.cs#L77) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@4914.input | [77:45](../YouTubeAdaptiveSourceBudget.cs#L77) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audio | [78:17](../YouTubeAdaptiveSourceBudget.cs#L78) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioCost | [82:21](../YouTubeAdaptiveSourceBudget.cs#L82) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioCost.anonymous@5361 | [82:76](../YouTubeAdaptiveSourceBudget.cs#L82) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioCost.anonymous@5361.input | [82:76](../YouTubeAdaptiveSourceBudget.cs#L82) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioCost.anonymous@5436 | [83:42](../YouTubeAdaptiveSourceBudget.cs#L83) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.audioCost.anonymous@5436.input | [83:42](../YouTubeAdaptiveSourceBudget.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices | [84:17](../YouTubeAdaptiveSourceBudget.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@5507 | [84:40](../YouTubeAdaptiveSourceBudget.cs#L84) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@5507.input | [84:40](../YouTubeAdaptiveSourceBudget.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@5722 | [86:25](../YouTubeAdaptiveSourceBudget.cs#L86) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.choices.anonymous@5722.input | [86:25](../YouTubeAdaptiveSourceBudget.cs#L86) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec | [91:17](../YouTubeAdaptiveSourceBudget.cs#L91) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec.anonymous@6098 | [91:37](../YouTubeAdaptiveSourceBudget.cs#L91) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.codec.anonymous@6098.choice | [91:37](../YouTubeAdaptiveSourceBudget.cs#L91) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible | [92:17](../YouTubeAdaptiveSourceBudget.cs#L92) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6192 | [92:42](../YouTubeAdaptiveSourceBudget.cs#L92) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6192.choice | [92:42](../YouTubeAdaptiveSourceBudget.cs#L92) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6288 | [93:36](../YouTubeAdaptiveSourceBudget.cs#L93) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6288.choice | [93:36](../YouTubeAdaptiveSourceBudget.cs#L93) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6353 | [94:35](../YouTubeAdaptiveSourceBudget.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6353.choice | [94:35](../YouTubeAdaptiveSourceBudget.cs#L94) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6491 | [95:35](../YouTubeAdaptiveSourceBudget.cs#L95) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6491.choice | [95:35](../YouTubeAdaptiveSourceBudget.cs#L95) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6566 | [96:25](../YouTubeAdaptiveSourceBudget.cs#L96) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6566.choice | [96:25](../YouTubeAdaptiveSourceBudget.cs#L96) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6660 | [97:25](../YouTubeAdaptiveSourceBudget.cs#L97) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6660.choice | [97:25](../YouTubeAdaptiveSourceBudget.cs#L97) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6729 | [98:25](../YouTubeAdaptiveSourceBudget.cs#L98) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.eligible.anonymous@6729.choice | [98:25](../YouTubeAdaptiveSourceBudget.cs#L98) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest | [99:17](../YouTubeAdaptiveSourceBudget.cs#L99) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@6856 | [99:43](../YouTubeAdaptiveSourceBudget.cs#L99) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@6856.choice | [99:43](../YouTubeAdaptiveSourceBudget.cs#L99) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@6911 | [100:25](../YouTubeAdaptiveSourceBudget.cs#L100) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.lowest.anonymous@6911.choice | [100:25](../YouTubeAdaptiveSourceBudget.cs#L100) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback | [101:17](../YouTubeAdaptiveSourceBudget.cs#L101) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback.anonymous@7016 | [101:52](../YouTubeAdaptiveSourceBudget.cs#L101) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.fallback.anonymous@7016.choice | [101:52](../YouTubeAdaptiveSourceBudget.cs#L101) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.preferred | [104:17](../YouTubeAdaptiveSourceBudget.cs#L104) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.observation | [105:17](../YouTubeAdaptiveSourceBudget.cs#L105) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected | [108:17](../YouTubeAdaptiveSourceBudget.cs#L108) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.budget | [108:55](../YouTubeAdaptiveSourceBudget.cs#L108) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7648 | [109:43](../YouTubeAdaptiveSourceBudget.cs#L109) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7648.choice | [109:43](../YouTubeAdaptiveSourceBudget.cs#L109) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7771 | [111:39](../YouTubeAdaptiveSourceBudget.cs#L111) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7771.choice | [111:39](../YouTubeAdaptiveSourceBudget.cs#L111) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7812 | [111:80](../YouTubeAdaptiveSourceBudget.cs#L111) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7812.choice | [111:80](../YouTubeAdaptiveSourceBudget.cs#L111) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7870 | [112:33](../YouTubeAdaptiveSourceBudget.cs#L112) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.selected.anonymous@7870.choice | [112:33](../YouTubeAdaptiveSourceBudget.cs#L112) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@8353 | [118:62](../YouTubeAdaptiveSourceBudget.cs#L118) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@8353.track | [118:62](../YouTubeAdaptiveSourceBudget.cs#L118) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@8687 | [122:104](../YouTubeAdaptiveSourceBudget.cs#L122) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.SelectAsync.anonymous@8687.track | [122:104](../YouTubeAdaptiveSourceBudget.cs#L122) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput | [126:9](../YouTubeAdaptiveSourceBudget.cs#L126) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.format | [126:41](../YouTubeAdaptiveSourceBudget.cs#L126) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.headers | [126:61](../YouTubeAdaptiveSourceBudget.cs#L126) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.duration | [127:13](../YouTubeAdaptiveSourceBudget.cs#L127) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.expiresUtc | [127:31](../YouTubeAdaptiveSourceBudget.cs#L127) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.id | [130:20](../YouTubeAdaptiveSourceBudget.cs#L130) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.extension | [130:52](../YouTubeAdaptiveSourceBudget.cs#L130) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.anonymous@9155 | [131:50](../YouTubeAdaptiveSourceBudget.cs#L131) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.anonymous@9155.c | [131:50](../YouTubeAdaptiveSourceBudget.cs#L131) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.size | [133:63](../YouTubeAdaptiveSourceBudget.cs#L133) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.length | [134:47](../YouTubeAdaptiveSourceBudget.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.video | [135:20](../YouTubeAdaptiveSourceBudget.cs#L135) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.audio | [135:52](../YouTubeAdaptiveSourceBudget.cs#L135) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.videoCodec | [136:20](../YouTubeAdaptiveSourceBudget.cs#L136) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.audioCodec | [137:20](../YouTubeAdaptiveSourceBudget.cs#L137) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.height | [139:18](../YouTubeAdaptiveSourceBudget.cs#L139) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.width | [139:54](../YouTubeAdaptiveSourceBudget.cs#L139) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.field | [141:13](../YouTubeAdaptiveSourceBudget.cs#L141) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.field.value | [142:58](../YouTubeAdaptiveSourceBudget.cs#L142) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.uri | [146:17](../YouTubeAdaptiveSourceBudget.cs#L146) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.declared | [147:19](../YouTubeAdaptiveSourceBudget.cs#L147) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.expiry | [147:36](../YouTubeAdaptiveSourceBudget.cs#L147) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part | [148:13](../YouTubeAdaptiveSourceBudget.cs#L148) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.pieces | [150:21](../YouTubeAdaptiveSourceBudget.cs#L150) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.name | [151:24](../YouTubeAdaptiveSourceBudget.cs#L151) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.anonymous@11246 | [154:38](../YouTubeAdaptiveSourceBudget.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.anonymous@11246.c | [154:38](../YouTubeAdaptiveSourceBudget.cs#L154) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.part.parsed | [155:108](../YouTubeAdaptiveSourceBudget.cs#L155) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.safeHeaders | [171:17](../YouTubeAdaptiveSourceBudget.cs#L171) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.local | [172:63](../YouTubeAdaptiveSourceBudget.cs#L172) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.header | [173:17](../YouTubeAdaptiveSourceBudget.cs#L173) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.ReadInput.bitrate | [177:21](../YouTubeAdaptiveSourceBudget.cs#L177) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation | [183:9](../YouTubeAdaptiveSourceBudget.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.input | [183:57](../YouTubeAdaptiveSourceBudget.cs#L183) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.route | [185:20](../YouTubeAdaptiveSourceBudget.cs#L185) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity | [187:20](../YouTubeAdaptiveSourceBudget.cs#L187) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@13261 | [187:86](../YouTubeAdaptiveSourceBudget.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@13261.pair | [187:86](../YouTubeAdaptiveSourceBudget.cs#L187) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@13337 | [188:25](../YouTubeAdaptiveSourceBudget.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.identity.anonymous@13337.pair | [188:25](../YouTubeAdaptiveSourceBudget.cs#L188) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.key | [189:17](../YouTubeAdaptiveSourceBudget.cs#L189) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.now | [192:22](../YouTubeAdaptiveSourceBudget.cs#L192) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry | [193:17](../YouTubeAdaptiveSourceBudget.cs#L193) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry.anonymous@13626 | [193:51](../YouTubeAdaptiveSourceBudget.cs#L193) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.entry.anonymous@13626.entry | [193:51](../YouTubeAdaptiveSourceBudget.cs#L193) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.existing | [195:52](../YouTubeAdaptiveSourceBudget.cs#L195) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest | [198:25](../YouTubeAdaptiveSourceBudget.cs#L198) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@13965 | [198:46](../YouTubeAdaptiveSourceBudget.cs#L198) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@13965.entry | [198:46](../YouTubeAdaptiveSourceBudget.cs#L198) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@14044 | [199:34](../YouTubeAdaptiveSourceBudget.cs#L199) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.oldest.anonymous@14044.entry | [199:34](../YouTubeAdaptiveSourceBudget.cs#L199) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.GetObservation.pending | [203:35](../YouTubeAdaptiveSourceBudget.cs#L203) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync | [217:9](../YouTubeAdaptiveSourceBudget.cs#L217) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.input | [217:61](../YouTubeAdaptiveSourceBudget.cs#L217) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.acquired | [219:18](../YouTubeAdaptiveSourceBudget.cs#L219) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.deadline | [220:23](../YouTubeAdaptiveSourceBudget.cs#L220) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.count | [226:21](../YouTubeAdaptiveSourceBudget.cs#L226) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.watch | [228:21](../YouTubeAdaptiveSourceBudget.cs#L228) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.bytes | [229:21](../YouTubeAdaptiveSourceBudget.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.rate | [233:24](../YouTubeAdaptiveSourceBudget.cs#L233) |
+| catch-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.MeasureAsync.error | [237:19](../YouTubeAdaptiveSourceBudget.cs#L237) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Fallback | [245:9](../YouTubeAdaptiveSourceBudget.cs#L245) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.CodecPreference | [246:9](../YouTubeAdaptiveSourceBudget.cs#L246) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.CodecPreference.codec | [246:44](../YouTubeAdaptiveSourceBudget.cs#L246) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text | [247:9](../YouTubeAdaptiveSourceBudget.cs#L247) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.value | [247:36](../YouTubeAdaptiveSourceBudget.cs#L247) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.field | [247:55](../YouTubeAdaptiveSourceBudget.cs#L247) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Text.item | [248:52](../YouTubeAdaptiveSourceBudget.cs#L248) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number | [249:9](../YouTubeAdaptiveSourceBudget.cs#L249) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.value | [249:39](../YouTubeAdaptiveSourceBudget.cs#L249) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.field | [249:58](../YouTubeAdaptiveSourceBudget.cs#L249) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.item | [250:52](../YouTubeAdaptiveSourceBudget.cs#L250) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Number.number | [251:42](../YouTubeAdaptiveSourceBudget.cs#L251) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer | [252:9](../YouTubeAdaptiveSourceBudget.cs#L252) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.value | [252:37](../YouTubeAdaptiveSourceBudget.cs#L252) |
+| parameter | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.field | [252:56](../YouTubeAdaptiveSourceBudget.cs#L252) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.item | [253:52](../YouTubeAdaptiveSourceBudget.cs#L253) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Integer.number | [253:128](../YouTubeAdaptiveSourceBudget.cs#L253) |
+| method | Emby.YouTubePlugin.YouTubeAdaptiveSourceBudget.Failure | [254:9](../YouTubeAdaptiveSourceBudget.cs#L254) |
 
 </details>
 
@@ -3722,6 +3759,52 @@ Plugin Compile source (SDK default); 54112 bytes; 1248 lines.
 | method | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt | [1238:9](../YouTubeApi.cs#L1238) |
 | parameter | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.publishedAt | [1238:50](../YouTubeApi.cs#L1238) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.dt | [1243:29](../YouTubeApi.cs#L1243) |
+
+</details>
+
+<a id="file-cf7aa53825fc61a7"></a>
+## [YouTubeAudioTracks.cs](../YouTubeAudioTracks.cs)
+
+Plugin Compile source (SDK default); 3554 bytes; 67 lines.
+
+<details>
+<summary>All 33 declarations / anchors</summary>
+
+| Kind | Owner / name | Source |
+|---|---|---|
+| namespace | Emby.YouTubePlugin | [8:1](../YouTubeAudioTracks.cs#L8) |
+| type | Emby.YouTubePlugin.YouTubeAudioTracks | [12:5](../YouTubeAudioTracks.cs#L12) |
+| field | Emby.YouTubePlugin.YouTubeAudioTracks.MaximumTracks | [14:28](../YouTubeAudioTracks.cs#L14) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Index | [16:9](../YouTubeAudioTracks.cs#L16) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Index.key | [16:35](../YouTubeAudioTracks.cs#L16) |
+| local-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Index.hash | [18:17](../YouTubeAudioTracks.cs#L18) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Key | [22:9](../YouTubeAudioTracks.cs#L22) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Key.format | [22:36](../YouTubeAudioTracks.cs#L22) |
+| local-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Key.id | [24:17](../YouTubeAudioTracks.cs#L24) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.IsDefault | [31:9](../YouTubeAudioTracks.cs#L31) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.IsDefault.format | [31:40](../YouTubeAudioTracks.cs#L31) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAudioTracks.IsDefault.value | [32:70](../YouTubeAudioTracks.cs#L32) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAudioTracks.IsDefault.preference | [33:47](../YouTubeAudioTracks.cs#L33) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.HasExplicitOriginalLabel | [37:9](../YouTubeAudioTracks.cs#L37) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.HasExplicitOriginalLabel.value | [37:55](../YouTubeAudioTracks.cs#L37) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.IsOriginal | [42:9](../YouTubeAudioTracks.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.IsOriginal.format | [42:41](../YouTubeAudioTracks.cs#L42) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Title | [45:9](../YouTubeAudioTracks.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Title.format | [45:38](../YouTubeAudioTracks.cs#L45) |
+| local-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Title.name | [47:17](../YouTubeAudioTracks.cs#L47) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Clean | [57:9](../YouTubeAudioTracks.cs#L57) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Clean.value | [57:38](../YouTubeAudioTracks.cs#L57) |
+| local-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Clean.text | [59:17](../YouTubeAudioTracks.cs#L59) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAudioTracks.Clean.text.anonymous@2898 | [59:47](../YouTubeAudioTracks.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Clean.text.anonymous@2898.c | [59:47](../YouTubeAudioTracks.cs#L59) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Text | [62:9](../YouTubeAudioTracks.cs#L62) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Text.value | [62:37](../YouTubeAudioTracks.cs#L62) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Text.field | [62:56](../YouTubeAudioTracks.cs#L62) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Text.item | [63:52](../YouTubeAudioTracks.cs#L63) |
+| method | Emby.YouTubePlugin.YouTubeAudioTracks.Flag | [64:9](../YouTubeAudioTracks.cs#L64) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Flag.value | [64:36](../YouTubeAudioTracks.cs#L64) |
+| parameter | Emby.YouTubePlugin.YouTubeAudioTracks.Flag.field | [64:55](../YouTubeAudioTracks.cs#L64) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAudioTracks.Flag.item | [65:52](../YouTubeAudioTracks.cs#L65) |
 
 </details>
 
@@ -4119,10 +4202,10 @@ Plugin Compile source (SDK default); 4987 bytes; 131 lines.
 <a id="file-d1cc636f42c38fb0"></a>
 ## [YouTubeChannel.DirectPlayback.cs](../YouTubeChannel.DirectPlayback.cs)
 
-Plugin Compile source (SDK default); 56934 bytes; 869 lines.
+Plugin Compile source (SDK default); 60158 bytes; 902 lines.
 
 <details>
-<summary>All 363 declarations / anchors</summary>
+<summary>All 392 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -4138,357 +4221,386 @@ Plugin Compile source (SDK default); 56934 bytes; 869 lines.
 | type | Emby.YouTubePlugin.YouTubeDirectPlayback | [37:5](../YouTubeChannel.DirectPlayback.cs#L37) |
 | field | Emby.YouTubePlugin.YouTubeDirectPlayback.ManifestGate | [39:47](../YouTubeChannel.DirectPlayback.cs#L39) |
 | field | Emby.YouTubePlugin.YouTubeDirectPlayback.MaximumManifestFiles | [40:27](../YouTubeChannel.DirectPlayback.cs#L40) |
-| field | Emby.YouTubePlugin.YouTubeDirectPlayback.ManifestLifetime | [41:42](../YouTubeChannel.DirectPlayback.cs#L41) |
-| field | Emby.YouTubePlugin.YouTubeDirectPlayback._fetchMaster | [44:109](../YouTubeChannel.DirectPlayback.cs#L44) |
-| property | Emby.YouTubePlugin.YouTubeDirectPlayback.Enabled | [46:9](../YouTubeChannel.DirectPlayback.cs#L46) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.IsVideoIdCharacter | [47:9](../YouTubeChannel.DirectPlayback.cs#L47) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsVideoIdCharacter.c | [47:49](../YouTubeChannel.DirectPlayback.cs#L47) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync | [49:9](../YouTubeChannel.DirectPlayback.cs#L49) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoId | [49:87](../YouTubeChannel.DirectPlayback.cs#L49) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.cancellationToken | [49:103](../YouTubeChannel.DirectPlayback.cs#L49) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.stage | [52:17](../YouTubeChannel.DirectPlayback.cs#L52) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.resolved | [55:21](../YouTubeChannel.DirectPlayback.cs#L55) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.metadata | [58:21](../YouTubeChannel.DirectPlayback.cs#L58) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.formats | [61:65](../YouTubeChannel.DirectPlayback.cs#L61) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.maximumHeight | [64:21](../YouTubeChannel.DirectPlayback.cs#L64) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates | [65:21](../YouTubeChannel.DirectPlayback.cs#L65) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates.anonymous@3609 | [65:65](../YouTubeChannel.DirectPlayback.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates.anonymous@3609.f | [65:65](../YouTubeChannel.DirectPlayback.cs#L65) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls | [67:21](../YouTubeChannel.DirectPlayback.cs#L67) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@3801 | [67:44](../YouTubeChannel.DirectPlayback.cs#L67) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@3801.f | [67:44](../YouTubeChannel.DirectPlayback.cs#L67) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4086 | [70:40](../YouTubeChannel.DirectPlayback.cs#L70) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4086.f | [70:40](../YouTubeChannel.DirectPlayback.cs#L70) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4130 | [70:84](../YouTubeChannel.DirectPlayback.cs#L70) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4130.f | [70:84](../YouTubeChannel.DirectPlayback.cs#L70) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.headers | [71:21](../YouTubeChannel.DirectPlayback.cs#L71) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.source | [72:33](../YouTubeChannel.DirectPlayback.cs#L72) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.masterUri | [76:22](../YouTubeChannel.DirectPlayback.cs#L76) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.managedMaster | [77:22](../YouTubeChannel.DirectPlayback.cs#L77) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.managedMaster.masterValue | [77:90](../YouTubeChannel.DirectPlayback.cs#L77) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.header | [89:21](../YouTubeChannel.DirectPlayback.cs#L89) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.bytes | [97:25](../YouTubeChannel.DirectPlayback.cs#L97) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.master | [101:25](../YouTubeChannel.DirectPlayback.cs#L101) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.advertised | [103:25](../YouTubeChannel.DirectPlayback.cs#L103) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.selected | [111:25](../YouTubeChannel.DirectPlayback.cs#L111) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.manifestPath | [113:25](../YouTubeChannel.DirectPlayback.cs#L113) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.selected | [133:25](../YouTubeChannel.DirectPlayback.cs#L133) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.video | [134:25](../YouTubeChannel.DirectPlayback.cs#L134) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audio | [135:25](../YouTubeChannel.DirectPlayback.cs#L135) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoHeaders | [141:25](../YouTubeChannel.DirectPlayback.cs#L141) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.header | [142:21](../YouTubeChannel.DirectPlayback.cs#L142) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoPath | [144:25](../YouTubeChannel.DirectPlayback.cs#L144) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audioPath | [145:29](../YouTubeChannel.DirectPlayback.cs#L145) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audioHeaders | [148:29](../YouTubeChannel.DirectPlayback.cs#L148) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.header | [149:25](../YouTubeChannel.DirectPlayback.cs#L149) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audioFormat | [155:25](../YouTubeChannel.DirectPlayback.cs#L155) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audioStream | [156:25](../YouTubeChannel.DirectPlayback.cs#L156) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.isLive | [187:21](../YouTubeChannel.DirectPlayback.cs#L187) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.isLive.live | [188:67](../YouTubeChannel.DirectPlayback.cs#L188) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.duration | [191:21](../YouTubeChannel.DirectPlayback.cs#L191) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@13803 | [205:67](../YouTubeChannel.DirectPlayback.cs#L205) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@13803.s | [205:67](../YouTubeChannel.DirectPlayback.cs#L205) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@14131 | [210:76](../YouTubeChannel.DirectPlayback.cs#L210) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@14131.s | [210:76](../YouTubeChannel.DirectPlayback.cs#L210) |
-| catch-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.error | [220:19](../YouTubeChannel.DirectPlayback.cs#L220) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo | [229:9](../YouTubeChannel.DirectPlayback.cs#L229) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.response | [229:58](../YouTubeChannel.DirectPlayback.cs#L229) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.videoId | [229:75](../YouTubeChannel.DirectPlayback.cs#L229) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.property | [234:17](../YouTubeChannel.DirectPlayback.cs#L234) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.original | [235:17](../YouTubeChannel.DirectPlayback.cs#L235) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources | [236:17](../YouTubeChannel.DirectPlayback.cs#L236) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988 | [237:24](../YouTubeChannel.DirectPlayback.cs#L237) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988.s | [237:24](../YouTubeChannel.DirectPlayback.cs#L237) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988.anonymous@16101 | [238:44](../YouTubeChannel.DirectPlayback.cs#L238) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988.anonymous@16101.t | [238:44](../YouTubeChannel.DirectPlayback.cs#L238) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988.anonymous@16189 | [239:43](../YouTubeChannel.DirectPlayback.cs#L239) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@15988.anonymous@16189.t | [239:43](../YouTubeChannel.DirectPlayback.cs#L239) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.list | [246:40](../YouTubeChannel.DirectPlayback.cs#L246) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.i | [248:26](../YouTubeChannel.DirectPlayback.cs#L248) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.source | [249:56](../YouTubeChannel.DirectPlayback.cs#L249) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.SourceId | [255:9](../YouTubeChannel.DirectPlayback.cs#L255) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.SourceId.videoId | [255:41](../YouTubeChannel.DirectPlayback.cs#L255) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedMediaUri | [256:9](../YouTubeChannel.DirectPlayback.cs#L256) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedMediaUri.value | [256:53](../YouTubeChannel.DirectPlayback.cs#L256) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Text | [264:9](../YouTubeChannel.DirectPlayback.cs#L264) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.value | [264:36](../YouTubeChannel.DirectPlayback.cs#L264) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.name | [264:55](../YouTubeChannel.DirectPlayback.cs#L264) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.p | [264:106](../YouTubeChannel.DirectPlayback.cs#L264) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Number | [265:9](../YouTubeChannel.DirectPlayback.cs#L265) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.value | [265:39](../YouTubeChannel.DirectPlayback.cs#L265) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.name | [265:58](../YouTubeChannel.DirectPlayback.cs#L265) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.p | [265:109](../YouTubeChannel.DirectPlayback.cs#L265) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.number | [265:177](../YouTubeChannel.DirectPlayback.cs#L265) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer | [266:9](../YouTubeChannel.DirectPlayback.cs#L266) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.value | [266:36](../YouTubeChannel.DirectPlayback.cs#L266) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.name | [266:55](../YouTubeChannel.DirectPlayback.cs#L266) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.p | [266:106](../YouTubeChannel.DirectPlayback.cs#L266) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.n | [266:173](../YouTubeChannel.DirectPlayback.cs#L266) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger | [267:9](../YouTubeChannel.DirectPlayback.cs#L267) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.value | [267:45](../YouTubeChannel.DirectPlayback.cs#L267) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.name | [267:64](../YouTubeChannel.DirectPlayback.cs#L267) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.number | [269:17](../YouTubeChannel.DirectPlayback.cs#L269) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.BitsPerSecond | [272:9](../YouTubeChannel.DirectPlayback.cs#L272) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.BitsPerSecond.kbps | [272:43](../YouTubeChannel.DirectPlayback.cs#L272) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers | [273:9](../YouTubeChannel.DirectPlayback.cs#L273) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers.value | [273:59](../YouTubeChannel.DirectPlayback.cs#L273) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers.h | [273:156](../YouTubeChannel.DirectPlayback.cs#L273) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync | [275:9](../YouTubeChannel.DirectPlayback.cs#L275) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.content | [275:62](../YouTubeChannel.DirectPlayback.cs#L275) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.cancellationToken | [275:78](../YouTubeChannel.DirectPlayback.cs#L275) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.bytes | [277:17](../YouTubeChannel.DirectPlayback.cs#L277) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.root | [279:17](../YouTubeChannel.DirectPlayback.cs#L279) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.directory | [281:17](../YouTubeChannel.DirectPlayback.cs#L281) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.name | [282:17](../YouTubeChannel.DirectPlayback.cs#L282) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.path | [289:21](../YouTubeChannel.DirectPlayback.cs#L289) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files | [296:21](../YouTubeChannel.DirectPlayback.cs#L296) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files.anonymous@20346 | [296:95](../YouTubeChannel.DirectPlayback.cs#L296) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files.anonymous@20346.p | [296:95](../YouTubeChannel.DirectPlayback.cs#L296) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file | [297:17](../YouTubeChannel.DirectPlayback.cs#L297) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file.anonymous@20428 | [297:50](../YouTubeChannel.DirectPlayback.cs#L297) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file.anonymous@20428.f | [297:50](../YouTubeChannel.DirectPlayback.cs#L297) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.temporary | [300:21](../YouTubeChannel.DirectPlayback.cs#L300) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.stream | [303:32](../YouTubeChannel.DirectPlayback.cs#L303) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest | [318:9](../YouTubeChannel.DirectPlayback.cs#L318) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.path | [318:45](../YouTubeChannel.DirectPlayback.cs#L318) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.name | [320:17](../YouTubeChannel.DirectPlayback.cs#L320) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.anonymous@21793 | [322:38](../YouTubeChannel.DirectPlayback.cs#L322) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.anonymous@21793.c | [322:38](../YouTubeChannel.DirectPlayback.cs#L322) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath | [325:9](../YouTubeChannel.DirectPlayback.cs#L325) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.path | [325:57](../YouTubeChannel.DirectPlayback.cs#L325) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.root | [327:17](../YouTubeChannel.DirectPlayback.cs#L327) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.directory | [330:17](../YouTubeChannel.DirectPlayback.cs#L330) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.fullPath | [331:17](../YouTubeChannel.DirectPlayback.cs#L331) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.comparison | [332:17](../YouTubeChannel.DirectPlayback.cs#L332) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.parent | [333:17](../YouTubeChannel.DirectPlayback.cs#L333) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.file | [334:17](../YouTubeChannel.DirectPlayback.cs#L334) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod | [341:9](../YouTubeChannel.DirectPlayback.cs#L341) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod.path | [342:41](../YouTubeChannel.DirectPlayback.cs#L342) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod.mode | [342:54](../YouTubeChannel.DirectPlayback.cs#L342) |
-| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess | [343:9](../YouTubeChannel.DirectPlayback.cs#L343) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess.path | [343:44](../YouTubeChannel.DirectPlayback.cs#L343) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess.mode | [343:57](../YouTubeChannel.DirectPlayback.cs#L343) |
-| type | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility | [355:5](../YouTubeChannel.DirectPlayback.cs#L355) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.HarmonyId | [357:30](../YouTubeChannel.DirectPlayback.cs#L357) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SourcePrefix | [358:30](../YouTubeChannel.DirectPlayback.cs#L358) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Sync | [359:40](../YouTubeChannel.DirectPlayback.cs#L359) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._harmony | [360:32](../YouTubeChannel.DirectPlayback.cs#L360) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._harmonyType | [361:30](../YouTubeChannel.DirectPlayback.cs#L361) |
-| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._binding | [362:33](../YouTubeChannel.DirectPlayback.cs#L362) |
-| type | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding | [364:9](../YouTubeChannel.DirectPlayback.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Source | [364:39](../YouTubeChannel.DirectPlayback.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputCodec | [364:60](../YouTubeChannel.DirectPlayback.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Input0 | [365:13](../YouTubeChannel.DirectPlayback.cs#L365) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Inputs | [365:34](../YouTubeChannel.DirectPlayback.cs#L365) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Url | [365:55](../YouTubeChannel.DirectPlayback.cs#L365) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Options | [366:13](../YouTubeChannel.DirectPlayback.cs#L366) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Protocol | [366:35](../YouTubeChannel.DirectPlayback.cs#L366) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.HttpType | [366:58](../YouTubeChannel.DirectPlayback.cs#L366) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.HttpStrings | [367:13](../YouTubeChannel.DirectPlayback.cs#L367) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.InputOptions | [367:41](../YouTubeChannel.DirectPlayback.cs#L367) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.ResolutionWidth | [368:13](../YouTubeChannel.DirectPlayback.cs#L368) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.ResolutionHeight | [368:43](../YouTubeChannel.DirectPlayback.cs#L368) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.SupportedCodecs | [368:74](../YouTubeChannel.DirectPlayback.cs#L368) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OriginalAudioStream | [369:13](../YouTubeChannel.DirectPlayback.cs#L369) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.BaseRequest | [369:47](../YouTubeChannel.DirectPlayback.cs#L369) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.StaticRequest | [369:73](../YouTubeChannel.DirectPlayback.cs#L369) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.TargetFrameRate | [370:13](../YouTubeChannel.DirectPlayback.cs#L370) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Output0 | [370:41](../YouTubeChannel.DirectPlayback.cs#L370) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputVideo | [370:63](../YouTubeChannel.DirectPlayback.cs#L370) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.VideoOptions | [371:13](../YouTubeChannel.DirectPlayback.cs#L371) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputFrameRate | [371:40](../YouTubeChannel.DirectPlayback.cs#L371) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.RequireInstalled | [373:9](../YouTubeChannel.DirectPlayback.cs#L373) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install | [380:9](../YouTubeChannel.DirectPlayback.cs#L380) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.stage | [385:21](../YouTubeChannel.DirectPlayback.cs#L385) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.encoder | [388:34](../YouTubeChannel.DirectPlayback.cs#L388) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.builder | [389:25](../YouTubeChannel.DirectPlayback.cs#L389) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.state | [390:25](../YouTubeChannel.DirectPlayback.cs#L390) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.command | [391:25](../YouTubeChannel.DirectPlayback.cs#L391) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.input | [392:25](../YouTubeChannel.DirectPlayback.cs#L392) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.output | [393:25](../YouTubeChannel.DirectPlayback.cs#L393) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.http | [394:25](../YouTubeChannel.DirectPlayback.cs#L394) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.resolution | [395:25](../YouTubeChannel.DirectPlayback.cs#L395) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.map | [398:25](../YouTubeChannel.DirectPlayback.cs#L398) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.setup | [399:25](../YouTubeChannel.DirectPlayback.cs#L399) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.resolutionLimits | [400:25](../YouTubeChannel.DirectPlayback.cs#L400) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.outputStream | [403:25](../YouTubeChannel.DirectPlayback.cs#L403) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioChannels | [405:25](../YouTubeChannel.DirectPlayback.cs#L405) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector | [411:25](../YouTubeChannel.DirectPlayback.cs#L411) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@27289 | [413:33](../YouTubeChannel.DirectPlayback.cs#L413) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@27289.m | [413:33](../YouTubeChannel.DirectPlayback.cs#L413) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@27289.p | [414:57](../YouTubeChannel.DirectPlayback.cs#L414) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.codecSelector | [419:25](../YouTubeChannel.DirectPlayback.cs#L419) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.frameRateSelector | [424:25](../YouTubeChannel.DirectPlayback.cs#L424) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments | [428:25](../YouTubeChannel.DirectPlayback.cs#L428) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@28770 | [429:33](../YouTubeChannel.DirectPlayback.cs#L429) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@28770.m | [429:33](../YouTubeChannel.DirectPlayback.cs#L429) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@28770.p | [431:57](../YouTubeChannel.DirectPlayback.cs#L431) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.segmentPolicyType | [439:25](../YouTubeChannel.DirectPlayback.cs#L439) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.segmentPolicy | [440:33](../YouTubeChannel.DirectPlayback.cs#L440) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.options | [450:25](../YouTubeChannel.DirectPlayback.cs#L450) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.baseRequest | [451:25](../YouTubeChannel.DirectPlayback.cs#L451) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.output0 | [452:25](../YouTubeChannel.DirectPlayback.cs#L452) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.outputVideo | [453:25](../YouTubeChannel.DirectPlayback.cs#L453) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoOptions | [456:25](../YouTubeChannel.DirectPlayback.cs#L456) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding | [461:25](../YouTubeChannel.DirectPlayback.cs#L461) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@31860 | [467:77](../YouTubeChannel.DirectPlayback.cs#L467) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@31860.n | [467:77](../YouTubeChannel.DirectPlayback.cs#L467) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@31974 | [468:58](../YouTubeChannel.DirectPlayback.cs#L468) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@31974.n | [468:58](../YouTubeChannel.DirectPlayback.cs#L468) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.assembly | [482:25](../YouTubeChannel.DirectPlayback.cs#L482) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.methodType | [484:25](../YouTubeChannel.DirectPlayback.cs#L484) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch | [486:25](../YouTubeChannel.DirectPlayback.cs#L486) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@33713 | [486:66](../YouTubeChannel.DirectPlayback.cs#L486) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@33713.m | [486:66](../YouTubeChannel.DirectPlayback.cs#L486) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@33713.anonymous@33902 | [488:50](../YouTubeChannel.DirectPlayback.cs#L488) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@33713.anonymous@33902.p | [488:50](../YouTubeChannel.DirectPlayback.cs#L488) |
-| local-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add | [489:21](../YouTubeChannel.DirectPlayback.cs#L489) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.original | [489:30](../YouTubeChannel.DirectPlayback.cs#L489) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.name | [489:51](../YouTubeChannel.DirectPlayback.cs#L489) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.isPrefix | [489:64](../YouTubeChannel.DirectPlayback.cs#L489) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.callback | [491:29](../YouTubeChannel.DirectPlayback.cs#L491) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.patchMethod | [492:29](../YouTubeChannel.DirectPlayback.cs#L492) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.parameters | [493:29](../YouTubeChannel.DirectPlayback.cs#L493) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.arguments | [494:29](../YouTubeChannel.DirectPlayback.cs#L494) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.i | [496:34](../YouTubeChannel.DirectPlayback.cs#L496) |
-| catch-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.error | [517:23](../YouTubeChannel.DirectPlayback.cs#L517) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Uninstall | [527:9](../YouTubeChannel.DirectPlayback.cs#L527) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix | [543:9](../YouTubeChannel.DirectPlayback.cs#L543) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix.__0 | [543:47](../YouTubeChannel.DirectPlayback.cs#L543) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix.__1 | [543:59](../YouTubeChannel.DirectPlayback.cs#L543) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix | [544:9](../YouTubeChannel.DirectPlayback.cs#L544) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix.__0 | [544:47](../YouTubeChannel.DirectPlayback.cs#L544) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix.__1 | [544:59](../YouTubeChannel.DirectPlayback.cs#L544) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix | [545:9](../YouTubeChannel.DirectPlayback.cs#L545) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix.__0 | [545:52](../YouTubeChannel.DirectPlayback.cs#L545) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix.__3 | [545:64](../YouTubeChannel.DirectPlayback.cs#L545) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix | [546:9](../YouTubeChannel.DirectPlayback.cs#L546) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__instance | [546:46](../YouTubeChannel.DirectPlayback.cs#L546) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__0 | [546:65](../YouTubeChannel.DirectPlayback.cs#L546) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__1 | [546:77](../YouTubeChannel.DirectPlayback.cs#L546) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__result | [546:87](../YouTubeChannel.DirectPlayback.cs#L546) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.binding | [550:17](../YouTubeChannel.DirectPlayback.cs#L550) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.source | [552:17](../YouTubeChannel.DirectPlayback.cs#L552) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.request | [555:17](../YouTubeChannel.DirectPlayback.cs#L555) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.effective | [570:25](../YouTubeChannel.DirectPlayback.cs#L570) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix | [582:9](../YouTubeChannel.DirectPlayback.cs#L582) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.__0 | [582:51](../YouTubeChannel.DirectPlayback.cs#L582) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.__3 | [582:63](../YouTubeChannel.DirectPlayback.cs#L582) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.binding | [584:17](../YouTubeChannel.DirectPlayback.cs#L584) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.source | [586:17](../YouTubeChannel.DirectPlayback.cs#L586) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.codec | [588:17](../YouTubeChannel.DirectPlayback.cs#L588) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.request | [589:17](../YouTubeChannel.DirectPlayback.cs#L589) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.output | [599:21](../YouTubeChannel.DirectPlayback.cs#L599) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.video | [600:21](../YouTubeChannel.DirectPlayback.cs#L600) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.options | [601:21](../YouTubeChannel.DirectPlayback.cs#L601) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.oldText | [603:21](../YouTubeChannel.DirectPlayback.cs#L603) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.oldRate | [604:21](../YouTubeChannel.DirectPlayback.cs#L604) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.requested | [608:21](../YouTubeChannel.DirectPlayback.cs#L608) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.validRequested | [609:21](../YouTubeChannel.DirectPlayback.cs#L609) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.rate | [610:21](../YouTubeChannel.DirectPlayback.cs#L610) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.cappedRate | [613:21](../YouTubeChannel.DirectPlayback.cs#L613) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate | [629:9](../YouTubeChannel.DirectPlayback.cs#L629) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.text | [629:53](../YouTubeChannel.DirectPlayback.cs#L629) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.parts | [632:17](../YouTubeChannel.DirectPlayback.cs#L632) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.numerator | [634:105](../YouTubeChannel.DirectPlayback.cs#L634) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.denominator | [636:20](../YouTubeChannel.DirectPlayback.cs#L636) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.rate | [639:17](../YouTubeChannel.DirectPlayback.cs#L639) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix | [642:9](../YouTubeChannel.DirectPlayback.cs#L642) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.__0 | [642:46](../YouTubeChannel.DirectPlayback.cs#L642) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.binding | [644:17](../YouTubeChannel.DirectPlayback.cs#L644) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.source | [646:17](../YouTubeChannel.DirectPlayback.cs#L646) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.codecs | [648:17](../YouTubeChannel.DirectPlayback.cs#L648) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index | [650:17](../YouTubeChannel.DirectPlayback.cs#L650) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index.anonymous@43564 | [650:49](../YouTubeChannel.DirectPlayback.cs#L650) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index.anonymous@43564.c | [650:49](../YouTubeChannel.DirectPlayback.cs#L650) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.preferred | [662:21](../YouTubeChannel.DirectPlayback.cs#L662) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio | [674:9](../YouTubeChannel.DirectPlayback.cs#L674) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.state | [674:61](../YouTubeChannel.DirectPlayback.cs#L674) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.outputStream | [674:75](../YouTubeChannel.DirectPlayback.cs#L674) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.binding | [676:17](../YouTubeChannel.DirectPlayback.cs#L676) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.source | [678:17](../YouTubeChannel.DirectPlayback.cs#L678) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.audio | [680:17](../YouTubeChannel.DirectPlayback.cs#L680) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix | [697:9](../YouTubeChannel.DirectPlayback.cs#L697) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__0 | [697:50](../YouTubeChannel.DirectPlayback.cs#L697) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__1 | [697:62](../YouTubeChannel.DirectPlayback.cs#L697) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__2 | [697:74](../YouTubeChannel.DirectPlayback.cs#L697) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__result | [697:86](../YouTubeChannel.DirectPlayback.cs#L697) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.audio | [700:17](../YouTubeChannel.DirectPlayback.cs#L700) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.maximum | [705:17](../YouTubeChannel.DirectPlayback.cs#L705) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix | [709:9](../YouTubeChannel.DirectPlayback.cs#L709) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__0 | [709:45](../YouTubeChannel.DirectPlayback.cs#L709) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__1 | [709:57](../YouTubeChannel.DirectPlayback.cs#L709) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__2 | [709:69](../YouTubeChannel.DirectPlayback.cs#L709) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index | [712:17](../YouTubeChannel.DirectPlayback.cs#L712) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index.anonymous@46942 | [712:46](../YouTubeChannel.DirectPlayback.cs#L712) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index.anonymous@46942.c | [712:46](../YouTubeChannel.DirectPlayback.cs#L712) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.preferred | [716:17](../YouTubeChannel.DirectPlayback.cs#L716) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix | [722:9](../YouTubeChannel.DirectPlayback.cs#L722) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__0 | [722:50](../YouTubeChannel.DirectPlayback.cs#L722) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__1 | [722:62](../YouTubeChannel.DirectPlayback.cs#L722) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__result | [722:71](../YouTubeChannel.DirectPlayback.cs#L722) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.binding | [724:17](../YouTubeChannel.DirectPlayback.cs#L724) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.source | [726:17](../YouTubeChannel.DirectPlayback.cs#L726) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.IsCanonicalDirectSource | [745:9](../YouTubeChannel.DirectPlayback.cs#L745) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.IsCanonicalDirectSource.source | [745:53](../YouTubeChannel.DirectPlayback.cs#L745) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit | [750:9](../YouTubeChannel.DirectPlayback.cs#L750) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.state | [750:46](../YouTubeChannel.DirectPlayback.cs#L750) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.resolution | [750:60](../YouTubeChannel.DirectPlayback.cs#L750) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.binding | [752:17](../YouTubeChannel.DirectPlayback.cs#L752) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.source | [754:17](../YouTubeChannel.DirectPlayback.cs#L754) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.maximumHeight | [764:21](../YouTubeChannel.DirectPlayback.cs#L764) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.maximumWidth | [768:21](../YouTubeChannel.DirectPlayback.cs#L768) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.previousWidth | [769:21](../YouTubeChannel.DirectPlayback.cs#L769) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.previousHeight | [770:21](../YouTubeChannel.DirectPlayback.cs#L770) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply | [785:9](../YouTubeChannel.DirectPlayback.cs#L785) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.state | [785:35](../YouTubeChannel.DirectPlayback.cs#L785) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.command | [785:49](../YouTubeChannel.DirectPlayback.cs#L785) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.requireMappedInput | [785:65](../YouTubeChannel.DirectPlayback.cs#L785) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.binding | [787:17](../YouTubeChannel.DirectPlayback.cs#L787) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.source | [792:17](../YouTubeChannel.DirectPlayback.cs#L792) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.manifest | [799:25](../YouTubeChannel.DirectPlayback.cs#L799) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.hlsInput | [800:25](../YouTubeChannel.DirectPlayback.cs#L800) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.hlsOptions | [803:25](../YouTubeChannel.DirectPlayback.cs#L803) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@52497 | [804:49](../YouTubeChannel.DirectPlayback.cs#L804) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@52497.p | [804:49](../YouTubeChannel.DirectPlayback.cs#L804) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks | [813:17](../YouTubeChannel.DirectPlayback.cs#L813) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks.anonymous@52884 | [813:53](../YouTubeChannel.DirectPlayback.cs#L813) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks.anonymous@52884.s | [813:53](../YouTubeChannel.DirectPlayback.cs#L813) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.videoUrl | [819:21](../YouTubeChannel.DirectPlayback.cs#L819) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.audioUrl | [820:21](../YouTubeChannel.DirectPlayback.cs#L820) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.primary | [821:21](../YouTubeChannel.DirectPlayback.cs#L821) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.inputs | [824:21](../YouTubeChannel.DirectPlayback.cs#L824) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.inputs.anonymous@53843 | [825:43](../YouTubeChannel.DirectPlayback.cs#L825) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.inputs.anonymous@53843.i | [825:43](../YouTubeChannel.DirectPlayback.cs#L825) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.outputCodec | [830:21](../YouTubeChannel.DirectPlayback.cs#L830) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.protocol | [834:21](../YouTubeChannel.DirectPlayback.cs#L834) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.copiedProtocol | [836:21](../YouTubeChannel.DirectPlayback.cs#L836) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.property | [837:17](../YouTubeChannel.DirectPlayback.cs#L837) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.primaryOptions | [838:21](../YouTubeChannel.DirectPlayback.cs#L838) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.audioOptions | [839:21](../YouTubeChannel.DirectPlayback.cs#L839) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.property | [840:17](../YouTubeChannel.DirectPlayback.cs#L840) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType | [849:9](../YouTubeChannel.DirectPlayback.cs#L849) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.name | [849:38](../YouTubeChannel.DirectPlayback.cs#L849) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@55717 | [850:21](../YouTubeChannel.DirectPlayback.cs#L850) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@55717.a | [850:21](../YouTubeChannel.DirectPlayback.cs#L850) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@55761 | [850:65](../YouTubeChannel.DirectPlayback.cs#L850) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@55761.t | [850:65](../YouTubeChannel.DirectPlayback.cs#L850) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property | [851:9](../YouTubeChannel.DirectPlayback.cs#L851) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.type | [851:46](../YouTubeChannel.DirectPlayback.cs#L851) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.name | [851:57](../YouTubeChannel.DirectPlayback.cs#L851) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.expected | [851:70](../YouTubeChannel.DirectPlayback.cs#L851) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.writable | [851:93](../YouTubeChannel.DirectPlayback.cs#L851) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.property | [853:17](../YouTubeChannel.DirectPlayback.cs#L853) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod | [858:9](../YouTubeChannel.DirectPlayback.cs#L858) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.type | [858:53](../YouTubeChannel.DirectPlayback.cs#L858) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.name | [858:64](../YouTubeChannel.DirectPlayback.cs#L858) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.parameters | [858:77](../YouTubeChannel.DirectPlayback.cs#L858) |
-| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning | [861:9](../YouTubeChannel.DirectPlayback.cs#L861) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.returns | [861:56](../YouTubeChannel.DirectPlayback.cs#L861) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.type | [861:70](../YouTubeChannel.DirectPlayback.cs#L861) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.name | [861:81](../YouTubeChannel.DirectPlayback.cs#L861) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.parameters | [861:94](../YouTubeChannel.DirectPlayback.cs#L861) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.method | [863:17](../YouTubeChannel.DirectPlayback.cs#L863) |
+| field | Emby.YouTubePlugin.YouTubeDirectPlayback.MaximumManifestBytes | [41:28](../YouTubeChannel.DirectPlayback.cs#L41) |
+| field | Emby.YouTubePlugin.YouTubeDirectPlayback.ManifestLifetime | [42:42](../YouTubeChannel.DirectPlayback.cs#L42) |
+| field | Emby.YouTubePlugin.YouTubeDirectPlayback._fetchMaster | [45:109](../YouTubeChannel.DirectPlayback.cs#L45) |
+| property | Emby.YouTubePlugin.YouTubeDirectPlayback.Enabled | [47:9](../YouTubeChannel.DirectPlayback.cs#L47) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.IsVideoIdCharacter | [48:9](../YouTubeChannel.DirectPlayback.cs#L48) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsVideoIdCharacter.c | [48:49](../YouTubeChannel.DirectPlayback.cs#L48) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync | [50:9](../YouTubeChannel.DirectPlayback.cs#L50) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoId | [50:87](../YouTubeChannel.DirectPlayback.cs#L50) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.cancellationToken | [50:103](../YouTubeChannel.DirectPlayback.cs#L50) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.stage | [53:17](../YouTubeChannel.DirectPlayback.cs#L53) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.resolved | [56:21](../YouTubeChannel.DirectPlayback.cs#L56) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.metadata | [59:21](../YouTubeChannel.DirectPlayback.cs#L59) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.formats | [62:65](../YouTubeChannel.DirectPlayback.cs#L62) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.maximumHeight | [65:21](../YouTubeChannel.DirectPlayback.cs#L65) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates | [66:21](../YouTubeChannel.DirectPlayback.cs#L66) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates.anonymous@3719 | [66:65](../YouTubeChannel.DirectPlayback.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.candidates.anonymous@3719.f | [66:65](../YouTubeChannel.DirectPlayback.cs#L66) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls | [68:21](../YouTubeChannel.DirectPlayback.cs#L68) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@3911 | [68:44](../YouTubeChannel.DirectPlayback.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@3911.f | [68:44](../YouTubeChannel.DirectPlayback.cs#L68) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4196 | [71:40](../YouTubeChannel.DirectPlayback.cs#L71) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4196.f | [71:40](../YouTubeChannel.DirectPlayback.cs#L71) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4240 | [71:84](../YouTubeChannel.DirectPlayback.cs#L71) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.hls.anonymous@4240.f | [71:84](../YouTubeChannel.DirectPlayback.cs#L71) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.headers | [72:21](../YouTubeChannel.DirectPlayback.cs#L72) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.source | [73:33](../YouTubeChannel.DirectPlayback.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.masterUri | [77:22](../YouTubeChannel.DirectPlayback.cs#L77) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.managedMaster | [78:22](../YouTubeChannel.DirectPlayback.cs#L78) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.managedMaster.masterValue | [78:90](../YouTubeChannel.DirectPlayback.cs#L78) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.header | [90:21](../YouTubeChannel.DirectPlayback.cs#L90) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.bytes | [98:25](../YouTubeChannel.DirectPlayback.cs#L98) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.master | [102:25](../YouTubeChannel.DirectPlayback.cs#L102) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.advertised | [104:25](../YouTubeChannel.DirectPlayback.cs#L104) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.selected | [112:25](../YouTubeChannel.DirectPlayback.cs#L112) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.manifestPath | [114:25](../YouTubeChannel.DirectPlayback.cs#L114) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.track | [126:21](../YouTubeChannel.DirectPlayback.cs#L126) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.selected | [143:25](../YouTubeChannel.DirectPlayback.cs#L143) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.video | [144:25](../YouTubeChannel.DirectPlayback.cs#L144) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audio | [145:25](../YouTubeChannel.DirectPlayback.cs#L145) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoHeaders | [151:25](../YouTubeChannel.DirectPlayback.cs#L151) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.header | [152:21](../YouTubeChannel.DirectPlayback.cs#L152) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.videoPath | [154:25](../YouTubeChannel.DirectPlayback.cs#L154) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.audioStreams | [155:25](../YouTubeChannel.DirectPlayback.cs#L155) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.track | [156:21](../YouTubeChannel.DirectPlayback.cs#L156) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.track.audioHeaders | [158:29](../YouTubeChannel.DirectPlayback.cs#L158) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.track.header | [159:25](../YouTubeChannel.DirectPlayback.cs#L159) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.track.audioPath | [160:29](../YouTubeChannel.DirectPlayback.cs#L160) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.isLive | [197:21](../YouTubeChannel.DirectPlayback.cs#L197) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.isLive.live | [198:67](../YouTubeChannel.DirectPlayback.cs#L198) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.duration | [201:21](../YouTubeChannel.DirectPlayback.cs#L201) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15086 | [215:67](../YouTubeChannel.DirectPlayback.cs#L215) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15086.s | [215:67](../YouTubeChannel.DirectPlayback.cs#L215) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15414 | [220:76](../YouTubeChannel.DirectPlayback.cs#L220) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15414.s | [220:76](../YouTubeChannel.DirectPlayback.cs#L220) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.occupiedIndices | [222:21](../YouTubeChannel.DirectPlayback.cs#L222) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.occupiedIndices.anonymous@15572 | [222:66](../YouTubeChannel.DirectPlayback.cs#L222) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.occupiedIndices.anonymous@15572.stream | [222:66](../YouTubeChannel.DirectPlayback.cs#L222) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15782 | [224:28](../YouTubeChannel.DirectPlayback.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.anonymous@15782.stream | [224:28](../YouTubeChannel.DirectPlayback.cs#L224) |
+| catch-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.GetMediaSourcesAsync.error | [232:19](../YouTubeChannel.DirectPlayback.cs#L232) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo | [241:9](../YouTubeChannel.DirectPlayback.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.response | [241:58](../YouTubeChannel.DirectPlayback.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.videoId | [241:75](../YouTubeChannel.DirectPlayback.cs#L241) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.property | [246:17](../YouTubeChannel.DirectPlayback.cs#L246) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.original | [247:17](../YouTubeChannel.DirectPlayback.cs#L247) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources | [248:17](../YouTubeChannel.DirectPlayback.cs#L248) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447 | [249:24](../YouTubeChannel.DirectPlayback.cs#L249) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447.s | [249:24](../YouTubeChannel.DirectPlayback.cs#L249) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447.anonymous@17560 | [250:44](../YouTubeChannel.DirectPlayback.cs#L250) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447.anonymous@17560.t | [250:44](../YouTubeChannel.DirectPlayback.cs#L250) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447.anonymous@17648 | [251:43](../YouTubeChannel.DirectPlayback.cs#L251) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.sources.anonymous@17447.anonymous@17648.t | [251:43](../YouTubeChannel.DirectPlayback.cs#L251) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.list | [258:40](../YouTubeChannel.DirectPlayback.cs#L258) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.i | [260:26](../YouTubeChannel.DirectPlayback.cs#L260) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireDirectPlaybackInfo.source | [261:56](../YouTubeChannel.DirectPlayback.cs#L261) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.SourceId | [267:9](../YouTubeChannel.DirectPlayback.cs#L267) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.SourceId.videoId | [267:41](../YouTubeChannel.DirectPlayback.cs#L267) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedMediaUri | [268:9](../YouTubeChannel.DirectPlayback.cs#L268) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedMediaUri.value | [268:53](../YouTubeChannel.DirectPlayback.cs#L268) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Text | [276:9](../YouTubeChannel.DirectPlayback.cs#L276) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.value | [276:36](../YouTubeChannel.DirectPlayback.cs#L276) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.name | [276:55](../YouTubeChannel.DirectPlayback.cs#L276) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Text.p | [276:106](../YouTubeChannel.DirectPlayback.cs#L276) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Number | [277:9](../YouTubeChannel.DirectPlayback.cs#L277) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.value | [277:39](../YouTubeChannel.DirectPlayback.cs#L277) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.name | [277:58](../YouTubeChannel.DirectPlayback.cs#L277) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.p | [277:109](../YouTubeChannel.DirectPlayback.cs#L277) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Number.number | [277:177](../YouTubeChannel.DirectPlayback.cs#L277) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer | [278:9](../YouTubeChannel.DirectPlayback.cs#L278) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.value | [278:36](../YouTubeChannel.DirectPlayback.cs#L278) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.name | [278:55](../YouTubeChannel.DirectPlayback.cs#L278) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.p | [278:106](../YouTubeChannel.DirectPlayback.cs#L278) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Integer.n | [278:173](../YouTubeChannel.DirectPlayback.cs#L278) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger | [279:9](../YouTubeChannel.DirectPlayback.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.value | [279:45](../YouTubeChannel.DirectPlayback.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.name | [279:64](../YouTubeChannel.DirectPlayback.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.PositiveInteger.number | [281:17](../YouTubeChannel.DirectPlayback.cs#L281) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.BitsPerSecond | [284:9](../YouTubeChannel.DirectPlayback.cs#L284) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.BitsPerSecond.kbps | [284:43](../YouTubeChannel.DirectPlayback.cs#L284) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers | [285:9](../YouTubeChannel.DirectPlayback.cs#L285) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers.value | [285:59](../YouTubeChannel.DirectPlayback.cs#L285) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.Headers.h | [285:156](../YouTubeChannel.DirectPlayback.cs#L285) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync | [287:9](../YouTubeChannel.DirectPlayback.cs#L287) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.content | [287:62](../YouTubeChannel.DirectPlayback.cs#L287) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.cancellationToken | [287:78](../YouTubeChannel.DirectPlayback.cs#L287) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.bytes | [289:17](../YouTubeChannel.DirectPlayback.cs#L289) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.root | [291:17](../YouTubeChannel.DirectPlayback.cs#L291) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.directory | [293:17](../YouTubeChannel.DirectPlayback.cs#L293) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.name | [294:17](../YouTubeChannel.DirectPlayback.cs#L294) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.path | [301:21](../YouTubeChannel.DirectPlayback.cs#L301) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files | [308:21](../YouTubeChannel.DirectPlayback.cs#L308) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files.anonymous@21805 | [308:95](../YouTubeChannel.DirectPlayback.cs#L308) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.files.anonymous@21805.p | [308:95](../YouTubeChannel.DirectPlayback.cs#L308) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file | [309:17](../YouTubeChannel.DirectPlayback.cs#L309) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file.anonymous@21887 | [309:50](../YouTubeChannel.DirectPlayback.cs#L309) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.file.anonymous@21887.f | [309:50](../YouTubeChannel.DirectPlayback.cs#L309) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.fileCount | [314:21](../YouTubeChannel.DirectPlayback.cs#L314) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.totalBytes | [315:22](../YouTubeChannel.DirectPlayback.cs#L315) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.entry | [316:17](../YouTubeChannel.DirectPlayback.cs#L316) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.entry.file | [318:25](../YouTubeChannel.DirectPlayback.cs#L318) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.temporary | [325:21](../YouTubeChannel.DirectPlayback.cs#L325) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.StoreManifestAsync.stream | [328:32](../YouTubeChannel.DirectPlayback.cs#L328) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest | [343:9](../YouTubeChannel.DirectPlayback.cs#L343) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.path | [343:45](../YouTubeChannel.DirectPlayback.cs#L343) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.name | [345:17](../YouTubeChannel.DirectPlayback.cs#L345) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.anonymous@24124 | [347:38](../YouTubeChannel.DirectPlayback.cs#L347) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.IsOwnedManifest.anonymous@24124.c | [347:38](../YouTubeChannel.DirectPlayback.cs#L347) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath | [350:9](../YouTubeChannel.DirectPlayback.cs#L350) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.path | [350:57](../YouTubeChannel.DirectPlayback.cs#L350) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.root | [352:17](../YouTubeChannel.DirectPlayback.cs#L352) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.directory | [355:17](../YouTubeChannel.DirectPlayback.cs#L355) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.fullPath | [356:17](../YouTubeChannel.DirectPlayback.cs#L356) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.comparison | [357:17](../YouTubeChannel.DirectPlayback.cs#L357) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.parent | [358:17](../YouTubeChannel.DirectPlayback.cs#L358) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectPlayback.RequireOwnedManifestPath.file | [359:17](../YouTubeChannel.DirectPlayback.cs#L359) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod | [366:9](../YouTubeChannel.DirectPlayback.cs#L366) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod.path | [367:41](../YouTubeChannel.DirectPlayback.cs#L367) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.Chmod.mode | [367:54](../YouTubeChannel.DirectPlayback.cs#L367) |
+| method | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess | [368:9](../YouTubeChannel.DirectPlayback.cs#L368) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess.path | [368:44](../YouTubeChannel.DirectPlayback.cs#L368) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectPlayback.RestrictAccess.mode | [368:57](../YouTubeChannel.DirectPlayback.cs#L368) |
+| type | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility | [380:5](../YouTubeChannel.DirectPlayback.cs#L380) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.HarmonyId | [382:30](../YouTubeChannel.DirectPlayback.cs#L382) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SourcePrefix | [383:30](../YouTubeChannel.DirectPlayback.cs#L383) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Sync | [384:40](../YouTubeChannel.DirectPlayback.cs#L384) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._harmony | [385:32](../YouTubeChannel.DirectPlayback.cs#L385) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._harmonyType | [386:30](../YouTubeChannel.DirectPlayback.cs#L386) |
+| field | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility._binding | [387:33](../YouTubeChannel.DirectPlayback.cs#L387) |
+| type | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding | [389:9](../YouTubeChannel.DirectPlayback.cs#L389) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Source | [389:39](../YouTubeChannel.DirectPlayback.cs#L389) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputCodec | [389:60](../YouTubeChannel.DirectPlayback.cs#L389) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Input0 | [390:13](../YouTubeChannel.DirectPlayback.cs#L390) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Inputs | [390:34](../YouTubeChannel.DirectPlayback.cs#L390) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Url | [390:55](../YouTubeChannel.DirectPlayback.cs#L390) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Options | [391:13](../YouTubeChannel.DirectPlayback.cs#L391) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Protocol | [391:35](../YouTubeChannel.DirectPlayback.cs#L391) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.HttpType | [391:58](../YouTubeChannel.DirectPlayback.cs#L391) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.HttpStrings | [392:13](../YouTubeChannel.DirectPlayback.cs#L392) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.InputOptions | [392:41](../YouTubeChannel.DirectPlayback.cs#L392) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.ResolutionWidth | [393:13](../YouTubeChannel.DirectPlayback.cs#L393) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.ResolutionHeight | [393:43](../YouTubeChannel.DirectPlayback.cs#L393) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.SupportedCodecs | [393:74](../YouTubeChannel.DirectPlayback.cs#L393) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OriginalAudioStream | [394:13](../YouTubeChannel.DirectPlayback.cs#L394) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.BaseRequest | [394:47](../YouTubeChannel.DirectPlayback.cs#L394) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.StaticRequest | [394:73](../YouTubeChannel.DirectPlayback.cs#L394) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.TargetFrameRate | [395:13](../YouTubeChannel.DirectPlayback.cs#L395) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.Output0 | [395:41](../YouTubeChannel.DirectPlayback.cs#L395) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputVideo | [395:63](../YouTubeChannel.DirectPlayback.cs#L395) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.VideoOptions | [396:13](../YouTubeChannel.DirectPlayback.cs#L396) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.OutputFrameRate | [396:40](../YouTubeChannel.DirectPlayback.cs#L396) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Binding.SelectedAudioStreams | [396:70](../YouTubeChannel.DirectPlayback.cs#L396) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.RequireInstalled | [398:9](../YouTubeChannel.DirectPlayback.cs#L398) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install | [405:9](../YouTubeChannel.DirectPlayback.cs#L405) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.stage | [410:21](../YouTubeChannel.DirectPlayback.cs#L410) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.encoder | [413:34](../YouTubeChannel.DirectPlayback.cs#L413) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.builder | [414:25](../YouTubeChannel.DirectPlayback.cs#L414) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.state | [415:25](../YouTubeChannel.DirectPlayback.cs#L415) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.command | [416:25](../YouTubeChannel.DirectPlayback.cs#L416) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.input | [417:25](../YouTubeChannel.DirectPlayback.cs#L417) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.output | [418:25](../YouTubeChannel.DirectPlayback.cs#L418) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.http | [419:25](../YouTubeChannel.DirectPlayback.cs#L419) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.resolution | [420:25](../YouTubeChannel.DirectPlayback.cs#L420) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.map | [423:25](../YouTubeChannel.DirectPlayback.cs#L423) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.setup | [424:25](../YouTubeChannel.DirectPlayback.cs#L424) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.resolutionLimits | [425:25](../YouTubeChannel.DirectPlayback.cs#L425) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.outputStream | [428:25](../YouTubeChannel.DirectPlayback.cs#L428) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioChannels | [430:25](../YouTubeChannel.DirectPlayback.cs#L430) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector | [436:25](../YouTubeChannel.DirectPlayback.cs#L436) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@29655 | [438:33](../YouTubeChannel.DirectPlayback.cs#L438) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@29655.m | [438:33](../YouTubeChannel.DirectPlayback.cs#L438) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.audioSelector.anonymous@29655.p | [439:57](../YouTubeChannel.DirectPlayback.cs#L439) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.codecSelector | [444:25](../YouTubeChannel.DirectPlayback.cs#L444) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.frameRateSelector | [449:25](../YouTubeChannel.DirectPlayback.cs#L449) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments | [453:25](../YouTubeChannel.DirectPlayback.cs#L453) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@31136 | [454:33](../YouTubeChannel.DirectPlayback.cs#L454) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@31136.m | [454:33](../YouTubeChannel.DirectPlayback.cs#L454) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoArguments.anonymous@31136.p | [456:57](../YouTubeChannel.DirectPlayback.cs#L456) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.segmentPolicyType | [464:25](../YouTubeChannel.DirectPlayback.cs#L464) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.segmentPolicy | [465:33](../YouTubeChannel.DirectPlayback.cs#L465) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.options | [475:25](../YouTubeChannel.DirectPlayback.cs#L475) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.baseRequest | [476:25](../YouTubeChannel.DirectPlayback.cs#L476) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.output0 | [477:25](../YouTubeChannel.DirectPlayback.cs#L477) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.outputVideo | [478:25](../YouTubeChannel.DirectPlayback.cs#L478) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.videoOptions | [481:25](../YouTubeChannel.DirectPlayback.cs#L481) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding | [486:25](../YouTubeChannel.DirectPlayback.cs#L486) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@34226 | [492:77](../YouTubeChannel.DirectPlayback.cs#L492) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@34226.n | [492:77](../YouTubeChannel.DirectPlayback.cs#L492) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@34340 | [493:58](../YouTubeChannel.DirectPlayback.cs#L493) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.binding.anonymous@34340.n | [493:58](../YouTubeChannel.DirectPlayback.cs#L493) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.assembly | [509:25](../YouTubeChannel.DirectPlayback.cs#L509) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.methodType | [511:25](../YouTubeChannel.DirectPlayback.cs#L511) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch | [513:25](../YouTubeChannel.DirectPlayback.cs#L513) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@36274 | [513:66](../YouTubeChannel.DirectPlayback.cs#L513) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@36274.m | [513:66](../YouTubeChannel.DirectPlayback.cs#L513) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@36274.anonymous@36463 | [515:50](../YouTubeChannel.DirectPlayback.cs#L515) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.patch.anonymous@36274.anonymous@36463.p | [515:50](../YouTubeChannel.DirectPlayback.cs#L515) |
+| local-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add | [516:21](../YouTubeChannel.DirectPlayback.cs#L516) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.original | [516:30](../YouTubeChannel.DirectPlayback.cs#L516) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.name | [516:51](../YouTubeChannel.DirectPlayback.cs#L516) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.isPrefix | [516:64](../YouTubeChannel.DirectPlayback.cs#L516) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.callback | [518:29](../YouTubeChannel.DirectPlayback.cs#L518) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.patchMethod | [519:29](../YouTubeChannel.DirectPlayback.cs#L519) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.parameters | [520:29](../YouTubeChannel.DirectPlayback.cs#L520) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.arguments | [521:29](../YouTubeChannel.DirectPlayback.cs#L521) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.Add.i | [523:34](../YouTubeChannel.DirectPlayback.cs#L523) |
+| catch-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Install.error | [544:23](../YouTubeChannel.DirectPlayback.cs#L544) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Uninstall | [554:9](../YouTubeChannel.DirectPlayback.cs#L554) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix | [570:9](../YouTubeChannel.DirectPlayback.cs#L570) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix.__0 | [570:47](../YouTubeChannel.DirectPlayback.cs#L570) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.MapStreamsPostfix.__1 | [570:59](../YouTubeChannel.DirectPlayback.cs#L570) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix | [571:9](../YouTubeChannel.DirectPlayback.cs#L571) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix.__0 | [571:47](../YouTubeChannel.DirectPlayback.cs#L571) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SetupInputPostfix.__1 | [571:59](../YouTubeChannel.DirectPlayback.cs#L571) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix | [572:9](../YouTubeChannel.DirectPlayback.cs#L572) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix.__0 | [572:52](../YouTubeChannel.DirectPlayback.cs#L572) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.CodecResolutionPostfix.__3 | [572:64](../YouTubeChannel.DirectPlayback.cs#L572) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix | [573:9](../YouTubeChannel.DirectPlayback.cs#L573) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__instance | [573:46](../YouTubeChannel.DirectPlayback.cs#L573) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__0 | [573:65](../YouTubeChannel.DirectPlayback.cs#L573) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__1 | [573:77](../YouTubeChannel.DirectPlayback.cs#L573) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.__result | [573:87](../YouTubeChannel.DirectPlayback.cs#L573) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.binding | [577:17](../YouTubeChannel.DirectPlayback.cs#L577) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.source | [579:17](../YouTubeChannel.DirectPlayback.cs#L579) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.request | [582:17](../YouTubeChannel.DirectPlayback.cs#L582) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FrameRatePostfix.effective | [597:25](../YouTubeChannel.DirectPlayback.cs#L597) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix | [609:9](../YouTubeChannel.DirectPlayback.cs#L609) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.__0 | [609:51](../YouTubeChannel.DirectPlayback.cs#L609) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.__3 | [609:63](../YouTubeChannel.DirectPlayback.cs#L609) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.binding | [611:17](../YouTubeChannel.DirectPlayback.cs#L611) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.source | [613:17](../YouTubeChannel.DirectPlayback.cs#L613) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.codec | [615:17](../YouTubeChannel.DirectPlayback.cs#L615) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.request | [616:17](../YouTubeChannel.DirectPlayback.cs#L616) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.output | [626:21](../YouTubeChannel.DirectPlayback.cs#L626) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.video | [627:21](../YouTubeChannel.DirectPlayback.cs#L627) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.options | [628:21](../YouTubeChannel.DirectPlayback.cs#L628) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.oldText | [630:21](../YouTubeChannel.DirectPlayback.cs#L630) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.oldRate | [631:21](../YouTubeChannel.DirectPlayback.cs#L631) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.requested | [635:21](../YouTubeChannel.DirectPlayback.cs#L635) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.validRequested | [636:21](../YouTubeChannel.DirectPlayback.cs#L636) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.rate | [637:21](../YouTubeChannel.DirectPlayback.cs#L637) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.VideoArgumentsPostfix.cappedRate | [640:21](../YouTubeChannel.DirectPlayback.cs#L640) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate | [656:9](../YouTubeChannel.DirectPlayback.cs#L656) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.text | [656:53](../YouTubeChannel.DirectPlayback.cs#L656) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.parts | [659:17](../YouTubeChannel.DirectPlayback.cs#L659) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.numerator | [661:105](../YouTubeChannel.DirectPlayback.cs#L661) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.denominator | [663:20](../YouTubeChannel.DirectPlayback.cs#L663) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ParseOutputFrameRate.rate | [666:17](../YouTubeChannel.DirectPlayback.cs#L666) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix | [669:9](../YouTubeChannel.DirectPlayback.cs#L669) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.__0 | [669:46](../YouTubeChannel.DirectPlayback.cs#L669) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.binding | [671:17](../YouTubeChannel.DirectPlayback.cs#L671) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.source | [673:17](../YouTubeChannel.DirectPlayback.cs#L673) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.codecs | [675:17](../YouTubeChannel.DirectPlayback.cs#L675) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index | [677:17](../YouTubeChannel.DirectPlayback.cs#L677) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index.anonymous@46125 | [677:49](../YouTubeChannel.DirectPlayback.cs#L677) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.index.anonymous@46125.c | [677:49](../YouTubeChannel.DirectPlayback.cs#L677) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferH264Prefix.preferred | [689:21](../YouTubeChannel.DirectPlayback.cs#L689) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio | [701:9](../YouTubeChannel.DirectPlayback.cs#L701) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.state | [701:61](../YouTubeChannel.DirectPlayback.cs#L701) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.outputStream | [701:75](../YouTubeChannel.DirectPlayback.cs#L701) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.binding | [703:17](../YouTubeChannel.DirectPlayback.cs#L703) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.source | [705:17](../YouTubeChannel.DirectPlayback.cs#L705) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.GetStereoOrUnknownAudio.audio | [707:17](../YouTubeChannel.DirectPlayback.cs#L707) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix | [724:9](../YouTubeChannel.DirectPlayback.cs#L724) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__0 | [724:50](../YouTubeChannel.DirectPlayback.cs#L724) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__1 | [724:62](../YouTubeChannel.DirectPlayback.cs#L724) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__2 | [724:74](../YouTubeChannel.DirectPlayback.cs#L724) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.__result | [724:86](../YouTubeChannel.DirectPlayback.cs#L724) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.audio | [727:17](../YouTubeChannel.DirectPlayback.cs#L727) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.AudioChannelsPostfix.maximum | [732:17](../YouTubeChannel.DirectPlayback.cs#L732) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix | [736:9](../YouTubeChannel.DirectPlayback.cs#L736) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__0 | [736:45](../YouTubeChannel.DirectPlayback.cs#L736) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__1 | [736:57](../YouTubeChannel.DirectPlayback.cs#L736) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.__2 | [736:69](../YouTubeChannel.DirectPlayback.cs#L736) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index | [739:17](../YouTubeChannel.DirectPlayback.cs#L739) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index.anonymous@49503 | [739:46](../YouTubeChannel.DirectPlayback.cs#L739) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.index.anonymous@49503.c | [739:46](../YouTubeChannel.DirectPlayback.cs#L739) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.PreferAacPrefix.preferred | [743:17](../YouTubeChannel.DirectPlayback.cs#L743) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix | [749:9](../YouTubeChannel.DirectPlayback.cs#L749) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__0 | [749:50](../YouTubeChannel.DirectPlayback.cs#L749) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__1 | [749:62](../YouTubeChannel.DirectPlayback.cs#L749) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.__result | [749:71](../YouTubeChannel.DirectPlayback.cs#L749) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.binding | [751:17](../YouTubeChannel.DirectPlayback.cs#L751) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.SegmentLengthPostfix.source | [753:17](../YouTubeChannel.DirectPlayback.cs#L753) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.IsCanonicalDirectSource | [772:9](../YouTubeChannel.DirectPlayback.cs#L772) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.IsCanonicalDirectSource.source | [772:53](../YouTubeChannel.DirectPlayback.cs#L772) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit | [777:9](../YouTubeChannel.DirectPlayback.cs#L777) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.state | [777:46](../YouTubeChannel.DirectPlayback.cs#L777) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.resolution | [777:60](../YouTubeChannel.DirectPlayback.cs#L777) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.binding | [779:17](../YouTubeChannel.DirectPlayback.cs#L779) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.source | [781:17](../YouTubeChannel.DirectPlayback.cs#L781) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.maximumHeight | [791:21](../YouTubeChannel.DirectPlayback.cs#L791) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.maximumWidth | [795:21](../YouTubeChannel.DirectPlayback.cs#L795) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.previousWidth | [796:21](../YouTubeChannel.DirectPlayback.cs#L796) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ApplyOutputLimit.previousHeight | [797:21](../YouTubeChannel.DirectPlayback.cs#L797) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply | [812:9](../YouTubeChannel.DirectPlayback.cs#L812) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.state | [812:35](../YouTubeChannel.DirectPlayback.cs#L812) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.command | [812:49](../YouTubeChannel.DirectPlayback.cs#L812) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.requireMappedInput | [812:65](../YouTubeChannel.DirectPlayback.cs#L812) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.binding | [814:17](../YouTubeChannel.DirectPlayback.cs#L814) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.source | [819:17](../YouTubeChannel.DirectPlayback.cs#L819) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.hls | [824:22](../YouTubeChannel.DirectPlayback.cs#L824) |
+| local-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.OwnedPath | [826:17](../YouTubeChannel.DirectPlayback.cs#L826) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.OwnedPath.path | [826:34](../YouTubeChannel.DirectPlayback.cs#L826) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.videoUrl | [828:21](../YouTubeChannel.DirectPlayback.cs#L828) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.primary | [829:21](../YouTubeChannel.DirectPlayback.cs#L829) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.primaryOptions | [832:21](../YouTubeChannel.DirectPlayback.cs#L832) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@55251 | [833:54](../YouTubeChannel.DirectPlayback.cs#L833) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@55251.p | [833:54](../YouTubeChannel.DirectPlayback.cs#L833) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.advertised | [835:21](../YouTubeChannel.DirectPlayback.cs#L835) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.advertised.anonymous@55424 | [835:61](../YouTubeChannel.DirectPlayback.cs#L835) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.advertised.anonymous@55424.s | [835:61](../YouTubeChannel.DirectPlayback.cs#L835) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@55559 | [837:37](../YouTubeChannel.DirectPlayback.cs#L837) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@55559.track | [837:37](../YouTubeChannel.DirectPlayback.cs#L837) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.selected | [838:21](../YouTubeChannel.DirectPlayback.cs#L838) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks | [846:21](../YouTubeChannel.DirectPlayback.cs#L846) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks.anonymous@56093 | [846:61](../YouTubeChannel.DirectPlayback.cs#L846) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.tracks.anonymous@56093.stream | [846:61](../YouTubeChannel.DirectPlayback.cs#L846) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56279 | [848:84](../YouTubeChannel.DirectPlayback.cs#L848) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56279.track | [848:84](../YouTubeChannel.DirectPlayback.cs#L848) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56341 | [849:39](../YouTubeChannel.DirectPlayback.cs#L849) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56341.track | [849:39](../YouTubeChannel.DirectPlayback.cs#L849) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56368 | [849:66](../YouTubeChannel.DirectPlayback.cs#L849) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.anonymous@56368.group | [849:66](../YouTubeChannel.DirectPlayback.cs#L849) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track | [850:17](../YouTubeChannel.DirectPlayback.cs#L850) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.anonymous@56488 | [850:52](../YouTubeChannel.DirectPlayback.cs#L850) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.anonymous@56488.track | [850:52](../YouTubeChannel.DirectPlayback.cs#L850) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.anonymous@56677 | [853:45](../YouTubeChannel.DirectPlayback.cs#L853) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.anonymous@56677.candidate | [853:45](../YouTubeChannel.DirectPlayback.cs#L853) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.audioUrl | [856:25](../YouTubeChannel.DirectPlayback.cs#L856) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.inputs | [857:25](../YouTubeChannel.DirectPlayback.cs#L857) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.inputs.anonymous@57182 | [858:47](../YouTubeChannel.DirectPlayback.cs#L858) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.inputs.anonymous@57182.input | [858:47](../YouTubeChannel.DirectPlayback.cs#L858) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.outputCodec | [861:25](../YouTubeChannel.DirectPlayback.cs#L861) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.audioOptions | [864:25](../YouTubeChannel.DirectPlayback.cs#L864) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.property | [865:21](../YouTubeChannel.DirectPlayback.cs#L865) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.protocol | [868:29](../YouTubeChannel.DirectPlayback.cs#L868) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.copiedProtocol | [870:29](../YouTubeChannel.DirectPlayback.cs#L870) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Apply.track.property | [871:25](../YouTubeChannel.DirectPlayback.cs#L871) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType | [882:9](../YouTubeChannel.DirectPlayback.cs#L882) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.name | [882:38](../YouTubeChannel.DirectPlayback.cs#L882) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@58941 | [883:21](../YouTubeChannel.DirectPlayback.cs#L883) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@58941.a | [883:21](../YouTubeChannel.DirectPlayback.cs#L883) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@58985 | [883:65](../YouTubeChannel.DirectPlayback.cs#L883) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.FindType.anonymous@58985.t | [883:65](../YouTubeChannel.DirectPlayback.cs#L883) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property | [884:9](../YouTubeChannel.DirectPlayback.cs#L884) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.type | [884:46](../YouTubeChannel.DirectPlayback.cs#L884) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.name | [884:57](../YouTubeChannel.DirectPlayback.cs#L884) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.expected | [884:70](../YouTubeChannel.DirectPlayback.cs#L884) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.writable | [884:93](../YouTubeChannel.DirectPlayback.cs#L884) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.Property.property | [886:17](../YouTubeChannel.DirectPlayback.cs#L886) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod | [891:9](../YouTubeChannel.DirectPlayback.cs#L891) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.type | [891:53](../YouTubeChannel.DirectPlayback.cs#L891) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.name | [891:64](../YouTubeChannel.DirectPlayback.cs#L891) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticMethod.parameters | [891:77](../YouTubeChannel.DirectPlayback.cs#L891) |
+| method | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning | [894:9](../YouTubeChannel.DirectPlayback.cs#L894) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.returns | [894:56](../YouTubeChannel.DirectPlayback.cs#L894) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.type | [894:70](../YouTubeChannel.DirectPlayback.cs#L894) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.name | [894:81](../YouTubeChannel.DirectPlayback.cs#L894) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.parameters | [894:94](../YouTubeChannel.DirectPlayback.cs#L894) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectSeekCompatibility.ExactStaticReturning.method | [896:17](../YouTubeChannel.DirectPlayback.cs#L896) |
 
 </details>
 
@@ -5336,21 +5448,80 @@ Plugin Compile source (SDK default); 8522 bytes; 208 lines.
 
 </details>
 
+<a id="file-59ad88b2f7a15737"></a>
+## [YouTubeChapterDtoInterceptor.cs](../YouTubeChapterDtoInterceptor.cs)
+
+Plugin Compile source (SDK default); 5246 bytes; 98 lines.
+
+<details>
+<summary>All 46 declarations / anchors</summary>
+
+| Kind | Owner / name | Source |
+|---|---|---|
+| namespace | Emby.YouTubePlugin | [7:1](../YouTubeChapterDtoInterceptor.cs#L7) |
+| type | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor | [11:5](../YouTubeChapterDtoInterceptor.cs#L11) |
+| method | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install | [13:9](../YouTubeChapterDtoInterceptor.cs#L13) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.harmony | [13:37](../YouTubeChapterDtoInterceptor.cs#L13) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.harmonyMethodType | [13:53](../YouTubeChapterDtoInterceptor.cs#L13) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.service | [17:21](../YouTubeChapterDtoInterceptor.cs#L17) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.patch | [23:21](../YouTubeChapterDtoInterceptor.cs#L23) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.patch.anonymous@958 | [24:37](../YouTubeChapterDtoInterceptor.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.patch.anonymous@958.method | [24:37](../YouTubeChapterDtoInterceptor.cs#L24) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.patch.anonymous@958.anonymous@1211 | [27:55](../YouTubeChapterDtoInterceptor.cs#L27) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.patch.anonymous@958.anonymous@1211.parameter | [27:55](../YouTubeChapterDtoInterceptor.cs#L27) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.count | [33:21](../YouTubeChapterDtoInterceptor.cs#L33) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target | [34:17](../YouTubeChapterDtoInterceptor.cs#L34) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target.method | [36:25](../YouTubeChapterDtoInterceptor.cs#L36) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target.postfix | [39:25](../YouTubeChapterDtoInterceptor.cs#L39) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target.parameters | [41:25](../YouTubeChapterDtoInterceptor.cs#L41) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target.arguments | [42:25](../YouTubeChapterDtoInterceptor.cs#L42) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.target.i | [44:30](../YouTubeChapterDtoInterceptor.cs#L44) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.Install.error | [52:19](../YouTubeChapterDtoInterceptor.cs#L52) |
+| method | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets | [59:9](../YouTubeChapterDtoInterceptor.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.implementation | [59:50](../YouTubeChapterDtoInterceptor.cs#L59) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.map | [62:17](../YouTubeChapterDtoInterceptor.cs#L62) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.result | [63:17](../YouTubeChapterDtoInterceptor.cs#L63) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.i | [64:22](../YouTubeChapterDtoInterceptor.cs#L64) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.method | [66:21](../YouTubeChapterDtoInterceptor.cs#L66) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.parameters | [67:21](../YouTubeChapterDtoInterceptor.cs#L67) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.many | [68:22](../YouTubeChapterDtoInterceptor.cs#L68) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.FindTargets.one | [69:22](../YouTubeChapterDtoInterceptor.cs#L69) |
+| method | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyOnePostfix | [80:9](../YouTubeChapterDtoInterceptor.cs#L80) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyOnePostfix.__0 | [80:45](../YouTubeChapterDtoInterceptor.cs#L80) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyOnePostfix.__result | [80:59](../YouTubeChapterDtoInterceptor.cs#L80) |
+| method | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix | [85:9](../YouTubeChapterDtoInterceptor.cs#L85) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.__0 | [85:46](../YouTubeChapterDtoInterceptor.cs#L85) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.__result | [85:63](../YouTubeChapterDtoInterceptor.cs#L85) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items | [91:17](../YouTubeChapterDtoInterceptor.cs#L91) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4810 | [91:35](../YouTubeChapterDtoInterceptor.cs#L91) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4810.item | [91:35](../YouTubeChapterDtoInterceptor.cs#L91) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4880 | [92:26](../YouTubeChapterDtoInterceptor.cs#L92) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4880.item | [92:26](../YouTubeChapterDtoInterceptor.cs#L92) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4918 | [92:64](../YouTubeChapterDtoInterceptor.cs#L92) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4918.group | [92:64](../YouTubeChapterDtoInterceptor.cs#L92) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4938 | [92:84](../YouTubeChapterDtoInterceptor.cs#L92) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.items.anonymous@4938.group | [92:84](../YouTubeChapterDtoInterceptor.cs#L92) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.dto | [93:13](../YouTubeChapterDtoInterceptor.cs#L93) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.dto.id | [94:116](../YouTubeChapterDtoInterceptor.cs#L94) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterDtoInterceptor.ApplyManyPostfix.dto.item | [95:54](../YouTubeChapterDtoInterceptor.cs#L95) |
+
+</details>
+
 <a id="file-90d85cea05c050fd"></a>
 ## [YouTubeChapterSync.cs](../YouTubeChapterSync.cs)
 
-Plugin Compile source (SDK default); 9995 bytes; 194 lines.
+Plugin Compile source (SDK default); 16877 bytes; 301 lines.
 
 <details>
-<summary>All 75 declarations / anchors</summary>
+<summary>All 135 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
 | namespace | Emby.YouTubePlugin | [12:1](../YouTubeChapterSync.cs#L12) |
 | type | Emby.YouTubePlugin.YouTubeChapterSync | [16:5](../YouTubeChapterSync.cs#L16) |
 | field | Emby.YouTubePlugin.YouTubeChapterSync.Gates | [18:42](../YouTubeChapterSync.cs#L18) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Gates.anonymous@620 | [18:81](../YouTubeChapterSync.cs#L18) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Gates.anonymous@620._ | [18:81](../YouTubeChapterSync.cs#L18) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Gates.anonymous@641 | [18:81](../YouTubeChapterSync.cs#L18) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Gates.anonymous@641._ | [18:81](../YouTubeChapterSync.cs#L18) |
 | field | Emby.YouTubePlugin.YouTubeChapterSync.StateAdmissionGate | [19:40](../YouTubeChapterSync.cs#L19) |
 | field | Emby.YouTubePlugin.YouTubeChapterSync.MaximumItems | [20:27](../YouTubeChapterSync.cs#L20) |
 | field | Emby.YouTubePlugin.YouTubeChapterSync.MaximumStateBytes | [21:27](../YouTubeChapterSync.cs#L21) |
@@ -5358,69 +5529,129 @@ Plugin Compile source (SDK default); 9995 bytes; 194 lines.
 | parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.itemId | [23:42](../YouTubeChapterSync.cs#L23) |
 | parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.videoId | [23:58](../YouTubeChapterSync.cs#L23) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.id | [26:59](../YouTubeChapterSync.cs#L26) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.incoming | [28:17](../YouTubeChapterSync.cs#L28) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.library | [34:25](../YouTubeChapterSync.cs#L34) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.repository | [35:25](../YouTubeChapterSync.cs#L35) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.item | [36:25](../YouTubeChapterSync.cs#L36) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.existing | [40:25](../YouTubeChapterSync.cs#L40) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary | [42:25](../YouTubeChapterSync.cs#L42) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary.anonymous@1965 | [42:51](../YouTubeChapterSync.cs#L42) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary.anonymous@1965.c | [42:51](../YouTubeChapterSync.cs#L42) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.oldHash | [43:25](../YouTubeChapterSync.cs#L43) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.newHash | [44:25](../YouTubeChapterSync.cs#L44) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.root | [46:25](../YouTubeChapterSync.cs#L46) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.directory | [48:25](../YouTubeChapterSync.cs#L48) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.path | [51:25](../YouTubeChapterSync.cs#L51) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.state | [52:28](../YouTubeChapterSync.cs#L52) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.info | [55:29](../YouTubeChapterSync.cs#L55) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ownedFingerprint | [64:59](../YouTubeChapterSync.cs#L64) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged | [69:25](../YouTubeChapterSync.cs#L69) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@3696 | [69:49](../YouTubeChapterSync.cs#L69) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@3696.c | [69:49](../YouTubeChapterSync.cs#L69) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@3787 | [70:51](../YouTubeChapterSync.cs#L70) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@3787.c | [70:51](../YouTubeChapterSync.cs#L70) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.error | [94:19](../YouTubeChapterSync.cs#L94) |
-| method | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters | [103:9](../YouTubeChapterSync.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.response | [103:53](../YouTubeChapterSync.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.itemId | [103:70](../YouTubeChapterSync.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.videoId | [103:86](../YouTubeChapterSync.cs#L103) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.id | [106:59](../YouTubeChapterSync.cs#L106) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.sources | [110:21](../YouTubeChapterSync.cs#L110) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.owned | [113:21](../YouTubeChapterSync.cs#L113) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.owned.anonymous@6260 | [114:28](../YouTubeChapterSync.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.owned.anonymous@6260.source | [114:28](../YouTubeChapterSync.cs#L114) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.library | [119:25](../YouTubeChapterSync.cs#L119) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.repository | [120:25](../YouTubeChapterSync.cs#L120) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.item | [121:25](../YouTubeChapterSync.cs#L121) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.existing | [125:25](../YouTubeChapterSync.cs#L125) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.source | [130:21](../YouTubeChapterSync.cs#L130) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.error | [134:19](../YouTubeChapterSync.cs#L134) |
-| method | Emby.YouTubePlugin.YouTubeChapterSync.CloneChapter | [141:9](../YouTubeChapterSync.cs#L141) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.CloneChapter.chapter | [141:49](../YouTubeChapterSync.cs#L141) |
-| method | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint | [152:9](../YouTubeChapterSync.cs#L152) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.chapters | [152:44](../YouTubeChapterSync.cs#L152) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value | [156:17](../YouTubeChapterSync.cs#L156) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value.anonymous@8445 | [156:41](../YouTubeChapterSync.cs#L156) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value.anonymous@8445.c | [156:41](../YouTubeChapterSync.cs#L156) |
-| method | Emby.YouTubePlugin.YouTubeChapterSync.Store | [164:9](../YouTubeChapterSync.cs#L164) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Store.path | [164:35](../YouTubeChapterSync.cs#L164) |
-| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Store.state | [164:48](../YouTubeChapterSync.cs#L164) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.bytes | [166:17](../YouTubeChapterSync.cs#L166) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.temporary | [168:17](../YouTubeChapterSync.cs#L168) |
-| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.file | [171:28](../YouTubeChapterSync.cs#L171) |
-| type | Emby.YouTubePlugin.YouTubeChapterSync.State | [186:9](../YouTubeChapterSync.cs#L186) |
-| property | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId | [188:13](../YouTubeChapterSync.cs#L188) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId.get | [188:34](../YouTubeChapterSync.cs#L188) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId.set | [188:39](../YouTubeChapterSync.cs#L188) |
-| property | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId | [189:13](../YouTubeChapterSync.cs#L189) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId.get | [189:37](../YouTubeChapterSync.cs#L189) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId.set | [189:42](../YouTubeChapterSync.cs#L189) |
-| property | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint | [190:13](../YouTubeChapterSync.cs#L190) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint.get | [190:47](../YouTubeChapterSync.cs#L190) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint.set | [190:52](../YouTubeChapterSync.cs#L190) |
-| property | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters | [191:13](../YouTubeChapterSync.cs#L191) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters.get | [191:53](../YouTubeChapterSync.cs#L191) |
-| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters.set | [191:58](../YouTubeChapterSync.cs#L191) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.library | [32:25](../YouTubeChapterSync.cs#L32) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.repository | [33:25](../YouTubeChapterSync.cs#L33) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.item | [34:25](../YouTubeChapterSync.cs#L34) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.incoming | [37:25](../YouTubeChapterSync.cs#L37) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.incoming.descriptionDerived | [37:72](../YouTubeChapterSync.cs#L37) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.existing | [39:25](../YouTubeChapterSync.cs#L39) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary | [41:25](../YouTubeChapterSync.cs#L41) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary.anonymous@1911 | [41:51](../YouTubeChapterSync.cs#L41) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ordinary.anonymous@1911.c | [41:51](../YouTubeChapterSync.cs#L41) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.oldHash | [42:25](../YouTubeChapterSync.cs#L42) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.newHash | [43:25](../YouTubeChapterSync.cs#L43) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.matching | [51:33](../YouTubeChapterSync.cs#L51) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.root | [61:25](../YouTubeChapterSync.cs#L61) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.directory | [63:25](../YouTubeChapterSync.cs#L63) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.path | [66:25](../YouTubeChapterSync.cs#L66) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.state | [67:28](../YouTubeChapterSync.cs#L67) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.ownedFingerprint | [76:59](../YouTubeChapterSync.cs#L76) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged | [81:25](../YouTubeChapterSync.cs#L81) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@4506 | [81:49](../YouTubeChapterSync.cs#L81) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@4506.c | [81:49](../YouTubeChapterSync.cs#L81) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@4597 | [82:51](../YouTubeChapterSync.cs#L82) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.merged.anonymous@4597.c | [82:51](../YouTubeChapterSync.cs#L82) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChapterSync.Synchronize.error | [107:19](../YouTubeChapterSync.cs#L107) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto | [116:9](../YouTubeChapterSync.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.originalItem | [116:43](../YouTubeChapterSync.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.dto | [116:66](../YouTubeChapterSync.cs#L116) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.id | [119:101](../YouTubeChapterSync.cs#L119) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.videoId | [121:21](../YouTubeChapterSync.cs#L121) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.item | [130:25](../YouTubeChapterSync.cs#L130) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.repository | [131:25](../YouTubeChapterSync.cs#L131) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.existing | [133:25](../YouTubeChapterSync.cs#L133) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.incoming | [135:25](../YouTubeChapterSync.cs#L135) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.fallback | [138:25](../YouTubeChapterSync.cs#L138) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyItemDto.error | [143:19](../YouTubeChapterSync.cs#L143) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters | [149:9](../YouTubeChapterSync.cs#L149) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.response | [149:53](../YouTubeChapterSync.cs#L149) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.itemId | [149:70](../YouTubeChapterSync.cs#L149) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.videoId | [149:86](../YouTubeChapterSync.cs#L149) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.id | [152:59](../YouTubeChapterSync.cs#L152) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.library | [158:25](../YouTubeChapterSync.cs#L158) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.repository | [159:25](../YouTubeChapterSync.cs#L159) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.item | [160:25](../YouTubeChapterSync.cs#L160) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.existing | [163:25](../YouTubeChapterSync.cs#L163) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplyPreferredChapters.error | [168:19](../YouTubeChapterSync.cs#L168) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources | [175:9](../YouTubeChapterSync.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.response | [175:42](../YouTubeChapterSync.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.item | [175:59](../YouTubeChapterSync.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.existing | [175:74](../YouTubeChapterSync.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.id | [175:102](../YouTubeChapterSync.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.videoId | [175:111](../YouTubeChapterSync.cs#L175) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.sources | [177:17](../YouTubeChapterSync.cs#L177) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.source | [180:13](../YouTubeChapterSync.cs#L180) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.source.anonymous@10183 | [181:24](../YouTubeChapterSync.cs#L181) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.source.anonymous@10183.source | [181:24](../YouTubeChapterSync.cs#L181) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ApplySources.source.fallback | [183:21](../YouTubeChapterSync.cs#L183) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.Preferred | [188:9](../YouTubeChapterSync.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.existing | [188:59](../YouTubeChapterSync.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.fallback | [188:87](../YouTubeChapterSync.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.id | [188:111](../YouTubeChapterSync.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.videoId | [188:120](../YouTubeChapterSync.cs#L188) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@10716 | [190:30](../YouTubeChapterSync.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@10716.chapter | [190:30](../YouTubeChapterSync.cs#L190) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.state | [191:17](../YouTubeChapterSync.cs#L191) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.fingerprint | [195:51](../YouTubeChapterSync.cs#L195) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@11286 | [197:51](../YouTubeChapterSync.cs#L197) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@11286.chapter | [197:51](../YouTubeChapterSync.cs#L197) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@11365 | [198:26](../YouTubeChapterSync.cs#L198) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Preferred.anonymous@11365.chapter | [198:26](../YouTubeChapterSync.cs#L198) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming | [201:9](../YouTubeChapterSync.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.item | [201:50](../YouTubeChapterSync.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.videoId | [201:65](../YouTubeChapterSync.cs#L201) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming | [203:9](../YouTubeChapterSync.cs#L203) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.item | [203:50](../YouTubeChapterSync.cs#L203) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.videoId | [203:65](../YouTubeChapterSync.cs#L203) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.descriptionDerived | [203:81](../YouTubeChapterSync.cs#L203) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.GetIncoming.resolved | [205:17](../YouTubeChapterSync.cs#L205) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem | [214:9](../YouTubeChapterSync.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.item | [214:41](../YouTubeChapterSync.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.videoId | [214:56](../YouTubeChapterSync.cs#L214) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.anonymous@12347 | [216:53](../YouTubeChapterSync.cs#L216) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.anonymous@12347.c | [216:53](../YouTubeChapterSync.cs#L216) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.uri | [218:72](../YouTubeChapterSync.cs#L218) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.IsOwnedItem.watchQuery | [222:18](../YouTubeChapterSync.cs#L222) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.ReadState | [228:9](../YouTubeChapterSync.cs#L228) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.id | [228:41](../YouTubeChapterSync.cs#L228) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.videoId | [228:50](../YouTubeChapterSync.cs#L228) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.root | [230:17](../YouTubeChapterSync.cs#L230) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.directory | [232:17](../YouTubeChapterSync.cs#L232) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.path | [235:17](../YouTubeChapterSync.cs#L235) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.info | [237:17](../YouTubeChapterSync.cs#L237) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.state | [240:17](../YouTubeChapterSync.cs#L240) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.fingerprint | [241:101](../YouTubeChapterSync.cs#L241) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.anonymous@14379 | [242:65](../YouTubeChapterSync.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.ReadState.anonymous@14379.c | [242:65](../YouTubeChapterSync.cs#L242) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.CloneChapter | [247:9](../YouTubeChapterSync.cs#L247) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.CloneChapter.chapter | [247:49](../YouTubeChapterSync.cs#L247) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint | [258:9](../YouTubeChapterSync.cs#L258) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.chapters | [258:44](../YouTubeChapterSync.cs#L258) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value | [262:17](../YouTubeChapterSync.cs#L262) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value.anonymous@15275 | [262:41](../YouTubeChapterSync.cs#L262) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Fingerprint.value.anonymous@15275.c | [262:41](../YouTubeChapterSync.cs#L262) |
+| method | Emby.YouTubePlugin.YouTubeChapterSync.Store | [270:9](../YouTubeChapterSync.cs#L270) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Store.path | [270:35](../YouTubeChapterSync.cs#L270) |
+| parameter | Emby.YouTubePlugin.YouTubeChapterSync.Store.state | [270:48](../YouTubeChapterSync.cs#L270) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.bytes | [272:17](../YouTubeChapterSync.cs#L272) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.temporary | [274:17](../YouTubeChapterSync.cs#L274) |
+| local-variable | Emby.YouTubePlugin.YouTubeChapterSync.Store.file | [277:28](../YouTubeChapterSync.cs#L277) |
+| type | Emby.YouTubePlugin.YouTubeChapterSync.State | [292:9](../YouTubeChapterSync.cs#L292) |
+| property | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId | [294:13](../YouTubeChapterSync.cs#L294) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId.get | [294:34](../YouTubeChapterSync.cs#L294) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.ItemId.set | [294:39](../YouTubeChapterSync.cs#L294) |
+| property | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId | [295:13](../YouTubeChapterSync.cs#L295) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId.get | [295:37](../YouTubeChapterSync.cs#L295) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.VideoId.set | [295:42](../YouTubeChapterSync.cs#L295) |
+| property | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint | [296:13](../YouTubeChapterSync.cs#L296) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint.get | [296:47](../YouTubeChapterSync.cs#L296) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OwnedFingerprint.set | [296:52](../YouTubeChapterSync.cs#L296) |
+| property | Emby.YouTubePlugin.YouTubeChapterSync.State.SourceKind | [297:13](../YouTubeChapterSync.cs#L297) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.SourceKind.get | [297:41](../YouTubeChapterSync.cs#L297) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.SourceKind.set | [297:46](../YouTubeChapterSync.cs#L297) |
+| property | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters | [298:13](../YouTubeChapterSync.cs#L298) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters.get | [298:53](../YouTubeChapterSync.cs#L298) |
+| accessor | Emby.YouTubePlugin.YouTubeChapterSync.State.OriginalChapters.set | [298:58](../YouTubeChapterSync.cs#L298) |
 
 </details>
 
@@ -5551,6 +5782,40 @@ Plugin Compile source (SDK default); 10549 bytes; 222 lines.
 | property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [219:13](../YouTubeConfigSaveService.cs#L219) |
 | accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [219:37](../YouTubeConfigSaveService.cs#L219) |
 | accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [219:42](../YouTubeConfigSaveService.cs#L219) |
+
+</details>
+
+<a id="file-879f815509e709e7"></a>
+## [YouTubeDescriptionChapters.cs](../YouTubeDescriptionChapters.cs)
+
+Plugin Compile source (SDK default); 4283 bytes; 72 lines.
+
+<details>
+<summary>All 21 declarations / anchors</summary>
+
+| Kind | Owner / name | Source |
+|---|---|---|
+| namespace | Emby.YouTubePlugin | [5:1](../YouTubeDescriptionChapters.cs#L5) |
+| type | Emby.YouTubePlugin.YouTubeDescriptionChapters | [10:5](../YouTubeDescriptionChapters.cs#L10) |
+| field | Emby.YouTubePlugin.YouTubeDescriptionChapters.MinimumChapterTicks | [12:28](../YouTubeDescriptionChapters.cs#L12) |
+| field | Emby.YouTubePlugin.YouTubeDescriptionChapters.MaximumDurationTicks | [13:28](../YouTubeDescriptionChapters.cs#L13) |
+| field | Emby.YouTubePlugin.YouTubeDescriptionChapters.MarkerLine | [14:39](../YouTubeDescriptionChapters.cs#L14) |
+| field | Emby.YouTubePlugin.YouTubeDescriptionChapters.TimePrefix | [17:39](../YouTubeDescriptionChapters.cs#L17) |
+| method | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read | [20:9](../YouTubeDescriptionChapters.cs#L20) |
+| parameter | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.description | [20:44](../YouTubeDescriptionChapters.cs#L20) |
+| parameter | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.durationTicks | [20:65](../YouTubeDescriptionChapters.cs#L20) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.lines | [25:17](../YouTubeDescriptionChapters.cs#L25) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.chapters | [27:17](../YouTubeDescriptionChapters.cs#L27) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.ended | [28:18](../YouTubeDescriptionChapters.cs#L28) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line | [29:13](../YouTubeDescriptionChapters.cs#L29) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.match | [31:21](../YouTubeDescriptionChapters.cs#L31) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.parts | [42:21](../YouTubeDescriptionChapters.cs#L42) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.first | [43:102](../YouTubeDescriptionChapters.cs#L43) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.second | [44:105](../YouTubeDescriptionChapters.cs#L44) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.last | [46:21](../YouTubeDescriptionChapters.cs#L46) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.seconds | [50:22](../YouTubeDescriptionChapters.cs#L50) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.ticks | [51:22](../YouTubeDescriptionChapters.cs#L51) |
+| local-variable | Emby.YouTubePlugin.YouTubeDescriptionChapters.Read.line.title | [55:21](../YouTubeDescriptionChapters.cs#L55) |
 
 </details>
 
@@ -5751,10 +6016,10 @@ Plugin Compile source (SDK default); 30432 bytes; 545 lines.
 <a id="file-5a4b4574992dd577"></a>
 ## [YouTubeDirectManifest.cs](../YouTubeDirectManifest.cs)
 
-Plugin Compile source (SDK default); 13694 bytes; 215 lines.
+Plugin Compile source (SDK default); 17658 bytes; 267 lines.
 
 <details>
-<summary>All 148 declarations / anchors</summary>
+<summary>All 203 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -5773,139 +6038,194 @@ Plugin Compile source (SDK default); 13694 bytes; 215 lines.
 | parameter | Emby.YouTubePlugin.YouTubeHlsSelection.AudioCodec | [16:59](../YouTubeDirectManifest.cs#L16) |
 | parameter | Emby.YouTubePlugin.YouTubeHlsSelection.AudioChannels | [17:9](../YouTubeDirectManifest.cs#L17) |
 | parameter | Emby.YouTubePlugin.YouTubeHlsSelection.AudioLanguage | [17:29](../YouTubeDirectManifest.cs#L17) |
-| type | Emby.YouTubePlugin.YouTubeDirectManifest | [22:5](../YouTubeDirectManifest.cs#L22) |
-| field | Emby.YouTubePlugin.YouTubeDirectManifest.MaximumMasterBytes | [24:28](../YouTubeDirectManifest.cs#L24) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.Select | [26:9](../YouTubeDirectManifest.cs#L26) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.text | [27:13](../YouTubeDirectManifest.cs#L27) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.masterUri | [27:26](../YouTubeDirectManifest.cs#L27) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.maximumHeight | [27:41](../YouTubeDirectManifest.cs#L27) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.validateUri | [27:60](../YouTubeDirectManifest.cs#L27) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.requiredVideoCodec | [28:13](../YouTubeDirectManifest.cs#L28) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.maximumBitrate | [28:48](../YouTubeDirectManifest.cs#L28) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.requiredAudioCodec | [28:76](../YouTubeDirectManifest.cs#L28) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines | [33:17](../YouTubeDirectManifest.cs#L33) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines.anonymous@1606 | [33:93](../YouTubeDirectManifest.cs#L33) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines.anonymous@1606.x | [33:93](../YouTubeDirectManifest.cs#L33) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.audio | [34:17](../YouTubeDirectManifest.cs#L34) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants | [35:17](../YouTubeDirectManifest.cs#L35) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Attributes | [35:38](../YouTubeDirectManifest.cs#L35) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Uri | [35:77](../YouTubeDirectManifest.cs#L35) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Width | [35:86](../YouTubeDirectManifest.cs#L35) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Height | [35:97](../YouTubeDirectManifest.cs#L35) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Bitrate | [35:109](../YouTubeDirectManifest.cs#L35) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.i | [36:22](../YouTubeDirectManifest.cs#L36) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.line | [38:21](../YouTubeDirectManifest.cs#L38) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.attrs | [47:25](../YouTubeDirectManifest.cs#L47) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.attrs | [56:25](../YouTubeDirectManifest.cs#L56) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.uri | [60:25](../YouTubeDirectManifest.cs#L60) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.dimensions | [61:25](../YouTubeDirectManifest.cs#L61) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.width | [63:114](../YouTubeDirectManifest.cs#L63) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.height | [64:114](../YouTubeDirectManifest.cs#L64) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.bitrate | [66:126](../YouTubeDirectManifest.cs#L66) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible | [76:17](../YouTubeDirectManifest.cs#L76) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4468 | [76:43](../YouTubeDirectManifest.cs#L76) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4468.v | [76:43](../YouTubeDirectManifest.cs#L76) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4523 | [77:24](../YouTubeDirectManifest.cs#L77) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4523.v | [77:24](../YouTubeDirectManifest.cs#L77) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4523.anonymous@4624 | [78:26](../YouTubeDirectManifest.cs#L78) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4523.anonymous@4624.codec | [78:26](../YouTubeDirectManifest.cs#L78) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4705 | [79:24](../YouTubeDirectManifest.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4705.v | [79:24](../YouTubeDirectManifest.cs#L79) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4705.anonymous@4806 | [80:26](../YouTubeDirectManifest.cs#L80) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4705.anonymous@4806.codec | [80:26](../YouTubeDirectManifest.cs#L80) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4899 | [81:36](../YouTubeDirectManifest.cs#L81) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4899.v | [81:36](../YouTubeDirectManifest.cs#L81) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4948 | [82:35](../YouTubeDirectManifest.cs#L82) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4948.v | [82:35](../YouTubeDirectManifest.cs#L82) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5071 | [83:35](../YouTubeDirectManifest.cs#L83) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5071.v | [83:35](../YouTubeDirectManifest.cs#L83) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5193 | [84:35](../YouTubeDirectManifest.cs#L84) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5193.v | [84:35](../YouTubeDirectManifest.cs#L84) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5262 | [85:35](../YouTubeDirectManifest.cs#L85) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5262.v | [85:35](../YouTubeDirectManifest.cs#L85) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.preferred | [90:17](../YouTubeDirectManifest.cs#L90) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable | [92:17](../YouTubeDirectManifest.cs#L92) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable.anonymous@5716 | [92:45](../YouTubeDirectManifest.cs#L92) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable.anonymous@5716.v | [92:45](../YouTubeDirectManifest.cs#L92) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected | [93:17](../YouTubeDirectManifest.cs#L93) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@5865 | [94:36](../YouTubeDirectManifest.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@5865.v | [94:36](../YouTubeDirectManifest.cs#L94) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@5888 | [94:59](../YouTubeDirectManifest.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@5888.v | [94:59](../YouTubeDirectManifest.cs#L94) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection | [98:9](../YouTubeDirectManifest.cs#L98) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected | [99:13](../YouTubeDirectManifest.cs#L99) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Attributes | [99:14](../YouTubeDirectManifest.cs#L99) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Uri | [99:53](../YouTubeDirectManifest.cs#L99) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Width | [99:62](../YouTubeDirectManifest.cs#L99) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Height | [99:73](../YouTubeDirectManifest.cs#L99) |
-| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Bitrate | [99:85](../YouTubeDirectManifest.cs#L99) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audio | [100:13](../YouTubeDirectManifest.cs#L100) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.masterUri | [100:53](../YouTubeDirectManifest.cs#L100) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.validateUri | [100:68](../YouTubeDirectManifest.cs#L100) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs | [102:17](../YouTubeDirectManifest.cs#L102) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs.anonymous@6353 | [102:81](../YouTubeDirectManifest.cs#L102) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs.anonymous@6353.x | [102:81](../YouTubeDirectManifest.cs#L102) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs | [103:17](../YouTubeDirectManifest.cs#L103) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs.anonymous@6441 | [103:63](../YouTubeDirectManifest.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs.anonymous@6441.x | [103:63](../YouTubeDirectManifest.cs#L103) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs | [104:17](../YouTubeDirectManifest.cs#L104) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs.anonymous@6541 | [104:63](../YouTubeDirectManifest.cs#L104) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs.anonymous@6541.x | [104:63](../YouTubeDirectManifest.cs#L104) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@6676 | [106:31](../YouTubeDirectManifest.cs#L106) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@6676.x | [106:31](../YouTubeDirectManifest.cs#L106) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.rendition | [109:41](../YouTubeDirectManifest.cs#L109) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioUri | [110:18](../YouTubeDirectManifest.cs#L110) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.group | [111:17](../YouTubeDirectManifest.cs#L111) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7092 | [114:41](../YouTubeDirectManifest.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7092.a | [114:41](../YouTubeDirectManifest.cs#L114) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7167 | [115:40](../YouTubeDirectManifest.cs#L115) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7167.a | [115:40](../YouTubeDirectManifest.cs#L115) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7240 | [116:39](../YouTubeDirectManifest.cs#L116) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7240.a | [116:39](../YouTubeDirectManifest.cs#L116) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7306 | [117:29](../YouTubeDirectManifest.cs#L117) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7306.a | [117:29](../YouTubeDirectManifest.cs#L117) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.output | [124:17](../YouTubeDirectManifest.cs#L124) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.key | [130:17](../YouTubeDirectManifest.cs#L130) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.frameRate | [138:55](../YouTubeDirectManifest.cs#L138) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.range | [140:17](../YouTubeDirectManifest.cs#L140) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.average | [146:136](../YouTubeDirectManifest.cs#L146) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.channels | [150:18](../YouTubeDirectManifest.cs#L150) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.count | [151:152](../YouTubeDirectManifest.cs#L151) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes | [159:9](../YouTubeDirectManifest.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.input | [159:68](../YouTubeDirectManifest.cs#L159) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.values | [161:17](../YouTubeDirectManifest.cs#L161) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.i | [162:17](../YouTubeDirectManifest.cs#L162) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.start | [165:21](../YouTubeDirectManifest.cs#L165) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.key | [168:21](../YouTubeDirectManifest.cs#L168) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.value | [169:24](../YouTubeDirectManifest.cs#L169) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.anonymous@11674 | [183:61](../YouTubeDirectManifest.cs#L183) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.anonymous@11674.c | [183:61](../YouTubeDirectManifest.cs#L183) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve | [190:9](../YouTubeDirectManifest.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.value | [190:36](../YouTubeDirectManifest.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.master | [190:50](../YouTubeDirectManifest.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.validate | [190:62](../YouTubeDirectManifest.cs#L190) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.Value | [192:9](../YouTubeDirectManifest.cs#L192) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Value.attrs | [192:37](../YouTubeDirectManifest.cs#L192) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Value.key | [192:80](../YouTubeDirectManifest.cs#L192) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Value.value | [192:126](../YouTubeDirectManifest.cs#L192) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate | [193:9](../YouTubeDirectManifest.cs#L193) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate.attrs | [193:41](../YouTubeDirectManifest.cs#L193) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate.fps | [194:114](../YouTubeDirectManifest.cs#L194) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.Quote | [195:9](../YouTubeDirectManifest.cs#L195) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Quote.value | [195:37](../YouTubeDirectManifest.cs#L195) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken | [196:9](../YouTubeDirectManifest.cs#L196) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.value | [196:41](../YouTubeDirectManifest.cs#L196) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.anonymous@12786 | [196:68](../YouTubeDirectManifest.cs#L196) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.anonymous@12786.c | [196:68](../YouTubeDirectManifest.cs#L196) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec | [198:9](../YouTubeDirectManifest.cs#L198) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.value | [198:44](../YouTubeDirectManifest.cs#L198) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [200:17](../YouTubeDirectManifest.cs#L200) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [201:17](../YouTubeDirectManifest.cs#L201) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [202:17](../YouTubeDirectManifest.cs#L202) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [203:17](../YouTubeDirectManifest.cs#L203) |
-| method | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec | [206:9](../YouTubeDirectManifest.cs#L206) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec.value | [206:44](../YouTubeDirectManifest.cs#L206) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec.s | [208:17](../YouTubeDirectManifest.cs#L208) |
+| property | Emby.YouTubePlugin.YouTubeHlsSelection.VideoContent | [19:9](../YouTubeDirectManifest.cs#L19) |
+| accessor | Emby.YouTubePlugin.YouTubeHlsSelection.VideoContent.get | [19:41](../YouTubeDirectManifest.cs#L19) |
+| accessor | Emby.YouTubePlugin.YouTubeHlsSelection.VideoContent.init | [19:46](../YouTubeDirectManifest.cs#L19) |
+| property | Emby.YouTubePlugin.YouTubeHlsSelection.AudioTracks | [20:9](../YouTubeDirectManifest.cs#L20) |
+| accessor | Emby.YouTubePlugin.YouTubeHlsSelection.AudioTracks.get | [20:68](../YouTubeDirectManifest.cs#L20) |
+| accessor | Emby.YouTubePlugin.YouTubeHlsSelection.AudioTracks.init | [20:73](../YouTubeDirectManifest.cs#L20) |
+| type | Emby.YouTubePlugin.YouTubeHlsAudioTrack | [23:5](../YouTubeDirectManifest.cs#L23) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.Key | [23:49](../YouTubeDirectManifest.cs#L23) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.Content | [23:61](../YouTubeDirectManifest.cs#L23) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.Name | [23:77](../YouTubeDirectManifest.cs#L23) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.Language | [24:9](../YouTubeDirectManifest.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.Channels | [24:27](../YouTubeDirectManifest.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeHlsAudioTrack.IsDefault | [24:42](../YouTubeDirectManifest.cs#L24) |
+| type | Emby.YouTubePlugin.YouTubeDirectManifest | [29:5](../YouTubeDirectManifest.cs#L29) |
+| field | Emby.YouTubePlugin.YouTubeDirectManifest.MaximumMasterBytes | [31:28](../YouTubeDirectManifest.cs#L31) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.Select | [33:9](../YouTubeDirectManifest.cs#L33) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.text | [34:13](../YouTubeDirectManifest.cs#L34) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.masterUri | [34:26](../YouTubeDirectManifest.cs#L34) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.maximumHeight | [34:41](../YouTubeDirectManifest.cs#L34) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.validateUri | [34:60](../YouTubeDirectManifest.cs#L34) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.requiredVideoCodec | [35:13](../YouTubeDirectManifest.cs#L35) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.maximumBitrate | [35:48](../YouTubeDirectManifest.cs#L35) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.requiredAudioCodec | [35:76](../YouTubeDirectManifest.cs#L35) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines | [40:17](../YouTubeDirectManifest.cs#L40) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines.anonymous@1927 | [40:93](../YouTubeDirectManifest.cs#L40) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.lines.anonymous@1927.x | [40:93](../YouTubeDirectManifest.cs#L40) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.audio | [41:17](../YouTubeDirectManifest.cs#L41) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants | [42:17](../YouTubeDirectManifest.cs#L42) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Attributes | [42:38](../YouTubeDirectManifest.cs#L42) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Uri | [42:77](../YouTubeDirectManifest.cs#L42) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Width | [42:86](../YouTubeDirectManifest.cs#L42) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Height | [42:97](../YouTubeDirectManifest.cs#L42) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.Select.variants.Bitrate | [42:109](../YouTubeDirectManifest.cs#L42) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.i | [43:22](../YouTubeDirectManifest.cs#L43) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.line | [45:21](../YouTubeDirectManifest.cs#L45) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.attrs | [54:25](../YouTubeDirectManifest.cs#L54) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.attrs | [63:25](../YouTubeDirectManifest.cs#L63) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.uri | [67:25](../YouTubeDirectManifest.cs#L67) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.dimensions | [68:25](../YouTubeDirectManifest.cs#L68) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.width | [70:114](../YouTubeDirectManifest.cs#L70) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.height | [71:114](../YouTubeDirectManifest.cs#L71) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.bitrate | [73:126](../YouTubeDirectManifest.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible | [83:17](../YouTubeDirectManifest.cs#L83) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4789 | [83:43](../YouTubeDirectManifest.cs#L83) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4789.v | [83:43](../YouTubeDirectManifest.cs#L83) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4844 | [84:24](../YouTubeDirectManifest.cs#L84) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4844.v | [84:24](../YouTubeDirectManifest.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4844.anonymous@4945 | [85:26](../YouTubeDirectManifest.cs#L85) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@4844.anonymous@4945.codec | [85:26](../YouTubeDirectManifest.cs#L85) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5026 | [86:24](../YouTubeDirectManifest.cs#L86) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5026.v | [86:24](../YouTubeDirectManifest.cs#L86) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5026.anonymous@5127 | [87:26](../YouTubeDirectManifest.cs#L87) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5026.anonymous@5127.codec | [87:26](../YouTubeDirectManifest.cs#L87) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5220 | [88:36](../YouTubeDirectManifest.cs#L88) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5220.v | [88:36](../YouTubeDirectManifest.cs#L88) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5269 | [89:35](../YouTubeDirectManifest.cs#L89) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5269.v | [89:35](../YouTubeDirectManifest.cs#L89) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5392 | [90:35](../YouTubeDirectManifest.cs#L90) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5392.v | [90:35](../YouTubeDirectManifest.cs#L90) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5514 | [91:35](../YouTubeDirectManifest.cs#L91) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5514.v | [91:35](../YouTubeDirectManifest.cs#L91) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5583 | [92:35](../YouTubeDirectManifest.cs#L92) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.eligible.anonymous@5583.v | [92:35](../YouTubeDirectManifest.cs#L92) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.preferred | [97:17](../YouTubeDirectManifest.cs#L97) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable | [99:17](../YouTubeDirectManifest.cs#L99) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable.anonymous@6037 | [99:45](../YouTubeDirectManifest.cs#L99) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.affordable.anonymous@6037.v | [99:45](../YouTubeDirectManifest.cs#L99) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected | [100:17](../YouTubeDirectManifest.cs#L100) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@6186 | [101:36](../YouTubeDirectManifest.cs#L101) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@6186.v | [101:36](../YouTubeDirectManifest.cs#L101) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@6209 | [101:59](../YouTubeDirectManifest.cs#L101) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Select.selected.anonymous@6209.v | [101:59](../YouTubeDirectManifest.cs#L101) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection | [105:9](../YouTubeDirectManifest.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected | [106:13](../YouTubeDirectManifest.cs#L106) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Attributes | [106:14](../YouTubeDirectManifest.cs#L106) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Uri | [106:53](../YouTubeDirectManifest.cs#L106) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Width | [106:62](../YouTubeDirectManifest.cs#L106) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Height | [106:73](../YouTubeDirectManifest.cs#L106) |
+| tuple-element | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.selected.Bitrate | [106:85](../YouTubeDirectManifest.cs#L106) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audio | [107:13](../YouTubeDirectManifest.cs#L107) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.masterUri | [107:53](../YouTubeDirectManifest.cs#L107) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.validateUri | [107:68](../YouTubeDirectManifest.cs#L107) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs | [109:17](../YouTubeDirectManifest.cs#L109) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs.anonymous@6674 | [109:81](../YouTubeDirectManifest.cs#L109) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.codecs.anonymous@6674.x | [109:81](../YouTubeDirectManifest.cs#L109) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs | [110:17](../YouTubeDirectManifest.cs#L110) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs.anonymous@6762 | [110:63](../YouTubeDirectManifest.cs#L110) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoCodecs.anonymous@6762.x | [110:63](../YouTubeDirectManifest.cs#L110) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs | [111:17](../YouTubeDirectManifest.cs#L111) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs.anonymous@6862 | [111:63](../YouTubeDirectManifest.cs#L111) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioCodecs.anonymous@6862.x | [111:63](../YouTubeDirectManifest.cs#L111) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@6997 | [113:31](../YouTubeDirectManifest.cs#L113) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@6997.x | [113:31](../YouTubeDirectManifest.cs#L113) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.rendition | [116:41](../YouTubeDirectManifest.cs#L116) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.audioUri | [117:18](../YouTubeDirectManifest.cs#L117) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.group | [118:17](../YouTubeDirectManifest.cs#L118) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7413 | [121:41](../YouTubeDirectManifest.cs#L121) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7413.a | [121:41](../YouTubeDirectManifest.cs#L121) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7488 | [122:40](../YouTubeDirectManifest.cs#L122) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7488.a | [122:40](../YouTubeDirectManifest.cs#L122) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7594 | [123:39](../YouTubeDirectManifest.cs#L123) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7594.a | [123:39](../YouTubeDirectManifest.cs#L123) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7667 | [124:39](../YouTubeDirectManifest.cs#L124) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7667.a | [124:39](../YouTubeDirectManifest.cs#L124) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7733 | [125:29](../YouTubeDirectManifest.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@7733.a | [125:29](../YouTubeDirectManifest.cs#L125) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.output | [132:17](../YouTubeDirectManifest.cs#L132) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.key | [138:17](../YouTubeDirectManifest.cs#L138) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.frameRate | [146:55](../YouTubeDirectManifest.cs#L146) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.range | [148:17](../YouTubeDirectManifest.cs#L148) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.average | [154:136](../YouTubeDirectManifest.cs#L154) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.channels | [158:18](../YouTubeDirectManifest.cs#L158) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.count | [159:152](../YouTubeDirectManifest.cs#L159) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.tracks | [161:17](../YouTubeDirectManifest.cs#L161) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.videoContent | [162:21](../YouTubeDirectManifest.cs#L162) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks | [165:21](../YouTubeDirectManifest.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10631 | [165:47](../YouTubeDirectManifest.cs#L165) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10631.a | [165:47](../YouTubeDirectManifest.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10706 | [166:40](../YouTubeDirectManifest.cs#L166) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10706.a | [166:40](../YouTubeDirectManifest.cs#L166) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10812 | [167:39](../YouTubeDirectManifest.cs#L167) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10812.a | [167:39](../YouTubeDirectManifest.cs#L167) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10885 | [168:39](../YouTubeDirectManifest.cs#L168) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10885.a | [168:39](../YouTubeDirectManifest.cs#L168) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10951 | [169:29](../YouTubeDirectManifest.cs#L169) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@10951.a | [169:29](../YouTubeDirectManifest.cs#L169) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@11030 | [170:29](../YouTubeDirectManifest.cs#L170) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.groupTracks.anonymous@11030.a | [170:29](../YouTubeDirectManifest.cs#L170) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track | [171:17](../YouTubeDirectManifest.cs#L171) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.name | [173:28](../YouTubeDirectManifest.cs#L173) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.language | [173:57](../YouTubeDirectManifest.cs#L173) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.uri | [176:25](../YouTubeDirectManifest.cs#L176) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.key | [177:28](../YouTubeDirectManifest.cs#L177) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.trackChannels | [178:26](../YouTubeDirectManifest.cs#L178) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.trackChannels.trackCount | [179:63](../YouTubeDirectManifest.cs#L179) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.content | [182:25](../YouTubeDirectManifest.cs#L182) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.content.anonymous@12244 | [184:47](../YouTubeDirectManifest.cs#L184) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.track.content.anonymous@12244.codec | [184:47](../YouTubeDirectManifest.cs#L184) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions | [188:21](../YouTubeDirectManifest.cs#L188) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12576 | [188:49](../YouTubeDirectManifest.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12576.track | [188:49](../YouTubeDirectManifest.cs#L188) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12649 | [189:28](../YouTubeDirectManifest.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12649.items | [189:28](../YouTubeDirectManifest.cs#L189) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12684 | [189:63](../YouTubeDirectManifest.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.collisions.anonymous@12684.items | [189:63](../YouTubeDirectManifest.cs#L189) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@12755 | [190:39](../YouTubeDirectManifest.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@12755.track | [190:39](../YouTubeDirectManifest.cs#L190) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@13134 | [194:40](../YouTubeDirectManifest.cs#L194) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@13134.track | [194:41](../YouTubeDirectManifest.cs#L194) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@13134.index | [194:48](../YouTubeDirectManifest.cs#L194) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@13579 | [198:56](../YouTubeDirectManifest.cs#L198) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.anonymous@13579.codec | [198:56](../YouTubeDirectManifest.cs#L198) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.BuildSelection.rate | [199:62](../YouTubeDirectManifest.cs#L199) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes | [211:9](../YouTubeDirectManifest.cs#L211) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.input | [211:68](../YouTubeDirectManifest.cs#L211) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.values | [213:17](../YouTubeDirectManifest.cs#L213) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.i | [214:17](../YouTubeDirectManifest.cs#L214) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.start | [217:21](../YouTubeDirectManifest.cs#L217) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.key | [220:21](../YouTubeDirectManifest.cs#L220) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.value | [221:24](../YouTubeDirectManifest.cs#L221) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.anonymous@15638 | [235:61](../YouTubeDirectManifest.cs#L235) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.ParseAttributes.anonymous@15638.c | [235:61](../YouTubeDirectManifest.cs#L235) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve | [242:9](../YouTubeDirectManifest.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.value | [242:36](../YouTubeDirectManifest.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.master | [242:50](../YouTubeDirectManifest.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Resolve.validate | [242:62](../YouTubeDirectManifest.cs#L242) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.Value | [244:9](../YouTubeDirectManifest.cs#L244) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Value.attrs | [244:37](../YouTubeDirectManifest.cs#L244) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Value.key | [244:80](../YouTubeDirectManifest.cs#L244) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.Value.value | [244:126](../YouTubeDirectManifest.cs#L244) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate | [245:9](../YouTubeDirectManifest.cs#L245) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate.attrs | [245:41](../YouTubeDirectManifest.cs#L245) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.FrameRate.fps | [246:114](../YouTubeDirectManifest.cs#L246) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.Quote | [247:9](../YouTubeDirectManifest.cs#L247) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.Quote.value | [247:37](../YouTubeDirectManifest.cs#L247) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken | [248:9](../YouTubeDirectManifest.cs#L248) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.value | [248:41](../YouTubeDirectManifest.cs#L248) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.anonymous@16750 | [248:68](../YouTubeDirectManifest.cs#L248) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.SafeToken.anonymous@16750.c | [248:68](../YouTubeDirectManifest.cs#L248) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec | [250:9](../YouTubeDirectManifest.cs#L250) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.value | [250:44](../YouTubeDirectManifest.cs#L250) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [252:17](../YouTubeDirectManifest.cs#L252) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [253:17](../YouTubeDirectManifest.cs#L253) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [254:17](../YouTubeDirectManifest.cs#L254) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.VideoCodec.s | [255:17](../YouTubeDirectManifest.cs#L255) |
+| method | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec | [258:9](../YouTubeDirectManifest.cs#L258) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec.value | [258:44](../YouTubeDirectManifest.cs#L258) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectManifest.AudioCodec.s | [260:17](../YouTubeDirectManifest.cs#L260) |
 
 </details>
 
@@ -6079,10 +6399,10 @@ Plugin Compile source (SDK default); 290 bytes; 11 lines.
 <a id="file-2b6757d8b9192715"></a>
 ## [YouTubeDirectQualityPolicy.cs](../YouTubeDirectQualityPolicy.cs)
 
-Plugin Compile source (SDK default); 1192 bytes; 28 lines.
+Plugin Compile source (SDK default); 552 bytes; 16 lines.
 
 <details>
-<summary>All 12 declarations / anchors</summary>
+<summary>All 7 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -6090,21 +6410,16 @@ Plugin Compile source (SDK default); 1192 bytes; 28 lines.
 | type | Emby.YouTubePlugin.YouTubeDirectQualityPolicy | [7:5](../YouTubeDirectQualityPolicy.cs#L7) |
 | field | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.MinimumHeight | [9:28](../YouTubeDirectQualityPolicy.cs#L9) |
 | field | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.MaximumHeight | [10:28](../YouTubeDirectQualityPolicy.cs#L10) |
-| field | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.MaximumStreamingBitrate | [14:28](../YouTubeDirectQualityPolicy.cs#L14) |
-| field | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.MaximumFrameRate | [15:28](../YouTubeDirectQualityPolicy.cs#L15) |
-| method | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampHeight | [17:9](../YouTubeDirectQualityPolicy.cs#L17) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampHeight.height | [17:41](../YouTubeDirectQualityPolicy.cs#L17) |
-| method | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampStreamingBitrate | [20:9](../YouTubeDirectQualityPolicy.cs#L20) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampStreamingBitrate.requested | [20:52](../YouTubeDirectQualityPolicy.cs#L20) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampStreamingBitrate.query | [20:69](../YouTubeDirectQualityPolicy.cs#L20) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampStreamingBitrate.maximum | [22:18](../YouTubeDirectQualityPolicy.cs#L22) |
+| field | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.MaximumFrameRate | [11:28](../YouTubeDirectQualityPolicy.cs#L11) |
+| method | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampHeight | [13:9](../YouTubeDirectQualityPolicy.cs#L13) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectQualityPolicy.ClampHeight.height | [13:41](../YouTubeDirectQualityPolicy.cs#L13) |
 
 </details>
 
 <a id="file-538c7a88a964bb3f"></a>
 ## [YouTubeDirectRangeProxy.cs](../YouTubeDirectRangeProxy.cs)
 
-Plugin Compile source (SDK default); 24520 bytes; 453 lines.
+Plugin Compile source (SDK default); 24721 bytes; 456 lines.
 
 <details>
 <summary>All 198 declarations / anchors</summary>
@@ -6114,201 +6429,201 @@ Plugin Compile source (SDK default); 24520 bytes; 453 lines.
 | namespace | Emby.YouTubePlugin | [15:1](../YouTubeDirectRangeProxy.cs#L15) |
 | type | Emby.YouTubePlugin.YouTubeDirectRangeProxy | [19:5](../YouTubeDirectRangeProxy.cs#L19) |
 | field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ChunkBytes | [21:27](../YouTubeDirectRangeProxy.cs#L21) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.MaximumEntries | [22:27](../YouTubeDirectRangeProxy.cs#L22) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.MaximumFileBytes | [23:28](../YouTubeDirectRangeProxy.cs#L23) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Gate | [24:40](../YouTubeDirectRangeProxy.cs#L24) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestSlots | [25:47](../YouTubeDirectRangeProxy.cs#L25) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.VideoId | [26:39](../YouTubeDirectRangeProxy.cs#L26) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.FormatId | [27:39](../YouTubeDirectRangeProxy.cs#L27) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.CapabilityPath | [28:39](../YouTubeDirectRangeProxy.cs#L28) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._server | [29:32](../YouTubeDirectRangeProxy.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._shutdown | [30:29](../YouTubeDirectRangeProxy.cs#L30) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._fetchRange | [34:121](../YouTubeDirectRangeProxy.cs#L34) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._resolve | [36:84](../YouTubeDirectRangeProxy.cs#L36) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._invalidate | [37:39](../YouTubeDirectRangeProxy.cs#L37) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync | [39:9](../YouTubeDirectRangeProxy.cs#L39) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.video | [39:52](../YouTubeDirectRangeProxy.cs#L39) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.format | [39:80](../YouTubeDirectRangeProxy.cs#L39) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.headers | [40:13](../YouTubeDirectRangeProxy.cs#L40) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.cancellationToken | [40:58](../YouTubeDirectRangeProxy.cs#L40) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.snapshot | [43:17](../YouTubeDirectRangeProxy.cs#L43) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.IsOwnedUri | [53:9](../YouTubeDirectRangeProxy.cs#L53) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.IsOwnedUri.value | [53:41](../YouTubeDirectRangeProxy.cs#L53) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Shutdown | [58:9](../YouTubeDirectRangeProxy.cs#L58) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Shutdown.previous | [60:21](../YouTubeDirectRangeProxy.cs#L60) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection | [65:9](../YouTubeDirectRangeProxy.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.video | [65:51](../YouTubeDirectRangeProxy.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.format | [65:79](../YouTubeDirectRangeProxy.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.headers | [66:13](../YouTubeDirectRangeProxy.cs#L66) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.id | [71:20](../YouTubeDirectRangeProxy.cs#L71) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.size | [72:85](../YouTubeDirectRangeProxy.cs#L72) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.length | [73:47](../YouTubeDirectRangeProxy.cs#L73) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.uri | [75:17](../YouTubeDirectRangeProxy.cs#L75) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.declaredLength | [76:19](../YouTubeDirectRangeProxy.cs#L76) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.expiry | [77:19](../YouTubeDirectRangeProxy.cs#L77) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair | [78:13](../YouTubeDirectRangeProxy.cs#L78) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.pieces | [80:21](../YouTubeDirectRangeProxy.cs#L80) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.name | [81:24](../YouTubeDirectRangeProxy.cs#L81) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.value | [85:57](../YouTubeDirectRangeProxy.cs#L85) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.value | [90:120](../YouTubeDirectRangeProxy.cs#L90) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.formats | [95:67](../YouTubeDirectRangeProxy.cs#L95) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches | [97:17](../YouTubeDirectRangeProxy.cs#L97) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches.anonymous@4758 | [97:58](../YouTubeDirectRangeProxy.cs#L97) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches.anonymous@4758.f | [97:58](../YouTubeDirectRangeProxy.cs#L97) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.identity | [99:17](../YouTubeDirectRangeProxy.cs#L99) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.expires | [105:22](../YouTubeDirectRangeProxy.cs#L105) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text | [111:9](../YouTubeDirectRangeProxy.cs#L111) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.value | [111:36](../YouTubeDirectRangeProxy.cs#L111) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.name | [111:55](../YouTubeDirectRangeProxy.cs#L111) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.property | [112:51](../YouTubeDirectRangeProxy.cs#L112) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer | [114:9](../YouTubeDirectRangeProxy.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.value | [114:37](../YouTubeDirectRangeProxy.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.name | [114:56](../YouTubeDirectRangeProxy.cs#L114) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.property | [119:53](../YouTubeDirectRangeProxy.cs#L119) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.number | [120:93](../YouTubeDirectRangeProxy.cs#L120) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal | [124:9](../YouTubeDirectRangeProxy.cs#L124) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.value | [124:37](../YouTubeDirectRangeProxy.cs#L124) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.number | [124:51](../YouTubeDirectRangeProxy.cs#L124) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.anonymous@6919 | [127:63](../YouTubeDirectRangeProxy.cs#L127) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.anonymous@6919.c | [127:63](../YouTubeDirectRangeProxy.cs#L127) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange | [131:9](../YouTubeDirectRangeProxy.cs#L131) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.value | [131:40](../YouTubeDirectRangeProxy.cs#L131) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.length | [131:55](../YouTubeDirectRangeProxy.cs#L131) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.start | [131:68](../YouTubeDirectRangeProxy.cs#L131) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.end | [131:84](../YouTubeDirectRangeProxy.cs#L131) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.pieces | [136:17](../YouTubeDirectRangeProxy.cs#L136) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.suffix | [140:50](../YouTubeDirectRangeProxy.cs#L140) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.requestedEnd | [146:46](../YouTubeDirectRangeProxy.cs#L146) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync | [151:9](../YouTubeDirectRangeProxy.cs#L151) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.server | [151:58](../YouTubeDirectRangeProxy.cs#L151) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.entry | [151:73](../YouTubeDirectRangeProxy.cs#L151) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.request | [151:86](../YouTubeDirectRangeProxy.cs#L151) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.offset | [152:13](../YouTubeDirectRangeProxy.cs#L152) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.count | [152:26](../YouTubeDirectRangeProxy.cs#L152) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.cancellationToken | [152:37](../YouTubeDirectRangeProxy.cs#L152) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.snapshot | [154:22](../YouTubeDirectRangeProxy.cs#L154) |
-| catch-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.error | [167:19](../YouTubeDirectRangeProxy.cs#L167) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync | [176:9](../YouTubeDirectRangeProxy.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.server | [176:56](../YouTubeDirectRangeProxy.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.entry | [176:71](../YouTubeDirectRangeProxy.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.stale | [176:84](../YouTubeDirectRangeProxy.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.cancellationToken | [176:100](../YouTubeDirectRangeProxy.cs#L176) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.renewal | [178:28](../YouTubeDirectRangeProxy.cs#L178) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@9952 | [185:46](../YouTubeDirectRangeProxy.cs#L185) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@10046 | [186:52](../YouTubeDirectRangeProxy.cs#L186) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@10046.task | [186:52](../YouTubeDirectRangeProxy.cs#L186) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync | [194:9](../YouTubeDirectRangeProxy.cs#L194) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.server | [194:58](../YouTubeDirectRangeProxy.cs#L194) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.entry | [194:73](../YouTubeDirectRangeProxy.cs#L194) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.stale | [194:86](../YouTubeDirectRangeProxy.cs#L194) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.deadline | [196:23](../YouTubeDirectRangeProxy.cs#L196) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.resolved | [199:17](../YouTubeDirectRangeProxy.cs#L199) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.formats | [200:70](../YouTubeDirectRangeProxy.cs#L200) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected | [201:17](../YouTubeDirectRangeProxy.cs#L201) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected.anonymous@11055 | [201:59](../YouTubeDirectRangeProxy.cs#L201) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected.anonymous@11055.f | [201:59](../YouTubeDirectRangeProxy.cs#L201) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.headers | [203:17](../YouTubeDirectRangeProxy.cs#L203) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.headers.global | [203:114](../YouTubeDirectRangeProxy.cs#L203) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.header | [204:13](../YouTubeDirectRangeProxy.cs#L204) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.header.local | [204:117](../YouTubeDirectRangeProxy.cs#L204) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.refreshed | [206:17](../YouTubeDirectRangeProxy.cs#L206) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Failure | [219:9](../YouTubeDirectRangeProxy.cs#L219) |
-| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity | [221:9](../YouTubeDirectRangeProxy.cs#L221) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.VideoId | [221:40](../YouTubeDirectRangeProxy.cs#L221) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.FormatId | [221:56](../YouTubeDirectRangeProxy.cs#L221) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Length | [221:73](../YouTubeDirectRangeProxy.cs#L221) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.VideoCodec | [221:86](../YouTubeDirectRangeProxy.cs#L221) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.AudioCodec | [222:13](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Extension | [222:32](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Language | [222:50](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Width | [222:67](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Height | [222:79](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Channels | [222:92](../YouTubeDirectRangeProxy.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.SampleRate | [222:107](../YouTubeDirectRangeProxy.cs#L222) |
-| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot | [223:9](../YouTubeDirectRangeProxy.cs#L223) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Identity | [223:40](../YouTubeDirectRangeProxy.cs#L223) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Uri | [223:59](../YouTubeDirectRangeProxy.cs#L223) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Headers | [223:68](../YouTubeDirectRangeProxy.cs#L223) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.ExpiresUtc | [223:113](../YouTubeDirectRangeProxy.cs#L223) |
-| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestState | [224:9](../YouTubeDirectRangeProxy.cs#L224) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestState.Renewed | [224:59](../YouTubeDirectRangeProxy.cs#L224) |
-| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry | [225:9](../YouTubeDirectRangeProxy.cs#L225) |
-| constructor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry | [227:13](../YouTubeDirectRangeProxy.cs#L227) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry.snapshot | [227:28](../YouTubeDirectRangeProxy.cs#L227) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry.token | [227:47](../YouTubeDirectRangeProxy.cs#L227) |
-| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Sync | [229:13](../YouTubeDirectRangeProxy.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Sync.get | [229:36](../YouTubeDirectRangeProxy.cs#L229) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Current | [230:31](../YouTubeDirectRangeProxy.cs#L230) |
-| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Identity | [231:13](../YouTubeDirectRangeProxy.cs#L231) |
-| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Identity.get | [231:42](../YouTubeDirectRangeProxy.cs#L231) |
-| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Token | [232:13](../YouTubeDirectRangeProxy.cs#L232) |
-| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Token.get | [232:37](../YouTubeDirectRangeProxy.cs#L232) |
-| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.CreatedUtc | [233:13](../YouTubeDirectRangeProxy.cs#L233) |
-| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.CreatedUtc.get | [233:44](../YouTubeDirectRangeProxy.cs#L233) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.LastAccessUtc | [234:31](../YouTubeDirectRangeProxy.cs#L234) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.ActiveRequests | [235:26](../YouTubeDirectRangeProxy.cs#L235) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Renewal | [236:38](../YouTubeDirectRangeProxy.cs#L236) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.RenewalRetryAfterUtc | [237:31](../YouTubeDirectRangeProxy.cs#L237) |
-| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server | [240:9](../YouTubeDirectRangeProxy.cs#L240) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._gate | [242:37](../YouTubeDirectRangeProxy.cs#L242) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._listener | [243:43](../YouTubeDirectRangeProxy.cs#L243) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._stop | [244:54](../YouTubeDirectRangeProxy.cs#L244) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._entries | [245:56](../YouTubeDirectRangeProxy.cs#L245) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._contexts | [246:59](../YouTubeDirectRangeProxy.cs#L246) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._origin | [247:37](../YouTubeDirectRangeProxy.cs#L247) |
-| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._stopped | [248:26](../YouTubeDirectRangeProxy.cs#L248) |
-| constructor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server | [249:13](../YouTubeDirectRangeProxy.cs#L249) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server.listener | [249:28](../YouTubeDirectRangeProxy.cs#L249) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server.port | [249:51](../YouTubeDirectRangeProxy.cs#L249) |
-| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.StopToken | [251:13](../YouTubeDirectRangeProxy.cs#L251) |
-| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.StopToken.get | [251:52](../YouTubeDirectRangeProxy.cs#L251) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start | [253:13](../YouTubeDirectRangeProxy.cs#L253) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.attempt | [255:26](../YouTubeDirectRangeProxy.cs#L255) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.reservation | [257:25](../YouTubeDirectRangeProxy.cs#L257) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.port | [258:25](../YouTubeDirectRangeProxy.cs#L258) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.listener | [261:25](../YouTubeDirectRangeProxy.cs#L261) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.server | [266:29](../YouTubeDirectRangeProxy.cs#L266) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register | [276:13](../YouTubeDirectRangeProxy.cs#L276) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.snapshot | [276:38](../YouTubeDirectRangeProxy.cs#L276) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing | [282:25](../YouTubeDirectRangeProxy.cs#L282) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing.anonymous@15401 | [282:67](../YouTubeDirectRangeProxy.cs#L282) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing.anonymous@15401.e | [282:67](../YouTubeDirectRangeProxy.cs#L282) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.token | [292:28](../YouTubeDirectRangeProxy.cs#L292) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns | [300:13](../YouTubeDirectRangeProxy.cs#L300) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.value | [300:32](../YouTubeDirectRangeProxy.cs#L300) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.path | [305:28](../YouTubeDirectRangeProxy.cs#L305) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.entry | [306:107](../YouTubeDirectRangeProxy.cs#L306) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune | [313:13](../YouTubeDirectRangeProxy.cs#L313) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry | [315:17](../YouTubeDirectRangeProxy.cs#L315) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry.anonymous@17108 | [315:61](../YouTubeDirectRangeProxy.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry.anonymous@17108.e | [315:61](../YouTubeDirectRangeProxy.cs#L315) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.AcceptAsync | [320:13](../YouTubeDirectRangeProxy.cs#L320) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.AcceptAsync.context | [326:29](../YouTubeDirectRangeProxy.cs#L326) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync | [341:13](../YouTubeDirectRangeProxy.cs#L341) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.context | [341:44](../YouTubeDirectRangeProxy.cs#L341) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.entry | [343:24](../YouTubeDirectRangeProxy.cs#L343) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.committed | [344:22](../YouTubeDirectRangeProxy.cs#L344) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.deadline | [345:27](../YouTubeDirectRangeProxy.cs#L345) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.request | [349:25](../YouTubeDirectRangeProxy.cs#L349) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.path | [355:28](../YouTubeDirectRangeProxy.cs#L355) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.head | [364:26](../YouTubeDirectRangeProxy.cs#L364) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.range | [365:29](../YouTubeDirectRangeProxy.cs#L365) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.offset | [366:76](../YouTubeDirectRangeProxy.cs#L366) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.end | [366:93](../YouTubeDirectRangeProxy.cs#L366) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.remaining | [371:26](../YouTubeDirectRangeProxy.cs#L371) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.state | [372:25](../YouTubeDirectRangeProxy.cs#L372) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.first | [373:29](../YouTubeDirectRangeProxy.cs#L373) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.response | [376:25](../YouTubeDirectRangeProxy.cs#L376) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.count | [392:33](../YouTubeDirectRangeProxy.cs#L392) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.bytes | [393:33](../YouTubeDirectRangeProxy.cs#L393) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject | [421:13](../YouTubeDirectRangeProxy.cs#L421) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject.context | [421:40](../YouTubeDirectRangeProxy.cs#L421) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject.status | [421:69](../YouTubeDirectRangeProxy.cs#L421) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Abort | [434:13](../YouTubeDirectRangeProxy.cs#L434) |
-| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Abort.context | [434:39](../YouTubeDirectRangeProxy.cs#L434) |
-| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop | [437:13](../YouTubeDirectRangeProxy.cs#L437) |
-| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop.contexts | [439:39](../YouTubeDirectRangeProxy.cs#L439) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop.context | [449:17](../YouTubeDirectRangeProxy.cs#L449) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.MaximumEntries | [25:27](../YouTubeDirectRangeProxy.cs#L25) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.MaximumFileBytes | [26:28](../YouTubeDirectRangeProxy.cs#L26) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Gate | [27:40](../YouTubeDirectRangeProxy.cs#L27) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestSlots | [28:47](../YouTubeDirectRangeProxy.cs#L28) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.VideoId | [29:39](../YouTubeDirectRangeProxy.cs#L29) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.FormatId | [30:39](../YouTubeDirectRangeProxy.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.CapabilityPath | [31:39](../YouTubeDirectRangeProxy.cs#L31) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._server | [32:32](../YouTubeDirectRangeProxy.cs#L32) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._shutdown | [33:29](../YouTubeDirectRangeProxy.cs#L33) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._fetchRange | [37:121](../YouTubeDirectRangeProxy.cs#L37) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._resolve | [39:84](../YouTubeDirectRangeProxy.cs#L39) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy._invalidate | [40:39](../YouTubeDirectRangeProxy.cs#L40) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync | [42:9](../YouTubeDirectRangeProxy.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.video | [42:52](../YouTubeDirectRangeProxy.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.format | [42:80](../YouTubeDirectRangeProxy.cs#L42) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.headers | [43:13](../YouTubeDirectRangeProxy.cs#L43) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.cancellationToken | [43:58](../YouTubeDirectRangeProxy.cs#L43) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RegisterAsync.snapshot | [46:17](../YouTubeDirectRangeProxy.cs#L46) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.IsOwnedUri | [56:9](../YouTubeDirectRangeProxy.cs#L56) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.IsOwnedUri.value | [56:41](../YouTubeDirectRangeProxy.cs#L56) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Shutdown | [61:9](../YouTubeDirectRangeProxy.cs#L61) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Shutdown.previous | [63:21](../YouTubeDirectRangeProxy.cs#L63) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection | [68:9](../YouTubeDirectRangeProxy.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.video | [68:51](../YouTubeDirectRangeProxy.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.format | [68:79](../YouTubeDirectRangeProxy.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.headers | [69:13](../YouTubeDirectRangeProxy.cs#L69) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.id | [74:20](../YouTubeDirectRangeProxy.cs#L74) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.size | [75:85](../YouTubeDirectRangeProxy.cs#L75) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.length | [76:47](../YouTubeDirectRangeProxy.cs#L76) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.uri | [78:17](../YouTubeDirectRangeProxy.cs#L78) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.declaredLength | [79:19](../YouTubeDirectRangeProxy.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.expiry | [80:19](../YouTubeDirectRangeProxy.cs#L80) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair | [81:13](../YouTubeDirectRangeProxy.cs#L81) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.pieces | [83:21](../YouTubeDirectRangeProxy.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.name | [84:24](../YouTubeDirectRangeProxy.cs#L84) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.value | [88:57](../YouTubeDirectRangeProxy.cs#L88) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.pair.value | [93:120](../YouTubeDirectRangeProxy.cs#L93) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.formats | [98:67](../YouTubeDirectRangeProxy.cs#L98) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches | [100:17](../YouTubeDirectRangeProxy.cs#L100) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches.anonymous@4959 | [100:58](../YouTubeDirectRangeProxy.cs#L100) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.matches.anonymous@4959.f | [100:58](../YouTubeDirectRangeProxy.cs#L100) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.identity | [102:17](../YouTubeDirectRangeProxy.cs#L102) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ValidateSelection.expires | [108:22](../YouTubeDirectRangeProxy.cs#L108) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text | [114:9](../YouTubeDirectRangeProxy.cs#L114) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.value | [114:36](../YouTubeDirectRangeProxy.cs#L114) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.name | [114:55](../YouTubeDirectRangeProxy.cs#L114) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Text.property | [115:51](../YouTubeDirectRangeProxy.cs#L115) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer | [117:9](../YouTubeDirectRangeProxy.cs#L117) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.value | [117:37](../YouTubeDirectRangeProxy.cs#L117) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.name | [117:56](../YouTubeDirectRangeProxy.cs#L117) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.property | [122:53](../YouTubeDirectRangeProxy.cs#L122) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Integer.number | [123:93](../YouTubeDirectRangeProxy.cs#L123) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal | [127:9](../YouTubeDirectRangeProxy.cs#L127) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.value | [127:37](../YouTubeDirectRangeProxy.cs#L127) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.number | [127:51](../YouTubeDirectRangeProxy.cs#L127) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.anonymous@7120 | [130:63](../YouTubeDirectRangeProxy.cs#L130) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Decimal.anonymous@7120.c | [130:63](../YouTubeDirectRangeProxy.cs#L130) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange | [134:9](../YouTubeDirectRangeProxy.cs#L134) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.value | [134:40](../YouTubeDirectRangeProxy.cs#L134) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.length | [134:55](../YouTubeDirectRangeProxy.cs#L134) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.start | [134:68](../YouTubeDirectRangeProxy.cs#L134) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.end | [134:84](../YouTubeDirectRangeProxy.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.pieces | [139:17](../YouTubeDirectRangeProxy.cs#L139) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.suffix | [143:50](../YouTubeDirectRangeProxy.cs#L143) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ParseRange.requestedEnd | [149:46](../YouTubeDirectRangeProxy.cs#L149) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync | [154:9](../YouTubeDirectRangeProxy.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.server | [154:58](../YouTubeDirectRangeProxy.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.entry | [154:73](../YouTubeDirectRangeProxy.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.request | [154:86](../YouTubeDirectRangeProxy.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.offset | [155:13](../YouTubeDirectRangeProxy.cs#L155) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.count | [155:26](../YouTubeDirectRangeProxy.cs#L155) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.cancellationToken | [155:37](../YouTubeDirectRangeProxy.cs#L155) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.snapshot | [157:22](../YouTubeDirectRangeProxy.cs#L157) |
+| catch-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.ReadChunkAsync.error | [170:19](../YouTubeDirectRangeProxy.cs#L170) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync | [179:9](../YouTubeDirectRangeProxy.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.server | [179:56](../YouTubeDirectRangeProxy.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.entry | [179:71](../YouTubeDirectRangeProxy.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.stale | [179:84](../YouTubeDirectRangeProxy.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.cancellationToken | [179:100](../YouTubeDirectRangeProxy.cs#L179) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.renewal | [181:28](../YouTubeDirectRangeProxy.cs#L181) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@10153 | [188:46](../YouTubeDirectRangeProxy.cs#L188) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@10247 | [189:52](../YouTubeDirectRangeProxy.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RenewAsync.anonymous@10247.task | [189:52](../YouTubeDirectRangeProxy.cs#L189) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync | [197:9](../YouTubeDirectRangeProxy.cs#L197) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.server | [197:58](../YouTubeDirectRangeProxy.cs#L197) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.entry | [197:73](../YouTubeDirectRangeProxy.cs#L197) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.stale | [197:86](../YouTubeDirectRangeProxy.cs#L197) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.deadline | [199:23](../YouTubeDirectRangeProxy.cs#L199) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.resolved | [202:17](../YouTubeDirectRangeProxy.cs#L202) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.formats | [203:70](../YouTubeDirectRangeProxy.cs#L203) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected | [204:17](../YouTubeDirectRangeProxy.cs#L204) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected.anonymous@11256 | [204:59](../YouTubeDirectRangeProxy.cs#L204) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.selected.anonymous@11256.f | [204:59](../YouTubeDirectRangeProxy.cs#L204) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.headers | [206:17](../YouTubeDirectRangeProxy.cs#L206) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.headers.global | [206:114](../YouTubeDirectRangeProxy.cs#L206) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.header | [207:13](../YouTubeDirectRangeProxy.cs#L207) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.header.local | [207:117](../YouTubeDirectRangeProxy.cs#L207) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RefreshAsync.refreshed | [209:17](../YouTubeDirectRangeProxy.cs#L209) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Failure | [222:9](../YouTubeDirectRangeProxy.cs#L222) |
+| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity | [224:9](../YouTubeDirectRangeProxy.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.VideoId | [224:40](../YouTubeDirectRangeProxy.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.FormatId | [224:56](../YouTubeDirectRangeProxy.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Length | [224:73](../YouTubeDirectRangeProxy.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.VideoCodec | [224:86](../YouTubeDirectRangeProxy.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.AudioCodec | [225:13](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Extension | [225:32](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Language | [225:50](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Width | [225:67](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Height | [225:79](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.Channels | [225:92](../YouTubeDirectRangeProxy.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Identity.SampleRate | [225:107](../YouTubeDirectRangeProxy.cs#L225) |
+| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot | [226:9](../YouTubeDirectRangeProxy.cs#L226) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Identity | [226:40](../YouTubeDirectRangeProxy.cs#L226) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Uri | [226:59](../YouTubeDirectRangeProxy.cs#L226) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.Headers | [226:68](../YouTubeDirectRangeProxy.cs#L226) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Snapshot.ExpiresUtc | [226:113](../YouTubeDirectRangeProxy.cs#L226) |
+| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestState | [227:9](../YouTubeDirectRangeProxy.cs#L227) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.RequestState.Renewed | [227:59](../YouTubeDirectRangeProxy.cs#L227) |
+| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry | [228:9](../YouTubeDirectRangeProxy.cs#L228) |
+| constructor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry | [230:13](../YouTubeDirectRangeProxy.cs#L230) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry.snapshot | [230:28](../YouTubeDirectRangeProxy.cs#L230) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Entry.token | [230:47](../YouTubeDirectRangeProxy.cs#L230) |
+| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Sync | [232:13](../YouTubeDirectRangeProxy.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Sync.get | [232:36](../YouTubeDirectRangeProxy.cs#L232) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Current | [233:31](../YouTubeDirectRangeProxy.cs#L233) |
+| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Identity | [234:13](../YouTubeDirectRangeProxy.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Identity.get | [234:42](../YouTubeDirectRangeProxy.cs#L234) |
+| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Token | [235:13](../YouTubeDirectRangeProxy.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Token.get | [235:37](../YouTubeDirectRangeProxy.cs#L235) |
+| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.CreatedUtc | [236:13](../YouTubeDirectRangeProxy.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.CreatedUtc.get | [236:44](../YouTubeDirectRangeProxy.cs#L236) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.LastAccessUtc | [237:31](../YouTubeDirectRangeProxy.cs#L237) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.ActiveRequests | [238:26](../YouTubeDirectRangeProxy.cs#L238) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.Renewal | [239:38](../YouTubeDirectRangeProxy.cs#L239) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Entry.RenewalRetryAfterUtc | [240:31](../YouTubeDirectRangeProxy.cs#L240) |
+| type | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server | [243:9](../YouTubeDirectRangeProxy.cs#L243) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._gate | [245:37](../YouTubeDirectRangeProxy.cs#L245) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._listener | [246:43](../YouTubeDirectRangeProxy.cs#L246) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._stop | [247:54](../YouTubeDirectRangeProxy.cs#L247) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._entries | [248:56](../YouTubeDirectRangeProxy.cs#L248) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._contexts | [249:59](../YouTubeDirectRangeProxy.cs#L249) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._origin | [250:37](../YouTubeDirectRangeProxy.cs#L250) |
+| field | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server._stopped | [251:26](../YouTubeDirectRangeProxy.cs#L251) |
+| constructor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server | [252:13](../YouTubeDirectRangeProxy.cs#L252) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server.listener | [252:28](../YouTubeDirectRangeProxy.cs#L252) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Server.port | [252:51](../YouTubeDirectRangeProxy.cs#L252) |
+| property | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.StopToken | [254:13](../YouTubeDirectRangeProxy.cs#L254) |
+| accessor | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.StopToken.get | [254:52](../YouTubeDirectRangeProxy.cs#L254) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start | [256:13](../YouTubeDirectRangeProxy.cs#L256) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.attempt | [258:26](../YouTubeDirectRangeProxy.cs#L258) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.reservation | [260:25](../YouTubeDirectRangeProxy.cs#L260) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.port | [261:25](../YouTubeDirectRangeProxy.cs#L261) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.listener | [264:25](../YouTubeDirectRangeProxy.cs#L264) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Start.server | [269:29](../YouTubeDirectRangeProxy.cs#L269) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register | [279:13](../YouTubeDirectRangeProxy.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.snapshot | [279:38](../YouTubeDirectRangeProxy.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing | [285:25](../YouTubeDirectRangeProxy.cs#L285) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing.anonymous@15602 | [285:67](../YouTubeDirectRangeProxy.cs#L285) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.existing.anonymous@15602.e | [285:67](../YouTubeDirectRangeProxy.cs#L285) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Register.token | [295:28](../YouTubeDirectRangeProxy.cs#L295) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns | [303:13](../YouTubeDirectRangeProxy.cs#L303) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.value | [303:32](../YouTubeDirectRangeProxy.cs#L303) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.path | [308:28](../YouTubeDirectRangeProxy.cs#L308) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Owns.entry | [309:107](../YouTubeDirectRangeProxy.cs#L309) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune | [316:13](../YouTubeDirectRangeProxy.cs#L316) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry | [318:17](../YouTubeDirectRangeProxy.cs#L318) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry.anonymous@17309 | [318:61](../YouTubeDirectRangeProxy.cs#L318) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Prune.entry.anonymous@17309.e | [318:61](../YouTubeDirectRangeProxy.cs#L318) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.AcceptAsync | [323:13](../YouTubeDirectRangeProxy.cs#L323) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.AcceptAsync.context | [329:29](../YouTubeDirectRangeProxy.cs#L329) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync | [344:13](../YouTubeDirectRangeProxy.cs#L344) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.context | [344:44](../YouTubeDirectRangeProxy.cs#L344) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.entry | [346:24](../YouTubeDirectRangeProxy.cs#L346) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.committed | [347:22](../YouTubeDirectRangeProxy.cs#L347) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.deadline | [348:27](../YouTubeDirectRangeProxy.cs#L348) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.request | [352:25](../YouTubeDirectRangeProxy.cs#L352) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.path | [358:28](../YouTubeDirectRangeProxy.cs#L358) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.head | [367:26](../YouTubeDirectRangeProxy.cs#L367) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.range | [368:29](../YouTubeDirectRangeProxy.cs#L368) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.offset | [369:76](../YouTubeDirectRangeProxy.cs#L369) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.end | [369:93](../YouTubeDirectRangeProxy.cs#L369) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.remaining | [374:26](../YouTubeDirectRangeProxy.cs#L374) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.state | [375:25](../YouTubeDirectRangeProxy.cs#L375) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.first | [376:29](../YouTubeDirectRangeProxy.cs#L376) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.response | [379:25](../YouTubeDirectRangeProxy.cs#L379) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.count | [395:33](../YouTubeDirectRangeProxy.cs#L395) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.HandleAsync.bytes | [396:33](../YouTubeDirectRangeProxy.cs#L396) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject | [424:13](../YouTubeDirectRangeProxy.cs#L424) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject.context | [424:40](../YouTubeDirectRangeProxy.cs#L424) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Reject.status | [424:69](../YouTubeDirectRangeProxy.cs#L424) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Abort | [437:13](../YouTubeDirectRangeProxy.cs#L437) |
+| parameter | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Abort.context | [437:39](../YouTubeDirectRangeProxy.cs#L437) |
+| method | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop | [440:13](../YouTubeDirectRangeProxy.cs#L440) |
+| local-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop.contexts | [442:39](../YouTubeDirectRangeProxy.cs#L442) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeDirectRangeProxy.Server.Stop.context | [452:17](../YouTubeDirectRangeProxy.cs#L452) |
 
 </details>
 
@@ -7324,10 +7639,10 @@ Plugin Compile source (SDK default); 11990 bytes; 198 lines.
 <a id="file-d1109fcde8c29d7a"></a>
 ## [YouTubeManagedResolver.cs](../YouTubeManagedResolver.cs)
 
-Plugin Compile source (SDK default); 21294 bytes; 321 lines.
+Plugin Compile source (SDK default); 23031 bytes; 342 lines.
 
 <details>
-<summary>All 182 declarations / anchors</summary>
+<summary>All 194 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -7395,8 +7710,8 @@ Plugin Compile source (SDK default); 21294 bytes; 321 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.audioCodec | [122:63](../YouTubeManagedResolver.cs#L122) |
 | local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.id | [127:32](../YouTubeManagedResolver.cs#L127) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.trackId | [128:81](../YouTubeManagedResolver.cs#L128) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.anonymous@9302 | [141:47](../YouTubeManagedResolver.cs#L141) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.anonymous@9302.item | [141:47](../YouTubeManagedResolver.cs#L141) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.anonymous@9367 | [141:47](../YouTubeManagedResolver.cs#L141) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.anonymous@9367.item | [141:47](../YouTubeManagedResolver.cs#L141) |
 | local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.format | [144:29](../YouTubeManagedResolver.cs#L144) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.bitrate | [151:50](../YouTubeManagedResolver.cs#L151) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.width | [152:52](../YouTubeManagedResolver.cs#L152) |
@@ -7404,115 +7719,127 @@ Plugin Compile source (SDK default); 21294 bytes; 321 lines.
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.fps | [154:56](../YouTubeManagedResolver.cs#L154) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.language | [155:62](../YouTubeManagedResolver.cs#L155) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.isDefault | [156:65](../YouTubeManagedResolver.cs#L156) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.channels | [157:68](../YouTubeManagedResolver.cs#L157) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.rate | [158:101](../YouTubeManagedResolver.cs#L158) |
-| catch-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.error | [162:27](../YouTubeManagedResolver.cs#L162) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength | [172:9](../YouTubeManagedResolver.cs#L172) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.uri | [172:45](../YouTubeManagedResolver.cs#L172) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.length | [172:54](../YouTubeManagedResolver.cs#L172) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.value | [174:19](../YouTubeManagedResolver.cs#L174) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair | [175:13](../YouTubeManagedResolver.cs#L175) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.pieces | [177:21](../YouTubeManagedResolver.cs#L177) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.name | [178:24](../YouTubeManagedResolver.cs#L178) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.parsed | [182:76](../YouTubeManagedResolver.cs#L182) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery | [190:9](../YouTubeManagedResolver.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery.uri | [190:41](../YouTubeManagedResolver.cs#L190) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery.offset | [192:17](../YouTubeManagedResolver.cs#L192) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions | [196:9](../YouTubeManagedResolver.cs#L196) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.root | [196:41](../YouTubeManagedResolver.cs#L196) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.target | [196:59](../YouTubeManagedResolver.cs#L196) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.tracks | [198:17](../YouTubeManagedResolver.cs#L198) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.accepted | [201:17](../YouTubeManagedResolver.cs#L201) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track | [202:13](../YouTubeManagedResolver.cs#L202) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.data | [205:21](../YouTubeManagedResolver.cs#L205) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.language | [206:25](../YouTubeManagedResolver.cs#L206) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.uri | [208:21](../YouTubeManagedResolver.cs#L208) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.query | [210:21](../YouTubeManagedResolver.cs#L210) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.duplicate | [211:22](../YouTubeManagedResolver.cs#L211) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.pair | [212:17](../YouTubeManagedResolver.cs#L212) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.pair.parts | [214:25](../YouTubeManagedResolver.cs#L214) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.actualLanguage | [217:98](../YouTubeManagedResolver.cs#L217) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.kind | [219:80](../YouTubeManagedResolver.cs#L219) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.url | [220:24](../YouTubeManagedResolver.cs#L220) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.group | [222:21](../YouTubeManagedResolver.cs#L222) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.key | [223:24](../YouTubeManagedResolver.cs#L223) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters | [229:9](../YouTubeManagedResolver.cs#L229) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.root | [229:72](../YouTubeManagedResolver.cs#L229) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.duration | [229:90](../YouTubeManagedResolver.cs#L229) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.found | [231:17](../YouTubeManagedResolver.cs#L231) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.nodes | [234:17](../YouTubeManagedResolver.cs#L234) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.exceeded | [235:18](../YouTubeManagedResolver.cs#L235) |
-| local-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit | [236:13](../YouTubeManagedResolver.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.value | [236:24](../YouTubeManagedResolver.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.depth | [236:43](../YouTubeManagedResolver.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.chapterPanel | [236:54](../YouTubeManagedResolver.cs#L236) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.item | [240:19](../YouTubeManagedResolver.cs#L240) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.targetId | [242:25](../YouTubeManagedResolver.cs#L242) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.knownPanel | [243:22](../YouTubeManagedResolver.cs#L243) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property | [244:17](../YouTubeManagedResolver.cs#L244) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.marker | [246:25](../YouTubeManagedResolver.cs#L246) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.millis | [248:73](../YouTubeManagedResolver.cs#L248) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.watch | [252:29](../YouTubeManagedResolver.cs#L252) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.seconds | [253:69](../YouTubeManagedResolver.cs#L253) |
-| local-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add | [259:13](../YouTubeManagedResolver.cs#L259) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.milliseconds | [259:22](../YouTubeManagedResolver.cs#L259) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.name | [259:41](../YouTubeManagedResolver.cs#L259) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned | [262:24](../YouTubeManagedResolver.cs#L262) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned.anonymous@17238 | [262:63](../YouTubeManagedResolver.cs#L262) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned.anonymous@17238.c | [262:63](../YouTubeManagedResolver.cs#L262) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.anonymous@17553 | [267:33](../YouTubeManagedResolver.cs#L267) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.anonymous@17553.pair | [267:33](../YouTubeManagedResolver.cs#L267) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData | [271:9](../YouTubeManagedResolver.cs#L271) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.html | [271:55](../YouTubeManagedResolver.cs#L271) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.match | [274:17](../YouTubeManagedResolver.cs#L274) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.start | [276:17](../YouTubeManagedResolver.cs#L276) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.depth | [278:17](../YouTubeManagedResolver.cs#L278) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.quoted | [278:33](../YouTubeManagedResolver.cs#L278) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.escaped | [278:49](../YouTubeManagedResolver.cs#L278) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.i | [279:22](../YouTubeManagedResolver.cs#L279) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.ch | [281:22](../YouTubeManagedResolver.cs#L281) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.document | [293:31](../YouTubeManagedResolver.cs#L293) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Title | [300:9](../YouTubeManagedResolver.cs#L300) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Title.value | [300:38](../YouTubeManagedResolver.cs#L300) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Title.simple | [302:53](../YouTubeManagedResolver.cs#L302) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Title.runs | [303:17](../YouTubeManagedResolver.cs#L303) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.Title.anonymous@19312 | [305:63](../YouTubeManagedResolver.cs#L305) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Title.anonymous@19312.run | [305:63](../YouTubeManagedResolver.cs#L305) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Property | [307:9](../YouTubeManagedResolver.cs#L307) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Property.value | [307:45](../YouTubeManagedResolver.cs#L307) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Property.name | [307:64](../YouTubeManagedResolver.cs#L307) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Property.found | [307:158](../YouTubeManagedResolver.cs#L307) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Text | [308:9](../YouTubeManagedResolver.cs#L308) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Text.value | [308:37](../YouTubeManagedResolver.cs#L308) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Text.name | [308:56](../YouTubeManagedResolver.cs#L308) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Text.found | [308:101](../YouTubeManagedResolver.cs#L308) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean | [309:9](../YouTubeManagedResolver.cs#L309) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean.value | [309:38](../YouTubeManagedResolver.cs#L309) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean.name | [309:57](../YouTubeManagedResolver.cs#L309) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Integer | [310:9](../YouTubeManagedResolver.cs#L310) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.value | [310:37](../YouTubeManagedResolver.cs#L310) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.name | [310:56](../YouTubeManagedResolver.cs#L310) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.found | [310:101](../YouTubeManagedResolver.cs#L310) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.number | [310:179](../YouTubeManagedResolver.cs#L310) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Long | [311:9](../YouTubeManagedResolver.cs#L311) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Long.value | [311:35](../YouTubeManagedResolver.cs#L311) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Long.name | [311:54](../YouTubeManagedResolver.cs#L311) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Long.found | [311:99](../YouTubeManagedResolver.cs#L311) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Long.number | [311:178](../YouTubeManagedResolver.cs#L311) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong | [312:9](../YouTubeManagedResolver.cs#L312) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.value | [312:44](../YouTubeManagedResolver.cs#L312) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.allowZero | [312:59](../YouTubeManagedResolver.cs#L312) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.anonymous@20454 | [313:26](../YouTubeManagedResolver.cs#L313) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.anonymous@20454.ch | [313:26](../YouTubeManagedResolver.cs#L313) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.number | [314:95](../YouTubeManagedResolver.cs#L314) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds | [315:9](../YouTubeManagedResolver.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds.value | [315:40](../YouTubeManagedResolver.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds.seconds | [315:55](../YouTubeManagedResolver.cs#L315) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Limit | [317:9](../YouTubeManagedResolver.cs#L317) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.value | [317:37](../YouTubeManagedResolver.cs#L317) |
-| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.maximum | [317:51](../YouTubeManagedResolver.cs#L317) |
-| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.length | [318:15](../YouTubeManagedResolver.cs#L318) |
-| method | Emby.YouTubePlugin.YouTubeManagedResolver.Failure | [319:9](../YouTubeManagedResolver.cs#L319) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.audioTrack | [157:29](../YouTubeManagedResolver.cs#L157) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.audioId | [158:62](../YouTubeManagedResolver.cs#L158) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.audioName | [159:62](../YouTubeManagedResolver.cs#L159) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.defaultAudio | [166:65](../YouTubeManagedResolver.cs#L166) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.originalAudio | [167:29](../YouTubeManagedResolver.cs#L167) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.dubbedAudio | [169:29](../YouTubeManagedResolver.cs#L169) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.drc | [171:61](../YouTubeManagedResolver.cs#L171) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.channels | [172:68](../YouTubeManagedResolver.cs#L172) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.rate | [173:101](../YouTubeManagedResolver.cs#L173) |
+| catch-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadFormats.field.entry.error | [177:27](../YouTubeManagedResolver.cs#L177) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength | [187:9](../YouTubeManagedResolver.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.uri | [187:45](../YouTubeManagedResolver.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.length | [187:54](../YouTubeManagedResolver.cs#L187) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.value | [189:19](../YouTubeManagedResolver.cs#L189) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair | [190:13](../YouTubeManagedResolver.cs#L190) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.pieces | [192:21](../YouTubeManagedResolver.cs#L192) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.name | [193:24](../YouTubeManagedResolver.cs#L193) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ValidateLength.pair.parsed | [197:76](../YouTubeManagedResolver.cs#L197) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery | [205:9](../YouTubeManagedResolver.cs#L205) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery.uri | [205:41](../YouTubeManagedResolver.cs#L205) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.RawQuery.offset | [207:17](../YouTubeManagedResolver.cs#L207) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions | [211:9](../YouTubeManagedResolver.cs#L211) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.root | [211:41](../YouTubeManagedResolver.cs#L211) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.target | [211:59](../YouTubeManagedResolver.cs#L211) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.tracks | [213:17](../YouTubeManagedResolver.cs#L213) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.accepted | [216:17](../YouTubeManagedResolver.cs#L216) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track | [217:13](../YouTubeManagedResolver.cs#L217) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.data | [220:21](../YouTubeManagedResolver.cs#L220) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.language | [221:25](../YouTubeManagedResolver.cs#L221) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.uri | [223:21](../YouTubeManagedResolver.cs#L223) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.query | [225:21](../YouTubeManagedResolver.cs#L225) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.duplicate | [226:22](../YouTubeManagedResolver.cs#L226) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.pair | [227:17](../YouTubeManagedResolver.cs#L227) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.pair.parts | [229:25](../YouTubeManagedResolver.cs#L229) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.actualLanguage | [232:98](../YouTubeManagedResolver.cs#L232) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.kind | [234:80](../YouTubeManagedResolver.cs#L234) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.url | [235:24](../YouTubeManagedResolver.cs#L235) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.group | [237:21](../YouTubeManagedResolver.cs#L237) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.AddCaptions.track.key | [238:24](../YouTubeManagedResolver.cs#L238) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters | [244:9](../YouTubeManagedResolver.cs#L244) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.root | [244:72](../YouTubeManagedResolver.cs#L244) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.duration | [244:90](../YouTubeManagedResolver.cs#L244) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.found | [246:17](../YouTubeManagedResolver.cs#L246) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.nodes | [249:17](../YouTubeManagedResolver.cs#L249) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.exceeded | [250:18](../YouTubeManagedResolver.cs#L250) |
+| local-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit | [251:13](../YouTubeManagedResolver.cs#L251) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.value | [251:24](../YouTubeManagedResolver.cs#L251) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.depth | [251:43](../YouTubeManagedResolver.cs#L251) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.chapterPanel | [251:54](../YouTubeManagedResolver.cs#L251) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.item | [255:19](../YouTubeManagedResolver.cs#L255) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.targetId | [257:25](../YouTubeManagedResolver.cs#L257) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.knownPanel | [258:22](../YouTubeManagedResolver.cs#L258) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property | [259:17](../YouTubeManagedResolver.cs#L259) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.marker | [261:25](../YouTubeManagedResolver.cs#L261) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.millis | [263:80](../YouTubeManagedResolver.cs#L263) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.watch | [267:29](../YouTubeManagedResolver.cs#L267) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Visit.property.seconds | [268:76](../YouTubeManagedResolver.cs#L268) |
+| local-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add | [274:13](../YouTubeManagedResolver.cs#L274) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.milliseconds | [274:22](../YouTubeManagedResolver.cs#L274) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.name | [274:41](../YouTubeManagedResolver.cs#L274) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned | [277:24](../YouTubeManagedResolver.cs#L277) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned.anonymous@18659 | [277:63](../YouTubeManagedResolver.cs#L277) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.Add.cleaned.anonymous@18659.c | [277:63](../YouTubeManagedResolver.cs#L277) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.anonymous@18974 | [282:33](../YouTubeManagedResolver.cs#L282) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ReadChapters.anonymous@18974.pair | [282:33](../YouTubeManagedResolver.cs#L282) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData | [286:9](../YouTubeManagedResolver.cs#L286) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.html | [286:55](../YouTubeManagedResolver.cs#L286) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.match | [289:17](../YouTubeManagedResolver.cs#L289) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.start | [291:17](../YouTubeManagedResolver.cs#L291) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.depth | [293:17](../YouTubeManagedResolver.cs#L293) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.quoted | [293:33](../YouTubeManagedResolver.cs#L293) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.escaped | [293:49](../YouTubeManagedResolver.cs#L293) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.i | [294:22](../YouTubeManagedResolver.cs#L294) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.ch | [296:22](../YouTubeManagedResolver.cs#L296) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ParseInitialData.document | [308:31](../YouTubeManagedResolver.cs#L308) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Title | [315:9](../YouTubeManagedResolver.cs#L315) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Title.value | [315:38](../YouTubeManagedResolver.cs#L315) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Title.simple | [317:53](../YouTubeManagedResolver.cs#L317) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Title.runs | [318:17](../YouTubeManagedResolver.cs#L318) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.Title.anonymous@20733 | [320:63](../YouTubeManagedResolver.cs#L320) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Title.anonymous@20733.run | [320:63](../YouTubeManagedResolver.cs#L320) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Property | [322:9](../YouTubeManagedResolver.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Property.value | [322:45](../YouTubeManagedResolver.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Property.name | [322:64](../YouTubeManagedResolver.cs#L322) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Property.found | [322:158](../YouTubeManagedResolver.cs#L322) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Text | [323:9](../YouTubeManagedResolver.cs#L323) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Text.value | [323:37](../YouTubeManagedResolver.cs#L323) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Text.name | [323:56](../YouTubeManagedResolver.cs#L323) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Text.found | [323:101](../YouTubeManagedResolver.cs#L323) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean | [324:9](../YouTubeManagedResolver.cs#L324) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean.value | [324:38](../YouTubeManagedResolver.cs#L324) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Boolean.name | [324:57](../YouTubeManagedResolver.cs#L324) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Integer | [325:9](../YouTubeManagedResolver.cs#L325) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.value | [325:37](../YouTubeManagedResolver.cs#L325) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.name | [325:56](../YouTubeManagedResolver.cs#L325) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.found | [325:101](../YouTubeManagedResolver.cs#L325) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Integer.number | [325:179](../YouTubeManagedResolver.cs#L325) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Long | [326:9](../YouTubeManagedResolver.cs#L326) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Long.value | [326:35](../YouTubeManagedResolver.cs#L326) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Long.name | [326:54](../YouTubeManagedResolver.cs#L326) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Long.found | [326:99](../YouTubeManagedResolver.cs#L326) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Long.number | [326:178](../YouTubeManagedResolver.cs#L326) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.ChapterTime | [327:9](../YouTubeManagedResolver.cs#L327) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ChapterTime.value | [327:42](../YouTubeManagedResolver.cs#L327) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.ChapterTime.name | [327:61](../YouTubeManagedResolver.cs#L327) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ChapterTime.found | [329:17](../YouTubeManagedResolver.cs#L329) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.ChapterTime.number | [331:53](../YouTubeManagedResolver.cs#L331) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong | [333:9](../YouTubeManagedResolver.cs#L333) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.value | [333:44](../YouTubeManagedResolver.cs#L333) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.allowZero | [333:59](../YouTubeManagedResolver.cs#L333) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.anonymous@22191 | [334:26](../YouTubeManagedResolver.cs#L334) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.anonymous@22191.ch | [334:26](../YouTubeManagedResolver.cs#L334) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeManagedResolver.CanonicalLong.number | [335:95](../YouTubeManagedResolver.cs#L335) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds | [336:9](../YouTubeManagedResolver.cs#L336) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds.value | [336:40](../YouTubeManagedResolver.cs#L336) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.TrySeconds.seconds | [336:55](../YouTubeManagedResolver.cs#L336) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Limit | [338:9](../YouTubeManagedResolver.cs#L338) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.value | [338:37](../YouTubeManagedResolver.cs#L338) |
+| parameter | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.maximum | [338:51](../YouTubeManagedResolver.cs#L338) |
+| local-variable | Emby.YouTubePlugin.YouTubeManagedResolver.Limit.length | [339:15](../YouTubeManagedResolver.cs#L339) |
+| method | Emby.YouTubePlugin.YouTubeManagedResolver.Failure | [340:9](../YouTubeManagedResolver.cs#L340) |
 
 </details>
 
@@ -7678,7 +8005,7 @@ Plugin Compile source (SDK default); 8281 bytes; 230 lines.
 <a id="file-28aab84e271eec1a"></a>
 ## [YouTubeSourceBudget.cs](../YouTubeSourceBudget.cs)
 
-Plugin Compile source (SDK default); 13295 bytes; 224 lines.
+Plugin Compile source (SDK default); 13233 bytes; 224 lines.
 
 <details>
 <summary>All 92 declarations / anchors</summary>
@@ -7728,16 +8055,16 @@ Plugin Compile source (SDK default); 13295 bytes; 224 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.key | [79:17](../YouTubeSourceBudget.cs#L79) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.now | [82:21](../YouTubeSourceBudget.cs#L82) |
 | iteration-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired | [83:17](../YouTubeSourceBudget.cs#L83) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4856 | [83:53](../YouTubeSourceBudget.cs#L83) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4856.pair | [83:53](../YouTubeSourceBudget.cs#L83) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4977 | [84:79](../YouTubeSourceBudget.cs#L84) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4977.pair | [84:79](../YouTubeSourceBudget.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4794 | [83:53](../YouTubeSourceBudget.cs#L83) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4794.pair | [83:53](../YouTubeSourceBudget.cs#L83) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4915 | [84:79](../YouTubeSourceBudget.cs#L84) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.expired.anonymous@4915.pair | [84:79](../YouTubeSourceBudget.cs#L84) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.cached | [85:52](../YouTubeSourceBudget.cs#L85) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest | [88:25](../YouTubeSourceBudget.cs#L88) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5223 | [88:46](../YouTubeSourceBudget.cs#L88) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5223.pair | [88:46](../YouTubeSourceBudget.cs#L88) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5300 | [89:34](../YouTubeSourceBudget.cs#L89) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5300.pair | [89:34](../YouTubeSourceBudget.cs#L89) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5161 | [88:46](../YouTubeSourceBudget.cs#L88) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5161.pair | [88:46](../YouTubeSourceBudget.cs#L88) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5238 | [89:34](../YouTubeSourceBudget.cs#L89) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.oldest.anonymous@5238.pair | [89:34](../YouTubeSourceBudget.cs#L89) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.GetObservation.task | [93:35](../YouTubeSourceBudget.cs#L93) |
 | method | Emby.YouTubePlugin.YouTubeSourceBudget.MeasureAsync | [105:9](../YouTubeSourceBudget.cs#L105) |
 | parameter | Emby.YouTubePlugin.YouTubeSourceBudget.MeasureAsync.videoUri | [105:61](../YouTubeSourceBudget.cs#L105) |
@@ -7756,16 +8083,16 @@ Plugin Compile source (SDK default); 13295 bytes; 224 lines.
 | parameter | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.headers | [154:49](../YouTubeSourceBudget.cs#L154) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.route | [158:17](../YouTubeSourceBudget.cs#L158) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity | [159:17](../YouTubeSourceBudget.cs#L159) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9541 | [160:53](../YouTubeSourceBudget.cs#L160) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9541.pair | [160:53](../YouTubeSourceBudget.cs#L160) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9621 | [161:29](../YouTubeSourceBudget.cs#L161) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9621.pair | [161:29](../YouTubeSourceBudget.cs#L161) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9479 | [160:53](../YouTubeSourceBudget.cs#L160) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9479.pair | [160:53](../YouTubeSourceBudget.cs#L160) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9559 | [161:29](../YouTubeSourceBudget.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.CacheKey.identity.anonymous@9559.pair | [161:29](../YouTubeSourceBudget.cs#L161) |
 | method | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment | [165:9](../YouTubeSourceBudget.cs#L165) |
 | parameter | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.text | [165:47](../YouTubeSourceBudget.cs#L165) |
 | parameter | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.playlistUri | [165:60](../YouTubeSourceBudget.cs#L165) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.lines | [168:17](../YouTubeSourceBudget.cs#L168) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.lines.anonymous@10095 | [169:37](../YouTubeSourceBudget.cs#L169) |
-| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.lines.anonymous@10095.line | [169:37](../YouTubeSourceBudget.cs#L169) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.lines.anonymous@10033 | [169:37](../YouTubeSourceBudget.cs#L169) |
+| parameter | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.lines.anonymous@10033.line | [169:37](../YouTubeSourceBudget.cs#L169) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.first | [171:18](../YouTubeSourceBudget.cs#L171) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.durationPending | [172:18](../YouTubeSourceBudget.cs#L172) |
 | local-variable | Emby.YouTubePlugin.YouTubeSourceBudget.ParseProbeSegment.targetDuration | [172:43](../YouTubeSourceBudget.cs#L172) |
@@ -7939,10 +8266,166 @@ Plugin Compile source (SDK default); 16082 bytes; 301 lines.
 
 </details>
 
+<a id="file-8b85a2815c8e321e"></a>
+## [YouTubeSubtitleDelivery.cs](../YouTubeSubtitleDelivery.cs)
+
+Plugin Compile source (SDK default); 16238 bytes; 258 lines.
+
+<details>
+<summary>All 143 declarations / anchors</summary>
+
+| Kind | Owner / name | Source |
+|---|---|---|
+| namespace | Emby.YouTubePlugin | [9:1](../YouTubeSubtitleDelivery.cs#L9) |
+| type | Emby.YouTubePlugin.YouTubeSubtitleDelivery | [11:5](../YouTubeSubtitleDelivery.cs#L11) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery.SourcePrefix | [13:30](../YouTubeSubtitleDelivery.cs#L13) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Clone | [14:44](../YouTubeSubtitleDelivery.cs#L14) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery._installed | [16:38](../YouTubeSubtitleDelivery.cs#L16) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery._input | [17:38](../YouTubeSubtitleDelivery.cs#L17) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery._render | [18:39](../YouTubeSubtitleDelivery.cs#L18) |
+| type | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding | [19:9](../YouTubeSubtitleDelivery.cs#L19) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.Inputs | [19:44](../YouTubeSubtitleDelivery.cs#L19) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.Input0 | [19:65](../YouTubeSubtitleDelivery.cs#L19) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.Url | [19:86](../YouTubeSubtitleDelivery.cs#L19) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.Subtitles0 | [20:13](../YouTubeSubtitleDelivery.cs#L20) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.IsExternal | [20:38](../YouTubeSubtitleDelivery.cs#L20) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.InputBinding.SubtitlePath | [20:63](../YouTubeSubtitleDelivery.cs#L20) |
+| type | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding | [21:9](../YouTubeSubtitleDelivery.cs#L21) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.EnsureSoftware | [21:45](../YouTubeSubtitleDelivery.cs#L21) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.Legacy | [21:72](../YouTubeSubtitleDelivery.cs#L21) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.Steps | [22:13](../YouTubeSubtitleDelivery.cs#L22) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.Demand | [22:33](../YouTubeSubtitleDelivery.cs#L22) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.InHardware | [22:54](../YouTubeSubtitleDelivery.cs#L22) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering | [28:9](../YouTubeSubtitleDelivery.cs#L28) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.requestDto | [28:52](../YouTubeSubtitleDelivery.cs#L28) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.property | [31:17](../YouTubeSubtitleDelivery.cs#L31) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.profile | [33:71](../YouTubeSubtitleDelivery.cs#L33) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.local | [40:17](../YouTubeSubtitleDelivery.cs#L40) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install | [48:9](../YouTubeSubtitleDelivery.cs#L48) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmony | [48:37](../YouTubeSubtitleDelivery.cs#L48) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmonyMethodType | [48:53](../YouTubeSubtitleDelivery.cs#L48) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.target | [54:21](../YouTubeSubtitleDelivery.cs#L54) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch | [58:21](../YouTubeSubtitleDelivery.cs#L58) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442 | [59:38](../YouTubeSubtitleDelivery.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.method | [59:38](../YouTubeSubtitleDelivery.cs#L59) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.parameters | [59:104](../YouTubeSubtitleDelivery.cs#L59) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.anonymous@3664 | [61:43](../YouTubeSubtitleDelivery.cs#L61) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.anonymous@3664.parameter | [61:43](../YouTubeSubtitleDelivery.cs#L61) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find | [63:17](../YouTubeSubtitleDelivery.cs#L63) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.name | [63:27](../YouTubeSubtitleDelivery.cs#L63) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3841 | [63:90](../YouTubeSubtitleDelivery.cs#L63) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3841.assembly | [63:90](../YouTubeSubtitleDelivery.cs#L63) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3920 | [64:37](../YouTubeSubtitleDelivery.cs#L64) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3920.type | [64:37](../YouTubeSubtitleDelivery.cs#L64) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipeline | [65:21](../YouTubeSubtitleDelivery.cs#L65) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource | [67:21](../YouTubeSubtitleDelivery.cs#L67) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320 | [68:29](../YouTubeSubtitleDelivery.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.method | [68:29](../YouTubeSubtitleDelivery.cs#L68) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.anonymous@4545 | [70:58](../YouTubeSubtitleDelivery.cs#L70) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.anonymous@4545.parameter | [70:58](../YouTubeSubtitleDelivery.cs#L70) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.command | [77:21](../YouTubeSubtitleDelivery.cs#L77) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demand | [78:21](../YouTubeSubtitleDelivery.cs#L78) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property | [79:17](../YouTubeSubtitleDelivery.cs#L79) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.type | [79:39](../YouTubeSubtitleDelivery.cs#L79) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.name | [79:50](../YouTubeSubtitleDelivery.cs#L79) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.expected | [79:63](../YouTubeSubtitleDelivery.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.property | [81:25](../YouTubeSubtitleDelivery.cs#L81) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.first | [85:21](../YouTubeSubtitleDelivery.cs#L85) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.inputs | [86:21](../YouTubeSubtitleDelivery.cs#L86) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.subtitles | [87:21](../YouTubeSubtitleDelivery.cs#L87) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.tracking | [92:21](../YouTubeSubtitleDelivery.cs#L92) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demands | [93:21](../YouTubeSubtitleDelivery.cs#L93) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method | [94:17](../YouTubeSubtitleDelivery.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.type | [94:35](../YouTubeSubtitleDelivery.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.name | [94:46](../YouTubeSubtitleDelivery.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.types | [94:59](../YouTubeSubtitleDelivery.cs#L94) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.method | [96:25](../YouTubeSubtitleDelivery.cs#L96) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.software | [100:21](../YouTubeSubtitleDelivery.cs#L100) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.plan | [101:21](../YouTubeSubtitleDelivery.cs#L101) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.step | [102:21](../YouTubeSubtitleDelivery.cs#L102) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.hardware | [103:21](../YouTubeSubtitleDelivery.cs#L103) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.steps | [104:21](../YouTubeSubtitleDelivery.cs#L104) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelineArguments | [109:21](../YouTubeSubtitleDelivery.cs#L109) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines | [112:21](../YouTubeSubtitleDelivery.cs#L112) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@8078 | [113:29](../YouTubeSubtitleDelivery.cs#L113) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@8078.name | [113:29](../YouTubeSubtitleDelivery.cs#L113) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@8288 | [115:35](../YouTubeSubtitleDelivery.cs#L115) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@8288.method | [115:35](../YouTubeSubtitleDelivery.cs#L115) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add | [116:17](../YouTubeSubtitleDelivery.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.original | [116:26](../YouTubeSubtitleDelivery.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.prefix | [116:47](../YouTubeSubtitleDelivery.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.postfix | [116:63](../YouTubeSubtitleDelivery.cs#L116) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.parameters | [118:25](../YouTubeSubtitleDelivery.cs#L118) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.arguments | [119:25](../YouTubeSubtitleDelivery.cs#L119) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.i | [121:30](../YouTubeSubtitleDelivery.cs#L121) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.callbackName | [123:29](../YouTubeSubtitleDelivery.cs#L123) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.method | [131:17](../YouTubeSubtitleDelivery.cs#L131) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.error | [136:19](../YouTubeSubtitleDelivery.cs#L136) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix | [143:9](../YouTubeSubtitleDelivery.cs#L143) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__0 | [143:50](../YouTubeSubtitleDelivery.cs#L143) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__3 | [143:71](../YouTubeSubtitleDelivery.cs#L143) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__4 | [143:98](../YouTubeSubtitleDelivery.cs#L143) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__5 | [143:114](../YouTubeSubtitleDelivery.cs#L143) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.error | [157:19](../YouTubeSubtitleDelivery.cs#L157) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix | [161:9](../YouTubeSubtitleDelivery.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__1 | [161:48](../YouTubeSubtitleDelivery.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__2 | [161:60](../YouTubeSubtitleDelivery.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__state | [161:72](../YouTubeSubtitleDelivery.cs#L161) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.binding | [164:17](../YouTubeSubtitleDelivery.cs#L164) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.error | [171:19](../YouTubeSubtitleDelivery.cs#L171) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix | [174:9](../YouTubeSubtitleDelivery.cs#L174) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__1 | [174:49](../YouTubeSubtitleDelivery.cs#L174) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__2 | [174:61](../YouTubeSubtitleDelivery.cs#L174) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__state | [174:73](../YouTubeSubtitleDelivery.cs#L174) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__result | [174:86](../YouTubeSubtitleDelivery.cs#L174) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.binding | [176:17](../YouTubeSubtitleDelivery.cs#L176) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.path | [182:17](../YouTubeSubtitleDelivery.cs#L182) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches | [183:17](../YouTubeSubtitleDelivery.cs#L183) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12158 | [184:24](../YouTubeSubtitleDelivery.cs#L184) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12158.input | [184:24](../YouTubeSubtitleDelivery.cs#L184) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12277 | [185:25](../YouTubeSubtitleDelivery.cs#L185) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12277.input | [185:25](../YouTubeSubtitleDelivery.cs#L185) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12328 | [185:76](../YouTubeSubtitleDelivery.cs#L185) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12328.stream | [185:76](../YouTubeSubtitleDelivery.cs#L185) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix | [189:9](../YouTubeSubtitleDelivery.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__0 | [189:46](../YouTubeSubtitleDelivery.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__2 | [189:58](../YouTubeSubtitleDelivery.cs#L189) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.binding | [191:17](../YouTubeSubtitleDelivery.cs#L191) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step | [193:13](../YouTubeSubtitleDelivery.cs#L193) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step.demand | [195:21](../YouTubeSubtitleDelivery.cs#L195) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix | [201:9](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__instance | [201:48](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__0 | [201:67](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__1 | [201:79](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__2 | [201:91](../YouTubeSubtitleDelivery.cs#L201) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.binding | [203:17](../YouTubeSubtitleDelivery.cs#L203) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand | [213:9](../YouTubeSubtitleDelivery.cs#L213) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.command | [213:51](../YouTubeSubtitleDelivery.cs#L213) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.demand | [213:67](../YouTubeSubtitleDelivery.cs#L213) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.binding | [215:17](../YouTubeSubtitleDelivery.cs#L215) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.first | [220:71](../YouTubeSubtitleDelivery.cs#L220) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.primary | [221:66](../YouTubeSubtitleDelivery.cs#L221) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.caption | [222:76](../YouTubeSubtitleDelivery.cs#L222) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.uri | [224:70](../YouTubeSubtitleDelivery.cs#L224) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.error | [229:19](../YouTubeSubtitleDelivery.cs#L229) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath | [232:9](../YouTubeSubtitleDelivery.cs#L232) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.path | [232:48](../YouTubeSubtitleDelivery.cs#L232) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.root | [235:17](../YouTubeSubtitleDelivery.cs#L235) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.full | [236:17](../YouTubeSubtitleDelivery.cs#L236) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.comparison | [237:17](../YouTubeSubtitleDelivery.cs#L237) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.name | [239:17](../YouTubeSubtitleDelivery.cs#L239) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.directory | [244:17](../YouTubeSubtitleDelivery.cs#L244) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.file | [245:17](../YouTubeSubtitleDelivery.cs#L245) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex | [250:9](../YouTubeSubtitleDelivery.cs#L250) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex.value | [250:35](../YouTubeSubtitleDelivery.cs#L250) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeProfiles | [252:9](../YouTubeSubtitleDelivery.cs#L252) |
+
+</details>
+
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 34274 bytes; 156 lines.
+Documentation/resource; 39018 bytes; 166 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -7952,7 +8435,7 @@ Documentation/resource; 6611 bytes; 54 lines.
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 9392 bytes; 77 lines.
+Documentation/resource; 9649 bytes; 77 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)

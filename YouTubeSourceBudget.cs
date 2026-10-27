@@ -70,7 +70,7 @@ namespace Emby.YouTubePlugin
             return observation.Bitrate is { } bitrate
                 ? YouTubeDirectManifest.Select(masterText, masterUri, maximumHeight,
                     YouTubeDirectHttp.ValidateMediaUri, "h264",
-                    Math.Min(bitrate, YouTubeDirectQualityPolicy.MaximumStreamingBitrate), "aac")
+                    bitrate, "aac")
                 : fallback;
         }
 

@@ -37,7 +37,8 @@ namespace Emby.YouTubePlugin
     internal static class YouTubeDirectPlayback
     {
         private static readonly SemaphoreSlim ManifestGate = new(1, 1);
-        private const int MaximumManifestFiles = 128;
+        private const int MaximumManifestFiles = 128 * (YouTubeAudioTracks.MaximumTracks + 1);
+        private const long MaximumManifestBytes = 64L * 1024 * 1024;
         private static readonly TimeSpan ManifestLifetime = TimeSpan.FromHours(12);
         // A private IO seam, not a configurable endpoint. Tests substitute only
         // the fetch; URI, parser, budget, source and native seek code stay real.
@@ -110,7 +111,7 @@ namespace Emby.YouTubePlugin
                     stage = "HLS source budget";
                     var selected = await YouTubeSourceBudget.SelectAsync(master, masterUri, headers,
                         maximumHeight, cancellationToken).ConfigureAwait(false);
-                    var manifestPath = await StoreManifestAsync(selected.Content, cancellationToken).ConfigureAwait(false);
+                    var manifestPath = await StoreManifestAsync(selected.VideoContent ?? selected.Content, cancellationToken).ConfigureAwait(false);
                     stage = "HLS source metadata";
                     source = new MediaSourceInfo
                     {
@@ -118,14 +119,23 @@ namespace Emby.YouTubePlugin
                         Container = "hls", Name = "YouTube Auto (bis " + selected.Height.ToString(CultureInfo.InvariantCulture) + "p)",
                         Bitrate = selected.Bitrate, MediaStreams = new List<MediaStream>
                         {
-                            // EXT-X-MEDIA precedes STREAM-INF in our output;
-                            // real upstream ffprobe verified audio0/video1.
-                            new() { Type = MediaStreamType.Video, Index = selected.AudioUri == null ? 0 : 1, Codec = selected.VideoCodec,
-                                Width = selected.Width, Height = selected.Height, AverageFrameRate = selected.FrameRate },
-                            new() { Type = MediaStreamType.Audio, Index = selected.AudioUri == null ? 1 : 0, Codec = selected.AudioCodec,
-                                Channels = selected.AudioChannels, Language = selected.AudioLanguage, IsDefault = true }
+                            new() { Type = MediaStreamType.Video, Index = 0, Codec = selected.VideoCodec,
+                                Width = selected.Width, Height = selected.Height, AverageFrameRate = selected.FrameRate }
                         }
                     };
+                    foreach (var track in selected.AudioTracks)
+                        source.MediaStreams.Add(new MediaStream
+                        {
+                            Type = MediaStreamType.Audio, Index = YouTubeAudioTracks.Index(track.Key), Codec = selected.AudioCodec,
+                            IsExternal = true, Protocol = MediaProtocol.File,
+                            Path = await StoreManifestAsync(track.Content, cancellationToken).ConfigureAwait(false),
+                            Channels = track.Channels, Language = track.Language, IsDefault = track.IsDefault,
+                            Title = track.Name, DisplayTitle = track.Name
+                        });
+                    if (selected.AudioTracks.Count == 0)
+                        source.MediaStreams.Add(new MediaStream { Type = MediaStreamType.Audio, Index = 1,
+                            Codec = selected.AudioCodec, Channels = selected.AudioChannels,
+                            Language = selected.AudioLanguage, IsDefault = true });
                 }
                 else
                 {
@@ -142,29 +152,29 @@ namespace Emby.YouTubePlugin
                     foreach (var header in Headers(video)) videoHeaders[header.Key] = header.Value;
                     stage = "adaptive range input registration";
                     var videoPath = await YouTubeDirectRangeProxy.RegisterAsync(resolved, video, videoHeaders, cancellationToken).ConfigureAwait(false);
-                    string? audioPath = null;
-                    if (audio.HasValue)
+                    var audioStreams = new List<MediaStream>();
+                    foreach (var track in selected.AudioTracks)
                     {
                         var audioHeaders = new Dictionary<string, string>(headers, StringComparer.OrdinalIgnoreCase);
-                        foreach (var header in Headers(audio.Value)) audioHeaders[header.Key] = header.Value;
-                        audioPath = RequireOwnedMediaUri(await YouTubeDirectRangeProxy.RegisterAsync(resolved, audio.Value, audioHeaders, cancellationToken).ConfigureAwait(false));
+                        foreach (var header in Headers(track)) audioHeaders[header.Key] = header.Value;
+                        var audioPath = RequireOwnedMediaUri(await YouTubeDirectRangeProxy.RegisterAsync(resolved, track, audioHeaders, cancellationToken).ConfigureAwait(false));
+                        audioStreams.Add(new MediaStream
+                        {
+                            Type = MediaStreamType.Audio, Index = YouTubeAudioTracks.Index(YouTubeAudioTracks.Key(track)),
+                            Codec = "aac", IsExternal = true, Path = audioPath, Protocol = MediaProtocol.Http,
+                            Channels = PositiveInteger(track, "audio_channels"), SampleRate = PositiveInteger(track, "asr"),
+                            BitRate = BitsPerSecond(Number(track, "tbr")), Language = Text(track, "language"),
+                            IsDefault = audioStreams.Count == 0, Title = YouTubeAudioTracks.Title(track), DisplayTitle = YouTubeAudioTracks.Title(track)
+                        });
                     }
                     // Upstream headers remain in each private registry entry,
                     // never on native loopback requests or the other input.
                     headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    var audioFormat = audio ?? video;
-                    var audioStream = new MediaStream
-                    {
-                        Type = MediaStreamType.Audio, Index = 1, Codec = "aac", IsExternal = audio.HasValue,
-                        Channels = PositiveInteger(audioFormat, "audio_channels"), SampleRate = PositiveInteger(audioFormat, "asr"),
-                        BitRate = BitsPerSecond(Number(audioFormat, audio.HasValue ? "tbr" : "abr")),
-                        Language = Text(audioFormat, "language"), IsDefault = true
-                    };
-                    if (audio.HasValue)
-                    {
-                        audioStream.Path = audioPath;
-                        audioStream.Protocol = MediaProtocol.Http;
-                    }
+                    if (audioStreams.Count == 0)
+                        audioStreams.Add(new MediaStream { Type = MediaStreamType.Audio, Index = 1, Codec = "aac",
+                            Channels = PositiveInteger(video, "audio_channels"), SampleRate = PositiveInteger(video, "asr"),
+                            BitRate = BitsPerSecond(Number(video, "abr")), Language = Text(video, "language"),
+                            IsDefault = true, Title = YouTubeAudioTracks.Title(video), DisplayTitle = YouTubeAudioTracks.Title(video) });
                     source = new MediaSourceInfo
                     {
                         Id = SourceId(videoId), Path = RequireOwnedMediaUri(videoPath),
@@ -176,10 +186,10 @@ namespace Emby.YouTubePlugin
                             new() { Type = MediaStreamType.Video, Index = 0,
                                 Codec = YouTubeDirectManifest.VideoCodec(Text(video, "vcodec")), Width = Integer(video, "width"),
                                 Height = Integer(video, "height"), AverageFrameRate = (float?)Number(video, "fps"),
-                                BitRate = BitsPerSecond(Number(video, audio.HasValue ? "tbr" : "vbr")) },
-                            audioStream
+                                BitRate = BitsPerSecond(Number(video, Text(video, "acodec") == "none" ? "tbr" : "vbr")) }
                         }
                     };
+                    source.MediaStreams.AddRange(audioStreams);
                 }
                 cancellationToken.ThrowIfCancellationRequested();
                 if (!Enabled || resolved.ExpiresUtc <= DateTime.UtcNow.AddSeconds(5))
@@ -209,7 +219,9 @@ namespace Emby.YouTubePlugin
                 source.RequiredHttpHeaders = headers;
                 source.DefaultAudioStreamIndex = source.MediaStreams.First(s => s.Type == MediaStreamType.Audio).Index;
                 stage = "subtitle preparation";
-                source.MediaStreams.AddRange(await YouTubeDirectSubtitles.GetStreamsAsync(resolved, 2, cancellationToken).ConfigureAwait(false));
+                var occupiedIndices = source.MediaStreams.Select(stream => stream.Index).ToHashSet();
+                source.MediaStreams.AddRange((await YouTubeDirectSubtitles.GetStreamsAsync(resolved, 2, cancellationToken).ConfigureAwait(false))
+                    .Where(stream => occupiedIndices.Add(stream.Index)));
                 // Captions are available, but YouTube starts without them. The
                 // PlaybackInfo prefix also makes Off explicit before Emby's
                 // automatic language selection; manual track requests survive.
@@ -295,8 +307,21 @@ namespace Emby.YouTubePlugin
                 }
                 var files = Directory.EnumerateFiles(directory).Where(IsOwnedManifest).Select(p => new FileInfo(p)).ToArray();
                 foreach (var file in files.Where(f => f.LinkTarget == null && DateTime.UtcNow - f.LastWriteTimeUtc > ManifestLifetime)) file.Delete();
-                if (Directory.EnumerateFiles(directory).Count() >= MaximumManifestFiles)
-                    throw new InvalidOperationException("Direct manifest cache is full; retry later.");
+                // More language wrappers must not reduce the former video
+                // capacity or expand its absolute 128 x 512KiB byte envelope.
+                // Count every entry, including unknown files; never traverse a
+                // link or nested directory while assessing the private cache.
+                int fileCount = 0;
+                long totalBytes = bytes.Length;
+                foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+                {
+                    var file = new FileInfo(entry);
+                    if (file.LinkTarget != null || (file.Attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
+                        throw new InvalidOperationException("Unsafe manifest cache entry.");
+                    if (++fileCount >= MaximumManifestFiles || file.Length > MaximumManifestBytes - totalBytes)
+                        throw new InvalidOperationException("Direct manifest cache is full; retry later.");
+                    totalBytes += file.Length;
+                }
                 var temporary = Path.Combine(directory, name + "." + Guid.NewGuid().ToString("N") + ".tmp");
                 try
                 {
@@ -368,7 +393,7 @@ namespace Emby.YouTubePlugin
             PropertyInfo ResolutionWidth, PropertyInfo ResolutionHeight, PropertyInfo SupportedCodecs,
             PropertyInfo OriginalAudioStream, PropertyInfo BaseRequest, PropertyInfo StaticRequest,
             MethodInfo TargetFrameRate, PropertyInfo Output0, PropertyInfo OutputVideo,
-            PropertyInfo VideoOptions, PropertyInfo OutputFrameRate);
+            PropertyInfo VideoOptions, PropertyInfo OutputFrameRate, PropertyInfo SelectedAudioStreams);
 
         internal static void RequireInstalled()
         {
@@ -473,10 +498,12 @@ namespace Emby.YouTubePlugin
                         Property(state, "SupportedVideoCodecs", typeof(string[]), true),
                         Property(outputStream, "OriginalStream", typeof(MediaStream)),
                         baseRequest, Property(baseRequest.PropertyType, "Static", typeof(bool)), frameRateSelector,
-                        output0, outputVideo, videoOptions, Property(videoOptions.PropertyType, "r", typeof(string), true));
+                        output0, outputVideo, videoOptions, Property(videoOptions.PropertyType, "r", typeof(string), true),
+                        Property(state, "AudioStreams", outputStream.MakeArrayType()));
                     if (http.GetConstructor(Type.EmptyTypes) == null
                         || !binding.Protocol.PropertyType.IsAssignableFrom(http)
-                        || !typeof(IEnumerable).IsAssignableFrom(binding.Inputs.PropertyType))
+                        || !typeof(IEnumerable).IsAssignableFrom(binding.Inputs.PropertyType)
+                        || !typeof(IEnumerable).IsAssignableFrom(binding.SelectedAudioStreams.PropertyType))
                         throw new InvalidOperationException();
                     stage = "Harmony load";
                     var assembly = EmbeddedDependencyLoader.LoadHarmonyAssembly();
@@ -792,53 +819,59 @@ namespace Emby.YouTubePlugin
             var source = binding.Source.GetValue(state) as MediaSourceInfo;
             if (!IsCanonicalDirectSource(source)) return;
             if (source == null) return;
-            if (source.Protocol == MediaProtocol.File && string.Equals(source.Container, "hls", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    var manifest = YouTubeDirectPlayback.RequireOwnedManifestPath(source.Path);
-                    var hlsInput = binding.Input0.GetValue(command) ?? throw new InvalidOperationException();
-                    if (!string.Equals(binding.Url.GetValue(hlsInput) as string, manifest, StringComparison.Ordinal))
-                        throw new InvalidOperationException();
-                    var hlsOptions = binding.Options.GetValue(hlsInput) ?? throw new InvalidOperationException();
-                    binding.InputOptions.Single(p => p.Name == "protocol_whitelist")
-                        .SetValue(hlsOptions, "file,https,tls,tcp,crypto");
-                    return;
-                }
-                catch
-                {
-                    throw new InvalidOperationException("Native YouTube HLS input validation failed.");
-                }
-            }
-            var tracks = source.MediaStreams?.Where(s => s.Type == MediaStreamType.Audio && s.IsExternal).ToArray();
-            if (tracks == null || tracks.Length == 0) return;
             try
             {
-                if (tracks.Length != 1 || source.Protocol != MediaProtocol.Http || tracks[0].Protocol != MediaProtocol.Http)
-                    throw new InvalidOperationException();
-                var videoUrl = YouTubeDirectPlayback.RequireOwnedMediaUri(source.Path);
-                var audioUrl = YouTubeDirectPlayback.RequireOwnedMediaUri(tracks[0].Path);
+                bool hls = source.Protocol == MediaProtocol.File && string.Equals(source.Container, "hls", StringComparison.OrdinalIgnoreCase);
+                if (!hls && source.Protocol != MediaProtocol.Http) return;
+                string OwnedPath(string path) => hls ? YouTubeDirectPlayback.RequireOwnedManifestPath(path)
+                    : YouTubeDirectPlayback.RequireOwnedMediaUri(path);
+                var videoUrl = OwnedPath(source.Path);
                 var primary = binding.Input0.GetValue(command) ?? throw new InvalidOperationException();
                 if (!string.Equals(binding.Url.GetValue(primary) as string, videoUrl, StringComparison.Ordinal))
                     throw new InvalidOperationException();
-                var inputs = ((IEnumerable)(binding.Inputs.GetValue(command) ?? throw new InvalidOperationException()))
-                    .Cast<object>().Where(i => !ReferenceEquals(i, primary)
-                        && string.Equals(binding.Url.GetValue(i) as string, audioUrl, StringComparison.Ordinal)).ToArray();
-                // SetupInput can run before MapStreams has created the audio
-                // input. The MapStreams postfix will perform the final copy.
-                if (inputs.Length == 0 && !requireMappedInput) return;
-                var outputCodec = binding.OutputCodec.GetValue(state) as string;
-                if (inputs.Length != 1 || string.IsNullOrWhiteSpace(outputCodec)
-                    || string.Equals(outputCodec, "copy", StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidOperationException();
-                var protocol = binding.Protocol.GetValue(primary);
-                if (protocol == null || protocol.GetType() != binding.HttpType) throw new InvalidOperationException();
-                var copiedProtocol = Activator.CreateInstance(binding.HttpType) ?? throw new InvalidOperationException();
-                foreach (var property in binding.HttpStrings) property.SetValue(copiedProtocol, property.GetValue(protocol));
                 var primaryOptions = binding.Options.GetValue(primary) ?? throw new InvalidOperationException();
-                var audioOptions = binding.Options.GetValue(inputs[0]) ?? throw new InvalidOperationException();
-                foreach (var property in binding.InputOptions) property.SetValue(audioOptions, property.GetValue(primaryOptions));
-                binding.Protocol.SetValue(inputs[0], copiedProtocol);
+                if (hls) binding.InputOptions.Single(p => p.Name == "protocol_whitelist")
+                    .SetValue(primaryOptions, "file,https,tls,tcp,crypto");
+                var advertised = source.MediaStreams?.Where(s => s.Type == MediaStreamType.Audio).ToArray()
+                    ?? Array.Empty<MediaStream>();
+                if (!advertised.Any(track => track.IsExternal)) return;
+                var selected = binding.SelectedAudioStreams.GetValue(state) as IEnumerable;
+                // Selection is native state, not the complete advertised list.
+                // Setup may precede selection; MapStreams must prove it exists.
+                if (selected == null)
+                {
+                    if (requireMappedInput) throw new InvalidOperationException();
+                    return;
+                }
+                var tracks = selected.Cast<object>().Select(stream => binding.OriginalAudioStream.GetValue(stream) as MediaStream)
+                    .ToArray();
+                if (tracks.Length > YouTubeAudioTracks.MaximumTracks || tracks.Any(track => track == null)
+                    || tracks.GroupBy(track => track!.Index).Any(group => group.Count() != 1)) throw new InvalidOperationException();
+                foreach (var track in tracks.Where(track => track!.IsExternal))
+                {
+                    if (track!.Type != MediaStreamType.Audio || track.Protocol != source.Protocol
+                        || advertised.Count(candidate => candidate.Index == track.Index && candidate.IsExternal
+                            && candidate.Protocol == track.Protocol && string.Equals(candidate.Path, track.Path, StringComparison.Ordinal)) != 1)
+                        throw new InvalidOperationException();
+                    var audioUrl = OwnedPath(track.Path);
+                    var inputs = ((IEnumerable)(binding.Inputs.GetValue(command) ?? throw new InvalidOperationException()))
+                        .Cast<object>().Where(input => !ReferenceEquals(input, primary)
+                            && string.Equals(binding.Url.GetValue(input) as string, audioUrl, StringComparison.Ordinal)).ToArray();
+                    if (inputs.Length == 0 && !requireMappedInput) continue;
+                    var outputCodec = binding.OutputCodec.GetValue(state) as string;
+                    if (inputs.Length != 1 || string.IsNullOrWhiteSpace(outputCodec)
+                        || string.Equals(outputCodec, "copy", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException();
+                    var audioOptions = binding.Options.GetValue(inputs[0]) ?? throw new InvalidOperationException();
+                    foreach (var property in binding.InputOptions) property.SetValue(audioOptions, property.GetValue(primaryOptions));
+                    if (!hls)
+                    {
+                        var protocol = binding.Protocol.GetValue(primary);
+                        if (protocol == null || protocol.GetType() != binding.HttpType) throw new InvalidOperationException();
+                        var copiedProtocol = Activator.CreateInstance(binding.HttpType) ?? throw new InvalidOperationException();
+                        foreach (var property in binding.HttpStrings) property.SetValue(copiedProtocol, property.GetValue(protocol));
+                        binding.Protocol.SetValue(inputs[0], copiedProtocol);
+                    }
+                }
             }
             catch
             {

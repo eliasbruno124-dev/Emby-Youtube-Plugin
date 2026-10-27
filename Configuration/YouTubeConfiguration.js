@@ -10,8 +10,6 @@ define([
 
     const pluginId = 'B2C3D4E5-F6A7-4B5C-9D0E-1F2A3B4C5D6E';
     const defaultDonateUrl = 'https://paypal.me/eliasbruno123';
-    const directMinimumHeight = 144;
-    const directMaximumHeight = 1080;
     function client() {
         return window.ApiClient || (window.Dashboard && Dashboard.getCurrentApiClient && Dashboard.getCurrentApiClient());
     }
@@ -50,17 +48,6 @@ define([
             parsed = fallback;
         }
         return Math.min(Math.max(parsed, min), max);
-    }
-
-    function clampDirectHeight(rawValue, fallbackValue) {
-        const parsed = rawValue == null || String(rawValue).trim() === '' ? NaN : Number(rawValue);
-        const fallback = fallbackValue == null || String(fallbackValue).trim() === ''
-            ? directMaximumHeight
-            : Number(fallbackValue);
-        const height = Number.isFinite(parsed)
-            ? Math.trunc(parsed)
-            : (Number.isFinite(fallback) ? Math.trunc(fallback) : directMaximumHeight);
-        return Math.min(Math.max(height, directMinimumHeight), directMaximumHeight);
     }
 
     function setStatus(view, text) {
@@ -757,8 +744,6 @@ define([
                     setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
                     setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
                     setChecked(view, 'chkDirectPlayback', config.DirectPlaybackEnabled !== false);
-                    setValue(view, 'numDirectMaxHeight', clampDirectHeight(config.DirectPlaybackMaxHeight));
-                    setValue(view, 'numDirectH264MaxHeight', clampDirectHeight(config.DirectPlaybackH264MaxHeight));
                     renderQuota(view, config);
                     setDonateButton(view);
                     setStatus(view, '');
@@ -824,8 +809,6 @@ define([
             config.MaxSearchVideos = numberValue(view, 'numMaxSearchVideos', 50, 1, 150);
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
             config.DirectPlaybackEnabled = checked(view, 'chkDirectPlayback');
-            config.DirectPlaybackMaxHeight = clampDirectHeight(value(view, 'numDirectMaxHeight'), config.DirectPlaybackMaxHeight);
-            config.DirectPlaybackH264MaxHeight = clampDirectHeight(value(view, 'numDirectH264MaxHeight'), config.DirectPlaybackH264MaxHeight);
             config.Donate = defaultDonateUrl;
             delete config.YtDlpPath;
             delete config.YtDlpJsRuntimePath;
