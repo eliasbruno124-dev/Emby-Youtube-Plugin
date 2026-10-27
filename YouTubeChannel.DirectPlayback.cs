@@ -120,7 +120,12 @@ namespace Emby.YouTubePlugin
                         Bitrate = selected.Bitrate, MediaStreams = new List<MediaStream>
                         {
                             new() { Type = MediaStreamType.Video, Index = 0, Codec = selected.VideoCodec,
-                                Width = selected.Width, Height = selected.Height, AverageFrameRate = selected.FrameRate }
+                                Width = selected.Width, Height = selected.Height, AverageFrameRate = selected.FrameRate,
+                                // HLS BANDWIDTH includes audio, so this is a
+                                // conservative video upper bound. Without a
+                                // stream bitrate Emby can use the client's
+                                // unrelated Auto ceiling as its encoder target.
+                                BitRate = selected.Bitrate }
                         }
                     };
                     foreach (var track in selected.AudioTracks)

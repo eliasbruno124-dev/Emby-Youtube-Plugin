@@ -15,7 +15,7 @@ namespace Emby.YouTubePlugin
     internal static class YouTubeSourceBudget
     {
         internal const int MaximumPlaylistBytes = YouTubeDirectHttp.MaximumMediaPlaylistBytes;
-        internal const int MaximumPlaylistSegments = 8192;
+        internal const int MaximumPlaylistSegments = 16384;
         internal const int MaximumCacheEntries = 64;
         internal const int MaximumPendingProbes = 16;
         internal const int MaximumParallelProbes = 2;

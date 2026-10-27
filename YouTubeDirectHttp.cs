@@ -20,7 +20,7 @@ namespace Emby.YouTubePlugin
     internal static class YouTubeDirectHttp
     {
         private const int MaximumPayloadBytes = 4 * 1024 * 1024;
-        internal const int MaximumMediaPlaylistBytes = 8 * 1024 * 1024;
+        internal const int MaximumMediaPlaylistBytes = 16 * 1024 * 1024;
         private static readonly SemaphoreSlim RequestSlots = new(4, 4);
         private static int _pendingRequests;
         private static readonly HttpClient Client = CreateClient();
