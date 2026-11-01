@@ -1,0 +1,54 @@
+<div is="emby-scroller" data-controller="configurationpage?name=YouTubePersonaljs"
+    class="view flex flex-direction-column scrollFrameY flex-grow" data-horizontal="false" data-forcescrollbar="true"
+    data-centerfocus="true" data-bindheader="true" data-title="YouTube">
+    <style>
+        #youtubePersonalRoot { max-width: 800px; }
+        #youtubePersonalRoot .paper-card { padding: 1.5em; margin-top: 1.5em; }
+        #youtubePersonalRoot .personalActions { display: flex; flex-wrap: wrap; gap: 0.75em; margin-top: 0.75em; }
+        #youtubePersonalRoot .personalChannel { display: flex; align-items: center; justify-content: space-between; gap: 1em; margin-top: 0.75em; }
+        #youtubePersonalRoot .personalChannel span { overflow-wrap: anywhere; }
+        #youtubePersonalRoot input { box-sizing: border-box; width: 100%; }
+        #youtubePersonalRoot .fieldDescription { margin-top: 0.65em; }
+        #youtubePersonalRoot [role="status"] { min-height: 1.5em; margin-top: 1em; }
+    </style>
+    <div class="scrollSlider flex-direction-column padded-left padded-left-page padded-right padded-top-page padded-bottom-page">
+        <div id="youtubePersonalRoot" class="readOnlyContent auto-center">
+            <h1 class="pageTitle">YouTube</h1>
+            <p class="fieldDescription">Your channels and API key. Server-wide settings are managed by your administrator.</p>
+            <div id="youtubePersonalStatus" role="status" aria-live="polite">Loading…</div>
+
+            <section class="paper-card" aria-labelledby="personalChannelsHeading">
+                <h2 id="personalChannelsHeading" style="margin-top: 0;">My Channels</h2>
+                <div id="personalChannelPolicy" class="fieldDescription"></div>
+                <form class="youtubePersonalChannelsForm" novalidate>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="txtPersonalChannel">Channel</label>
+                        <input is="emby-input" id="txtPersonalChannel" type="text" autocomplete="off" maxlength="31" disabled
+                            placeholder="@handle or UC… channel ID" />
+                        <div class="fieldDescription">Use an @handle or a UC channel ID, not a link. Changes save when you add or remove a channel.</div>
+                    </div>
+                    <button is="emby-button" id="btnAddPersonalChannel" type="submit" class="raised button-submit" disabled><span>Add channel</span></button>
+                </form>
+                <div id="personalChannelsList"></div>
+            </section>
+
+            <section class="paper-card" aria-labelledby="personalKeyHeading">
+                <h2 id="personalKeyHeading" style="margin-top: 0;">My API Key</h2>
+                <div id="personalKeyPolicy" class="fieldDescription"></div>
+                <div id="personalKeyStatus" class="fieldDescription"></div>
+                <form class="youtubePersonalKeyForm" novalidate>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="txtPersonalApiKey">New API key</label>
+                        <input is="emby-input" id="txtPersonalApiKey" type="password" autocomplete="new-password" maxlength="256"
+                            spellcheck="false" autocapitalize="off" disabled />
+                        <div class="fieldDescription">Saved keys are never shown. Leaving this blank keeps your current key.</div>
+                    </div>
+                    <div class="personalActions">
+                        <button is="emby-button" id="btnSavePersonalKey" type="submit" class="raised button-submit" disabled><span>Save key</span></button>
+                        <button is="emby-button" id="btnClearPersonalKey" type="button" class="raised" disabled><span>Remove key</span></button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>

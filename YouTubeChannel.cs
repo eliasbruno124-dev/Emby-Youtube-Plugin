@@ -19,7 +19,12 @@ namespace Emby.YouTubePlugin
 {
     public partial class YouTubeChannel : IChannel, IHasChannelFeatures, IRequiresMediaInfoCallback
     {
-        private static void Log(string msg) => LogPublic(msg);
+        private static void Log(string msg)
+        {
+            // Shared catalog diagnostics may include channel names. A personal
+            // refresh must not put its owner's subscriptions into shared logs.
+            if (YouTubePersonalRequestContext.Current == null) LogPublic(msg);
+        }
         public static void LogPublic(string msg)
         {
             var logger = Plugin.PluginLogger;
@@ -55,7 +60,8 @@ namespace Emby.YouTubePlugin
                     var config = Plugin.Instance?.Options;
                     return config == null
                         ? "1.0.0." + ChannelDataRevision
-                        : "1.0.0." + ChannelDataRevision + "." + PluginEntryPoint.ComputeConfigHash(config);
+                        : "1.0.0." + ChannelDataRevision + "." + PluginEntryPoint.ComputeConfigHash(config)
+                            + "." + Interlocked.Read(ref YouTubePersonalCatalog.Revision);
                 }
                 catch
                 {
@@ -84,15 +90,24 @@ namespace Emby.YouTubePlugin
             var config = plugin.Options;
             var apiKey = (config.ApiKey ?? "").Trim();
 
+            ChannelRefreshInvoker.NoteChannelScanActivity();
+            if (query.FolderId?.StartsWith(YouTubePersonalCatalog.Prefix, StringComparison.Ordinal) == true)
+                return await GetPersonalItemsAsync(query.FolderId, config, cancellationToken).ConfigureAwait(false);
+
             Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
 
             // Mark the channel pipeline as active so the sort-name / image repair
             // queues pause their library.db writes. Covers refreshes started by
             // Emby's own scheduled task as well as plugin-triggered ones.
-            ChannelRefreshInvoker.NoteChannelScanActivity();
-
             if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                if (string.IsNullOrEmpty(query.FolderId))
+                {
+                    AddPersonalRoots(items, config);
+                    if (items.Count > 0) return ToResult(items);
+                }
                 return Msg(items, "ERROR: Please configure a YouTube API Key in the plugin settings.");
+            }
 
             try
             {

@@ -132,12 +132,19 @@ namespace Emby.YouTubePlugin
                 throw new ArgumentException("Empty or invalid YouTube configuration payload.");
 
             lock (SaveLock)
+            lock (YouTubePersonalProfiles.SyncRoot)
             {
                 var config = plugin.Options;
+                if (dto.PersonalChannelVisibility != null
+                    && dto.PersonalChannelVisibility is not ("OwnUser" or "Shared"))
+                    throw new ArgumentException("Invalid personal channel visibility.");
 
                 // Only overwrite fields the page actually sent. Strings/numbers/bools
                 // are nullable on the DTO so a partial payload can't wipe other values.
                 if (dto.ApiKey != null) config.ApiKey = dto.ApiKey;
+                if (dto.EnablePersonalApiKeys.HasValue) config.EnablePersonalApiKeys = dto.EnablePersonalApiKeys.Value;
+                if (dto.EnablePersonalSubscriptions.HasValue) config.EnablePersonalSubscriptions = dto.EnablePersonalSubscriptions.Value;
+                if (dto.PersonalChannelVisibility != null) config.PersonalChannelVisibility = dto.PersonalChannelVisibility;
                 if (dto.SavedItems != null) config.SavedItems = dto.SavedItems;
                 if (dto.WatchLaterPlaylist != null) config.WatchLaterPlaylist = dto.WatchLaterPlaylist;
                 if (dto.ShowTrending.HasValue) config.ShowTrending = dto.ShowTrending.Value;
@@ -189,15 +196,18 @@ namespace Emby.YouTubePlugin
             {
                 return JsonSerializer.Deserialize<ConfigDto>(json, JsonOptions);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
-                throw new ArgumentException($"Malformed YouTube configuration payload: {ex.Message}", ex);
+                throw new ArgumentException("Malformed YouTube configuration payload.");
             }
         }
 
         private sealed class ConfigDto
         {
             public string? ApiKey { get; set; }
+            public bool? EnablePersonalApiKeys { get; set; }
+            public bool? EnablePersonalSubscriptions { get; set; }
+            public string? PersonalChannelVisibility { get; set; }
             public string? SavedItems { get; set; }
             public string? WatchLaterPlaylist { get; set; }
             public bool? ShowTrending { get; set; }

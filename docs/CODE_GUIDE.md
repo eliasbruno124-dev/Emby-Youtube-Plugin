@@ -26,7 +26,55 @@ Die [Konfigurations-HTML](../Configuration/YouTubeConfiguration.html) bindet den
 
 `ChannelRefreshInvoker` in `PluginEntryPoint.cs` serialisiert Refresh-Anforderungen und sammelt nötige Folgedurchläufe. Seine Aktivitätsmarkierung bleibt bis zum tatsächlichen Ende des Emby-Refreshs bestehen. Sortier- und Bildreparaturen berücksichtigen diese Markierung, damit ihre Datenbank-Schreibvorgänge nicht mit einem laufenden Scan kollidieren.
 
-## Ordner → API-Daten → Emby-Elemente
+## Persönliche Schlüssel und Kanäle
+
+`EnablePersonalApiKeys` und `EnablePersonalSubscriptions` sind unabhängige,
+standardmäßig ausgeschaltete Administratoreinstellungen. `PersonalChannelVisibility`
+bestimmt, ob hinzugefügte Kanäle nur im eigenen Bereich oder zusätzlich im
+gemeinsamen Katalog erscheinen. [YouTubePersonalService](../YouTubePersonalService.cs)
+leitet den Besitzer ausschließlich aus der authentifizierten Emby-Identität ab;
+Teiländerungen benötigen die aktuelle Revision. Ein API-Diensttoken ohne Benutzer
+darf diese Oberfläche nicht verwenden. Die [persönliche Seite](../Configuration/YouTubePersonal.js)
+benutzt keine globale Konfiguration und zeigt gespeicherte Schlüssel niemals an.
+
+[YouTubePersonalProfiles](../YouTubePersonalProfiles.cs) hält begrenzte, verschlüsselte
+Profile unter `youtube-personal` im Emby-Datenverzeichnis. Dateirechte und atomare
+Ersetzung schützen die Ablage; der daneben liegende Schlüssel ist kein Schutz
+gegen den Serveradministrator. Abschalten bewahrt die Werte, deaktiviert aber
+Verwendung und Änderungen. Beschädigte oder fremde Ablagen werden nicht überschrieben.
+
+[YouTubeChannel.Personal](../YouTubeChannel.Personal.cs) erstellt einen undurchsichtig
+benannten persönlichen Wurzelordner pro aktivem Profil. Ordner-IDs erhalten dessen
+Scope, Video-IDs und Kanalabstammung bleiben für die native Wiedergabe erhalten.
+Ein eingeschalteter vorhandener eigener API-Schlüssel gilt für Abrufe dieses
+Bereichs; ohne eigenen Schlüssel gilt der globale Schlüssel. Ein ungültiger
+eigener Schlüssel wird nicht heimlich durch den globalen ersetzt. Im Modus
+`Shared` werden zusätzliche gemeinsame Kanäle mit dem globalen Schlüssel geladen.
+Die persönlichen Profile und Schlüssel bleiben trotzdem getrennt. Das sind
+lokal verwaltete Kanäle, keine OAuth-Synchronisierung mit Google-Abos.
+
+[YouTubePersonalVisibility](../YouTubePersonalVisibility.cs) ergänzt Embys native
+benutzerbezogene Abfragen, promovierte Kanalwurzeln und Item-DTOs. SQL-Ausschlüsse
+greifen vor Zählung und Seiteneinteilung. Berechtigungen werden nicht zwischengespeichert.
+Eine anfängliche Abwesenheitsprüfung vermeidet wiederholte zusätzliche Abfragen
+bei Installationen ohne persönliche Inhalte; vor dem ersten neuen Wurzelordner
+wird sie synchron ungültig. Ohne vollständige geprüfte Laufzeitbindung werden
+keine neuen persönlichen Ordner erzeugt. Exakte verbleibende DTO-/View-Bindungen
+sperren bestehende persönliche Einträge bei einem unvollständigen Query-Vertrag.
+Eine völlig veränderte künftige Emby-Laufzeit ist keine garantierte Datenschutzgrenze;
+dieser Adapter muss nach Serverupdates überprüft werden. Administratorzugriff,
+öffentliche YouTube-Videos und vom Client bereits gespeicherte Daten werden nicht
+zu geschützten Medien umdefiniert.
+
+[YouTubePersonalRequestContext](../YouTubePersonalRequestContext.cs) bindet
+Metadatenarbeit an Besitzer, Revision und Schlüssel. Änderungen am Profil,
+gemeinsamen Katalog oder an der Konfiguration verwerfen verspätete Ergebnisse.
+Persönliche Aufrufe nutzen getrennte gehashte Memory-/In-flight-Schlüssel, keinen
+Disk-Cache und keinen veralteten Disk-Fallback. Die globale Quota zählt nur
+Versuche mit dem globalen Schlüssel. Echte HTTP-Anfragen übertragen den API-Key
+im Header, nicht in ihrer URL; Redirects sind für diese API-Anfragen deaktiviert.
+
+## Gemeinsame Ordner und Medien
 
 | Partial-Datei | Zuständigkeit |
 |---|---|
@@ -126,6 +174,11 @@ Nach dem Umschalten müssen bereits geöffnete Apps vollständig neu geöffnet w
 `TryGetCachedJsonAsync` prüft Memory-Cache, Disk-Cache, gemeinsam bearbeitete Cache-Misses und begrenzten veralteten Disk-Fallback. Eine Generation verhindert, dass ein alter laufender Request nach einer Invalidierung wieder gültige Cache-Daten einträgt. `GetJsonAsync` begrenzt und wiederholt echte Requests; genau dort zählt [QuotaTracker](../QuotaTracker.cs) jeden gesendeten Versuch. Cache-Treffer verbrauchen an dieser Stelle keine zusätzliche gezählte Quota.
 
 `InvalidateAllCache` löscht den Memory-Cache, lässt den Disk-Cache aber bestehen. `InvalidateCacheContaining` entfernt zusätzlich passende markierte Playlist-Dateien. Diese Verträge dürfen bei einer Änderung nicht verwechselt werden.
+
+Upload-Playlists (`UU…`) haben eine Frischezeit von 55 Minuten; andere normale
+Listen behalten sechs Stunden. Das verkürzt Cachealter, legt aber keinen neuen
+Emby-Zeitplan an. API-Antworten sind auf 4 MiB begrenzt; geheime Request-URLs
+werden weder als Memory-Schlüssel noch in Transportfehlermeldungen verwendet.
 
 Der Poller verwendet `GetPlaylistSnapshotFreshAsync` ohne Cache und vergleicht persistierte Fingerprints. Eine erstmalige Baseline benötigt keinen unnötigen Tiefenscan; Änderungen gegenüber einer vorhandenen Baseline lösen dagegen gezielte Invalidierung und Refresh aus. Teilresultate fehlgeschlagener Abrufe dürfen keine scheinbare Playlist-Änderung vortäuschen.
 

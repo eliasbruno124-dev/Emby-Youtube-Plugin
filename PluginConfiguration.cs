@@ -8,6 +8,12 @@ namespace Emby.YouTubePlugin
     {
         public string ApiKey { get; set; } = "";
 
+        public bool EnablePersonalApiKeys { get; set; }
+
+        public bool EnablePersonalSubscriptions { get; set; }
+
+        public string PersonalChannelVisibility { get; set; } = "OwnUser";
+
         public string SavedItems { get; set; } = "";
 
         public string WatchLaterPlaylist { get; set; } = "";

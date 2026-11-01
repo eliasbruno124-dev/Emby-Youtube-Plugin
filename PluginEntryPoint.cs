@@ -40,6 +40,7 @@ namespace Emby.YouTubePlugin
         private readonly YouTubeHomeSectionManager _homeSectionManager;
         private readonly YouTubeCaptionOffGuard _captionOffGuard;
         private readonly IUserManager _userManager;
+        private readonly IUserViewManager _userViewManager;
         private readonly CancellationTokenSource _lifetimeCts = new();
         private readonly CancellationToken _lifetimeToken;
         private readonly object _resumeDispatchLifetimeGate = new();
@@ -183,6 +184,7 @@ namespace Emby.YouTubePlugin
             _libraryManager = libraryManager;
             _userDataManager = userDataManager;
             _userManager = userManager;
+            _userViewManager = userViewManager;
             _lifetimeToken = _lifetimeCts.Token;
             _homeSectionManager = new YouTubeHomeSectionManager(userManager, userViewManager);
             _captionOffGuard = new YouTubeCaptionOffGuard(sessionManager);
@@ -203,6 +205,7 @@ namespace Emby.YouTubePlugin
             // Capture PlaybackInfo before PlaybackStart so resume and
             // "play from beginning" can be told apart reliably.
             EmbeddedDependencyLoader.Register();
+            YouTubePersonalCatalog.Start(_libraryManager!, _userManager, _userViewManager);
             YouTubeDirectSeekCompatibility.Install();
             PlaybackIntentInterceptor.Install();
             DashboardYouTubePlayerInterceptor.Install();
@@ -2687,6 +2690,9 @@ namespace Emby.YouTubePlugin
             var blob = string.Join("|", new[]
             {
                 (c.ApiKey ?? "").Trim(),
+                c.EnablePersonalApiKeys ? "personal-key" : "shared-key",
+                c.EnablePersonalSubscriptions ? "personal-channels" : "shared-channels",
+                c.PersonalChannelVisibility ?? "OwnUser",
                 (c.SavedItems ?? "").Trim(),
                 (c.WatchLaterPlaylist ?? "").Trim(),
                 c.DirectPlaybackEnabled ? "direct" : "legacy",
@@ -2720,6 +2726,7 @@ namespace Emby.YouTubePlugin
             try { YouTubeDirectRangeProxy.Shutdown(); }
             catch { YouTubeChannel.LogPublic("[YT] Native range input shutdown did not complete cleanly."); }
             _captionOffGuard.Dispose();
+            YouTubePersonalCatalog.Stop();
             if (ReferenceEquals(_current, this))
                 _current = null;
             if (_libraryManager != null)
@@ -2753,7 +2760,8 @@ namespace Emby.YouTubePlugin
     internal static class ChannelRefreshInvoker
     {
         public const int RootRefreshDepth = 1;
-        public const int ContentRefreshDepth = 3;
+        public static int ContentRefreshDepth => Plugin.Instance?.Options is { } config
+            && (config.EnablePersonalApiKeys || config.EnablePersonalSubscriptions) ? 4 : 3;
         private static IChannelManager? _channelMgr;
         private static IChannel? _registeredChannel;
         private static int _refreshAgainRequested;

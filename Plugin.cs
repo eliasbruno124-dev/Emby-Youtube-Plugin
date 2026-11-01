@@ -97,6 +97,20 @@ namespace Emby.YouTubePlugin
                 {
                     Name = "YouTubeConfigurationjs",
                     EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubeConfiguration.js"
+                },
+                new PluginPageInfo
+                {
+                    Name = "YouTubePersonal",
+                    DisplayName = "My YouTube",
+                    EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubePersonal.html",
+                    EnableInUserMenu = true,
+                    IsMainConfigPage = false,
+                    MenuIcon = "subscriptions"
+                },
+                new PluginPageInfo
+                {
+                    Name = "YouTubePersonaljs",
+                    EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubePersonal.js"
                 }
             };
         }
@@ -198,11 +212,17 @@ namespace Emby.YouTubePlugin
             {
                 YouTubeChannel.LogPublic($"[YT] Failed to initialize plugin paths: {ex.Message}");
             }
+            try { YouTubePersonalProfiles.Initialize(applicationPaths.DataPath); }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] Personal settings unavailable (" + error.GetType().Name + ").");
+            }
         }
 
         private static void NormalizeConfiguration(PluginConfiguration config)
         {
             config.ApiKey = (config.ApiKey ?? string.Empty).Trim();
+            config.PersonalChannelVisibility = config.PersonalChannelVisibility == "Shared" ? "Shared" : "OwnUser";
             config.SavedItems = (config.SavedItems ?? string.Empty).Trim();
             config.WatchLaterPlaylist = (config.WatchLaterPlaylist ?? string.Empty).Trim();
             config.TrendingRegion = (config.TrendingRegion ?? string.Empty).Trim().ToUpperInvariant();

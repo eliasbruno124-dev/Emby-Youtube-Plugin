@@ -38,10 +38,16 @@
       "sources": ["ManagedResolver/Compatibility.cs", "ManagedResolver/Upstream.json", "ManagedResolver/License.txt", "ManagedResolver/vendored/Videos/VideoController.cs", "ManagedResolver/vendored/Videos/VideoId.cs", "ManagedResolver/vendored/Bridge/PlayerResponse.cs", "ManagedResolver/vendored/Bridge/IStreamData.cs", "ManagedResolver/vendored/Bridge/ThumbnailData.cs", "ManagedResolver/vendored/Utils/Json.cs", "ManagedResolver/vendored/Utils/UrlEx.cs", "ManagedResolver/vendored/Utils/Protobuf.cs", "ManagedResolver/vendored/Exceptions/YoutubeExplodeException.cs", "ManagedResolver/vendored/Exceptions/VideoUnplayableException.cs", "ManagedResolver/vendored/Exceptions/VideoUnavailableException.cs", "YouTubeManagedResolver.cs", "YouTubeManagedHttp.cs"]
     },
     {
+      "id": "personal-settings",
+      "title": "Optional per-user keys and channel subscriptions",
+      "summary": "Independent default-off admin switches enable authenticated, revision-checked personal profile writes. Bounded encrypted owner-only storage retains disabled values without using them. Scoped native channel folders preserve raw video identities; OwnUser isolates personal browsing and Shared adds channel union to the global catalog with its global key. Exact structural native query/view/DTO bindings gate new personal publication; unknown future runtime surfaces require revalidation. Explicit owner/revision request contexts isolate personal API memory/in-flight cache, disable disk/stale fallback, reject stale work and keep global quota separate. Keys travel in headers, never transport URLs. Local subscriptions do not sync Google account subscriptions.",
+      "sources": ["YouTubePersonalProfiles.cs", "YouTubePersonalService.cs", "YouTubePersonalRequestContext.cs", "YouTubePersonalVisibility.cs", "YouTubeChannel.Personal.cs", "YouTubeChannel.cs", "YouTubeChannel.Folders.cs", "YouTubeHomeSectionManager.cs", "Plugin.cs", "PluginConfiguration.cs", "PluginEntryPoint.cs", "YouTubeConfigSaveService.cs", "YouTubeApi.cs", "Configuration/YouTubePersonal.html", "Configuration/YouTubePersonal.js", "Configuration/YouTubeConfiguration.html", "Configuration/YouTubeConfiguration.js"]
+    },
+    {
       "id": "api-cache",
       "title": "Requests, cache and quota accounting",
-      "summary": "Endpoint wrappers use memory/disk caches and coalesced misses, then throttled/retried HTTP. Quota accounting occurs on dispatched attempts. Global-memory and targeted-playlist invalidation have different disk behavior.",
-      "sources": ["YouTubeApi.cs", "YouTubeHttpClientFactory.cs", "QuotaTracker.cs", "Plugin.cs"]
+      "summary": "Endpoint wrappers use bounded HTTP with header credentials, hashed memory/in-flight keys, shared disk cache and coalesced misses. Personal request contexts isolate owner/revision work and disable disk/stale fallback. Global quota counts only actual global-key attempts. Upload lists refresh after 55 minutes; other ordinary lists retain six hours. Global-memory and targeted-playlist invalidation have different disk behavior.",
+      "sources": ["YouTubeApi.cs", "YouTubeHttpClientFactory.cs", "QuotaTracker.cs", "Plugin.cs", "YouTubePersonalRequestContext.cs"]
     },
     {
       "id": "polling",
