@@ -63,6 +63,8 @@ namespace Emby.YouTubePlugin
         private static int _startStampSuppressLogsRemaining = 12;
         private static int _legacyTabletSourceLogsRemaining = 12;
         private static int _requestSubtitleSuppressLogsRemaining = 16;
+        private static int _nativeSourceBindingLogsRemaining = 16;
+        private static int _initialSubtitleWarningsRemaining = 8;
 
         internal static void DiscardCapturedIntents()
         {
@@ -427,12 +429,32 @@ namespace Emby.YouTubePlugin
                 // Start/audio/subtitle selection and output bitrate stay native.
                 // The client and main Emby settings own the output budget.
                 var directItemId = Normalize(GetStringProperty(requestDto, "Id"));
-                if (!string.IsNullOrEmpty(TryResolveYouTubeVideoId(directItemId)))
+                var directVideoId = TryResolveYouTubeVideoId(directItemId);
+                if (!string.IsNullOrEmpty(directVideoId))
                 {
                     SetBoolProperty(requestDto, "AllowVideoStreamCopy", false);
                     SetBoolProperty(requestDto, "EnableDirectPlay", false);
                     SetBoolProperty(requestDto, "EnableDirectStream", false);
                     var directQuery = GetServiceRequest(service)?.QueryString;
+                    // Emby applies requested track indices only to the matching
+                    // source. Starts and track changes can omit MediaSourceId; without it
+                    // even explicit Off falls back to the account's language
+                    // preference. Bind that missing identity before negotiation,
+                    // not by changing the displayed default after URL creation.
+                    var sourceId = YouTubeDirectPlayback.SourceId(directVideoId);
+                    var requestedSourceId = GetStringProperty(requestDto, "MediaSourceId");
+                    var querySourceId = directQuery?["MediaSourceId"];
+                    if (string.IsNullOrWhiteSpace(requestedSourceId)
+                        && (string.IsNullOrWhiteSpace(querySourceId)
+                            || string.Equals(querySourceId, sourceId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        SetStringProperty(requestDto, "MediaSourceId", sourceId);
+                        TrySetRequestCollectionValue(directQuery, "MediaSourceId", sourceId);
+                        if (string.Equals(GetStringProperty(requestDto, "MediaSourceId"), sourceId, StringComparison.Ordinal)
+                            && System.Threading.Interlocked.Decrement(ref _nativeSourceBindingLogsRemaining) >= 0)
+                            YouTubeChannel.LogPublic("[YT] Native source identity bound before track negotiation ("
+                                + (IsNewNativePlayback(requestDto, GetServiceRequest(service)) ? "new playback" : "continuation") + ").");
+                    }
                     TrySetRequestCollectionValue(directQuery, "AllowVideoStreamCopy", "false");
                     TrySetRequestCollectionValue(directQuery, "EnableDirectPlay", "false");
                     TrySetRequestCollectionValue(directQuery, "EnableDirectStream", "false");
@@ -646,16 +668,23 @@ namespace Emby.YouTubePlugin
 
         private static void DefaultInitialNativeSubtitlesOff(object response)
         {
-            // GET metadata applies the account's automatic language preference
-            // after the request prefix. Keep its displayed default consistent
-            // with a new POST start. Clone sources: a shared/cached object must
-            // not reset another player's manually selected subtitle.
+            // Metadata-only GETs do not negotiate a device profile. Keep that
+            // initial offer Off, but never disguise an already negotiated URL's
+            // real selection: prepared playback is entirely Emby's decision.
+            // Clone sources so cached metadata cannot affect another player.
             var property = response.GetType().GetProperty("MediaSources", BindingFlags.Public | BindingFlags.Instance);
             if (property?.GetValue(response) is not IEnumerable original)
                 return;
             var clone = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance)!;
             var sources = original.Cast<object>().OfType<MediaSourceInfo>().Select(source =>
             {
+                if (!string.IsNullOrWhiteSpace(source.TranscodingUrl))
+                {
+                    if (source.DefaultSubtitleStreamIndex is >= 0
+                        && System.Threading.Interlocked.Decrement(ref _initialSubtitleWarningsRemaining) >= 0)
+                        YouTubeChannel.LogPublic("[YT] Initial native playback unexpectedly selected captions; native result retained for diagnosis.");
+                    return source;
+                }
                 var local = (MediaSourceInfo)clone.Invoke(source, null)!;
                 local.DefaultSubtitleStreamIndex = -1;
                 return local;
@@ -1190,6 +1219,13 @@ namespace Emby.YouTubePlugin
                 Fragment = string.Empty
             };
             return builder.Uri.ToString();
+        }
+
+        private static void SetStringProperty(object source, string name, string value)
+        {
+            var property = source.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+            if (property?.CanWrite == true && property.PropertyType == typeof(string))
+                property.SetValue(source, value);
         }
 
         private static bool SetStringPropertyToNull(object source, string name)
