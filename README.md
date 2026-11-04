@@ -10,13 +10,13 @@
 
 # Emby YouTube Plugin
 
-**YouTube, right inside Emby.** Add your favourite YouTube channels and
-playlists once, and they show up in Emby as folders – next to your movies and
-shows. Trending, categories and Shorts are there too.
+**YouTube, right inside Emby.** Add the YouTube channels and playlists you like
+once, and they appear in Emby as folders next to your movies and shows. Trending,
+categories and Shorts are there too, and videos play in Emby's own player without
+YouTube ads.
 
-An Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
-
-The plugin adds a YouTube entry to Emby and lets you browse saved channels, playlists, Watch Later-style playlists, trending videos, categories, and Shorts from one place.
+The plugin uses the official YouTube Data API v3. You need a free API key from
+Google – the built-in setup guide walks you through it.
 
 ## Highlights
 
@@ -28,10 +28,10 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Split channels into Videos and Shorts when those folders have content.
 - Hide Shorts globally if you prefer a long-form-only view.
 - Hide empty playlists, categories, and Shorts folders.
-- Optionally show YouTube root folders at the top level and, on Emby 4.10+, add one latest-videos home row per saved channel while reversibly hiding both forms of combined YouTube-latest row.
+- Optionally show the YouTube folders at the top level and, on Emby 4.10+, add a "latest videos" row on the home screen for each saved channel (replaces Emby's combined YouTube row; can be switched back).
 - Track estimated daily YouTube API quota usage.
-- Enable **My YouTube** with optional personal API keys and channel subscriptions for each Emby user.
-- Ad-free native playback in Emby (2.0.12+): YouTube ads are not played, up to 1080p with transcoded output capped at 30 fps. The optional YouTube embed player is YouTube's own player and can show ads.
+- **My YouTube:** each Emby user can have their own API key and channel list (optional, enabled by the admin).
+- Ad-free playback in Emby's own player (2.0.12+), up to 1080p. If you switch to the optional YouTube embed player, YouTube may show ads.
 
 
 ## Screenshots
@@ -138,12 +138,12 @@ separate.
 
 ## Notes
 
-- Native playback is enabled by default and uses Emby's server playback pipeline, up to 1080p with transcoded output capped at 30 fps on the supported runtime. To use YouTube embeds in compatible browser clients, disable **Use the Emby player** and reopen the app. Native playback failures do not automatically switch to embeds.
+- Videos play in Emby's own player by default, up to 1080p (when Emby transcodes, the output is capped at 30 fps). To use the YouTube embed player in the browser instead, turn off **Use the Emby player** and reload the app. If Emby playback fails, the plugin does not switch to the embed player by itself.
 - Video information comes from the official YouTube Data API v3.
-- Available audio tracks, subtitles and chapters depend on the video; playback and track-selection behavior also depend on the Emby client.
+- Audio tracks, subtitles and chapters are available when the video has them; how you pick them depends on the Emby app.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.
-- No Google account login or access to private YouTube account data. Personal API keys and plugin-managed subscriptions are supported through **My YouTube**.
-- Verified on Emby Server 4.10.2.0 with Linux/Docker; physical-client confirmation and support on other platforms remain client-dependent.
+- There is no Google sign-in and no access to private YouTube data. Personal API keys and channel lists are set under **My YouTube**.
+- Tested with Emby Server 4.10.2 on Linux/Docker.
 - After updating, restart Emby. If the web app still looks outdated, clear its browser cache.
 
 ## License
