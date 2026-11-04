@@ -22,6 +22,9 @@ public sealed class YouTubePersonalStartup : IServerEntryPoint, IRunBeforeStartu
     {
         EmbeddedDependencyLoader.Register();
         YouTubePersonalCatalog.Start(_library, _users, _views);
+        // Complete identity loading/bootstrap before Emby opens HTTP. This is
+        // independent of the channel-provider cache and performs no root refresh.
+        YouTubeAdminProvenance.BootstrapAsync().GetAwaiter().GetResult();
     }
     public void Dispose() => YouTubePersonalCatalog.Stop();
 }

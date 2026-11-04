@@ -114,10 +114,9 @@ subfolder. Other users cannot browse these personal entries. **All users** also
 adds them to the common YouTube catalog.
 With **All users**, there is no extra **My YouTube** folder, because the channels
 are already in the common list – unless a user has their own API key. The
-**My YouTube** settings page is always available. Historical channel folders with
-unverifiable ownership are hidden; an administrator-saved `@handle` may therefore
-remain hidden until a successful refresh resolves it (an explicit `UC...` ID is
-verifiable immediately).
+**My YouTube** settings page is always available. Verified administrator handle
+mappings survive restarts and load before browsing is available. Missing mappings are resolved during startup, with a 30-second
+API/cache budget; entries without a verified identity remain hidden.
 Personal channels use the user's enabled key when present, otherwise the server
 key; common channels use the server key. A failing personal key does not silently
 fall back to the server key.

@@ -9,9 +9,13 @@ namespace Emby.YouTubePlugin;
 internal static class YouTubeChannelProvenance
 {
     internal const string Prefix = "personalshared_x_";
-    private sealed record Proof(string ConfigurationHash, long Revision, string[] Admin, string[] Shared, string[] SharedTokens);
+    private sealed record Proof(string ConfigurationHash, long Revision, string[] Shared, string[] SharedTokens);
     private static Proof? _proof;
-    internal static void Reset() => Volatile.Write(ref _proof, null);
+    internal static void Reset()
+    {
+        Volatile.Write(ref _proof, null);
+        YouTubeAdminProvenance.Reset();
+    }
     internal static PluginConfiguration Copy(PluginConfiguration config) =>
         JsonSerializer.Deserialize<PluginConfiguration>(JsonSerializer.Serialize(config))!;
     internal static string Token(string term) => Convert.ToHexString(SHA256.HashData(
@@ -34,13 +38,15 @@ internal static class YouTubeChannelProvenance
     {
         if (!id.StartsWith("channel_x_", StringComparison.Ordinal)) return false;
         var term = id.Substring("channel_x_".Length);
-        // A configured canonical UC ID is self-proving. Handles must have been
-        // resolved by a successful global refresh with this exact configuration.
+        // A configured canonical UC ID is self-proving. Handles use the dedicated
+        // verified map bound to current admin SavedItems, including after restart.
         if (YouTubeChannel.IsCanonicalChannelId(term) && YouTubeChannel.ConfiguredTerms(config.SavedItems).Contains(term, StringComparer.Ordinal)) return true;
+        if (YouTubeAdminProvenance.Allows(id, config)) return true;
         var proof = Volatile.Read(ref _proof);
         if (proof == null || proof.ConfigurationHash != PluginEntryPoint.ComputeConfigHash(config)) return false;
-        return proof.Admin.Contains(id, StringComparer.Ordinal)
-            || proof.Revision == Interlocked.Read(ref YouTubePersonalCatalog.Revision)
+        // Admin aliases are authorized only by their exact verified handle map,
+        // never by a previous root-build union of canonical IDs.
+        return proof.Revision == Interlocked.Read(ref YouTubePersonalCatalog.Revision)
                 && config.EnablePersonalSubscriptions && config.PersonalChannelVisibility == "Shared"
                 && proof.SharedTokens.Length > 0
                 && proof.SharedTokens.SequenceEqual(YouTubePersonalCatalog.SharedChannels(config).Select(Token).Distinct().OrderBy(value => value, StringComparer.Ordinal))
@@ -50,7 +56,9 @@ internal static class YouTubeChannelProvenance
     {
         if (YouTubePersonalRequestContext.Current != null) return;
         EnsureCurrent(hash, revision);
-        Volatile.Write(ref _proof, new Proof(hash, revision, admin.Distinct(StringComparer.Ordinal).ToArray(), shared.Distinct(StringComparer.Ordinal).ToArray(),
+        // The legacy admin argument is not an identity proof; exact handle
+        // resolutions are recorded separately by the global admin builder.
+        Volatile.Write(ref _proof, new Proof(hash, revision, shared.Distinct(StringComparer.Ordinal).ToArray(),
             sharedTerms.Select(Token).Distinct().OrderBy(value => value, StringComparer.Ordinal).ToArray()));
         EnsureCurrent(hash, revision);
     }

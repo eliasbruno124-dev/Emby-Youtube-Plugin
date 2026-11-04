@@ -97,9 +97,25 @@ Alte unmarkierte `channel_x_`-Wurzeln werden ebenfalls geprüft; eine negative
 Anfangsprüfung überspringt spätere Prüfungen nicht. [YouTubeChannelProvenance](../YouTubeChannelProvenance.cs)
 markiert neue gemeinsame Beiträge samt Ordnernachkommen mit `personalshared_x_`.
 Ihre Berechtigung hängt vom aktuellen Modus und aktuellen aktiven Abos ab.
-Unmarkierte Altrows brauchen einen aktuellen expliziten Admin-UC-Eintrag oder
-positiv aufgelöste Herkunft aus einem globalen Refresh. Unbekannte Handles bleiben
-nach Start/Policywechsel konservativ unsichtbar, bis die Auflösung gelingt.
+Unmarkierte Admin-Altrows brauchen einen aktuellen expliziten UC-Eintrag oder
+eine paarweise bestätigte Handle→UC-Zuordnung aus [YouTubeAdminProvenance](../YouTubeAdminProvenance.cs).
+Die atomare JSON-Datei im Plugin-Datenverzeichnis enthält nur Schema,
+normalisierte Handles, kanonische UC-IDs und einen Fingerprint der Admin-Kanalbegriffe.
+Schlüssel, Profile und eine bloße Root-ID-Vereinigung werden nicht gespeichert.
+Der Fingerprint ignoriert Keys und persönlichen Sichtbarkeitsmodus, wird aber bei
+jeder Freigabe gegen aktuelle Admin-SavedItems geprüft. Änderungen dieser
+Kanalbegriffe entwerten die alte Bindung. Eine neue positive Zuordnung ersetzt
+die alte UC-ID desselben Handles. Offline gilt der letzte positive Nachweis.
+Der frühe EntryPoint lädt diese Datei nach dem Katalog-Reset und vor HTTP-Freigabe.
+Fehlende Handles werden unabhängig vom Emby-Providercache cache-first mit dem
+Serverkey aufgelöst; insgesamt höchstens 30 Sekunden warten, maximal 128 fehlende
+Handles pro Start. Nur positive kanonische Antworten dürfen die Map ergänzen.
+Teilweise, fehlende oder korrupte Nachweise gelten nicht als vollständig;
+unbelegte Einträge bleiben gesperrt. Ohne Erstnachweis, brauchbaren Cache oder API-Antwort ist eine
+sofortige Wiederherstellung nicht beweisbar. Nicht-Admin-Altrows bleiben separat
+an aktuelle Shared-Provenienz gebunden; ohne erfolgreichen Refresh gibt es dafür
+keine feste obere Freigabefrist. Der globale Admin-Builder aktualisiert die Map,
+persönliche/Shared-Lookups dürfen das nicht.
 Snapshot, Konfigurationshash und Katalogrevision sperren veraltete Publikationen;
 persönliche Aufrufe dürfen den globalen Herkunftsnachweis nicht befüllen.
 Der separate frühe EntryPoint installiert diese Guards vor der HTTP-Freigabe.

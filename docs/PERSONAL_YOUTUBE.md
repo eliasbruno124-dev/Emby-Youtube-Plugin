@@ -31,9 +31,12 @@ and its private key remain in Emby's data directory, like other plugin settings;
 removing the DLL does not erase those files.
 
 Historical unmarked channel roots require positive proof from the current admin
-configuration. An unresolved administrator `@handle` can remain hidden after a
-restart or policy change until a successful refresh resolves its canonical channel
-ID; an explicit `UC…` ID is verifiable immediately. Mode and subscription changes
+configuration. Verified administrator `@handle` mappings are stored without keys
+and restored before browsing is available. Startup resolves missing mappings from
+the API cache or server-key API, with a 30-second total wait budget. A first startup
+without a saved mapping, usable cache or successful API reply cannot prove the
+identity and keeps that entry hidden. An explicit `UC…` ID is verifiable immediately.
+Mode and subscription changes
 revoke old folder permissions before any refresh. Moving to flat owner roots changes
 Emby's materialized item IDs, so saved deep links to the former folder may expire.
 The plugin does not migrate existing native item user data to the new IDs.

@@ -95,7 +95,8 @@ namespace Emby.YouTubePlugin
             var shared = YouTubePersonalCatalog.SharedChannels(snapshot).ToArray();
             YouTubeChannelProvenance.EnsureCurrent(hash, revision);
             var adminItems = new List<ChannelItemInfo>();
-            await AddConfiguredTermsAsync(adminItems, apiKey, SplitConfiguredItems(snapshot.SavedItems), ct).ConfigureAwait(false);
+            await AddConfiguredTermsAsync(adminItems, apiKey, SplitConfiguredItems(snapshot.SavedItems), ct,
+                (handle, id) => YouTubeAdminProvenance.Record(snapshot, handle, id, ct)).ConfigureAwait(false);
             var adminIds = adminItems.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
             items.AddRange(adminItems);
             var sharedIds = new List<string>();
@@ -123,7 +124,7 @@ namespace Emby.YouTubePlugin
         }
 
         private static async Task AddConfiguredTermsAsync(List<ChannelItemInfo> items, string apiKey,
-            IEnumerable<string> saved, CancellationToken ct)
+            IEnumerable<string> saved, CancellationToken ct, Action<string, string>? adminResolved = null)
         {
             foreach (var term in saved.Distinct(StringComparer.Ordinal))
             {
@@ -135,6 +136,7 @@ namespace Emby.YouTubePlugin
                     var details = await YouTubeApi.GetChannelDetailsAsync(apiKey, term, true, ct)
                         .ConfigureAwait(false);
                     Log($"[YT] Handle {term} resolved to id={details.id}, name={details.name}");
+                    if (details.id != null && IsSupportedChannelId(details.id)) adminResolved?.Invoke(term, details.id);
                     items.Add(Folder(
                         details.name ?? term,
                         $"channel{FolderSeparator}{details.id ?? term}",
@@ -184,6 +186,7 @@ namespace Emby.YouTubePlugin
 
         internal static IEnumerable<string> ConfiguredTerms(string? value) => SplitConfiguredItems(value);
         internal static bool IsCanonicalChannelId(string value) => IsSupportedChannelId(value);
+        internal static bool IsCanonicalHandle(string value) => IsSupportedHandle(value);
 
         private static IEnumerable<string> SplitConfiguredItems(string? value) =>
             (value ?? string.Empty)
