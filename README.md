@@ -30,6 +30,7 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Hide empty playlists, categories, and Shorts folders.
 - Optionally show YouTube root folders at the top level and, on Emby 4.10+, add one latest-videos home row per saved channel while reversibly hiding both forms of combined YouTube-latest row.
 - Track estimated daily YouTube API quota usage.
+- Ad-free native playback in Emby (2.0.12+): videos are streamed directly into Emby's own player, so YouTube ads are not played. The optional YouTube embed player is YouTube's own player and can show ads.
 
 
 ## Screenshots
