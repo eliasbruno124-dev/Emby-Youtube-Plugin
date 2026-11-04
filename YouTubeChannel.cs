@@ -43,7 +43,7 @@ namespace Emby.YouTubePlugin
         public string Name => "YouTube";
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
-        private const string ChannelDataRevision = "20260908-stats-labels";
+        private const string ChannelDataRevision = "20261104-personal-folder-policy";
 
         // Emby caches the channel's folders/items keyed by DataVersion and only
         // re-queries GetChannelItems when it changes. A constant version means a

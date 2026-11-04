@@ -14,6 +14,10 @@ refresh. The settings page itself is a web page, not a custom TV settings screen
 adds them to the common YouTube catalog. Removing one user's subscription does
 not remove a channel that another user or the administrator still follows.
 These are plugin subscriptions, not a connection to a Google account.
+The separate **My YouTube** folder is shown for an active owner-only profile,
+or in shared mode when its personal API key is enabled and present. Shared
+subscriptions still appear in the common catalog without a duplicate folder;
+the personal settings page is unchanged.
 
 An enabled personal key is used for that user's area. Without one, the global
 key is used. A failing personal key does not silently consume the global key's

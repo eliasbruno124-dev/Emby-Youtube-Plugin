@@ -57,8 +57,15 @@ gegen den Serveradministrator. Abschalten bewahrt die Werte, deaktiviert aber
 Verwendung und Änderungen. Beschädigte oder fremde Ablagen werden nicht überschrieben.
 
 [YouTubeChannel.Personal](../YouTubeChannel.Personal.cs) erstellt einen undurchsichtig
-benannten persönlichen Wurzelordner pro aktivem Profil. Ordner-IDs erhalten dessen
-Scope, Video-IDs und Kanalabstammung bleiben für die native Wiedergabe erhalten.
+benannten persönlichen Wurzelordner für aktive Profile in `OwnUser`; in `Shared`
+nur, wenn ein eigener API-Schlüssel eingeschaltet und vorhanden ist. Die gemeinsame
+Kanalvereinigung verwendet weiterhin alle aktiven Beitragsprofile. Dieselbe
+Ordnerberechtigung gilt für neue Wurzeln, alte materialisierte Einträge,
+Ordnerabrufe und die Gültigkeit laufender persönlicher Arbeit. Eine geänderte
+Kanal-Datenrevision verwirft alte Emby-Ordnerlisten auch bei unveränderter
+Pluginversion; Konfigurationshash und Katalogrevision invalidieren weiterhin
+Umstellungen und Profiländerungen. Die Einstellungsseite bleibt unverändert.
+Ordner-IDs erhalten den Scope des Profils, Video-IDs und Kanalabstammung bleiben für die native Wiedergabe erhalten.
 Ein eingeschalteter vorhandener eigener API-Schlüssel gilt für Abrufe dieses
 Bereichs; ohne eigenen Schlüssel gilt der globale Schlüssel. Ein ungültiger
 eigener Schlüssel wird nicht heimlich durch den globalen ersetzt. Im Modus

@@ -15,6 +15,7 @@ public partial class YouTubeChannel
         if (YouTubePersonalRequestContext.Current != null || !YouTubePersonalVisibility.IsReady) return;
         foreach (var profile in YouTubePersonalCatalog.ActiveProfiles(config))
         {
+            if (!YouTubePersonalCatalog.HasPersonalRoot(profile, config)) continue;
             YouTubePersonalVisibility.MarkPersonalContent();
             items.Add(Folder("My YouTube", YouTubePersonalCatalog.Wrap(profile.ScopeId, "root"), FolderIcons.WatchLater));
         }
@@ -25,7 +26,8 @@ public partial class YouTubeChannel
         if (!YouTubePersonalCatalog.TryParse(id, out var scope, out var inner)
             || !YouTubePersonalVisibility.IsReady)
             return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
-        var profile = YouTubePersonalCatalog.ActiveProfiles(config).SingleOrDefault(p => p.ScopeId == scope);
+        var profile = YouTubePersonalCatalog.ActiveProfiles(config).SingleOrDefault(p => p.ScopeId == scope
+            && YouTubePersonalCatalog.HasPersonalRoot(p, config));
         if (profile == null) return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
         var usePersonalKey = config.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey);
         var key = usePersonalKey ? profile.ApiKey! : config.ApiKey;
@@ -179,7 +181,7 @@ internal static class YouTubePersonalCatalog
         var user = _users?.GetUserById(userId);
         if (config == null || user == null || _users!.GetUserPolicy(user).IsDisabled) return false;
         return Volatile.Read(ref _profiles).Any(profile => profile.ScopeId == scope && profile.UserId == user.Id
-            && IsEnabled(profile, config));
+            && HasPersonalRoot(profile, config));
     }
 
     internal static bool IsCurrent(YouTubePersonalProfiles.Snapshot original, string configurationHash, long catalogRevision)
@@ -191,8 +193,15 @@ internal static class YouTubePersonalCatalog
         var user = _users?.GetUserList(new UserQuery()).FirstOrDefault(candidate => candidate.Id == original.UserId);
         if (user == null || _users!.GetUserPolicy(user).IsDisabled) return false;
         return Volatile.Read(ref _profiles).Any(profile => profile.UserId == original.UserId
-            && profile.ScopeId == original.ScopeId && profile.Revision == original.Revision && IsEnabled(profile, config));
+            && profile.ScopeId == original.ScopeId && profile.Revision == original.Revision && HasPersonalRoot(profile, config));
     }
+
+    // Shared subscriptions already appear in the common catalog. Keep a
+    // separate root only when its enabled personal key gives it a distinct scope.
+    internal static bool HasPersonalRoot(YouTubePersonalProfiles.Snapshot profile, PluginConfiguration config) =>
+        IsEnabled(profile, config)
+        && (config.PersonalChannelVisibility != "Shared"
+            || config.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey));
 
     private static bool IsEnabled(YouTubePersonalProfiles.Snapshot profile, PluginConfiguration config) =>
         config.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey)

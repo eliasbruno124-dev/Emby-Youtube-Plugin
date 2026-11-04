@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0249188008b47aa82c62fea29b35aceb1c0d555b5be6d87a9286e8fa303b1373"
+      "sha256": "0c95426742e7ac2ae17e1681554b485be5bac5b883d01b7a9aa70eceaf67211d"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -231,7 +231,7 @@
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "5bb43b099de118fa68b064f30468d3c8af46c31bf2aeef443205fde08a60fb27"
+      "sha256": "2bf3e128f67cc723b52a913660845533ab705b90f9339ebd112fcbdcb99d26ff"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -243,7 +243,7 @@
     },
     {
       "path": "YouTubeChannel.cs",
-      "sha256": "e547bd4938ede86a726c09c6cdf1f2b96a4d643092e2f5ae22861b718b84432a"
+      "sha256": "6ae7a82ec3bf5871ddf70ac28e32a3a719b02dbf085a37edf7838db4ae696caf"
     },
     {
       "path": "YouTubeChapterDtoInterceptor.cs",
@@ -363,7 +363,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "369d552438e970532aa1af35cc89eee33d3c4a8503c306523346e637abdb0cae"
+      "sha256": "845f00530edea271daece358986dfb94f3b286484a8b9f4ab48833db36c069d4"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -371,11 +371,11 @@
     },
     {
       "path": "docs/PERSONAL_YOUTUBE.md",
-      "sha256": "8d5f58ac737cfbc28309187b19c03c30f4c4d2811f6e643cd772c9eee6c3ade4"
+      "sha256": "8d05ad87916138313e45edcaf116342db989587c8396dec095510c2ac6aa84d5"
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "fcdf9346815c942dce2de04f41acd90252090f311c1004982c472ee454c13ecd"
+      "sha256": "8627ea8192f6f37925864b6da2cfe3fb43bf9356cf4047ea699b11ad2e971e93"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -445,11 +445,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "aa50fe730d3423c712def7c8e9a740e7881b6b2d7c50b4f703686129d4519b1d"
+      "sha256": "ab2ea8fc44f57eb37dedd75dab959321a015fb832ca9f20f45b42f84e01913cd"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "e05ddbd54405dfb5e03e8b8f373c72f8e3fdd194cd95d59dc02c5dd2c1533326"
+      "sha256": "727209fa0a323371ca25ce82826afcc71e40c31e5a138abd40534c9b4e6874ea"
     }
   ],
   "parsers": {

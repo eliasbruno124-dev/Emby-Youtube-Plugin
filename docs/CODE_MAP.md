@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 110 files; 8559 syntax declarations/HTML anchors.
+Scope: 110 files; 8562 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -69,7 +69,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannel.Live.cs](#file-fd75d22d5169819c) | Plugin Compile source (SDK default) | 30 |
 | [YouTubeChannel.Mapping.cs](#file-b5a9b427d9c6cb61) | Plugin Compile source (SDK default) | 95 |
 | [YouTubeChannel.MediaFolders.cs](#file-11faad7ba4aab64e) | Plugin Compile source (SDK default) | 130 |
-| [YouTubeChannel.Personal.cs](#file-ea131b3b3c2fe81c) | Plugin Compile source (SDK default) | 116 |
+| [YouTubeChannel.Personal.cs](#file-ea131b3b3c2fe81c) | Plugin Compile source (SDK default) | 119 |
 | [YouTubeChannel.Shorts.cs](#file-b6bd071cf0a75be9) | Plugin Compile source (SDK default) | 148 |
 | [YouTubeChannel.State.cs](#file-bd6961656d4c3822) | Plugin Compile source (SDK default) | 52 |
 | [YouTubeChannel.cs](#file-aa77154cbf6e5636) | Plugin Compile source (SDK default) | 47 |
@@ -3301,7 +3301,7 @@ Plugin Compile source (SDK default); 15771 bytes; 423 lines.
 <a id="file-b335630551682c19"></a>
 ## [README.md](../README.md)
 
-Documentation/resource; 7822 bytes; 162 lines.
+Documentation/resource; 7988 bytes; 164 lines.
 
 <a id="file-03de83be30141261"></a>
 ## [YouTubeAdaptiveSourceBudget.cs](../YouTubeAdaptiveSourceBudget.cs)
@@ -5360,10 +5360,10 @@ Plugin Compile source (SDK default); 19016 bytes; 467 lines.
 <a id="file-ea131b3b3c2fe81c"></a>
 ## [YouTubeChannel.Personal.cs](../YouTubeChannel.Personal.cs)
 
-Plugin Compile source (SDK default); 14245 bytes; 255 lines.
+Plugin Compile source (SDK default); 14861 bytes; 264 lines.
 
 <details>
-<summary>All 116 declarations / anchors</summary>
+<summary>All 119 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -5373,116 +5373,119 @@ Plugin Compile source (SDK default); 14245 bytes; 255 lines.
 | parameter | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRoots.items | [13:42](../YouTubeChannel.Personal.cs#L13) |
 | parameter | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRoots.config | [13:71](../YouTubeChannel.Personal.cs#L13) |
 | iteration-variable | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRoots.profile | [16:9](../YouTubeChannel.Personal.cs#L16) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync | [23:5](../YouTubeChannel.Personal.cs#L23) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.id | [23:65](../YouTubeChannel.Personal.cs#L23) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.config | [23:76](../YouTubeChannel.Personal.cs#L23) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ct | [23:104](../YouTubeChannel.Personal.cs#L23) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.scope | [25:58](../YouTubeChannel.Personal.cs#L25) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.inner | [25:73](../YouTubeChannel.Personal.cs#L25) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile | [28:13](../YouTubeChannel.Personal.cs#L28) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@1245 | [28:85](../YouTubeChannel.Personal.cs#L28) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@1245.p | [28:85](../YouTubeChannel.Personal.cs#L28) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.usePersonalKey | [30:13](../YouTubeChannel.Personal.cs#L30) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.key | [31:13](../YouTubeChannel.Personal.cs#L31) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.configurationHash | [34:13](../YouTubeChannel.Personal.cs#L34) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.catalogRevision | [35:13](../YouTubeChannel.Personal.cs#L35) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context | [36:19](../YouTubeChannel.Personal.cs#L36) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context.anonymous@1989 | [37:13](../YouTubeChannel.Personal.cs#L37) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.saved | [38:13](../YouTubeChannel.Personal.cs#L38) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.local | [42:13](../YouTubeChannel.Personal.cs#L42) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.result | [52:27](../YouTubeChannel.Personal.cs#L52) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.error | [61:15](../YouTubeChannel.Personal.cs#L61) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.item | [66:9](../YouTubeChannel.Personal.cs#L66) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync | [72:5](../YouTubeChannel.Personal.cs#L72) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.folderId | [72:73](../YouTubeChannel.Personal.cs#L72) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.apiKey | [73:9](../YouTubeChannel.Personal.cs#L73) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.config | [73:24](../YouTubeChannel.Personal.cs#L73) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.ct | [73:52](../YouTubeChannel.Personal.cs#L73) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.separator | [75:13](../YouTubeChannel.Personal.cs#L75) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.type | [77:13](../YouTubeChannel.Personal.cs#L77) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.term | [78:13](../YouTubeChannel.Personal.cs#L78) |
-| type | Emby.YouTubePlugin.YouTubePersonalCatalog | [89:1](../YouTubeChannel.Personal.cs#L89) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Prefix | [91:27](../YouTubeChannel.Personal.cs#L91) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.HarmonyId | [92:26](../YouTubeChannel.Personal.cs#L92) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._users | [93:34](../YouTubeChannel.Personal.cs#L93) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._profiles | [94:55](../YouTubeChannel.Personal.cs#L94) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._harmony | [95:28](../YouTubeChannel.Personal.cs#L95) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._channelId | [96:25](../YouTubeChannel.Personal.cs#L96) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._refreshQueued | [97:24](../YouTubeChannel.Personal.cs#L97) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._lifetime | [98:45](../YouTubeChannel.Personal.cs#L98) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Revision | [99:26](../YouTubeChannel.Personal.cs#L99) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap | [101:5](../YouTubeChannel.Personal.cs#L101) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.scope | [101:33](../YouTubeChannel.Personal.cs#L101) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.inner | [101:47](../YouTubeChannel.Personal.cs#L101) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse | [103:5](../YouTubeChannel.Personal.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.value | [103:35](../YouTubeChannel.Personal.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.scope | [103:50](../YouTubeChannel.Personal.cs#L103) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.inner | [103:68](../YouTubeChannel.Personal.cs#L103) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Start | [114:5](../YouTubeChannel.Personal.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.library | [114:32](../YouTubeChannel.Personal.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.users | [114:57](../YouTubeChannel.Personal.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.views | [114:77](../YouTubeChannel.Personal.cs#L114) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.dto | [124:17](../YouTubeChannel.Personal.cs#L124) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.assembly | [125:17](../YouTubeChannel.Personal.cs#L125) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.harmonyType | [126:17](../YouTubeChannel.Personal.cs#L126) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.methodType | [127:17](../YouTubeChannel.Personal.cs#L127) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7282 | [131:71](../YouTubeChannel.Personal.cs#L131) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7282.channels | [134:21](../YouTubeChannel.Personal.cs#L134) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7282.manager | [136:21](../YouTubeChannel.Personal.cs#L136) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7282.providerMethod | [137:21](../YouTubeChannel.Personal.cs#L137) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7282.channel | [140:17](../YouTubeChannel.Personal.cs#L140) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.count | [145:17](../YouTubeChannel.Personal.cs#L145) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.error | [149:15](../YouTubeChannel.Personal.cs#L149) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles | [155:5](../YouTubeChannel.Personal.cs#L155) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.config | [155:71](../YouTubeChannel.Personal.cs#L155) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.users | [158:13](../YouTubeChannel.Personal.cs#L158) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled | [159:13](../YouTubeChannel.Personal.cs#L159) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9032 | [159:35](../YouTubeChannel.Personal.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9032.user | [159:35](../YouTubeChannel.Personal.cs#L159) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9088 | [159:91](../YouTubeChannel.Personal.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9088.user | [159:91](../YouTubeChannel.Personal.cs#L159) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@9168 | [160:51](../YouTubeChannel.Personal.cs#L160) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@9168.profile | [160:51](../YouTubeChannel.Personal.cs#L160) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels | [165:5](../YouTubeChannel.Personal.cs#L165) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.config | [165:45](../YouTubeChannel.Personal.cs#L165) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@9622 | [167:49](../YouTubeChannel.Personal.cs#L167) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@9622.profile | [167:49](../YouTubeChannel.Personal.cs#L167) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor | [170:5](../YouTubeChannel.Personal.cs#L170) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.config | [170:40](../YouTubeChannel.Personal.cs#L170) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.userId | [170:68](../YouTubeChannel.Personal.cs#L170) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@9850 | [171:36](../YouTubeChannel.Personal.cs#L171) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@9850.profile | [171:36](../YouTubeChannel.Personal.cs#L171) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView | [175:5](../YouTubeChannel.Personal.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.externalId | [175:33](../YouTubeChannel.Personal.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.userId | [175:52](../YouTubeChannel.Personal.cs#L175) |
-| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.scope | [177:58](../YouTubeChannel.Personal.cs#L177) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.config | [178:13](../YouTubeChannel.Personal.cs#L178) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.user | [179:13](../YouTubeChannel.Personal.cs#L179) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@10433 | [181:49](../YouTubeChannel.Personal.cs#L181) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@10433.profile | [181:49](../YouTubeChannel.Personal.cs#L181) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent | [185:5](../YouTubeChannel.Personal.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.original | [185:36](../YouTubeChannel.Personal.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.configurationHash | [185:79](../YouTubeChannel.Personal.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.catalogRevision | [185:105](../YouTubeChannel.Personal.cs#L185) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.config | [189:13](../YouTubeChannel.Personal.cs#L189) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user | [191:13](../YouTubeChannel.Personal.cs#L191) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@11067 | [191:72](../YouTubeChannel.Personal.cs#L191) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@11067.candidate | [191:72](../YouTubeChannel.Personal.cs#L191) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@11244 | [193:49](../YouTubeChannel.Personal.cs#L193) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@11244.profile | [193:49](../YouTubeChannel.Personal.cs#L193) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled | [197:5](../YouTubeChannel.Personal.cs#L197) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.profile | [197:35](../YouTubeChannel.Personal.cs#L197) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.config | [197:77](../YouTubeChannel.Personal.cs#L197) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles | [201:5](../YouTubeChannel.Personal.cs#L201) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles.error | [204:15](../YouTubeChannel.Personal.cs#L204) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged | [212:5](../YouTubeChannel.Personal.cs#L212) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.lifetime | [215:13](../YouTubeChannel.Personal.cs#L215) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.token | [217:27](../YouTubeChannel.Personal.cs#L217) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@12618 | [221:22](../YouTubeChannel.Personal.cs#L221) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@12618.error | [233:19](../YouTubeChannel.Personal.cs#L233) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop | [241:5](../YouTubeChannel.Personal.cs#L241) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.lifetime | [244:13](../YouTubeChannel.Personal.cs#L244) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.error | [248:15](../YouTubeChannel.Personal.cs#L248) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync | [24:5](../YouTubeChannel.Personal.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.id | [24:65](../YouTubeChannel.Personal.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.config | [24:76](../YouTubeChannel.Personal.cs#L24) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ct | [24:104](../YouTubeChannel.Personal.cs#L24) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.scope | [26:58](../YouTubeChannel.Personal.cs#L26) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.inner | [26:73](../YouTubeChannel.Personal.cs#L26) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile | [29:13](../YouTubeChannel.Personal.cs#L29) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@1329 | [29:85](../YouTubeChannel.Personal.cs#L29) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@1329.p | [29:85](../YouTubeChannel.Personal.cs#L29) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.usePersonalKey | [32:13](../YouTubeChannel.Personal.cs#L32) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.key | [33:13](../YouTubeChannel.Personal.cs#L33) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.configurationHash | [36:13](../YouTubeChannel.Personal.cs#L36) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.catalogRevision | [37:13](../YouTubeChannel.Personal.cs#L37) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context | [38:19](../YouTubeChannel.Personal.cs#L38) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context.anonymous@2138 | [39:13](../YouTubeChannel.Personal.cs#L39) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.saved | [40:13](../YouTubeChannel.Personal.cs#L40) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.local | [44:13](../YouTubeChannel.Personal.cs#L44) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.result | [54:27](../YouTubeChannel.Personal.cs#L54) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.error | [63:15](../YouTubeChannel.Personal.cs#L63) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.item | [68:9](../YouTubeChannel.Personal.cs#L68) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync | [74:5](../YouTubeChannel.Personal.cs#L74) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.folderId | [74:73](../YouTubeChannel.Personal.cs#L74) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.apiKey | [75:9](../YouTubeChannel.Personal.cs#L75) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.config | [75:24](../YouTubeChannel.Personal.cs#L75) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.ct | [75:52](../YouTubeChannel.Personal.cs#L75) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.separator | [77:13](../YouTubeChannel.Personal.cs#L77) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.type | [79:13](../YouTubeChannel.Personal.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.term | [80:13](../YouTubeChannel.Personal.cs#L80) |
+| type | Emby.YouTubePlugin.YouTubePersonalCatalog | [91:1](../YouTubeChannel.Personal.cs#L91) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Prefix | [93:27](../YouTubeChannel.Personal.cs#L93) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.HarmonyId | [94:26](../YouTubeChannel.Personal.cs#L94) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._users | [95:34](../YouTubeChannel.Personal.cs#L95) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._profiles | [96:55](../YouTubeChannel.Personal.cs#L96) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._harmony | [97:28](../YouTubeChannel.Personal.cs#L97) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._channelId | [98:25](../YouTubeChannel.Personal.cs#L98) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._refreshQueued | [99:24](../YouTubeChannel.Personal.cs#L99) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._lifetime | [100:45](../YouTubeChannel.Personal.cs#L100) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Revision | [101:26](../YouTubeChannel.Personal.cs#L101) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap | [103:5](../YouTubeChannel.Personal.cs#L103) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.scope | [103:33](../YouTubeChannel.Personal.cs#L103) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.inner | [103:47](../YouTubeChannel.Personal.cs#L103) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse | [105:5](../YouTubeChannel.Personal.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.value | [105:35](../YouTubeChannel.Personal.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.scope | [105:50](../YouTubeChannel.Personal.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.inner | [105:68](../YouTubeChannel.Personal.cs#L105) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Start | [116:5](../YouTubeChannel.Personal.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.library | [116:32](../YouTubeChannel.Personal.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.users | [116:57](../YouTubeChannel.Personal.cs#L116) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.views | [116:77](../YouTubeChannel.Personal.cs#L116) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.dto | [126:17](../YouTubeChannel.Personal.cs#L126) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.assembly | [127:17](../YouTubeChannel.Personal.cs#L127) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.harmonyType | [128:17](../YouTubeChannel.Personal.cs#L128) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.methodType | [129:17](../YouTubeChannel.Personal.cs#L129) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7431 | [133:71](../YouTubeChannel.Personal.cs#L133) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7431.channels | [136:21](../YouTubeChannel.Personal.cs#L136) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7431.manager | [138:21](../YouTubeChannel.Personal.cs#L138) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7431.providerMethod | [139:21](../YouTubeChannel.Personal.cs#L139) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@7431.channel | [142:17](../YouTubeChannel.Personal.cs#L142) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.count | [147:17](../YouTubeChannel.Personal.cs#L147) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.error | [151:15](../YouTubeChannel.Personal.cs#L151) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles | [157:5](../YouTubeChannel.Personal.cs#L157) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.config | [157:71](../YouTubeChannel.Personal.cs#L157) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.users | [160:13](../YouTubeChannel.Personal.cs#L160) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled | [161:13](../YouTubeChannel.Personal.cs#L161) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9181 | [161:35](../YouTubeChannel.Personal.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9181.user | [161:35](../YouTubeChannel.Personal.cs#L161) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9237 | [161:91](../YouTubeChannel.Personal.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@9237.user | [161:91](../YouTubeChannel.Personal.cs#L161) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@9317 | [162:51](../YouTubeChannel.Personal.cs#L162) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@9317.profile | [162:51](../YouTubeChannel.Personal.cs#L162) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels | [167:5](../YouTubeChannel.Personal.cs#L167) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.config | [167:45](../YouTubeChannel.Personal.cs#L167) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@9771 | [169:49](../YouTubeChannel.Personal.cs#L169) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@9771.profile | [169:49](../YouTubeChannel.Personal.cs#L169) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor | [172:5](../YouTubeChannel.Personal.cs#L172) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.config | [172:40](../YouTubeChannel.Personal.cs#L172) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.userId | [172:68](../YouTubeChannel.Personal.cs#L172) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@9999 | [173:36](../YouTubeChannel.Personal.cs#L173) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@9999.profile | [173:36](../YouTubeChannel.Personal.cs#L173) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView | [177:5](../YouTubeChannel.Personal.cs#L177) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.externalId | [177:33](../YouTubeChannel.Personal.cs#L177) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.userId | [177:52](../YouTubeChannel.Personal.cs#L177) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.scope | [179:58](../YouTubeChannel.Personal.cs#L179) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.config | [180:13](../YouTubeChannel.Personal.cs#L180) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.user | [181:13](../YouTubeChannel.Personal.cs#L181) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@10582 | [183:49](../YouTubeChannel.Personal.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@10582.profile | [183:49](../YouTubeChannel.Personal.cs#L183) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent | [187:5](../YouTubeChannel.Personal.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.original | [187:36](../YouTubeChannel.Personal.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.configurationHash | [187:79](../YouTubeChannel.Personal.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.catalogRevision | [187:105](../YouTubeChannel.Personal.cs#L187) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.config | [191:13](../YouTubeChannel.Personal.cs#L191) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user | [193:13](../YouTubeChannel.Personal.cs#L193) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@11222 | [193:72](../YouTubeChannel.Personal.cs#L193) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@11222.candidate | [193:72](../YouTubeChannel.Personal.cs#L193) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@11399 | [195:49](../YouTubeChannel.Personal.cs#L195) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@11399.profile | [195:49](../YouTubeChannel.Personal.cs#L195) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot | [201:5](../YouTubeChannel.Personal.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.profile | [201:42](../YouTubeChannel.Personal.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.config | [201:84](../YouTubeChannel.Personal.cs#L201) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled | [206:5](../YouTubeChannel.Personal.cs#L206) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.profile | [206:35](../YouTubeChannel.Personal.cs#L206) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.config | [206:77](../YouTubeChannel.Personal.cs#L206) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles | [210:5](../YouTubeChannel.Personal.cs#L210) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles.error | [213:15](../YouTubeChannel.Personal.cs#L213) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged | [221:5](../YouTubeChannel.Personal.cs#L221) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.lifetime | [224:13](../YouTubeChannel.Personal.cs#L224) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.token | [226:27](../YouTubeChannel.Personal.cs#L226) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@13234 | [230:22](../YouTubeChannel.Personal.cs#L230) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@13234.error | [242:19](../YouTubeChannel.Personal.cs#L242) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop | [250:5](../YouTubeChannel.Personal.cs#L250) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.lifetime | [253:13](../YouTubeChannel.Personal.cs#L253) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.error | [257:15](../YouTubeChannel.Personal.cs#L257) |
 
 </details>
 
@@ -5715,7 +5718,7 @@ Plugin Compile source (SDK default); 4189 bytes; 86 lines.
 <a id="file-aa77154cbf6e5636"></a>
 ## [YouTubeChannel.cs](../YouTubeChannel.cs)
 
-Plugin Compile source (SDK default); 9318 bytes; 223 lines.
+Plugin Compile source (SDK default); 9328 bytes; 223 lines.
 
 <details>
 <summary>All 47 declarations / anchors</summary>
@@ -9320,7 +9323,7 @@ Plugin Compile source (SDK default); 16238 bytes; 258 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 44426 bytes; 234 lines.
+Documentation/resource; 45010 bytes; 241 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -9330,12 +9333,12 @@ Documentation/resource; 6611 bytes; 54 lines.
 <a id="file-b0baa6a0de87a8db"></a>
 ## [docs/PERSONAL_YOUTUBE.md](../docs/PERSONAL_YOUTUBE.md)
 
-Documentation/resource; 2466 bytes; 40 lines.
+Documentation/resource; 2737 bytes; 44 lines.
 
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 11766 bytes; 83 lines.
+Documentation/resource; 12037 bytes; 83 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)
