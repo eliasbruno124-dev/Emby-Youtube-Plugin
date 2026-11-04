@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "e1fcf5be26f3ab99fe477eb998b83617ad5b259883e1dc65d3efcbecbce9fbb9"
+      "sha256": "9a79125899fd54c477ec1cc622418de4d086253734b733a14ba7b7317f18659d"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -215,7 +215,7 @@
     },
     {
       "path": "YouTubeChannel.Folders.cs",
-      "sha256": "df593ce030a7f75ec4791c94e47143d36161e45d6adbd6dec19af7715c4219cd"
+      "sha256": "be101fb1080af0402c97173d36982c23ea268847863c50353040907a35117901"
     },
     {
       "path": "YouTubeChannel.Live.cs",
@@ -231,7 +231,7 @@
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "9e152d7bd8c2b4d1ad5f7345fc16dfd3ecc85684758374cb65336f4a879fc489"
+      "sha256": "786dc8e487be8bc554b41b710a660391f39a56c1f8287b43421806342a81fa82"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -243,7 +243,7 @@
     },
     {
       "path": "YouTubeChannel.cs",
-      "sha256": "9406d02bfc0e8df04ad9b21f1819539629b588be93626e8a62cbad13c9f9eeb5"
+      "sha256": "f966f763f2cdc64f8844ac2001d9494e4fe3ba9f4546ae6b6adddbaeb7b9d29c"
     },
     {
       "path": "YouTubeChannelProvenance.cs",
@@ -339,7 +339,7 @@
     },
     {
       "path": "YouTubePersonalStartup.cs",
-      "sha256": "5d0f6b264e04a04dfe3a13289fac77f75a733627cd271bacb6f6d3d60861afd8"
+      "sha256": "bcb6327ef21839df86a3bf77f7bd8f001c62e669c3dbd02ccd0bbe329d612782"
     },
     {
       "path": "YouTubePersonalVisibility.cs",
@@ -371,7 +371,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "bb73479349a91207e3bcee26d9328495154a03f8c1e0edbbbeeb8ebf09e06640"
+      "sha256": "b483d74fc99c5095fe370102c575c75cfbccc23bb93680be7c2a2b04d14c7bab"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -379,11 +379,11 @@
     },
     {
       "path": "docs/PERSONAL_YOUTUBE.md",
-      "sha256": "8d05ad87916138313e45edcaf116342db989587c8396dec095510c2ac6aa84d5"
+      "sha256": "425f8980042a5cd1d5099457ab4ab06f92334abffdaf186d9aa00125e10885e5"
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "38236fbe5269f6010871e5d469aa33eab556dd098b2d05d9177b078d47e227c8"
+      "sha256": "c18542f00f6c446d5cecdbb3f8e18f215574a5da6adba97370e0ad978e49c1e3"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -453,11 +453,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "678eb52fb3ac25bc6084587b8ab0cb59d495ce2f955f12d5cc693820ccdce1f1"
+      "sha256": "4f7f3e69f2736b9b2532263b6da1b0bed1cd5e5bcc72c22635b0057399eb1040"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "8ceee6cd204741a44b1cef53d62b97290b053ba706412c5f34de076c94f528ae"
+      "sha256": "eaaa22b978bab4efeb452f39121066faa264b286f3bc18e642cb13ef04952cf3"
     }
   ],
   "parsers": {

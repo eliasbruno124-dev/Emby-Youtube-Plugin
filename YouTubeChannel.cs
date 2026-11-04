@@ -43,7 +43,7 @@ namespace Emby.YouTubePlugin
         public string Name => "YouTube";
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
-        private const string ChannelDataRevision = "20261104-channel-provenance-v1";
+        private const string ChannelDataRevision = "20261104-private-flat-roots-v1";
 
         // Emby caches the channel's folders/items keyed by DataVersion and only
         // re-queries GetChannelItems when it changes. A constant version means a
@@ -106,7 +106,7 @@ namespace Emby.YouTubePlugin
             {
                 if (string.IsNullOrEmpty(query.FolderId))
                 {
-                    AddPersonalRoots(items, config);
+                    await AddPersonalRootsAsync(items, config, cancellationToken).ConfigureAwait(false);
                     if (items.Count > 0) return ToResult(items);
                 }
                 return Msg(items, "ERROR: Please configure a YouTube API Key in the plugin settings.");

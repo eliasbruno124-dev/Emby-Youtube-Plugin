@@ -1,3 +1,4 @@
+using MediaBrowser.Common;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
 
@@ -10,8 +11,9 @@ public sealed class YouTubePersonalStartup : IServerEntryPoint, IRunBeforeStartu
     private readonly ILibraryManager _library;
     private readonly IUserManager _users;
     private readonly IUserViewManager _views;
-    public YouTubePersonalStartup(ILibraryManager library, IUserManager users, IUserViewManager views)
+    public YouTubePersonalStartup(IApplicationHost host, ILibraryManager library, IUserManager users, IUserViewManager views)
     {
+        Plugin.InitializeApplicationHost(host);
         _library = library;
         _users = users;
         _views = views;

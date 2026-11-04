@@ -32,7 +32,7 @@ namespace Emby.YouTubePlugin
                 items.Add(Folder("📂 Categories", "categories_x_root", FolderIcons.Categories));
 
             await AddSavedContentFoldersAsync(items, apiKey, config, ct).ConfigureAwait(false);
-            AddPersonalRoots(items, config);
+            await AddPersonalRootsAsync(items, config, ct).ConfigureAwait(false);
 
             Log($"[YT] Root level: returning {items.Count} items");
             return ToResult(items);
@@ -199,7 +199,8 @@ namespace Emby.YouTubePlugin
             !string.IsNullOrEmpty(externalId)
             && (externalId.StartsWith($"channel{FolderSeparator}", StringComparison.Ordinal)
                 || YouTubeChannelProvenance.TryParse(externalId, out _, out var sharedInner) && sharedInner.StartsWith("channel_x_", StringComparison.Ordinal)
-                || YouTubePersonalCatalog.TryParse(externalId, out _, out var inner) && inner == "root");
+                || YouTubePersonalCatalog.TryParse(externalId, out _, out var inner)
+                    && (inner == "root" || YouTubePersonalCatalog.TryParseOwn(inner, out _, out var ownInner) && ownInner.StartsWith("channel_x_", StringComparison.Ordinal)));
 
         private static ChannelItemInfo Folder(string name, string id, string? imageUrl) =>
             new()

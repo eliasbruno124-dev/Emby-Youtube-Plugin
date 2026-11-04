@@ -108,17 +108,19 @@ personal settings to save your own key or follow channels by `@handle` or `UC...
 channel ID. Version 2.0.12.1 fixes the missing settings entry in 2.0.12.0.
 The resulting folders can also be browsed in native Emby clients; personal settings are managed through Emby Web.
 
-The administrator chooses **Only the owner** to keep these channels in each user's
-personal area, or **All users** to also add them to the common YouTube catalog.
+The administrator chooses **Only the owner** to show each user's channels directly
+in their YouTube root beside the common channels, without a **My YouTube**
+subfolder. Other users cannot browse these personal entries. **All users** also
+adds them to the common YouTube catalog.
 With **All users**, there is no extra **My YouTube** folder, because the channels
 are already in the common list – unless a user has their own API key. The
 **My YouTube** settings page is always available. Historical channel folders with
 unverifiable ownership are hidden; an administrator-saved `@handle` may therefore
 remain hidden until a successful refresh resolves it (an explicit `UC...` ID is
 verifiable immediately).
-Personal browsing uses the user's enabled key when present, otherwise the server
-key. A failing personal key does not silently fall back to the server key; the
-shared catalog always uses the server key.
+Personal channels use the user's enabled key when present, otherwise the server
+key; common channels use the server key. A failing personal key does not silently
+fall back to the server key.
 
 These are plugin-managed subscriptions, with no Google account sign-in or
 automatic import of your YouTube account's subscriptions. See

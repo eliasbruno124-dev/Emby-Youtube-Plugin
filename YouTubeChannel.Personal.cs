@@ -10,25 +10,67 @@ namespace Emby.YouTubePlugin;
 
 public partial class YouTubeChannel
 {
-    private static void AddPersonalRoots(List<ChannelItemInfo> items, PluginConfiguration config)
+    private static async Task AddPersonalRootsAsync(List<ChannelItemInfo> items, PluginConfiguration config, CancellationToken ct)
     {
         if (YouTubePersonalRequestContext.Current != null || !YouTubePersonalVisibility.IsReady) return;
-        foreach (var profile in YouTubePersonalCatalog.ActiveProfiles(config))
+        var hash = PluginEntryPoint.ComputeConfigHash(config);
+        var revision = Interlocked.Read(ref YouTubePersonalCatalog.Revision);
+        var snapshot = YouTubeChannelProvenance.Copy(config);
+        if (PluginEntryPoint.ComputeConfigHash(snapshot) != hash)
+            throw new OperationCanceledException("YouTube configuration changed during snapshot capture.");
+        var profiles = YouTubePersonalCatalog.ActiveProfiles(snapshot);
+        YouTubeChannelProvenance.EnsureCurrent(hash, revision);
+        foreach (var profile in profiles)
         {
-            if (!YouTubePersonalCatalog.HasPersonalRoot(profile, config)) continue;
-            YouTubePersonalVisibility.MarkPersonalContent();
-            items.Add(Folder("My YouTube", YouTubePersonalCatalog.Wrap(profile.ScopeId, "root"), FolderIcons.WatchLater));
+            ct.ThrowIfCancellationRequested();
+            if (!YouTubePersonalCatalog.HasPersonalRoot(profile, snapshot)) continue;
+            if (snapshot.PersonalChannelVisibility == "Shared")
+            {
+                YouTubePersonalVisibility.MarkPersonalContent();
+                items.Add(Folder("My YouTube", YouTubePersonalCatalog.Wrap(profile.ScopeId, "root"), FolderIcons.WatchLater));
+                continue;
+            }
+            if (!snapshot.EnablePersonalSubscriptions || profile.Channels.Length == 0) continue;
+            var personalKey = snapshot.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey);
+            var key = personalKey ? profile.ApiKey! : snapshot.ApiKey;
+            if (string.IsNullOrWhiteSpace(key)) continue;
+            using var context = new YouTubePersonalRequestContext(profile.UserId, profile.Revision, key, personalKey,
+                () => YouTubePersonalCatalog.IsCurrent(profile, hash, revision));
+            var existing = items.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
+            foreach (var term in profile.Channels.Distinct(StringComparer.Ordinal))
+            {
+                var own = new List<ChannelItemInfo>();
+                await AddConfiguredTermsAsync(own, key, new[] { term }, ct).ConfigureAwait(false);
+                context.EnsureCurrent();
+                foreach (var item in own)
+                {
+                    // A matching common channel is already present with the
+                    // server key. Within a profile, aliases also deduplicate.
+                    if (!existing.Add(item.Id)) continue;
+                    item.Id = YouTubePersonalCatalog.WrapOwn(profile.ScopeId, YouTubeChannelProvenance.Token(term), item.Id);
+                    YouTubePersonalVisibility.MarkPersonalContent();
+                    items.Add(item);
+                }
+            }
         }
+        YouTubeChannelProvenance.EnsureCurrent(hash, revision);
     }
 
     private async Task<ChannelItemResult> GetPersonalItemsAsync(string id, PluginConfiguration config, CancellationToken ct)
     {
         if (!YouTubePersonalCatalog.TryParse(id, out var scope, out var inner)
-            || !YouTubePersonalVisibility.IsReady)
+            || !YouTubePersonalVisibility.IsReady
+            || (config.PersonalChannelVisibility == "OwnUser") != inner.StartsWith("own_", StringComparison.Ordinal))
+            return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
+        var ownRoot = inner.StartsWith("own_", StringComparison.Ordinal);
+        var contribution = "";
+        if (ownRoot && !YouTubePersonalCatalog.TryParseOwn(inner, out contribution, out inner))
             return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
         var profile = YouTubePersonalCatalog.ActiveProfiles(config).SingleOrDefault(p => p.ScopeId == scope
             && YouTubePersonalCatalog.HasPersonalRoot(p, config));
-        if (profile == null) return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
+        if (profile == null || ownRoot && (!config.EnablePersonalSubscriptions
+            || !profile.Channels.Any(term => YouTubeChannelProvenance.Token(term) == contribution)))
+            return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
         var usePersonalKey = config.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey);
         var key = usePersonalKey ? profile.ApiKey! : config.ApiKey;
         if (string.IsNullOrWhiteSpace(key))
@@ -67,7 +109,7 @@ public partial class YouTubeChannel
         }
         foreach (var item in result.Items)
             if (item.Type == ChannelItemType.Folder)
-                item.Id = YouTubePersonalCatalog.Wrap(scope, item.Id);
+                item.Id = ownRoot ? YouTubePersonalCatalog.WrapOwn(scope, contribution, item.Id) : YouTubePersonalCatalog.Wrap(scope, item.Id);
         return result;
     }
 
@@ -79,8 +121,8 @@ public partial class YouTubeChannel
         var hash = PluginEntryPoint.ComputeConfigHash(config);
         var revision = Interlocked.Read(ref YouTubePersonalCatalog.Revision);
         var snapshot = YouTubeChannelProvenance.Copy(config);
-            if (PluginEntryPoint.ComputeConfigHash(snapshot) != hash)
-                throw new OperationCanceledException("YouTube configuration changed during snapshot capture.");
+        if (PluginEntryPoint.ComputeConfigHash(snapshot) != hash)
+            throw new OperationCanceledException("YouTube configuration changed during snapshot capture.");
         YouTubeChannelProvenance.EnsureCurrent(hash, revision);
         if (!YouTubeChannelProvenance.SharedAllowed(token, snapshot))
             throw new OperationCanceledException("Shared contribution was revoked.");
@@ -123,6 +165,17 @@ internal static class YouTubePersonalCatalog
     internal static long Revision;
 
     internal static string Wrap(string scope, string inner) => Prefix + scope + "_" + inner;
+
+    internal static string WrapOwn(string scope, string token, string inner) => Wrap(scope, "own_" + token + "_" + inner);
+    internal static bool TryParseOwn(string value, out string token, out string inner)
+    {
+        token = inner = "";
+        if (!value.StartsWith("own_", StringComparison.Ordinal) || value.Length <= 37 || value[36] != '_') return false;
+        token = value.Substring(4, 32);
+        if (token.Any(c => !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f'))) return false;
+        inner = value.Substring(37);
+        return inner.Length > 0 && !inner.StartsWith("own_", StringComparison.Ordinal);
+    }
 
     internal static bool TryParse(string? value, out string scope, out string inner)
     {
@@ -195,9 +248,10 @@ internal static class YouTubePersonalCatalog
             : Array.Empty<string>();
 
     internal static bool HasContentFor(PluginConfiguration config, Guid userId) =>
-        ActiveProfiles(config).Any(profile => profile.UserId == userId
-            || config.EnablePersonalSubscriptions && config.PersonalChannelVisibility == "Shared"
-                && profile.Channels.Length > 0);
+        ActiveProfiles(config).Any(profile => config.PersonalChannelVisibility == "OwnUser"
+            ? profile.UserId == userId && config.EnablePersonalSubscriptions && profile.Channels.Length > 0
+            : profile.UserId == userId && config.EnablePersonalApiKeys && !string.IsNullOrWhiteSpace(profile.ApiKey)
+                || config.EnablePersonalSubscriptions && profile.Channels.Length > 0);
 
     private static bool MayView(string externalId, long userId)
     {
@@ -209,9 +263,14 @@ internal static class YouTubePersonalCatalog
             return YouTubeChannelProvenance.SharedAllowed(sharedToken, config);
         if (externalId.StartsWith("channel_x_", StringComparison.Ordinal))
             return YouTubeChannelProvenance.LegacyAllowed(externalId, config);
-        if (!TryParse(externalId, out var scope, out _)) return false;
+        if (!TryParse(externalId, out var scope, out var inner)
+            || (config.PersonalChannelVisibility == "OwnUser") != inner.StartsWith("own_", StringComparison.Ordinal)) return false;
+        var own = config.PersonalChannelVisibility == "OwnUser";
+        var contribution = "";
+        if (own && (!config.EnablePersonalSubscriptions || !TryParseOwn(inner, out contribution, out _))) return false;
         return Volatile.Read(ref _profiles).Any(profile => profile.ScopeId == scope && profile.UserId == user.Id
-            && HasPersonalRoot(profile, config));
+            && HasPersonalRoot(profile, config)
+            && (!own || profile.Channels.Any(term => YouTubeChannelProvenance.Token(term) == contribution)));
     }
 
     internal static bool IsCurrent(YouTubePersonalProfiles.Snapshot original, string configurationHash, long catalogRevision)

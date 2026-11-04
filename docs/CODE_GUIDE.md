@@ -57,9 +57,15 @@ Ersetzung schützen die Ablage; der daneben liegende Schlüssel ist kein Schutz
 gegen den Serveradministrator. Abschalten bewahrt die Werte, deaktiviert aber
 Verwendung und Änderungen. Beschädigte oder fremde Ablagen werden nicht überschrieben.
 
-[YouTubeChannel.Personal](../YouTubeChannel.Personal.cs) erstellt einen undurchsichtig
-benannten persönlichen Wurzelordner für aktive Profile in `OwnUser`; in `Shared`
-nur, wenn ein eigener API-Schlüssel eingeschaltet und vorhanden ist. Die gemeinsame
+[YouTubeChannel.Personal](../YouTubeChannel.Personal.cs) erstellt in `OwnUser`
+flache persönliche Kanalwurzeln neben den gemeinsamen Kanälen. Ordner-IDs tragen
+Profil-Scope, Modusmarker und einen Hash des konkreten Abobeitrags; derselbe Marker
+bleibt auf Ordnernachkommen erhalten. Aktueller Modus, Abo-Freigabe und aktuelle
+Beitragsliste entscheiden auch über bereits materialisierte Einträge. Alte
+`My YouTube`-Wurzeln sind in `OwnUser` gesperrt; alte flache Wurzeln sind in `Shared`
+auch bei aktiviertem persönlichem Schlüssel gesperrt. In `Shared` gibt es den
+persönlichen `My YouTube`-Ordner nur mit aktiviertem vorhandenem eigenem Schlüssel.
+Die gemeinsame
 Kanalvereinigung verwendet weiterhin alle aktiven Beitragsprofile. Dieselbe
 Ordnerberechtigung gilt für neue Wurzeln, alte materialisierte Einträge,
 Ordnerabrufe und die Gültigkeit laufender persönlicher Arbeit. Eine geänderte
@@ -67,10 +73,11 @@ Kanal-Datenrevision verwirft alte Emby-Ordnerlisten auch bei unveränderter
 Pluginversion; Konfigurationshash und Katalogrevision invalidieren weiterhin
 Umstellungen und Profiländerungen. Die Einstellungsseite bleibt unverändert.
 Ordner-IDs erhalten den Scope des Profils, Video-IDs und Kanalabstammung bleiben für die native Wiedergabe erhalten.
-Ein eingeschalteter vorhandener eigener API-Schlüssel gilt für Abrufe dieses
-Bereichs; ohne eigenen Schlüssel gilt der globale Schlüssel. Ein ungültiger
-eigener Schlüssel wird nicht heimlich durch den globalen ersetzt. Im Modus
-`Shared` werden zusätzliche gemeinsame Kanäle mit dem globalen Schlüssel geladen.
+Ein eingeschalteter vorhandener eigener API-Schlüssel gilt für eigene Kanäle; ohne eigenen Schlüssel gilt der globale Schlüssel. Ein ungültiger
+eigener Schlüssel wird nicht heimlich durch den globalen ersetzt. Gemeinsame Kanäle und die zusätzlichen `Shared`-Beiträge verwenden den globalen
+Schlüssel. Identische gemeinsame Kanalwurzeln werden nicht nochmals als eigene
+Wurzel eingefügt. Das Umhängen erzeugt neue native Item-IDs: alte Deeplinks und
+benutzerbezogene Itemdaten werden nicht automatisch migriert.
 Die persönlichen Profile und Schlüssel bleiben trotzdem getrennt. Das sind
 lokal verwaltete Kanäle, keine OAuth-Synchronisierung mit Google-Abos.
 
