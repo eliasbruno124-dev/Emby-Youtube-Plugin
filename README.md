@@ -31,7 +31,7 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Optionally show YouTube root folders at the top level and, on Emby 4.10+, add one latest-videos home row per saved channel while reversibly hiding both forms of combined YouTube-latest row.
 - Track estimated daily YouTube API quota usage.
 - Enable **My YouTube** with optional personal API keys and channel subscriptions for each Emby user.
-- Native playback in Emby (2.0.12+), up to 1080p with transcoded output capped at 30 fps. The optional YouTube embed player can show ads.
+- Ad-free native playback in Emby (2.0.12+): YouTube ads are not played, up to 1080p with transcoded output capped at 30 fps. The optional YouTube embed player is YouTube's own player and can show ads.
 
 
 ## Screenshots
