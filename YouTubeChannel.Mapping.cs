@@ -38,7 +38,28 @@ namespace Emby.YouTubePlugin
             if (includeComments && commentCount is >= 0)
                 parts.Add($"{commentCount.Value.ToString("N0", CultureInfo.InvariantCulture)} comments");
 
-            return string.Join(" | ", parts);
+            return string.Join("\n", parts);
+        }
+
+        private static string? BuildVideoOverview(string? videoId, string? description,
+            long? viewCount, long? likeCount, long? commentCount)
+        {
+            // API responses may be cached (or stale on network failure). Prefer
+            // a genuinely recent extraction, field by field, without treating
+            // absent yt-dlp values as zero or erasing API fallback metadata.
+            if (videoId != null && YouTubeDirectMetadata.TryGet(videoId, out var direct))
+            {
+                description = direct.Description ?? description;
+                viewCount = direct.ViewCount ?? viewCount;
+                likeCount = direct.LikeCount ?? likeCount;
+                commentCount = direct.CommentCount ?? commentCount;
+            }
+            string stats = BuildEngagementStatsLine(viewCount, likeCount, commentCount,
+                Plugin.Instance?.Options.ShowLikeCount == true,
+                Plugin.Instance?.Options.ShowCommentCount == true);
+            if (!string.IsNullOrWhiteSpace(description))
+                return (stats.Length > 0 ? stats + "\n\n" : string.Empty) + description;
+            return stats.Length > 0 ? stats : description != null ? string.Empty : null;
         }
 
         private static List<MediaSourceInfo> MakeMediaSources(string videoId, bool isLive = false)
@@ -56,7 +77,9 @@ namespace Emby.YouTubePlugin
                 Bitrate = 1_000_000,
                 SupportsTranscoding = false,
                 SupportsDirectStream = false,
-                SupportsDirectPlay = true,
+                // In direct mode this persisted watch path is metadata identity
+                // only; the dynamic callback must produce the playable source.
+                SupportsDirectPlay = !YouTubeDirectPlayback.Enabled,
                 IsInfiniteStream = isLive,
                 RequiresOpening = false,
                 RequiresClosing = false,
@@ -148,18 +171,7 @@ namespace Emby.YouTubePlugin
                     if (long.TryParse(YouTubeApi.GetString(stats, "commentCount"), out var c)) commentCount = c;
                 }
 
-                string statsLine = BuildEngagementStatsLine(
-                    viewCount,
-                    likeCount,
-                    commentCount,
-                    Plugin.Instance?.Options.ShowLikeCount == true,
-                    Plugin.Instance?.Options.ShowCommentCount == true);
-
-                string? overview = null;
-                if (!string.IsNullOrWhiteSpace(desc))
-                    overview = (statsLine.Length > 0 ? statsLine + "\n\n" : "") + desc;
-                else if (statsLine.Length > 0)
-                    overview = statsLine;
+                string? apiOverview = BuildVideoOverview(null, desc, viewCount, likeCount, commentCount);
 
                 // Flag currently-live videos early so folder filters see them.
                 bool isLive = false;
@@ -169,6 +181,10 @@ namespace Emby.YouTubePlugin
                     if (!string.IsNullOrEmpty(concurrentViewers))
                         isLive = true;
                 }
+                string? overview = BuildVideoOverview(isLive ? null : videoId, desc, viewCount, likeCount, commentCount);
+                long? runtimeTicks = ts?.Ticks;
+                if (!isLive && YouTubeDirectMetadata.TryGet(videoId, out var direct))
+                    runtimeTicks = direct.DurationTicks ?? runtimeTicks;
 
                 // Same Shorts signals we use during enrichment.
                 bool isReel = !isLive && HasShortsTagOrHashtag(el);
@@ -189,7 +205,7 @@ namespace Emby.YouTubePlugin
                     ProductionYear = premiere?.Year,
                     DateCreated = premiere,
                     PremiereDate = premiere,
-                    RunTimeTicks = isLive ? null : ts?.Ticks,
+                    RunTimeTicks = isLive ? null : runtimeTicks,
                     ContentType = MediaBrowser.Model.Channels.ChannelMediaContentType.Episode,
                     Id = itemId,
                     Type = ChannelItemType.Media,
@@ -201,7 +217,8 @@ namespace Emby.YouTubePlugin
                     MediaSources = MakeMediaSources(videoId, isLive)
                 };
 
-                MetaCache[itemId] = new VideoMeta(overview, premiere, premiere?.Year, ts?.Ticks, thumb, DateTime.UtcNow, origLang);
+                MetaCache[itemId] = new VideoMeta(apiOverview, premiere, premiere?.Year, ts?.Ticks, thumb,
+                    DateTime.UtcNow, origLang, desc, viewCount, likeCount, commentCount, true);
                 list.Add(info);
             }
             return list;
@@ -258,12 +275,11 @@ namespace Emby.YouTubePlugin
                 var liveBroadcastContent = YouTubeApi.GetNestedString(el, "snippet", "liveBroadcastContent");
                 bool isLive = liveBroadcastContent == "live" || liveBroadcastContent == "upcoming";
 
-                string? overview = !string.IsNullOrWhiteSpace(desc) ? desc : null;
+                string? overview = BuildVideoOverview(isLive ? null : videoId, desc, null, null, null);
 
                 string itemId = isLive ? LivePrefix + videoId : videoId;
                 string displayTitle = isLive ? $"🔴 LIVE: {title}" : title;
 
-                MetaCache.TryGetValue(itemId, out var cachedMeta);
                 var info = new ChannelItemInfo
                 {
                     Name = displayTitle,

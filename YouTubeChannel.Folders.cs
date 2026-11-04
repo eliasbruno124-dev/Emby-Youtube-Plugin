@@ -32,6 +32,7 @@ namespace Emby.YouTubePlugin
                 items.Add(Folder("📂 Categories", "categories_x_root", FolderIcons.Categories));
 
             await AddSavedContentFoldersAsync(items, apiKey, config, ct).ConfigureAwait(false);
+            AddPersonalRoots(items, config);
 
             Log($"[YT] Root level: returning {items.Count} items");
             return ToResult(items);
@@ -81,7 +82,10 @@ namespace Emby.YouTubePlugin
         private static async Task AddSavedContentFoldersAsync(
             List<ChannelItemInfo> items, string apiKey, PluginConfiguration config, CancellationToken ct)
         {
-            foreach (var term in SplitConfiguredItems(config.SavedItems))
+            var saved = SplitConfiguredItems(config.SavedItems);
+            if (YouTubePersonalRequestContext.Current == null)
+                saved = saved.Concat(YouTubePersonalCatalog.SharedChannels(config));
+            foreach (var term in saved.Distinct(StringComparer.Ordinal))
             {
                 ct.ThrowIfCancellationRequested();
 
@@ -150,7 +154,8 @@ namespace Emby.YouTubePlugin
 
         internal static bool IsSavedChannelRootExternalId(string? externalId) =>
             !string.IsNullOrEmpty(externalId)
-            && externalId.StartsWith($"channel{FolderSeparator}", StringComparison.Ordinal);
+            && (externalId.StartsWith($"channel{FolderSeparator}", StringComparison.Ordinal)
+                || YouTubePersonalCatalog.TryParse(externalId, out _, out var inner) && inner == "root");
 
         private static ChannelItemInfo Folder(string name, string id, string? imageUrl) =>
             new()

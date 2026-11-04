@@ -36,7 +36,8 @@ namespace Emby.YouTubePlugin
         // Memory cache lifetimes. Disk uses the same value per request,
         // capped by the global limit below.
         private const long CacheTtlMs = 15 * 60 * 1000;            // Default: 15 minutes.
-        private const long FreshListTtlMs = 6 * 60 * 60 * 1000;       // Trending, uploads, and playlists: 6 hours.
+        private const long FreshListTtlMs = 6 * 60 * 60 * 1000;       // Trending and ordinary playlists: 6 hours.
+        private const long ChannelUploadsTtlMs = 55 * 60 * 1000;
         private const long ChannelDetailsCacheTtlMs = 6 * 60 * 60 * 1000;       // Channel names and thumbnails: 6 hours.
         private const long SearchTtlMs = 24 * 60 * 60 * 1000;           // Search has a separate daily call limit.
         private const long CategoriesTtlMs = 30L * 24 * 60 * 60 * 1000; // Categories rarely change.
@@ -54,7 +55,7 @@ namespace Emby.YouTubePlugin
 
         private static readonly HttpClient Http = new HttpClient(
             YouTubeHttpClientFactory.CreateHandler(
-                allowAutoRedirect: true,
+                allowAutoRedirect: false,
                 automaticDecompression: DecompressionMethods.All))
         {
             // ResponseHeadersRead completes as soon as the headers arrive, so
@@ -247,7 +248,8 @@ namespace Emby.YouTubePlugin
         private static async Task<JsonDocument> GetJsonAsync(string url, CancellationToken ct)
         {
             HttpStatusCode? lastStatus = null;
-            Exception? lastException = null;
+            var personal = YouTubePersonalRequestContext.Current;
+            var transport = CreateApiRequest(url);
 
             for (int attempt = 0; attempt <= RetryDelaysMs.Length; attempt++)
             {
@@ -262,25 +264,38 @@ namespace Emby.YouTubePlugin
                         // unsuccessful API responses. Cached reads never reach
                         // this point and therefore do not consume quota.
                         ct.ThrowIfCancellationRequested();
-                        QuotaTracker.RecordCall(url);
+                        personal?.EnsureCurrent();
+                        if (personal?.UsesPersonalKey != true) QuotaTracker.RecordCall(transport.Uri.AbsoluteUri);
 
                         using var attemptCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
                         attemptCts.CancelAfter(RequestAttemptTimeout);
                         var attemptToken = attemptCts.Token;
 
-                        using var resp = await Http.GetAsync(
-                                url,
+                        using var request = new HttpRequestMessage(HttpMethod.Get, transport.Uri);
+                        request.Headers.Add("X-Goog-Api-Key", transport.Key);
+                        using var resp = await Http.SendAsync(
+                                request,
                                 HttpCompletionOption.ResponseHeadersRead,
                                 attemptToken)
                             .ConfigureAwait(false);
 
-                        lastException = null;
                         if (resp.IsSuccessStatusCode)
                         {
+                            if (resp.Content.Headers.ContentLength > 4 * 1024 * 1024)
+                                throw new InvalidDataException("YouTube API response exceeded its limit.");
                             await using var stream = await resp.Content
                                 .ReadAsStreamAsync(attemptToken).ConfigureAwait(false);
-                            return await JsonDocument.ParseAsync(stream, cancellationToken: attemptToken)
-                                .ConfigureAwait(false);
+                            using var buffer = new MemoryStream();
+                            var chunk = new byte[16384];
+                            int read;
+                            while ((read = await stream.ReadAsync(chunk.AsMemory(), attemptToken).ConfigureAwait(false)) > 0)
+                            {
+                                if (buffer.Length + read > 4 * 1024 * 1024)
+                                    throw new InvalidDataException("YouTube API response exceeded its limit.");
+                                buffer.Write(chunk, 0, read);
+                            }
+                            personal?.EnsureCurrent();
+                            return JsonDocument.Parse(buffer.ToArray());
                         }
 
                         lastStatus = resp.StatusCode;
@@ -306,38 +321,32 @@ namespace Emby.YouTubePlugin
                         }
                     }
                 }
-                catch (OperationCanceledException ex) when (ct.IsCancellationRequested)
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
-                    throw new OperationCanceledException(
-                        "YouTube API request was canceled.",
-                        ex,
-                        ct);
+                    throw new OperationCanceledException("YouTube API request was canceled.", ct);
                 }
                 catch (OperationCanceledException ex)
                 {
                     // HttpClient timeouts surface as OperationCanceledException
                     // even though the caller's token was not cancelled.
-                    lastException = ex;
                     lastStatus = null;
-                    Debug.WriteLine($"[YouTubeApi] Request timed out on attempt {attempt + 1}: {ex.Message}");
+                    personal?.EnsureCurrent();
+                    Debug.WriteLine($"[YouTubeApi] Request timed out on attempt {attempt + 1} ({ex.GetType().Name}).");
                 }
                 catch (HttpRequestException ex)
                 {
-                    lastException = ex;
                     lastStatus = null;
-                    Debug.WriteLine($"[YouTubeApi] Transport error on attempt {attempt + 1}: {ex.Message}");
+                    Debug.WriteLine($"[YouTubeApi] Transport error on attempt {attempt + 1} ({ex.GetType().Name}).");
                 }
                 catch (IOException ex)
                 {
-                    lastException = ex;
                     lastStatus = null;
-                    Debug.WriteLine($"[YouTubeApi] Response stream error on attempt {attempt + 1}: {ex.Message}");
+                    Debug.WriteLine($"[YouTubeApi] Response stream error on attempt {attempt + 1} ({ex.GetType().Name}).");
                 }
                 catch (JsonException ex)
                 {
-                    lastException = ex;
                     lastStatus = null;
-                    Debug.WriteLine($"[YouTubeApi] Invalid JSON on attempt {attempt + 1}: {ex.Message}");
+                    Debug.WriteLine($"[YouTubeApi] Invalid JSON on attempt {attempt + 1} ({ex.GetType().Name}).");
                 }
 
                 if (!shouldRetry || attempt == RetryDelaysMs.Length)
@@ -351,8 +360,28 @@ namespace Emby.YouTubePlugin
             var message = lastStatus.HasValue
                 ? $"YouTube API returned HTTP {(int)lastStatus.Value}"
                 : "YouTube API request failed before a valid response was received";
-            throw new HttpRequestException(message, lastException, lastStatus);
+            throw new HttpRequestException(message, null, lastStatus);
         }
+
+        internal static (Uri Uri, string Key) CreateApiRequest(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != "https"
+                || uri.Host != "www.googleapis.com" || !uri.IsDefaultPort
+                || !uri.AbsolutePath.StartsWith("/youtube/v3/", StringComparison.Ordinal)
+                || uri.UserInfo.Length != 0 || uri.Fragment.Length != 0)
+                throw new ArgumentException("Invalid YouTube API endpoint.");
+            var parts = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
+            var keys = parts.Where(part => part.StartsWith("key=", StringComparison.Ordinal)).ToArray();
+            if (keys.Length != 1) throw new ArgumentException("YouTube API credential is required.");
+            var key = Uri.UnescapeDataString(keys[0].Substring(4));
+            if (key.Length is < 1 or > 256 || key.Any(c => c < 33 || c > 126))
+                throw new ArgumentException("Invalid YouTube API credential.");
+            return (new Uri(uri.GetLeftPart(UriPartial.Path) + "?" + string.Join("&",
+                parts.Where(part => !part.StartsWith("key=", StringComparison.Ordinal)))), key);
+        }
+
+        private static string CacheIdentity(string url) => Convert.ToHexString(SHA256.HashData(
+            Encoding.UTF8.GetBytes((YouTubePersonalRequestContext.Current?.CacheNamespace ?? "shared") + "|" + url)));
 
         private static async Task<JsonDocument?> TryGetJsonAsync(string url, CancellationToken ct)
         {
@@ -366,7 +395,7 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[YouTubeApi] TryGetJsonAsync failed: {ex.GetType().Name}: {ex.Message}");
+                Debug.WriteLine($"[YouTubeApi] TryGetJsonAsync failed ({ex.GetType().Name}).");
                 return null;
             }
         }
@@ -378,25 +407,28 @@ namespace Emby.YouTubePlugin
             string? cacheTag = null)
         {
             ct.ThrowIfCancellationRequested();
+            var personal = YouTubePersonalRequestContext.Current;
+            personal?.EnsureCurrent();
+            var cacheIdentity = CacheIdentity(url);
             var memTtl = customTtlMs ?? CacheTtlMs;
             var diskTtl = Math.Min(memTtl, DiskCacheTtlMs);
             var now = Environment.TickCount64;
 
             // First stop: in-memory cache.
-            if (ResponseCache.TryGetValue(url, out var cached))
+            if (ResponseCache.TryGetValue(cacheIdentity, out var cached))
             {
                 if (now < cached.ExpiresAtMs)
                 {
-                    try { return JsonDocument.Parse(cached.Json); }
+                    try { personal?.EnsureCurrent(); return JsonDocument.Parse(cached.Json); }
                     catch (JsonException ex)
                     {
                         Debug.WriteLine($"[YouTubeApi] Dropping invalid memory cache entry: {ex.Message}");
-                        ResponseCache.TryRemove(url, out _);
+                        ResponseCache.TryRemove(cacheIdentity, out _);
                     }
                 }
                 else
                 {
-                    ResponseCache.TryRemove(url, out _);
+                    ResponseCache.TryRemove(cacheIdentity, out _);
                 }
             }
 
@@ -413,7 +445,7 @@ namespace Emby.YouTubePlugin
                 {
                     if (Interlocked.Read(ref _cacheGeneration) == diskReadGeneration)
                     {
-                        ResponseCache[url] = new CachedResponse(
+                        ResponseCache[cacheIdentity] = new CachedResponse(
                             diskHit.Json,
                             now - diskHit.AgeMs,
                             now + remainingMs,
@@ -464,7 +496,10 @@ namespace Emby.YouTubePlugin
                 }
             }
             if (freshJson != null)
+            {
+                personal?.EnsureCurrent();
                 return JsonDocument.Parse(freshJson);
+            }
 
             // If YouTube is unreachable, fall back to the freshest disk copy
             // we have. Stale content beats an empty channel during an outage
@@ -482,7 +517,7 @@ namespace Emby.YouTubePlugin
                     if (Interlocked.Read(ref _cacheGeneration) == staleReadGeneration)
                     {
                         var staleCachedAt = Environment.TickCount64;
-                        ResponseCache[url] = new CachedResponse(
+                        ResponseCache[cacheIdentity] = new CachedResponse(
                             staleHit.Json,
                             staleCachedAt,
                             staleCachedAt + (5 * 60 * 1000),
@@ -503,7 +538,7 @@ namespace Emby.YouTubePlugin
             long ttlMs,
             string? cacheTag,
             long cacheGeneration) =>
-            $"{cacheGeneration}|{ttlMs}|{cacheTag ?? string.Empty}|{url}";
+            $"{cacheGeneration}|{ttlMs}|{cacheTag ?? string.Empty}|{CacheIdentity(url)}";
 
         private static bool RemoveInFlightRequest(
             string inFlightKey,
@@ -523,12 +558,13 @@ namespace Emby.YouTubePlugin
                 return null;
 
             var json = doc.RootElement.GetRawText();
+            YouTubePersonalRequestContext.Current?.EnsureCurrent();
             lock (CacheMutationLock)
             {
                 if (Interlocked.Read(ref _cacheGeneration) == cacheGeneration)
                 {
                     var cachedAt = Environment.TickCount64;
-                    ResponseCache[url] = new CachedResponse(
+                    ResponseCache[CacheIdentity(url)] = new CachedResponse(
                         json,
                         cachedAt,
                         cachedAt + memTtl,
@@ -567,6 +603,8 @@ namespace Emby.YouTubePlugin
 
         private static DiskCacheHit? TryReadDiskCache(string url, long ttlMs, string? cacheTag)
         {
+            // Personal metadata never shares persisted cache or stale fallback.
+            if (YouTubePersonalRequestContext.Current != null) return null;
             string? file = null;
             try
             {
@@ -606,6 +644,7 @@ namespace Emby.YouTubePlugin
 
         private static void WriteDiskCache(string url, string json, string? cacheTag)
         {
+            if (YouTubePersonalRequestContext.Current != null) return;
             string? tempFile = null;
             try
             {
@@ -740,13 +779,9 @@ namespace Emby.YouTubePlugin
                         var playlistTag = GetPlaylistCacheTag(substring);
                         foreach (var kvp in ResponseCache.ToList())
                         {
-                            if (string.Equals(kvp.Value.CacheTag, playlistTag, StringComparison.Ordinal)
-                                || kvp.Key.IndexOf(substring, StringComparison.OrdinalIgnoreCase) >= 0)
+                            if (string.Equals(kvp.Value.CacheTag, playlistTag, StringComparison.Ordinal))
                             {
                                 ResponseCache.TryRemove(kvp.Key, out _);
-                                var cacheDir = Plugin.CachePath;
-                                if (!string.IsNullOrEmpty(cacheDir))
-                                    TryDeleteCacheFile(GetDiskCacheFile(cacheDir, kvp.Key, kvp.Value.CacheTag));
                             }
                         }
 
@@ -840,7 +875,7 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[YouTubeApi] GetChannelDetailsAsync failed for '{query}': {ex.Message}");
+                Debug.WriteLine($"[YouTubeApi] GetChannelDetailsAsync failed ({ex.GetType().Name}).");
             }
             return (null, null, null, null);
         }
@@ -911,7 +946,7 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[YouTubeApi] GetPlaylistDetailsAsync failed for '{playlistId}': {ex.Message}");
+                Debug.WriteLine($"[YouTubeApi] GetPlaylistDetailsAsync failed ({ex.GetType().Name}).");
             }
             return (null, null, 0, false);
         }
@@ -968,12 +1003,12 @@ namespace Emby.YouTubePlugin
                       $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
             if (!string.IsNullOrEmpty(pageToken))
                 url += $"&pageToken={Uri.EscapeDataString(pageToken)}";
-            // Uploads/playlists are cheap but noisy, so 6h hits a good middle
-            // ground for normal browsing.
+            // Upload lists expire before an hourly channel refresh. Other
+            // playlists retain their six-hour lifetime.
             return await TryGetCachedJsonAsync(
                     url,
                     ct,
-                    FreshListTtlMs,
+                    playlistId.StartsWith("UU", StringComparison.Ordinal) ? ChannelUploadsTtlMs : FreshListTtlMs,
                     GetPlaylistCacheTag(playlistId))
                 .ConfigureAwait(false);
         }

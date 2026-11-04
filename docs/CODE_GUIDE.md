@@ -1,0 +1,221 @@
+# Orientierung im Plugin
+
+Diese Seite erklärt die Architektur; [CODE_MAP.md](CODE_MAP.md) enthält die automatisch ermittelten Dateien und Deklarationen. Vor einer Änderung: `node tools/code-map.mjs check`. Ein Fehler bedeutet, dass Karte oder fachlicher Prüfstand nicht mehr zum Quellcode passen. Die [Wartungsanleitung](CODE_MAP_MAINTENANCE.md) beschreibt die getrennte Neuerzeugung und fachliche Prüfung.
+
+Die Karte beschreibt den Repository-Quellcode. Sie beweist weder, dass eine bestimmte Emby-Version einen privaten Reflection-Einstieg besitzt, noch dass ein nativer Client einen gesendeten Befehl tatsächlich sichtbar umsetzt.
+
+## Die wichtigsten Einstiege
+
+| Aufgabe | Einstieg | Wesentliche Verbindung |
+|---|---|---|
+| Plugin registrieren, Einstellungen speichern | [Plugin.cs](../Plugin.cs): `Plugin`, `GetPages`, `SaveConfiguration` | Konfiguration, Webressourcen, Cache und Refresh |
+| Start/Ende und Hintergrundarbeit | [PluginEntryPoint.cs](../PluginEntryPoint.cs): `Run`, `Dispose` | Emby-Dienste, Ereignisse, Polling, Resume, Reparaturen |
+| Ordner und Videos liefern | [YouTubeChannel.cs](../YouTubeChannel.cs): `GetChannelItems` | Partielle Dateien für Ordner, Metadaten und dynamische Wiedergabe |
+| YouTube-Daten abrufen | [YouTubeApi.cs](../YouTubeApi.cs): Endpoint-Methoden, `TryGetCachedJsonAsync`, `GetJsonAsync` | Cache, gemeinsame laufende Requests, Quota, Transport |
+| Wiedergabe vorbereiten | [PlaybackIntentInterceptor.cs](../PlaybackIntentInterceptor.cs): `Install`, `CapturePlaybackInfo`, `NormalizeYouTubeMediaSources` | GET/POST PlaybackInfo und explizite Startabsicht |
+| Native YouTube-Wiedergabe | [YouTubeChannel.DirectPlayback.cs](../YouTubeChannel.DirectPlayback.cs): `GetChannelItemMediaInfo`, `GetMediaSourcesAsync` | Verwaltete Medienauflösung, Emby-Transcoding und externe Untertitel |
+| Client-Wiedergabe anpassen | [DashboardYouTubePlayerInterceptor.cs](../DashboardYouTubePlayerInterceptor.cs): `PatchResource` | Externe Emby-JavaScript-Bundles und [YouTubeEmbed.html](../YouTubeEmbed.html) |
+
+Emby findet Provider und Services über deren Schnittstellen beziehungsweise Route-Attribute. Diese Einstiege müssen nicht von einer anderen Pluginmethode direkt aufgerufen werden. Harmony-Hooks und Reflection sind ebenfalls bewusst manuell dokumentierte Verbindungen, keine automatisch bewiesenen Aufrufkanten.
+
+## Einstellungen → sichtbare Inhalte
+
+Die [Konfigurations-HTML](../Configuration/YouTubeConfiguration.html) bindet den [AMD-Controller](../Configuration/YouTubeConfiguration.js). Dieser lädt Werte, wartet laufende Speicherungen ab und fasst schnelle Änderungen in einer serialisierten Autosave-Warteschlange zusammen. `YouTubeConfigSaveService.Post` liest den Request asynchron und ändert nur die gelieferten Felder unter einer gemeinsamen Sperre. `Plugin.SaveConfiguration` normalisiert und persistiert sie.
+
+`ComputeConfigHash` in `PluginEntryPoint` entscheidet, ob Inhalte neu geladen werden müssen. Derselbe Vertrag beeinflusst `YouTubeChannel.DataVersion`. Ein neues inhaltsrelevantes Feld benötigt deshalb nicht nur ein Formularfeld: auch DTO, Konfiguration, Normalisierung und Hash/Invalidierung müssen geprüft werden. Das bloße Ändern des Pollingintervalls darf nicht unnötig YouTube-Daten neu abrufen.
+
+`ChannelRefreshInvoker` in `PluginEntryPoint.cs` serialisiert Refresh-Anforderungen und sammelt nötige Folgedurchläufe. Seine Aktivitätsmarkierung bleibt bis zum tatsächlichen Ende des Emby-Refreshs bestehen. Sortier- und Bildreparaturen berücksichtigen diese Markierung, damit ihre Datenbank-Schreibvorgänge nicht mit einem laufenden Scan kollidieren.
+
+## Persönliche Schlüssel und Kanäle
+
+`EnablePersonalApiKeys` und `EnablePersonalSubscriptions` sind unabhängige,
+standardmäßig ausgeschaltete Administratoreinstellungen. `PersonalChannelVisibility`
+bestimmt, ob hinzugefügte Kanäle nur im eigenen Bereich oder zusätzlich im
+gemeinsamen Katalog erscheinen. [YouTubePersonalService](../YouTubePersonalService.cs)
+leitet den Besitzer ausschließlich aus der authentifizierten Emby-Identität ab;
+Teiländerungen benötigen die aktuelle Revision. Ein API-Diensttoken ohne Benutzer
+darf diese Oberfläche nicht verwenden. Die [persönliche Seite](../Configuration/YouTubePersonal.js)
+benutzt keine globale Konfiguration und zeigt gespeicherte Schlüssel niemals an.
+
+[YouTubePersonalProfiles](../YouTubePersonalProfiles.cs) hält begrenzte, verschlüsselte
+Profile unter `youtube-personal` im Emby-Datenverzeichnis. Dateirechte und atomare
+Ersetzung schützen die Ablage; der daneben liegende Schlüssel ist kein Schutz
+gegen den Serveradministrator. Abschalten bewahrt die Werte, deaktiviert aber
+Verwendung und Änderungen. Beschädigte oder fremde Ablagen werden nicht überschrieben.
+
+[YouTubeChannel.Personal](../YouTubeChannel.Personal.cs) erstellt einen undurchsichtig
+benannten persönlichen Wurzelordner pro aktivem Profil. Ordner-IDs erhalten dessen
+Scope, Video-IDs und Kanalabstammung bleiben für die native Wiedergabe erhalten.
+Ein eingeschalteter vorhandener eigener API-Schlüssel gilt für Abrufe dieses
+Bereichs; ohne eigenen Schlüssel gilt der globale Schlüssel. Ein ungültiger
+eigener Schlüssel wird nicht heimlich durch den globalen ersetzt. Im Modus
+`Shared` werden zusätzliche gemeinsame Kanäle mit dem globalen Schlüssel geladen.
+Die persönlichen Profile und Schlüssel bleiben trotzdem getrennt. Das sind
+lokal verwaltete Kanäle, keine OAuth-Synchronisierung mit Google-Abos.
+
+[YouTubePersonalVisibility](../YouTubePersonalVisibility.cs) ergänzt Embys native
+benutzerbezogene Abfragen, promovierte Kanalwurzeln und Item-DTOs. SQL-Ausschlüsse
+greifen vor Zählung und Seiteneinteilung. Berechtigungen werden nicht zwischengespeichert.
+Eine anfängliche Abwesenheitsprüfung vermeidet wiederholte zusätzliche Abfragen
+bei Installationen ohne persönliche Inhalte; vor dem ersten neuen Wurzelordner
+wird sie synchron ungültig. Ohne vollständige geprüfte Laufzeitbindung werden
+keine neuen persönlichen Ordner erzeugt. Exakte verbleibende DTO-/View-Bindungen
+sperren bestehende persönliche Einträge bei einem unvollständigen Query-Vertrag.
+Eine völlig veränderte künftige Emby-Laufzeit ist keine garantierte Datenschutzgrenze;
+dieser Adapter muss nach Serverupdates überprüft werden. Administratorzugriff,
+öffentliche YouTube-Videos und vom Client bereits gespeicherte Daten werden nicht
+zu geschützten Medien umdefiniert.
+
+[YouTubePersonalRequestContext](../YouTubePersonalRequestContext.cs) bindet
+Metadatenarbeit an Besitzer, Revision und Schlüssel. Änderungen am Profil,
+gemeinsamen Katalog oder an der Konfiguration verwerfen verspätete Ergebnisse.
+Persönliche Aufrufe nutzen getrennte gehashte Memory-/In-flight-Schlüssel, keinen
+Disk-Cache und keinen veralteten Disk-Fallback. Die globale Quota zählt nur
+Versuche mit dem globalen Schlüssel. Echte HTTP-Anfragen übertragen den API-Key
+im Header, nicht in ihrer URL; Redirects sind für diese API-Anfragen deaktiviert.
+
+## Gemeinsame Ordner und Medien
+
+| Partial-Datei | Zuständigkeit |
+|---|---|
+| [YouTubeChannel.State.cs](../YouTubeChannel.State.cs) | Geteilte Caches/Datentypen, ID-Prüfung, `_x_`, `LIVE_`, `REEL_` |
+| [YouTubeChannel.Folders.cs](../YouTubeChannel.Folders.cs) | Root, gespeicherte Kanäle/Playlists/Suchen, Unterordner und Kategorien |
+| [YouTubeChannel.MediaFolders.cs](../YouTubeChannel.MediaFolders.cs) | Pagination, Deduplizierung, Live-Kandidaten, Filter und Inhaltsflags |
+| [YouTubeChannel.Mapping.cs](../YouTubeChannel.Mapping.cs) | API-Datensätze in `ChannelItemInfo`/`MediaSourceInfo` umwandeln |
+| [YouTubeChannel.Enrichment.cs](../YouTubeChannel.Enrichment.cs) | Detaildaten, Verfügbarkeit, Region, Statistik, Laufzeit und Klassifikation |
+| [YouTubeChannel.Aggregates.cs](../YouTubeChannel.Aggregates.cs) | Trending/Kategorie-Aggregate und nachträglicher Shorts-Filter |
+| [YouTubeChannel.Shorts.cs](../YouTubeChannel.Shorts.cs) | Shorts-URL-/Seitenprüfung, Cache, Überlastungsschutz und begrenzter HTTP-Abruf ohne Hilfsprogramme |
+| [YouTubeChannel.Live.cs](../YouTubeChannel.Live.cs) | LIVE-/UPCOMING-Kandidaten aus der Streams-Seite |
+
+Normale Medienseiten werden vollständig dedupliziert und angereichert, bevor Filter und die gewünschte Ergebnisgrenze greifen. Sonst könnten früh verworfene Shorts/private Videos gültige spätere Seiteneinträge verdrängen. Trending und Live verwenden zusätzliche eigene Wege. Ein fehlgeschlagener Probe-Abruf ist nicht dasselbe wie eine erfolgreich gelesene leere Seite.
+
+`MakeMediaSources` hält den Watch-Link als stabile Item-/Provider-Identität. Im alten Wiedergabemodus ist er zugleich die Quelle des YouTube-Players. Bei eingeschaltetem Direktmodus ersetzt `IRequiresMediaInfoCallback.GetChannelItemMediaInfo` diese Quelle vor der Wiedergabe durch echte Medien. Der persistierte Watch-Link ist dann ausdrücklich nicht direkt abspielbar; ein fehlgeschlagener Resolver darf nicht auf iframe oder YouTube-App zurückfallen.
+
+## Direktmodus: Medienauflösung, Qualität und Untertitel
+
+[YouTubeStreamResolver](../YouTubeStreamResolver.cs) verwaltet Auflösungen für validierte elfstellige Video-IDs innerhalb des Emby-Prozesses. Zwei aktive Auflösungen, zehn Gesamtaufträge, gemeinsam genutzte laufende Anfragen, Abbruch, kurze Fehlerpausen und der begrenzte Kurzzeitcache bleiben seine Zuständigkeit. [YouTubeManagedResolver](../YouTubeManagedResolver.cs) wandelt einen begrenzten Player-Snapshot in das private Medienformat um; einzelne Formate verursachen keine eigenen Verfügbarkeits-Probes. [YouTubeManagedHttp](../YouTubeManagedHttp.cs) begrenzt erlaubte Endpunkte, Methoden, Antwortgrößen, Anfragezahl und Fristen. Fehler enthalten keine signierten URLs oder ungefilterten Antworttexte.
+
+Die einzige Installationsdatei ist die DLL. Der fest versionierte MIT-Quelltext unter [ManagedResolver](../ManagedResolver/) wird direkt mitkompiliert; es handelt sich um einen eingeschränkten Quelltext-Teilumfang, nicht um das unveränderte offizielle Binärpaket. Herkunft und lokale Anpassungen sind dort separat dokumentiert, die Lizenz ist eingebettet. Harmony wird wie bisher aus einer eingebetteten verwalteten Assembly im Speicher geladen. Seine eingebettete MonoMod-Komponente kann auf Unix eine native Hilfsbibliothek im temporären Verzeichnis ablegen; das ist keine gewöhnliche Cachedatei. Deshalb ist „nur eine DLL installieren“ nicht identisch mit „niemals zusätzlichen Programmcode außerhalb der DLL ablegen“. Der neue Resolver selbst startet, entpackt oder lädt keine ausführbaren Programme und benötigt weder yt-dlp noch Deno oder einen zusätzlichen Container. Embys eigener Transcoder bleibt für die native Ausgabe zuständig.
+
+Normale Einstellungen, Untertiteldateien, private HLS-Manifeste und begrenzte Zustands-/Cachedateien liegen weiterhin in Embys vorgesehenen Verzeichnissen. Das Löschen der Plugin-DLL entfernt diese Daten nicht. Alte Programmpfad-/Updater-Felder werden nur für die XML-Kompatibilität eingelesen, beim Speichern geleert beziehungsweise deaktiviert und nicht ausgeführt. Änderungen des Abrufcodes werden als neue Plugin-DLL ausgeliefert; es gibt keinen separaten Laufzeit-Updater. Verwalteter Code ist kein Nachweis eines tatsächlichen Windows-/macOS- oder vollständigen Clienttests.
+
+Die temporäre native Bibliothek ist ein dokumentiertes Verhalten von [MonoMods Unix-Hilfsbibliothek](https://monomod.dev/api/MonoMod.Switches.HelperDropPath.html). Sie darf nicht mit einem separat installierten oder gestarteten YouTube-Resolver gleichgesetzt werden, bleibt aber eine ausdrückliche Ausnahme von einer vollständig dateilosen Laufzeit.
+
+[YouTubeRequestBackoff](../YouTubeRequestBackoff.cs) lässt neue Auflösungen frühestens alle fünf Sekunden und höchstens 120-mal pro gleitender Stunde starten. Das sind konservative lokale Grenzen, keine zugesicherten YouTube-Kontingente. Eine verweigerte Player-Antwort beendet den Abruf. HTTP 403/429 oder eine ausdrückliche Bot-Prüfung lösen zusätzlich eine begrenzte gemeinsame Pause aus; ein gelöschtes oder alters-, konto- beziehungsweise regionsbeschränktes Video sperrt dagegen nicht alle anderen Videos. Es gibt keinen Wechsel auf eine andere Clientidentität. Cachetreffer werden nicht künstlich verzögert. Es gibt weder importierte Account-Cookies noch Identitäts-/IP-Wechsel oder einen PO-Token-Dienst zur Umgehung von Ablehnungen. Der Abruf hängt weiterhin von YouTubes aktuellen Anforderungen ab; eine Sperrfreiheit oder offiziell garantierte sichere Abrufrate ist nicht bekannt.
+
+[YouTubeDirectHttp](../YouTubeDirectHttp.cs) beschränkt Quellen auf erlaubte HTTPS-Hosts, validiert Redirects und Header und bindet Verbindungen an geprüfte öffentliche DNS-Adressen. IPv4 wird bevorzugt, weil ein nicht funktionsfähiger IPv6-Pfad unnötige Startverzögerung erzeugen kann. Signierte Medienadressen gehören weder in öffentliche Logs noch in die Karte.
+
+Der Direktmodus unterstützt derzeit abrufbare Videos und abgeschlossene Livestreams, nicht laufende oder angekündigte Livestreams. Die API-Oberfläche kann solche Live-Einträge weiterhin anzeigen; die Auflösung lehnt sie ausdrücklich ab, ohne auf die YouTube-App zurückzufallen. Diese Grenze betrifft den neuen Direktmodus, nicht die unabhängigen Such-/Metadatenfunktionen.
+
+`YouTubeDirectPlayback` begrenzt Quellen und Ausgabe innerhalb der DLL auf höchstens 1080p; ältere 2160-Konfigurationen werden ebenfalls begrenzt. [YouTubeDirectQualityPolicy](../YouTubeDirectQualityPolicy.cs) ist die gemeinsame Quelle für Default, Deserialisierung, Speichern und Runtime. Emby kann aufgrund seiner Geräte-/Bitratenverhandlung eine kleinere Ausgabe wählen. Getrennte HTTPS-Audio-/Videoeingänge sind auch unterhalb von 1080p erreichbar, wenn die Auflösung keinen HLS-Master liefert; sie sind kein 4K-Auswahlweg.
+
+Die Auflösungsgrenze ist kein Bitratenlimit. Das Plugin verändert `MaxStreamingBitrate` weder im Request-DTO noch in der Query: Clientvorgaben und Embys globale Einstellungen bestimmen die Ausgabe. Auch hohe automatische Vorgaben bleiben erhalten; das Plugin misst nicht das Client-WLAN. Das separat gemessene Server-CDN-Budget darf größer als die Ausgabe sein: Eine 1080p-Quelle mit höherer Bitrate kann nach der Transcodierung eine kleinere Ausgabe ergeben. Ist keine Quelle innerhalb des gemessenen Budgets vorhanden, bleibt die kleinste kompatible Variante der Fallback, keine Zusage einer harten Eingangsgrenze. Nach Änderungen sind der native Transcoding-Link und der tatsächlich gestartete Encoder zu prüfen, nicht nur die Auflösung der Quelle. Die Einstellungen zeigen nur den Wiedergabemodus; alte Höhenfelder bleiben für bestehende Konfigurationen kompatibel, sind aber nicht mehr im Formular editierbar.
+
+Bei gleicher Auflösung bevorzugen die HLS-/HTTPS-Selektoren bekannte Quellen bis 30 fps vor höheren Bildraten. Der pfadgesicherte Postfix auf `EncodingJobInfo.GetTargetFramerate(string,bool)` begrenzt die native YouTube-Zielrate auf 30 fps. Er berücksichtigt explizite Framerate-Optionen; eine alleinige Maxframerate-Option wäre übersteuerbar. Für optionale/null Rückgaben wird Embys eigener normalisierter Quellratenpfad verwendet, nicht eine erfundene Rate. VAAPI übernimmt diese optionale Zielrate nicht in jedem Pfad: Ein zusätzlicher Postfix nach `TranscodingCommandBuilder.SetVideoArguments` setzt deshalb die abschließende Streamoption `Output0.Video0.Options.r`, die als `-r:v:0` serialisiert wird. Bereits niedrigere positive Dezimal-/Bruchraten bleiben erhalten; unbekannte nichtleere Ausdrücke werden nicht umgedeutet. Kleinere Zielraten, unbekannte Quellen ohne Zielrate, Static/Copy und fremde Medien bleiben nativ. Bereits laufende validierte Direktquellen behalten die Begrenzung nach Abschalten des Direktmodus. Tatsächliche Segment-FPS, Keyframes und Segmentdauer müssen gemeinsam geprüft werden, nicht nur eine gemeldete Zielrate. Das verringert die zu erzeugende Bildzahl, ist aber kein Nachweis, dass beliebige Hardware oder Netzwerkstrecken jede Wiedergabe schaffen. Der native HLS-Master enthält weiterhin nur eine Qualitätsstufe, kein nahtlos wechselndes ABR-Angebot.
+
+Neue native YouTube-Starts erhalten schon vor Embys Sprachwahl `SubtitleStreamIndex=-1`; die erzeugte Quelle beginnt ebenfalls mit Off. Das gilt auch für einen vom Client mitgesendeten positiven Index, weil dieser aus der automatischen Auswahl oder einer gespeicherten Auswahl stammen kann. Ohne `CurrentPlaySessionId` gilt auch ein Start an einer gespeicherten Position als neue Wiedergabe und beginnt ohne Untertitel. Innerhalb einer laufenden Wiedergabe kennzeichnet `CurrentPlaySessionId` den Spurwechsel beziehungsweise Seek/Qualitätswechsel: Hier bleibt die Auswahl einschließlich Aus erhalten. Ein vor dem Start gewählter Untertitel wird deshalb ebenfalls zurückgesetzt; Einschalten erfolgt nach dem Start. Clients müssen ihre laufende Wiedergabe beim Wechsel korrekt kennzeichnen. Andere Medien und globale Benutzerpräferenzen werden nicht geändert. Es gibt keinen Timer, der eine manuelle Auswahl nachträglich ausschaltet.
+
+Emby übernimmt angeforderte Spurindizes nur bei passender `MediaSourceId`. Fehlt diese bei einem eigenen Direktvideo, bindet der Request-Prefix sie vor der Verhandlung an dessen kanonische Direktquelle; eine ausdrücklich andere Quellen-ID bleibt unverändert. Dadurch erreicht auch `-1` Embys tatsächliche URL-Erzeugung, statt nur die sichtbare Auswahl zu ändern. Eine bereits in der Query vorhandene passende ID kann in den POST-DTO übernommen werden.
+
+GET-Metadaten ohne Geräteprofil durchlaufen keine solche Wiedergabeverhandlung. Nur bei Quellen ohne `TranscodingUrl` projiziert der Postfix deshalb den anfänglichen Off-Standard auf Kopien. Bei einer bereits vorbereiteten Wiedergabe bleibt Embys echte Auswahl unverändert: Eine Antwort darf nicht Aus anzeigen, während ihre URL weiterhin Untertitel anfordert. Fortlaufende Sitzungen erhalten keine Defaultkorrektur. Eine GET-Detailantwort ohne Transcoding-URL beweist keine erfolgreiche Wiedergabe.
+
+[YouTubeSourceBudget](../YouTubeSourceBudget.cs) wählt beim Start/Neustart eine AVC/AAC-HLS-Variante anhand einer kurzen begrenzten Messung echter Mediendaten zwischen Server und CDN. Die bevorzugte Manifestvariante wird zuerst validiert; ein beschädigter Master darf nicht durch eine Rückstufung versteckt werden. Das Bitratenbudget lässt 40 Prozent Messreserve. Bei unbekannter Kapazität gilt höchstens 480p, wenn vorhanden, sonst die niedrigste kompatible Variante. Die Messung einschließlich Warteschlange dauert höchstens 1,8 Sekunden; sie wird kurzzeitig zwischen Abrufen derselben Route geteilt. Diese Startentscheidung misst nicht das Client-WLAN, garantiert keine ruckelfreie Wiedergabe und ist kein kontinuierliches ABR.
+
+Die Medien-Playlist darf für diese Messung bis zu 16 MiB und 16.384 Segmente enthalten: lange Videos wiederholen signierte absolute URLs und können dadurch mehrere MiB große Listen besitzen. Die gesamte Liste bleibt validiert; Frist und Parallelität der Messung bleiben unverändert. Nur der dafür bestimmte Medien-Playlist-Abruf erhält diese größere Grenze; gewöhnliche HTTP-/Range-Abrufe bleiben bei höchstens 4 MiB, Untertitel zusätzlich bei ihrer engeren 2-MiB-Grenze. HLS-BANDWIDTH wird auch als konservative Obergrenze der Video-Stream-Bitrate angegeben, damit die echte Quellinformation bei der nativen Transcode-Planung nicht fehlt; es ist keine zusätzliche feste Client- oder Server-Bitratenbegrenzung.
+
+Es entsteht ein privater HLS-Master mit genau einer Video-Variante. Separate Audiogruppen werden als eigene, kleine Einspur-Manifeste angeboten; eingebetteter Ton ohne separate Gruppe bleibt beim Video. Der Manifestcache ist auf 4.224 Dateien und zusammen 64 MiB begrenzt. Ein vom Resolver gelieferter `hls_manifest_url` wird als tatsächlicher Master gelesen; Auflösung und Codecs kommen aus seinen Einträgen, nicht aus erfundenen Formatfeldern. Ein vorhandener, aber ungültiger oder verweigerter Master führt zum Fehler und wird nicht durch HTTPS-Auswahl umgangen.
+
+Ohne HLS-Master wählt [YouTubeAdaptiveSourceBudget](../YouTubeAdaptiveSourceBudget.cs) echte HTTPS-Repräsentationen, bevorzugt AVC/AAC. Eine begrenzte Bytebereichsprobe misst die Server-CDN-Strecke; unbekannte oder zu schwache Kapazität führt zu einer konservativen Auswahl. Video plus Audio zählen zum Budget. Gemeinsame Probes, Cache, Warteschlange, Datenmenge und Frist sind begrenzt. Auch das ist eine Startentscheidung und kein fortlaufender Qualitätswechsel. Ungültige Quellen oder inkompatible Formate lösen keinen Rückfall in die YouTube-App aus.
+
+Signierte HLS-URLs besitzen eine begrenzte Gültigkeit. Der kurze Resolvercache verhindert ihre unbegrenzte Wiederverwendung bei neuen Starts; ein bereits laufender HLS-Auftrag erneuert seine eingebetteten URLs jedoch nicht automatisch. Ein stundenlanger Wiedergabetest und die Wiederaufnahme nach Ablauf sind daher eigene Prüffälle, keine durch das Start-Gate bewiesene Eigenschaft.
+
+Die HLS-Auswahl filtert unterstützte AVC-Varianten bis 1080p vor der Qualitätsrangfolge. Eine daneben angebotene höhere VP9-/WebM-Variante blockiert somit passendes AVC-HLS nicht. Fehlgeschlagene Messungen ergeben eine ausdrücklich konservative Startwahl, während ungültige Medienidentität oder ein beschädigter Master weiterhin Fehler bleiben.
+
+[YouTubeDirectRangeProxy](../YouTubeDirectRangeProxy.cs) vermittelt ausgewählte HTTPS-Dateiquellen innerhalb des Emby-Prozesses über einen ausschließlich an Loopback gebundenen HTTP-Listener. Hintergrund: Bestimmte YouTube-CDNs lehnen offene oder zu große Bytebereiche mit HTTP 403 ab; das installierte FFmpeg 5.1 kann diese Abrufe nicht selbst in kleine Anfragen aufteilen. Der Adapter übersetzt normale GET-/HEAD-/Range-Anfragen in begrenzte Teilabrufe, ohne das gesamte Video vorab herunterzuladen. Undurchsichtige registrierte Quellpfade ersetzen die signierten Adressen im nativen Encoder. Es gibt keinen frei übergebenen URL-Parameter, keinen öffentlichen Plugin-Endpunkt und keinen vollständigen Mediendatei-Cache. Der genaue Range-, Größen-, Ablauf- und Abbruchvertrag ist im Adapter implementiert und separat zu testen; ein erfolgreicher Download des ersten Blocks beweist keine funktionierende Wiedergabe nach einem Seek.
+
+`DirectPlaybackH264MaxHeight` ist eine zusätzliche serverseitige Ausgabegrenze für H.264, keine niedrigere Quellwahl. Sie kann kleiner als die normale Grenze eingestellt werden. Alle nativen YouTube-Ausgabecodecs bleiben dennoch unter der allgemeinen 1080-Grenze. Der Postfix auf `EncodingHelpers.ApplyCodecResolutionLimits` greift nach der tatsächlichen Codec-Auswahl und begrenzt lokale Auflösungsoptionen; Geräteprofile und Stream-URLs werden nicht umgeschrieben. Strengere Clientgrenzen und fremde Medien bleiben unverändert. Der native Encoder erhält die Seitenverhältnisse innerhalb der begrenzten Abmessungen. Änderungen gelten für neue Encoding-Aufträge, nicht als ungefragter Eingriff in einen laufenden Encoder.
+
+Ein Prefix auf `BaseStreamingService.GetOutputVideoCodec` bevorzugt für validierte eigene Direktquellen H.264, sofern der Client es tatsächlich ankündigt. Er legt eine neue auftragslokale Codec-Liste an, ohne Fähigkeiten hinzuzufügen. Der originale Emby-Selektor, Untertitelbehandlung und strengere H.264-Grenzen bleiben maßgeblich; fremde Medien und gemeinsam genutzte Profile werden nicht verändert. Anlass ist ein reproduzierter HEVC-Ausgabepfad, dessen 1080p-Quelle als 1088 Zeilen mit grünem unteren Rand ausgegeben wurde. Die Kompatibilitätswahl repariert nicht pauschal den zugrunde liegenden Treiber und ersetzt keinen Gerätetest.
+
+Die Audio-Hooks auf `EncodingHelpers.GetOutputAudioCodec` und `GetNumAudioChannelsParam` gelten ebenfalls nur für kanonische Direktquellen mit zusätzlich geprüftem Pfadbesitz. Für bekannte Mono-/Stereospuren und unbekannte Kanalangaben wird vorhandenes AAC in einer neuen Argumentliste bevorzugt; die originale Emby-Auswahl einschließlich Copy-Prüfung bleibt aktiv. Bekannte Monoquellen bleiben einkanalig, Stereo bleibt höchstens zweikanalig, kleinere native/Clientgrenzen bleiben erhalten. Unbekannte Kanäle erhalten eine zweikanalige Ausgabeobergrenze, keine erfundenen Quellmetadaten: HLS kann CHANNELS weglassen, worauf Emby sonst sechs Kanäle und AC3 wählen kann. Unbekannter tatsächlicher Monoton kann bei dieser Fallback-Regel trotzdem zweikanalig ausgegeben werden. Erkannter Mehrkanalton erhält keine zusätzliche Zweikanalgrenze; Copy-Ausgabe und fremde Medien behalten ihre native Behandlung.
+
+[YouTubeAudioTracks](../YouTubeAudioTracks.cs) gruppiert tatsächliche Audioidentitäten, wählt eine kompatible Repräsentation je Spur und vergibt stabile positive Indizes getrennt von der Videospur. Explizit belegte Originalspuren werden bevorzugt; andernfalls bleibt YouTubes Default maßgeblich. Sprache allein beweist weder Original noch KI-Synchronisation. Die Auswahl enthält höchstens 32 Spuren; Kollisionen und mehrdeutige Identitäten werden nicht still einer anderen Spur zugeordnet. HLS erzeugt getrennte private Video-/Audiomanifeste, HTTPS getrennte registrierte Fähigkeiten. Der native Mapping-Hook fügt ausschließlich den ausgewählten Audioeingang hinzu und übernimmt dessen Zeitbasis beim Fortsetzen und Spurwechsel. Nicht ausgewählte Spuren laden keine Medien. Der Range-Adapter begrenzt die Registry auf 1.024 Einträge; aktive Request- und Chunk-Grenzen steigen dadurch nicht.
+
+In Emby 4.10.2 ruft `AttachMediaSourceInfo` die Audiocodecauswahl vor dem Setzen von `EncodingJobInfo.MediaSource` auf. Der pfadgesicherte Audio-Hook darf dort noch nicht eingreifen; die angebotene Codec-Liste im Transcoding-Link bleibt vollständig. `PreferNativeYouTubeAudio` zieht deshalb für identifizierte native YouTube-Anfragen vorhandenes AAC schon in Video-/Streaming-/HLS-Profilen vor. Das geschieht nur in Kopien des Geräteprofils, seines Transcoding-Arrays und der geänderten Profilobjekte; unveränderte Felder, Codecbedingungen und kleinere Grenzen bleiben erhalten. Die Quellkanalzahl ist an diesem frühen Punkt noch unbekannt: AAC kann auch bei Mehrkanalton bevorzugt werden, sofern Embys originale Bedingungen es erlauben. Es wird keine AAC-Fähigkeit ergänzt. Ohne übergebenes Geräteprofil ist dieser frühe Schritt wirkungslos; tatsächlicher Link und Encoder müssen deshalb beide geprüft werden.
+
+`YouTubeDirectSeekCompatibility` gleicht bei getrennten Eingängen Startzeit und erlaubte HTTP-Optionen ab. Der Hook ist auf die genaue geprüfte Emby-Version 4.10.2.0 und die kanonische Direktquellen-ID begrenzt; bei inkompatiblen Runtime-Signaturen scheitert dieser Wiedergabeweg sichtbar. Andere Medienquellen bleiben unverändert. Eine bereits erzeugte Direktquelle behält ihre notwendige Synchronisierung auch nach Abschalten des globalen Schalters. Videostreamcopy wird für native YouTube-Starts nicht verwendet: unterschiedliche Keyframe-Anfänge können beim Spulen trotz gleicher `-ss`-Werte Bild und Ton versetzen. Dies verursacht echte Transcoding-Last. Auch `SupportsDirectPlay` und `SupportsDirectStream` sind aus: der native `original.hls`-Pfad würde den privaten Master unverändert ausliefern und kann die angeforderte Startposition sowie die externe Untertitel-Zeitbasis umgehen. Der Direktmodus benutzt daher ausschließlich Embys Transcoding-Zeitachse, ohne wiederholte nachträgliche Seek-Kommandos.
+
+Für private HLS-Manifeste setzt derselbe Hook eine eng begrenzte FFmpeg-Protokollfreigabe. Die Quellen-ID allein genügt nicht: Container, Dateiprotokoll, tatsächlicher Eingangspfad, eigener Manifestordner, SHA-Dateiname und fehlende Symlinks müssen übereinstimmen. Ohne diese Freigabe erlaubt FFmpeg bei einer lokalen Manifestdatei keine eingebetteten HTTPS-Abrufe. Der PlaybackInfo-Postfix entfernt außerdem statische Watch-Quellen ausdrücklich: Emby fängt Fehler dynamischer Channel-Provider ab und würde sonst trotz fehlgeschlagener Auflösung den gespeicherten Watch-Link zurückgeben.
+
+Falls eine angepasste Serverlaufzeit `FastVodSegmentLengthPolicy` enthält, erhält ein optionaler, genau gebundener Hook für validierte Direktquellen die ursprüngliche Segmentdauer. Diese vorhandene Anpassung konnte nach der H.264-Auflösungsbegrenzung drei Sekunden auf eine Sekunde verkürzen, ohne die Wiedergabeliste passend zu ändern: Segment 40 bedeutete dadurch 40 statt 120 Sekunden. Die Korrektur verändert weder normale Medien noch Stock-Emby ohne diese Zusatzklasse. Ein Seek-Test muss deshalb Playlist, Encoder-Eingangspositionen und tatsächlich erzeugte Zeitstempel gemeinsam prüfen.
+
+[YouTubeDirectSubtitles](../YouTubeDirectSubtitles.cs) lädt vorhandene originale manuelle und automatisch erzeugte Untertitel als geprüfte VTT-Dateien. Automatische Übersetzungsvarianten werden nicht vervielfacht. Inhaltsadressierte Dateien werden nicht unter laufenden Lesern überschrieben. Sprach-/Track-Identitäten erhalten deterministische positive Int32-Indizes; erkannte Hashkollisionen werden vollständig ausgelassen. Cache, Spuranzahl, Parallelität und Abrufzeiten sind begrenzt. Bei unbekanntem Sessionzustand wird nicht aggressiv aufgeräumt. Emby erhält normale externe Subtitle-Tracks; Auswahl und `-1` für Aus bleiben Benutzer-/Cliententscheidung. Eingebrannter Text im Videobild kann dadurch nicht entfernt werden.
+
+[YouTubeCaptionNormalizer](../YouTubeCaptionNormalizer.cs) erzeugt aus YouTube-VTT eine einfache VTT-Darstellung ohne Karaoke-Zeitstempel und Layout-Markup. Absolute Cuezeiten, Überlappungen und wiederholter gesprochener Text bleiben erhalten; Transport-Zeitstempel werden nicht erfunden. Syntaktisch gültige leere ASR-Cues werden ausgelassen, ohne die Endzeit anderer Cues zu verändern; fehlerhafte Zeitstempel oder Markups bleiben Fehler. Die Formatversion gehört zum Datei-Cache, nicht zur stabilen Spur-ID. Eine Normalisierung beweist noch keine sichtbaren Untertitel auf jedem Gerät.
+
+[YouTubeSubtitleDelivery](../YouTubeSubtitleDelivery.cs) wählt bei nachgewiesenen Direktquellen auf der geprüften Emby-Laufzeit 4.10.2.0 die native Texteinarbeitung statt des externen Client-Renderers. Geräteprofile werden nur auftragslokal kopiert; ein zusätzlich gesicherter `StreamBuilder.GetSubtitleStreams`-Hook deckt GET und nachträglich geladene Profile ab. Die Spurauswahl und Aus bleiben unverändert. Das ist ein Kompatibilitätsweg für Clients, die gültige VTT-Dateien abrufen, aber nicht anzeigen, kein Beweis für deren genaue Renderer-Ursache.
+
+Bei getrenntem Audio liegt Embys zusätzliche Untertitelquelle nicht mehr an Eingang 1. Ein eng begrenzter Hook auf `CreateTextSubtitleStreamSource` nimmt ausschließlich die neu hinzugefügte, pfadgeprüfte Caption-Quelle. Zusätzlich benutzt die eigene Caption-Demand Embys Legacy-libass-Renderpfad: Die native Hardware-Verarbeitungsplanung markiert nur diesen Schritt als Software; Download, Upload, Zeitstempel und Hardware-Encoding bleiben in Embys Pipeline. Einträge fremder Medien oder fremde Caption-Pfade bleiben unangetastet. Erst wenn sämtliche exakten Signaturen gebunden sind, wird diese Policy aktiviert; sonst wird die Unverfügbarkeit protokolliert und die bisherige externe Zustellung bleibt erhalten. Ausgewählte Untertitel werden so Teil des erzeugten Bildes, können aber über einen neuen nativen Encoding-Auftrag wieder ausgeschaltet werden. Das kann beim Umschalten einen kurzen Neuaufbau der Wiedergabe erfordern.
+
+[YouTubeDirectMetadata](../YouTubeDirectMetadata.cs) übernimmt ausschließlich erlaubte Felder bereits erfolgreich aufgelöster Metadaten in einen begrenzten 15-Minuten-Cache. Lesen verlängert das Alter nicht. Fehlende Zähler bleiben unbekannt, während echte Nullwerte angezeigt werden dürfen. Aufrufe, Likes und Kommentare erhalten jeweils eine Zeile und vor der eigentlichen Beschreibung folgt eine Leerzeile. Browsing löst dafür keine zusätzlichen Medienauflösungen aus; bestehende API-Prüfungen für Verfügbarkeit und Region bleiben bestehen.
+
+Validierte YouTube-Kapitel werden als native `ChapterInfo` ausgegeben. Der verwaltete Resolver berücksichtigt echte Kapitelmarker einschließlich numerischer Zeichenketten und kann dafür höchstens einen zusätzlichen, begrenzten Watch-Seitenabruf verwenden. [YouTubeChapterDtoInterceptor](../YouTubeChapterDtoInterceptor.cs) projiziert bereits vorhandene Kapitel auf die tatsächlichen Item-DTOs, bevor der Client seine Detailseite zwischenspeichert; dieser Hook startet keine Netzwerkanfrage. Wenn noch keine Resolver-Kapitel vorliegen, erkennt [YouTubeDescriptionChapters](../YouTubeDescriptionChapters.cs) ausschließlich einen zusammenhängenden Kapitelblock mit mindestens drei benannten, aufsteigenden Zeitmarken ab null und mindestens zehn Sekunden je Kapitel. Beliebige einzelne Zeitcodes oder Links werden nicht in Kapitel umgedeutet. [YouTubeChapterSync](../YouTubeChapterSync.cs) kann Kapitel zusätzlich am exakt identifizierten Kanal-Item hinterlegen. Besitzfingerprints, Herkunft und eine eng begrenzte ursprüngliche Kapitelkopie schützen manuell bearbeitete oder gelöschte Kapitel; Intro-/Credit-Marker werden nicht als gewöhnliche Kapitel ersetzt. Validierte Resolver-Kapitel werden nach einem Cacheablauf nicht durch den Beschreibungs-Fallback herabgestuft. Fehlende Extraktionsdaten sind kein Löschauftrag.
+
+`ApplyPreferredChapters` übernimmt anschließend geschützte Datenbankkapitel in die passende Wiedergabequelle. Eine leere Datenbank darf frisch aufgelöste Kapitel nicht verdrängen, außer ein Besitznachweis belegt eine manuelle Löschung. Ein erneuter Vergleich vor dem Speichern reduziert konkurrierende Bearbeitungsrennen, ersetzt aber keine atomare Datenbankoperation gegenüber fremden Editoren. Ob und wo eine konkrete App Kapitelknöpfe darstellt, bleibt ein eigener Clienttest.
+
+Die Kapitel-Besitzprüfung akzeptiert neben dem reinen Watch-Link auch die tatsächlich von `GetYouTubeWatchUrl` gespeicherten Parameter `playsinline=1&enablejsapi=1`. Host, Video-ID, Provider-/ExternalId-Tupel und restliche URL-Struktur bleiben eng geprüft. Ein Test nur mit einem vereinfachten Watch-Link deckt den produktiven Itempfad nicht ab.
+
+Tests gegen Embys PlaybackInfo müssen sowohl fehlende als auch passende und ausdrücklich fremde `MediaSourceId` abdecken. Beim manuellen Einschalten gehört die `CurrentPlaySessionId` der begonnenen Wiedergabe dazu. Ohne aktuelle Wiedergabesitzung setzt die Startregel den Index auf Aus; die Quellenbindung stellt sicher, dass diese Auswahl in die Verhandlung gelangt. Antwortauswahl, URL und tatsächliche Zustellung müssen zusammenpassen; bei Aus kann der native Default `null` beziehungsweise nicht serialisiert sein. Bei aktiver nativer Rendering-Policy bleibt ausgewählter Text `DeliveryMethod=Encode`; die tatsächliche Encoderausgabe muss das bestätigen. Die bestehende TV-Kompatibilität darf nicht allein aufgrund eines erfolgreichen Browser-Metadatentests entfernt werden. Weder eine angebotene Sprache noch HTTP 200 beweist sichtbaren Text: zusätzlich sind dekodierte Bilder, Cuezeit bei Resume und Off/On zu prüfen.
+
+Die Auslieferung benutzt Embys vorhandenen SubtitleService. In der tatsächlich geprüften Version 4.10.2.0 ist dessen `GetSubtitle`-DTO als `Unauthenticated` markiert; bekannte Subtitle-URLs waren auch ohne Token lokal abrufbar. Deshalb keine Authentifizierungszusage für diese native Route. Das Plugin fügt keinen eigenen öffentlichen Resolver oder beliebigen URL-Proxy hinzu und exportiert weder signierte Videoquellen noch Zugangsdaten über Caption-Dateien. Eine Änderung von Embys allgemeinem Zugriffsvertrag ist eine gesonderte Server-/Client-Kompatibilitätsaufgabe.
+
+Nach dem Umschalten müssen bereits geöffnete Apps vollständig neu geöffnet werden: ein zuvor geladener gepatchter YouTube-Player kann seine alte Playerauswahl sonst weiterverwenden. Der Direktmodus deaktiviert Dashboard-Umschreibungen, verspätete Resume-Kommandos und Caption-Off-Guard; API-Browsing, Such-/Playlistdaten und Metadaten bleiben unabhängig davon erhalten.
+
+## Cache, Quota und Playlist-Polling
+
+`TryGetCachedJsonAsync` prüft Memory-Cache, Disk-Cache, gemeinsam bearbeitete Cache-Misses und begrenzten veralteten Disk-Fallback. Eine Generation verhindert, dass ein alter laufender Request nach einer Invalidierung wieder gültige Cache-Daten einträgt. `GetJsonAsync` begrenzt und wiederholt echte Requests; genau dort zählt [QuotaTracker](../QuotaTracker.cs) jeden gesendeten Versuch. Cache-Treffer verbrauchen an dieser Stelle keine zusätzliche gezählte Quota.
+
+`InvalidateAllCache` löscht den Memory-Cache, lässt den Disk-Cache aber bestehen. `InvalidateCacheContaining` entfernt zusätzlich passende markierte Playlist-Dateien. Diese Verträge dürfen bei einer Änderung nicht verwechselt werden.
+
+Upload-Playlists (`UU…`) haben eine Frischezeit von 55 Minuten; andere normale
+Listen behalten sechs Stunden. Das verkürzt Cachealter, legt aber keinen neuen
+Emby-Zeitplan an. API-Antworten sind auf 4 MiB begrenzt; geheime Request-URLs
+werden weder als Memory-Schlüssel noch in Transportfehlermeldungen verwendet.
+
+Der Poller verwendet `GetPlaylistSnapshotFreshAsync` ohne Cache und vergleicht persistierte Fingerprints. Eine erstmalige Baseline benötigt keinen unnötigen Tiefenscan; Änderungen gegenüber einer vorhandenen Baseline lösen dagegen gezielte Invalidierung und Refresh aus. Teilresultate fehlgeschlagener Abrufe dürfen keine scheinbare Playlist-Änderung vortäuschen.
+
+## Alter Playerpfad: Resume und Untertitel
+
+Der folgende Abschnitt beschreibt den weiterhin vorhandenen, bei deaktiviertem Direktmodus verwendeten YouTube-Playerpfad. Er ist keine zusätzliche Resume- oder Subtitle-Schicht auf der nativen Direktwiedergabe.
+
+PlaybackInfo erfasst die explizite Startposition vor den Session-Ereignissen. `PluginEntryPoint` verarbeitet Start/Fortschritt/Stop, schützt Resume-Checkpoints und verwaltet zeitlich begrenzte Seek-Zustände. [YouTubeSessionCommandRouter](../YouTubeSessionCommandRouter.cs) prüft Session, Benutzer, Item und einen passenden aktiven Transport; nur eine eindeutig zugeordnete native Bridge ist zulässig. Die genaue PlaySession-/Generationszuordnung sichern `PluginEntryPoint` beziehungsweise `YouTubeCaptionOffGuard` zusätzlich ab. Eine spätere Änderung muss alte Ereignisse und einen inzwischen gewechselten Titel getrennt behandeln. Ein manueller nativer Seek ist nicht durchgehend zuverlässig erkennbar: Ein gewöhnliches `TimeUpdate` unterscheidet Benutzeraktionen nicht sicher von automatischen Sprüngen, und die verwendete SDK-Oberfläche stellt kein allgemeines `SeekPositionTicks`-Signal bereit.
+
+Web/iframe und native Apps sind unterschiedliche Implementierungen. Der Dashboard-Interceptor verändert ausgewählte Originalressourcen zur Antwortzeit. Seine String-Muster müssen gegen die wirklich verwendeten Emby-Bundles getestet werden; ein erfolgreicher C#-Build beweist keinen passenden JavaScript-Patch. Die aktuelle und die ältere Signatur des Web-Subtitle-Setters besitzen getrennte Patchpfade. `PlayerPatchHelpers` und `IframeTeardownHelper` sind JavaScript in C#-Konstanten und werden zusätzlich mit Acorn erfasst; auch das vollständige Legacy-Helfermuster wird als Payload indexiert. Andere Replacement-Strings sind oft nur Fragmente fremder Bundles; die Karte ordnet sie ihren C#-Patchmethoden zu, statt einen nicht vorhandenen vollständigen Bundle-Quelltext zu erfinden.
+
+[YouTubeEmbed.html](../YouTubeEmbed.html) besitzt den Player und den gleichursprünglichen Nachrichtenkanal zum Parent, einschließlich Status, Autoplay-Behandlung und Aufräumen. [YouTubeCaptionOffGuard](../YouTubeCaptionOffGuard.cs) sendet playerbezogene native Befehle, ändert aber keine Benutzerpräferenz. Ein erfolgreicher Send ist kein Nachweis ausgeschalteter sichtbarer Untertitel. [YouTubeCaptionMetadata.cs](../YouTubeCaptionMetadata.cs) ist ausdrücklich vom Build ausgeschlossen; ihre Existenz bedeutet keine aktive Caption-Track-Unterstützung.
+
+## Home, Bilder und Wartungsreste
+
+[YouTubeHomeSectionManager](../YouTubeHomeSectionManager.cs) erzeugt optionale kanalbezogene Startseitenzeilen je Benutzer. Er prüft sichtbare/materialisierte Kanalwurzeln, verwendet eigene IDs und entdeckt schreibende APIs zur Laufzeit. Migrationen für alte Aggregate und Filter besitzen Sicherungs-/Besitzdaten. Eine fehlende Runtime-Funktion oder vorübergehend nicht materialisierte Wurzel ist kein Auftrag, fremde Benutzerzeilen zu entfernen.
+
+[YouTubeImageProvider](../YouTubeImageProvider.cs) identifiziert Plugin-Videos über die Kombination aus Watch-Pfad, Provider-ID und ExternalId; andere YouTube-Trailer sind nicht automatisch Pluginbesitz. Der [Episode-Provider](../YouTubeEpisodeMetadataProvider.cs) und ItemUpdated-Hooks ergänzen die Bildwiederherstellung. [YouTubeSortNameRepairer](../YouTubeSortNameRepairer.cs) hält die Sortierung über eine deduplizierte, scanbewusste Warteschlange aktuell. `LogPublic` schreibt zusätzlich über [PluginFileLog](../PluginFileLog.cs) in ein begrenzt rotierendes Diagnoseprotokoll.
+
+`ResetCrossFolderSeen()` ist nur noch ein leerer Kompatibilitätsaufruf. `HideShorts` hingegen ist weiterhin relevante Alt-Konfiguration mit Migration. `Configuration/guide/step6.png` bleibt durch den Resource-Glob eingebettet, obwohl die aktuelle Guide-Seite den Dateinamen nicht referenziert. Dokumentations-Screenshots sind keine eingebetteten Pluginressourcen; `thumb.png` ist eingebettet und wird daneben ins Build-Output kopiert.
+
+## Wo anfangen, wenn …
+
+| Änderung | Zuerst ansehen | Gemeinsam prüfen |
+|---|---|---|
+| Neues Setting | Konfigurationsklasse, DTO, HTML/JS | Normalisierung, Hash, Roundtrip, Refresh |
+| Ordnerstruktur | Folders, GetChannelItems | IDs, DataVersion, Home, Refreshtiefe |
+| Metadaten/Stats/Filter | Mapping, Enrichment | Cachealter, Playability, Shorts/live |
+| Resume | PlaybackIntentInterceptor, EntryPoint | Identität, Router, Checkpoints, späte Ereignisse |
+| Native Qualität/Seek | Channel.DirectPlayback, DirectManifest | Geräteeigenschaften, getrennte Audioeingänge, genaue Runtime-Signatur, tatsächliche FFmpeg-Ausgabe |
+| Native Untertitel | DirectSubtitles, SubtitleDelivery, DirectHttp | Stabiler Trackindex, Caption-Eingang neben Audio, native Renderplanung, tatsächliche Bildpixel und Cuezeit, Auswahl/Aus, aktive Cachedateien |
+| Medienauflösung | StreamResolver, ManagedResolver, ManagedHttp, DirectHttp | Gemeinsame Auflösungen, Abbruch, signierte URL-Laufzeit, Netzwerkfamilie, begrenzte Warteschlange und Ablehnungspausen |
+| HTTPS-Teilabrufe/403 | DirectRangeProxy, DirectHttp | Registrierte Loopback-Quellen, exakte Bytebereiche, Format-/Größenidentität bei Erneuerung, Abbruch und Speichergrenzen |
+| Webplayer/Caption-UI | Dashboard-Interceptor, Embed | Aktuelle und ältere Bundle-Formen, Nicht-YouTube-Fälle |
+| Native Caption-Policy | CaptionOffGuard | Tatsächliche Client-Unterstützung, keine Preference-Schreibvorgänge |
+| Cache/Requests | YouTubeApi, HttpClientFactory, QuotaTracker | Abbruch, Coalescing, Invalidierung, Versuche zählen |
+| Home-Zeilen | HomeSectionManager | Besitz-IDs, Runtime-Capability, Backups |
+| Bild/Sortierung | Provider, Repairer, EntryPoint | Pluginidentität, Scan-/Schreibkoordination |

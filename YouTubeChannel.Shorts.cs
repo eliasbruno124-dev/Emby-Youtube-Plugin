@@ -437,17 +437,6 @@ namespace Emby.YouTubePlugin
             {
                 var url = $"https://www.youtube.com/channel/{channelId}/shorts";
                 var html = await GetShortsPageHtmlAsync(url, cancellationToken).ConfigureAwait(false);
-                var usedExternalFallback = false;
-                if (!IsUsableShortsPage(html))
-                {
-                    var fallbackHtml = await TryGetShortsPageHtmlWithExternalToolAsync(url, cancellationToken)
-                        .ConfigureAwait(false);
-                    if (IsUsableShortsPage(fallbackHtml))
-                    {
-                        html = fallbackHtml!;
-                        usedExternalFallback = true;
-                    }
-                }
 
                 if (!IsUsableShortsPage(html))
                     throw new InvalidOperationException("YouTube returned a consent, block, or incomplete Shorts page.");
@@ -469,11 +458,11 @@ namespace Emby.YouTubePlugin
                                         || html.IndexOf("\\\"videoId\\\":\\\"", StringComparison.Ordinal) >= 0;
                     var hasShortsPathMarker = html.IndexOf("/shorts/", StringComparison.Ordinal) >= 0
                                            || html.IndexOf("\\/shorts\\/", StringComparison.Ordinal) >= 0;
-                    Log($"[YT] Shorts page probe for {channelId}: 0 ids (html={html.Length}, videoIdMarker={hasVideoIdMarker}, shortsPathMarker={hasShortsPathMarker}, externalFallback={usedExternalFallback})");
+                    Log($"[YT] Shorts page probe for {channelId}: 0 ids (html={html.Length}, videoIdMarker={hasVideoIdMarker}, shortsPathMarker={hasShortsPathMarker})");
                 }
                 else
                 {
-                    Log($"[YT] Shorts page probe for {channelId}: {ids.Count} ids (externalFallback={usedExternalFallback})");
+                    Log($"[YT] Shorts page probe for {channelId}: {ids.Count} ids");
                 }
 
                 return new ChannelPageProbeResult(ids, true);
@@ -484,7 +473,7 @@ namespace Emby.YouTubePlugin
             }
             catch (Exception ex)
             {
-                Log($"[YT] Shorts page probe failed for {channelId}: {ex.Message}");
+                Log($"[YT] Shorts page probe failed for {channelId} ({ex.GetType().Name}).");
                 if (ShortsPageCache.TryGetValue(channelId, out var stale))
                 {
                     return new ChannelPageProbeResult(
@@ -509,128 +498,34 @@ namespace Emby.YouTubePlugin
 
         private static async Task<string> GetShortsPageHtmlAsync(string url, CancellationToken cancellationToken)
         {
+            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            deadline.CancelAfter(TimeSpan.FromSeconds(15));
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Referrer = new Uri("https://www.youtube.com/");
 
             using var response = await ShortsHttp.SendAsync(
                     request,
                     HttpCompletionOption.ResponseHeadersRead,
-                    cancellationToken)
+                    deadline.Token)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        private static async Task<string?> TryGetShortsPageHtmlWithExternalToolAsync(
-            string url,
-            CancellationToken cancellationToken)
-        {
-            foreach (var tool in new[] { "curl", "wget" })
+            const int maximumBytes = 4 * 1024 * 1024;
+            if (response.Content.Headers.ContentLength > maximumBytes)
+                throw new InvalidOperationException("YouTube channel page exceeds the size limit.");
+            using var stream = await response.Content.ReadAsStreamAsync(deadline.Token).ConfigureAwait(false);
+            using var body = new System.IO.MemoryStream();
+            var buffer = new byte[16 * 1024];
+            while (true)
             {
-                try
-                {
-                    var html = await RunShortsFetchToolAsync(tool, url, cancellationToken).ConfigureAwait(false);
-                    if (!string.IsNullOrWhiteSpace(html))
-                        return html;
-                }
-                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[YouTubeChannel] Shorts {tool} fallback failed: {ex.Message}");
-                }
+                int read = await stream.ReadAsync(buffer.AsMemory(0,
+                    Math.Min(buffer.Length, maximumBytes + 1 - (int)body.Length)), deadline.Token).ConfigureAwait(false);
+                if (read == 0) break;
+                body.Write(buffer, 0, read);
+                if (body.Length > maximumBytes)
+                    throw new InvalidOperationException("YouTube channel page exceeds the size limit.");
             }
-
-            return null;
-        }
-
-        private static async Task<string?> RunShortsFetchToolAsync(
-            string tool,
-            string url,
-            CancellationToken cancellationToken)
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = tool,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            if (string.Equals(tool, "curl", StringComparison.OrdinalIgnoreCase))
-            {
-                startInfo.ArgumentList.Add("-L");
-                startInfo.ArgumentList.Add("-sS");
-                startInfo.ArgumentList.Add("--max-time");
-                startInfo.ArgumentList.Add("15");
-                startInfo.ArgumentList.Add("-A");
-                startInfo.ArgumentList.Add(ShortsBrowserUserAgent);
-                AddCurlHeader(startInfo, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-                AddCurlHeader(startInfo, "Accept-Language: en-US,en;q=0.9,de;q=0.8");
-                AddCurlHeader(startInfo, "Cache-Control: no-cache");
-                AddCurlHeader(startInfo, "Pragma: no-cache");
-                AddCurlHeader(startInfo, "Referer: https://www.youtube.com/");
-                AddCurlHeader(startInfo, "Cookie: " + ShortsConsentCookie);
-                startInfo.ArgumentList.Add(url);
-            }
-            else
-            {
-                startInfo.ArgumentList.Add("-q");
-                startInfo.ArgumentList.Add("--timeout=15");
-                startInfo.ArgumentList.Add("--tries=1");
-                startInfo.ArgumentList.Add("-O");
-                startInfo.ArgumentList.Add("-");
-                startInfo.ArgumentList.Add("-U");
-                startInfo.ArgumentList.Add(ShortsBrowserUserAgent);
-                AddWgetHeader(startInfo, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-                AddWgetHeader(startInfo, "Accept-Language: en-US,en;q=0.9,de;q=0.8");
-                AddWgetHeader(startInfo, "Cache-Control: no-cache");
-                AddWgetHeader(startInfo, "Pragma: no-cache");
-                AddWgetHeader(startInfo, "Referer: https://www.youtube.com/");
-                AddWgetHeader(startInfo, "Cookie: " + ShortsConsentCookie);
-                startInfo.ArgumentList.Add(url);
-            }
-
-            using var process = Process.Start(startInfo);
-            if (process == null)
-                return null;
-
-            // net6.0 has no CancellationToken overload of ReadToEndAsync; the
-            // WaitForExitAsync below carries the cancellation, and the reads
-            // complete when the process exits.
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
-                catch { }
-                throw;
-            }
-            var stdout = await stdoutTask.ConfigureAwait(false);
-            await stderrTask.ConfigureAwait(false);
-
-            return process.ExitCode == 0 ? stdout : null;
-        }
-
-        private static void AddCurlHeader(ProcessStartInfo startInfo, string header)
-        {
-            startInfo.ArgumentList.Add("-H");
-            startInfo.ArgumentList.Add(header);
-        }
-
-        private static void AddWgetHeader(ProcessStartInfo startInfo, string header)
-        {
-            startInfo.ArgumentList.Add("--header");
-            startInfo.ArgumentList.Add(header);
+            return Encoding.UTF8.GetString(body.ToArray());
         }
 
         private static void ApplyShortsPageMatches(List<ChannelItemInfo> batch, HashSet<string> shortsVideoIds)

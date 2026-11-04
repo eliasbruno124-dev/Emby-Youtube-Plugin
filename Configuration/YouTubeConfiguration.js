@@ -724,6 +724,9 @@ define([
                     const config = this.config;
 
                     setValue(view, 'txtApiKey', config.ApiKey);
+                    setChecked(view, 'chkEnablePersonalApiKeys', config.EnablePersonalApiKeys === true);
+                    setChecked(view, 'chkEnablePersonalSubscriptions', config.EnablePersonalSubscriptions === true);
+                    setValue(view, 'selectPersonalChannelVisibility', config.PersonalChannelVisibility === 'Shared' ? 'Shared' : 'OwnUser');
                     this.savedItems = uniqueEntries(splitEntries(config.SavedItems));
                     this.watchLaterItems = uniqueEntries(splitEntries(config.WatchLaterPlaylist));
                     this.syncEntryFields(view);
@@ -743,6 +746,7 @@ define([
                     setValue(view, 'numMaxChannelVideos', config.MaxChannelVideos || 50);
                     setValue(view, 'numMaxSearchVideos', config.MaxSearchVideos || 50);
                     setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
+                    setChecked(view, 'chkDirectPlayback', config.DirectPlaybackEnabled !== false);
                     renderQuota(view, config);
                     setDonateButton(view);
                     setStatus(view, '');
@@ -791,6 +795,9 @@ define([
 
             const config = Object.assign({}, this.config || {});
             config.ApiKey = value(view, 'txtApiKey').trim();
+            config.EnablePersonalApiKeys = checked(view, 'chkEnablePersonalApiKeys');
+            config.EnablePersonalSubscriptions = checked(view, 'chkEnablePersonalSubscriptions');
+            config.PersonalChannelVisibility = value(view, 'selectPersonalChannelVisibility') === 'Shared' ? 'Shared' : 'OwnUser';
             this.syncEntryFields(view);
             config.SavedItems = this.savedItems.join(', ');
             config.WatchLaterPlaylist = this.watchLaterItems.join(', ');
@@ -807,7 +814,11 @@ define([
             config.MaxChannelVideos = numberValue(view, 'numMaxChannelVideos', 50, 1, 150);
             config.MaxSearchVideos = numberValue(view, 'numMaxSearchVideos', 50, 1, 150);
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
+            config.DirectPlaybackEnabled = checked(view, 'chkDirectPlayback');
             config.Donate = defaultDonateUrl;
+            delete config.YtDlpPath;
+            delete config.YtDlpJsRuntimePath;
+            delete config.YtDlpAutoUpdateEnabled;
             delete config.ShowRecentlyAdded;
             delete config.ShowLiveFolders;
             delete config.RecentlyAddedPerChannel;

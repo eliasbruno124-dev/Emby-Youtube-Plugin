@@ -13,7 +13,10 @@ namespace Emby.YouTubePlugin
         private record VideoMeta(
             string? Overview, DateTime? Premiere, int? Year,
             long? RuntimeTicks, string? ThumbUrl, DateTime CachedAt,
-            string? OriginalLang = null);
+            string? OriginalLang = null,
+            string? Description = null, long? ViewCount = null,
+            long? LikeCount = null, long? CommentCount = null,
+            bool HasEngagementMetadata = false);
 
         private static readonly ConcurrentDictionary<string, VideoMeta> MetaCache = new();
         private static readonly ConcurrentDictionary<string, ShortsPageCacheEntry> ShortsPageCache = new(StringComparer.Ordinal);

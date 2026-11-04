@@ -1,0 +1,7 @@
+{
+  "name": "emby-youtube-code-map-tools",
+  "private": true,
+  "description": "Development-only code map parser; not a plugin runtime dependency",
+  "engines": { "node": ">=18" },
+  "devDependencies": { "acorn": "8.8.1" }
+}

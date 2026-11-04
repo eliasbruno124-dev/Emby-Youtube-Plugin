@@ -3,6 +3,8 @@ obj/
 .vs/
 scripts/
 tests/
+.unlazy/
+.unlazy-hook-state.json
 .github/workflows/
 *.user
 *.suo

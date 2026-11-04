@@ -97,6 +97,20 @@ namespace Emby.YouTubePlugin
                 {
                     Name = "YouTubeConfigurationjs",
                     EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubeConfiguration.js"
+                },
+                new PluginPageInfo
+                {
+                    Name = "YouTubePersonal",
+                    DisplayName = "My YouTube",
+                    EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubePersonal.html",
+                    EnableInUserMenu = true,
+                    IsMainConfigPage = false,
+                    MenuIcon = "subscriptions"
+                },
+                new PluginPageInfo
+                {
+                    Name = "YouTubePersonaljs",
+                    EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubePersonal.js"
                 }
             };
         }
@@ -118,6 +132,7 @@ namespace Emby.YouTubePlugin
                 StringComparison.Ordinal);
 
             base.SaveConfiguration();
+            PluginEntryPoint.SuppressLegacyPlaybackForDirectMode();
 
             // Update the shared config hash so the polling loop doesn't
             // re-detect this same change and fire a duplicate refresh.
@@ -197,11 +212,17 @@ namespace Emby.YouTubePlugin
             {
                 YouTubeChannel.LogPublic($"[YT] Failed to initialize plugin paths: {ex.Message}");
             }
+            try { YouTubePersonalProfiles.Initialize(applicationPaths.DataPath); }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] Personal settings unavailable (" + error.GetType().Name + ").");
+            }
         }
 
         private static void NormalizeConfiguration(PluginConfiguration config)
         {
             config.ApiKey = (config.ApiKey ?? string.Empty).Trim();
+            config.PersonalChannelVisibility = config.PersonalChannelVisibility == "Shared" ? "Shared" : "OwnUser";
             config.SavedItems = (config.SavedItems ?? string.Empty).Trim();
             config.WatchLaterPlaylist = (config.WatchLaterPlaylist ?? string.Empty).Trim();
             config.TrendingRegion = (config.TrendingRegion ?? string.Empty).Trim().ToUpperInvariant();
@@ -214,6 +235,13 @@ namespace Emby.YouTubePlugin
             config.MaxChannelVideos = Math.Clamp(config.MaxChannelVideos, 1, 150);
             config.MaxSearchVideos = Math.Clamp(config.MaxSearchVideos, 1, 150);
             config.WatchLaterPollMinutes = Math.Clamp(config.WatchLaterPollMinutes, 1, 60);
+            // Playback runs inside Emby. Keep obsolete tool paths inactive;
+            // do not use them to change explicit playback preferences.
+            config.YtDlpPath = string.Empty;
+            config.YtDlpJsRuntimePath = string.Empty;
+            config.YtDlpAutoUpdateEnabled = false;
+            config.DirectPlaybackMaxHeight = YouTubeDirectQualityPolicy.ClampHeight(config.DirectPlaybackMaxHeight);
+            config.DirectPlaybackH264MaxHeight = YouTubeDirectQualityPolicy.ClampHeight(config.DirectPlaybackH264MaxHeight);
             if (config.HideShorts)
             {
                 config.ShowShorts = false;

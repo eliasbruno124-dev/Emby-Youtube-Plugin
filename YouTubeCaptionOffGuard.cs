@@ -63,8 +63,19 @@ namespace Emby.YouTubePlugin
             _sessionManager.PlaybackStopped += OnPlaybackStopped;
         }
 
+        internal void SuspendForDirectPlayback()
+        {
+            foreach (var state in _playbacks.Values)
+                CancelState(state);
+        }
+
         private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e)
         {
+            if (YouTubeDirectPlayback.Enabled)
+            {
+                SuspendForDirectPlayback();
+                return;
+            }
             try
             {
                 var session = e.Session;
@@ -97,6 +108,11 @@ namespace Emby.YouTubePlugin
 
         private void OnPlaybackProgress(object? sender, PlaybackProgressEventArgs e)
         {
+            if (YouTubeDirectPlayback.Enabled)
+            {
+                SuspendForDirectPlayback();
+                return;
+            }
             try
             {
                 if (IsDisposingOrDisposed())
@@ -139,7 +155,7 @@ namespace Emby.YouTubePlugin
                 var identity = state.Identity;
                 lock (state.Gate)
                 {
-                    if (state.Cancelled || state.Paused || IsDisposingOrDisposed()
+                    if (YouTubeDirectPlayback.Enabled || state.Cancelled || state.Paused || IsDisposingOrDisposed()
                         || !_playbacks.TryGetValue(identity.SessionId, out var active)
                         || !ReferenceEquals(active, state)
                         || !IsCurrentIdentity(identity, out var currentSession)
@@ -170,6 +186,8 @@ namespace Emby.YouTubePlugin
                         ControllingUserId = identity.UserId,
                         Arguments = new Dictionary<string, string> { ["Index"] = "-1" }
                     };
+                    if (YouTubeDirectPlayback.Enabled)
+                        return;
                     dispatch = _sessionManager.SendGeneralCommand(
                         identity.SessionId,
                         commandSessionId,
@@ -202,7 +220,7 @@ namespace Emby.YouTubePlugin
                 try
                 {
                     await Task.Delay(RetryDelay, _lifetimeCts.Token).ConfigureAwait(false);
-                    if (!IsDisposingOrDisposed())
+                    if (!YouTubeDirectPlayback.Enabled && !IsDisposingOrDisposed())
                         await TrySendCaptionOffAsync(state).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (_lifetimeCts.IsCancellationRequested)

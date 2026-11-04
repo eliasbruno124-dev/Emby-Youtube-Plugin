@@ -6,6 +6,26 @@ namespace Emby.YouTubePlugin
 {
     internal static class YouTubeSessionCommandRouter
     {
+        internal enum PlaybackItemMatch { Unavailable, Match, Mismatch }
+
+        internal static PlaybackItemMatch MatchPlaybackItem(SessionInfo session, long itemId)
+        {
+            if (itemId <= 0)
+                return PlaybackItemMatch.Mismatch;
+
+            var fullItem = session.FullNowPlayingItem;
+            if (fullItem != null)
+                return fullItem.InternalId == itemId ? PlaybackItemMatch.Match : PlaybackItemMatch.Mismatch;
+
+            var dtoId = session.NowPlayingItem?.Id;
+            if (string.IsNullOrEmpty(dtoId))
+                return PlaybackItemMatch.Unavailable;
+
+            return long.TryParse(dtoId, out var parsedId) && parsedId == itemId
+                ? PlaybackItemMatch.Match
+                : PlaybackItemMatch.Mismatch;
+        }
+
         // Android can report playback through the web layer while its native
         // bridge owns the socket under a second client name. Never broadcast a
         // command: use the playback session, or one unambiguous bridge belonging
@@ -28,7 +48,7 @@ namespace Emby.YouTubePlugin
                 string.Equals(s.Id, playbackSessionId, StringComparison.Ordinal));
             if (playback == null
                 || !string.Equals(playback.UserId, userId, StringComparison.Ordinal)
-                || playback.FullNowPlayingItem?.InternalId != itemId)
+                || MatchPlaybackItem(playback, itemId) != PlaybackItemMatch.Match)
                 return false;
 
             if (HasActiveTransport(playback, messageName))

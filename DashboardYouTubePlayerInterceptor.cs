@@ -112,6 +112,8 @@ namespace Emby.YouTubePlugin
 
         private static bool GetDashboardResourcePrefix(object __instance, object __0, ref Task<object> __result)
         {
+            if (YouTubeDirectPlayback.Enabled)
+                return true;
             try
             {
                 var resourceName = GetStringProperty(__0, "ResourceName");
@@ -308,6 +310,8 @@ namespace Emby.YouTubePlugin
 
         private static string PatchResource(string normalizedResourceName, string source)
         {
+            if (YouTubeDirectPlayback.Enabled)
+                return source;
             // Keep the shell patch narrow: app.js is only adjusted at the
             // YouTube-player registration site so browser-engine Theater/Xbox
             // clients load Emby's normal YouTube player instead of falling
@@ -447,6 +451,19 @@ namespace Emby.YouTubePlugin
         {
             if (source.Contains(PlaybackManagerPatchMarker, StringComparison.Ordinal))
                 return source;
+
+            // 4.10.2 uses an options object and getSubtitleChangeInfo instead of
+            // the legacy early remote-player branch. With no Emby subtitle
+            // streams that helper returns "none", so the owned YouTube player
+            // never receives an off command. Keep the complete known prefix
+            // exact; unfamiliar resource shapes must remain untouched.
+            const string currentBefore =
+                "self.setSubtitleStreamIndex=function(index,player,options){var subtitleChangeInfo=getSubtitleChangeInfo(this,getSubtitleStream(this,player=player||self._currentPlayer,index),player,null==options?void 0:options.RefreshMediaSource),currentIndex=this.getSubtitleStreamIndex(player);switch(subtitleChangeInfo.method){";
+            const string currentAfter =
+                "self.setSubtitleStreamIndex=function(index,player,options){if((player=player||self._currentPlayer)&&\"youtubeplayer\"===player.id&&-1===index&&\"function\"==typeof player.setSubtitleStreamIndex)return/*ytPluginCaptionCommand20260919*/player.setSubtitleStreamIndex(-1,options||{});var subtitleChangeInfo=getSubtitleChangeInfo(this,getSubtitleStream(this,player=player||self._currentPlayer,index),player,null==options?void 0:options.RefreshMediaSource),currentIndex=this.getSubtitleStreamIndex(player);switch(subtitleChangeInfo.method){";
+
+            if (source.Contains(currentBefore, StringComparison.Ordinal))
+                return source.Replace(currentBefore, currentAfter, StringComparison.Ordinal);
 
             const string before =
                 "self.setSubtitleStreamIndex=function(index,player,refreshMediaSource){if((player=player||self._currentPlayer)&&!player.isLocalPlayer)return player.setSubtitleStreamIndex(index,refreshMediaSource);";
@@ -1060,7 +1077,7 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
         private static string PluginVersion =>
             typeof(DashboardYouTubePlayerInterceptor).Assembly.GetName().Version?.ToString() ?? "0.0.0.0";
 
-        private const string DashboardPatchRevision = "20260919-youtube-web-caption-route-v15";
+        private const string DashboardPatchRevision = "20261026-youtube-web-caption-route-v16";
 
         private static string PluginCacheQueryPart =>
             $"ytplugin={PluginVersion}&ytpatch={DashboardPatchRevision}";

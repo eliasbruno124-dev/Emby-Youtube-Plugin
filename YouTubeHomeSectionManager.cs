@@ -128,7 +128,7 @@ namespace Emby.YouTubePlugin
                                 user,
                                 enabled,
                                 enabled && userEnabled,
-                                hasConfiguredChannels,
+                                hasConfiguredChannels || YouTubePersonalCatalog.HasContentFor(config, user.Id),
                                 cancellationToken)
                             .ConfigureAwait(false);
                     }

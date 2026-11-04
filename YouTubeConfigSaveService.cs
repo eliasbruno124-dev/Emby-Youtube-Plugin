@@ -132,12 +132,19 @@ namespace Emby.YouTubePlugin
                 throw new ArgumentException("Empty or invalid YouTube configuration payload.");
 
             lock (SaveLock)
+            lock (YouTubePersonalProfiles.SyncRoot)
             {
                 var config = plugin.Options;
+                if (dto.PersonalChannelVisibility != null
+                    && dto.PersonalChannelVisibility is not ("OwnUser" or "Shared"))
+                    throw new ArgumentException("Invalid personal channel visibility.");
 
                 // Only overwrite fields the page actually sent. Strings/numbers/bools
                 // are nullable on the DTO so a partial payload can't wipe other values.
                 if (dto.ApiKey != null) config.ApiKey = dto.ApiKey;
+                if (dto.EnablePersonalApiKeys.HasValue) config.EnablePersonalApiKeys = dto.EnablePersonalApiKeys.Value;
+                if (dto.EnablePersonalSubscriptions.HasValue) config.EnablePersonalSubscriptions = dto.EnablePersonalSubscriptions.Value;
+                if (dto.PersonalChannelVisibility != null) config.PersonalChannelVisibility = dto.PersonalChannelVisibility;
                 if (dto.SavedItems != null) config.SavedItems = dto.SavedItems;
                 if (dto.WatchLaterPlaylist != null) config.WatchLaterPlaylist = dto.WatchLaterPlaylist;
                 if (dto.ShowTrending.HasValue) config.ShowTrending = dto.ShowTrending.Value;
@@ -153,6 +160,9 @@ namespace Emby.YouTubePlugin
                 if (dto.MaxChannelVideos.HasValue) config.MaxChannelVideos = dto.MaxChannelVideos.Value;
                 if (dto.MaxSearchVideos.HasValue) config.MaxSearchVideos = dto.MaxSearchVideos.Value;
                 if (dto.WatchLaterPollMinutes.HasValue) config.WatchLaterPollMinutes = dto.WatchLaterPollMinutes.Value;
+                if (dto.DirectPlaybackEnabled.HasValue) config.DirectPlaybackEnabled = dto.DirectPlaybackEnabled.Value;
+                if (dto.DirectPlaybackMaxHeight.HasValue) config.DirectPlaybackMaxHeight = dto.DirectPlaybackMaxHeight.Value;
+                if (dto.DirectPlaybackH264MaxHeight.HasValue) config.DirectPlaybackH264MaxHeight = dto.DirectPlaybackH264MaxHeight.Value;
                 if (dto.Donate != null) config.Donate = dto.Donate;
 
                 // Reuse the plugin's own override: it normalizes/clamps the values,
@@ -186,15 +196,18 @@ namespace Emby.YouTubePlugin
             {
                 return JsonSerializer.Deserialize<ConfigDto>(json, JsonOptions);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
-                throw new ArgumentException($"Malformed YouTube configuration payload: {ex.Message}", ex);
+                throw new ArgumentException("Malformed YouTube configuration payload.");
             }
         }
 
         private sealed class ConfigDto
         {
             public string? ApiKey { get; set; }
+            public bool? EnablePersonalApiKeys { get; set; }
+            public bool? EnablePersonalSubscriptions { get; set; }
+            public string? PersonalChannelVisibility { get; set; }
             public string? SavedItems { get; set; }
             public string? WatchLaterPlaylist { get; set; }
             public bool? ShowTrending { get; set; }
@@ -210,6 +223,9 @@ namespace Emby.YouTubePlugin
             public int? MaxChannelVideos { get; set; }
             public int? MaxSearchVideos { get; set; }
             public int? WatchLaterPollMinutes { get; set; }
+            public bool? DirectPlaybackEnabled { get; set; }
+            public int? DirectPlaybackMaxHeight { get; set; }
+            public int? DirectPlaybackH264MaxHeight { get; set; }
             public string? Donate { get; set; }
         }
     }

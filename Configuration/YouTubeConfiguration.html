@@ -409,6 +409,35 @@
                     </div>
 
                     <div class="paper-card">
+                        <h2 style="margin-top: 0;">Personal Settings</h2>
+                        <div class="checkboxGroup">
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkEnablePersonalApiKeys" type="checkbox" />
+                                    <span>Allow personal API keys</span>
+                                </label>
+                                <div class="fieldDescription">Users can save their own key. Otherwise, the server key is used.</div>
+                            </div>
+                            <div>
+                                <label class="checkboxContainer">
+                                    <input is="emby-checkbox" id="chkEnablePersonalSubscriptions" type="checkbox" />
+                                    <span>Allow personal channels</span>
+                                </label>
+                                <div class="fieldDescription">Users can manage channels in their YouTube user settings.</div>
+                            </div>
+                        </div>
+                        <div class="selectContainer" style="margin-top: 1.25em;">
+                            <label class="selectLabel" for="selectPersonalChannelVisibility">Personal Channel Visibility</label>
+                            <select is="emby-select" id="selectPersonalChannelVisibility">
+                                <option value="OwnUser">Only the owner</option>
+                                <option value="Shared">All users</option>
+                            </select>
+                            <div class="fieldDescription">Applies to personal channels. API keys stay private in either mode.</div>
+                        </div>
+                        <div class="fieldDescription">Both permissions are off by default. Turning them off keeps saved personal settings.</div>
+                    </div>
+
+                    <div class="paper-card">
                         <h2 style="margin-top: 0;">Content</h2>
                         <div class="settingsStack">
                             <div class="inputContainer">
@@ -459,6 +488,18 @@
                                     Check interval in minutes. Default: 3. Shorter intervals use more API quota.
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="paper-card">
+                        <h2 style="margin-top: 0;">Playback</h2>
+                        <label class="checkboxContainer">
+                            <input is="emby-checkbox" id="chkDirectPlayback" type="checkbox" />
+                            <span>Use the Emby player</span>
+                        </label>
+                        <div class="fieldDescription">
+                            Native playback up to 1080p. Quality follows your Emby settings.
+                            Reopen the app after changing this option.
                         </div>
                     </div>
 
