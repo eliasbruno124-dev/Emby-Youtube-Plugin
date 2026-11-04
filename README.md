@@ -110,8 +110,9 @@ The resulting folders can also be browsed in native Emby clients; personal setti
 
 The administrator chooses **Only the owner** to keep these channels in each user's
 personal area, or **All users** to also add them to the common YouTube catalog.
-The **My YouTube** folder appears for an active owner-only profile, or in shared
-mode only with an enabled saved personal API key; the settings page stays available.
+With **All users**, there is no extra **My YouTube** folder, because the channels
+are already in the common list – unless a user has their own API key. The
+**My YouTube** settings page is always available.
 Personal browsing uses the user's enabled key when present, otherwise the server
 key. A failing personal key does not silently fall back to the server key; the
 shared catalog always uses the server key.
