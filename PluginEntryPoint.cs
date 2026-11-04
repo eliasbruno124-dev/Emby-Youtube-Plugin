@@ -240,6 +240,7 @@ namespace Emby.YouTubePlugin
             _userManager.UserCreated += OnHomeSectionUserChanged;
             _userManager.UserPolicyUpdated += OnHomeSectionUserChanged;
             QueueHomeSectionSync("plugin startup", TimeSpan.FromSeconds(15));
+            YouTubeRootMigration.Start(_libraryManager!, _lifetimeToken, upgradeRefreshQueued);
         }
 
         private void OnHomeSectionUserChanged(
@@ -250,6 +251,7 @@ namespace Emby.YouTubePlugin
             // item-share rows. A short delay makes GetUserViews observe the new
             // channel access instead of immediately reading the old shares.
             QueueHomeSectionSync("user access changed", TimeSpan.FromSeconds(2));
+            YouTubeRootMigration.TryRequest("user eligibility changed");
         }
 
         internal static void RequestHomeSectionSync(
@@ -2196,7 +2198,7 @@ namespace Emby.YouTubePlugin
                 {
                     try
                     {
-                        await Task.Delay(TimeSpan.FromMinutes(2)).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromMinutes(2), _lifetimeToken).ConfigureAwait(false);
                         if (string.IsNullOrWhiteSpace(Plugin.Instance?.Options.ApiKey))
                         {
                             YouTubeChannel.LogPublic("[YT] Skipping post-upgrade channel refresh; API key is not configured.");
@@ -2214,8 +2216,9 @@ namespace Emby.YouTubePlugin
                             $"[YT] Triggering post-upgrade channel refresh (depth {refreshDepth})");
                         // Yield to any channel scan Emby is already running near
                         // startup; an active scan already runs the new filtering code.
-                        await ChannelRefreshInvoker.TriggerRefreshAsync(
-                            refreshDepth, skipIfScanActive: true).ConfigureAwait(false);
+                        if (!YouTubeRootMigration.TryRequest("plugin upgrade", force: true))
+                            await ChannelRefreshInvoker.TriggerRefreshAsync(
+                                refreshDepth, skipIfScanActive: true).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -2255,7 +2258,7 @@ namespace Emby.YouTubePlugin
                 {
                     try
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(75)).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromSeconds(75), _lifetimeToken).ConfigureAwait(false);
                         if (string.IsNullOrWhiteSpace(Plugin.Instance?.Options.ApiKey))
                         {
                             YouTubeChannel.LogPublic("[YT] Skipping channel surface refresh; API key is not configured.");
@@ -2263,7 +2266,8 @@ namespace Emby.YouTubePlugin
                         }
 
                         YouTubeChannel.LogPublic("[YT] Triggering channel surface refresh");
-                        await ChannelRefreshInvoker.TriggerRefreshAsync(skipIfScanActive: true).ConfigureAwait(false);
+                        if (!YouTubeRootMigration.TryRequest("legacy surface migration", force: true))
+                            await ChannelRefreshInvoker.TriggerRefreshAsync(skipIfScanActive: true).ConfigureAwait(false);
                         TryWriteChannelSurfaceStamp(stampPath);
                     }
                     catch (Exception ex)
@@ -2485,7 +2489,8 @@ namespace Emby.YouTubePlugin
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] Cache invalidation failed: {ex.Message}"); }
 
             ct.ThrowIfCancellationRequested();
-            await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
+            if (!YouTubeRootMigration.TryRequest("detected configuration change"))
+                await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false);
         }
 
         private async Task PollWatchLaterPlaylists(
@@ -2749,6 +2754,7 @@ namespace Emby.YouTubePlugin
             SaveResumeCheckpoints();
             if (pollStopped)
                 _lifetimeCts.Dispose();
+            YouTubeRootMigration.Stop();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
             YouTubeDirectSeekCompatibility.Uninstall();
@@ -2771,7 +2777,7 @@ namespace Emby.YouTubePlugin
         // same lock so we never run two YouTube scans at the same time.
         private static readonly SemaphoreSlim RefreshGate = new(1, 1);
 
-        // True while Emby's RefreshChannelContent is actively persisting channel
+        // Counts tasks while Emby's RefreshChannelContent is actively persisting channel
         // items. The sort-name and image repair queues check this so they never
         // write to library.db at the same time as the refresh; concurrent writers
         // make SQLite fail with "Busy: database is locked" on macOS Emby.
@@ -2864,6 +2870,41 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        // Migration needs the real task outcome, not a queued request or the
+        // legacy120s tracking window. Hold the shared gate and activity unit
+        // through native completion, including cancellation during a slow task.
+        internal static async Task<bool> RefreshMaterializationAsync(CancellationToken cancellation)
+        {
+            await RefreshGate.WaitAsync(cancellation).ConfigureAwait(false);
+            bool ownsActivity = false;
+            try
+            {
+                cancellation.ThrowIfCancellationRequested();
+                if (!EnsureChannelManager()) throw new InvalidOperationException("Registered YouTube provider unavailable.");
+                // Native ChannelManager serializes this registered channel.
+                // Queue behind any older scan instead of treating a heuristic
+                // quiet-window timeout as a completed migration attempt.
+                cancellation.ThrowIfCancellationRequested();
+                Interlocked.Increment(ref _refreshActive); ownsActivity = true;
+                var task = _channelMgr!.RefreshChannelContent(_registeredChannel!, ContentRefreshDepth, null, cancellation)
+                    ?? throw new InvalidOperationException("Native channel refresh returned no task.");
+                await task.ConfigureAwait(false);
+                cancellation.ThrowIfCancellationRequested();
+                PluginEntryPoint.RequestHomeSectionSync("root materialization refresh completed");
+                return true;
+            }
+            finally
+            {
+                if (ownsActivity) Interlocked.Decrement(ref _refreshActive);
+                RefreshGate.Release();
+                if (Interlocked.Exchange(ref _refreshAgainRequested, 0) == 1)
+                {
+                    var maySkip = Volatile.Read(ref _nonSkippableRefreshRequested) == 0;
+                    _ = Task.Run(() => TriggerRefreshAsync(RootRefreshDepth, maySkip));
+                }
+            }
+        }
+
         private static async Task TriggerRefreshCoreAsync(int refreshDepth, bool skipIfScanActive = false)
         {
             try
@@ -2923,7 +2964,7 @@ namespace Emby.YouTubePlugin
                 // re-trigger Emby's own SaveItems "database is locked" (the empty
                 // home-screen symptom) — which retry/backoff cannot rescue
                 // because it is Emby's write, not ours, that fails.
-                Interlocked.Exchange(ref _refreshActive, 1);
+                Interlocked.Increment(ref _refreshActive);
                 var gateHandedOff = false;
                 try
                 {
@@ -2945,7 +2986,7 @@ namespace Emby.YouTubePlugin
                     _ = task.ContinueWith(
                         completedTask =>
                         {
-                            Interlocked.Exchange(ref _refreshActive, 0);
+                            Interlocked.Decrement(ref _refreshActive);
                             if (completedTask.Status == TaskStatus.RanToCompletion)
                             {
                                 PluginEntryPoint.RequestHomeSectionSync(
@@ -2976,7 +3017,7 @@ namespace Emby.YouTubePlugin
                     // or a synchronous throw before hand-off), drop it here so it
                     // can never stick.
                     if (!gateHandedOff)
-                        Interlocked.Exchange(ref _refreshActive, 0);
+                        Interlocked.Decrement(ref _refreshActive);
                 }
             }
             catch (Exception ex)

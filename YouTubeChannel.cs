@@ -43,7 +43,7 @@ namespace Emby.YouTubePlugin
         public string Name => "YouTube";
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
-        private const string ChannelDataRevision = "20261104-private-flat-roots-v1";
+        internal const string ChannelDataRevision = "20261104-private-flat-roots-v1";
 
         // Emby caches the channel's folders/items keyed by DataVersion and only
         // re-queries GetChannelItems when it changes. A constant version means a
@@ -88,6 +88,7 @@ namespace Emby.YouTubePlugin
                 return Msg(items, "ERROR: Plugin not initialized.");
 
             var config = plugin.Options;
+            var rootAttempt = string.IsNullOrEmpty(query.FolderId) ? YouTubeRootMigration.BeginRoot() : null;
             var apiKey = (config.ApiKey ?? "").Trim();
 
             ChannelRefreshInvoker.NoteChannelScanActivity();
@@ -107,7 +108,12 @@ namespace Emby.YouTubePlugin
                 if (string.IsNullOrEmpty(query.FolderId))
                 {
                     await AddPersonalRootsAsync(items, config, cancellationToken).ConfigureAwait(false);
-                    if (items.Count > 0) return ToResult(items);
+                    if (items.Count > 0)
+                    {
+                        var personalOnly = ToResult(items);
+                        YouTubeRootMigration.ObserveRoot(rootAttempt, personalOnly);
+                        return personalOnly;
+                    }
                 }
                 return Msg(items, "ERROR: Please configure a YouTube API Key in the plugin settings.");
             }
@@ -117,8 +123,9 @@ namespace Emby.YouTubePlugin
                 // Root: build the visible folders.
                 if (string.IsNullOrEmpty(query.FolderId))
                 {
-                    return await BuildRootItemsAsync(apiKey, config, cancellationToken)
-                        .ConfigureAwait(false);
+                    var root = await BuildRootItemsAsync(apiKey, config, cancellationToken).ConfigureAwait(false);
+                    YouTubeRootMigration.ObserveRoot(rootAttempt, root);
+                    return root;
                 }
 
                 // Subfolder: load videos or drop one more level.
@@ -166,6 +173,12 @@ namespace Emby.YouTubePlugin
             }
             catch (OperationCanceledException)
             {
+                throw;
+            }
+            catch (ChannelIdentityUnavailableException)
+            {
+                // Preserve existing roots: a message folder would be a valid
+                // replacement list to the native materialization algorithm.
                 throw;
             }
             catch (Exception ex)

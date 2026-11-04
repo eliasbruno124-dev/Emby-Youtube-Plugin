@@ -40,6 +40,10 @@ Mode and subscription changes
 revoke old folder permissions before any refresh. Moving to flat owner roots changes
 Emby's materialized item IDs, so saved deep links to the former folder may expire.
 The plugin does not migrate existing native item user data to the new IDs.
+At startup and after relevant settings changes, an outdated root layout is
+refreshed automatically and checked against the stored root IDs. If that refresh
+fails, it is not repeated continuously. Administrators can also run Emby's
+**Refresh Internet Channels** task to materialize the current layout.
 
 Native visibility is checked against the server's actual query and DTO methods.
 Runtime-hook and SQL tests use Emby Server 4.10.2.0, Linux x64. They do not replace

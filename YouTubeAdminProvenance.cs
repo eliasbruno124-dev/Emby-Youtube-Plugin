@@ -43,6 +43,21 @@ internal static class YouTubeAdminProvenance
             && state.Mappings.Values.Contains(legacyId.Substring("channel_x_".Length), StringComparer.Ordinal);
     }
 
+    internal static string? KnownChannel(PluginConfiguration config, string handle)
+    {
+        var state = Volatile.Read(ref _state);
+        return state != null && state.Revision == Revision(config)
+            && state.Mappings.TryGetValue(Normalize(handle), out var id) ? id : null;
+    }
+
+    internal static string IdentityRevision(PluginConfiguration config)
+    {
+        var state = Volatile.Read(ref _state);
+        var revision = Revision(config);
+        return state?.Revision != revision ? revision : Convert.ToHexString(SHA256.HashData(
+            JsonSerializer.SerializeToUtf8Bytes(state.Mappings.OrderBy(pair => pair.Key, StringComparer.Ordinal).ToArray()))).ToLowerInvariant();
+    }
+
     internal static void Load(PluginConfiguration config)
     {
         if (YouTubePersonalRequestContext.Current != null) return;

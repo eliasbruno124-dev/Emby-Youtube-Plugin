@@ -310,6 +310,7 @@ internal static class YouTubePersonalCatalog
     private static void ProfilesChanged()
     {
         ReloadProfiles();
+        if (YouTubeRootMigration.TryRequest("personal settings changed")) return;
         var lifetime = _lifetime;
         if (lifetime == null || lifetime.IsCancellationRequested) return;
         CancellationToken token;

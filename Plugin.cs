@@ -159,6 +159,7 @@ namespace Emby.YouTubePlugin
             // Kick off a channel refresh right away so users see their changes
             // immediately. Serialized via ChannelRefreshInvoker so a flurry of
             // saves doesn't fan out into parallel scans.
+            if (YouTubeRootMigration.TryRequest("configuration save")) return;
             _ = System.Threading.Tasks.Task.Run(async () =>
             {
                 try { await ChannelRefreshInvoker.TriggerRefreshAsync(ChannelRefreshInvoker.ContentRefreshDepth).ConfigureAwait(false); }

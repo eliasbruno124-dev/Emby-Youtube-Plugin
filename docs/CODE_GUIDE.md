@@ -138,6 +138,61 @@ Disk-Cache und keinen veralteten Disk-Fallback. Die globale Quota zählt nur
 Versuche mit dem globalen Schlüssel. Echte HTTP-Anfragen übertragen den API-Key
 im Header, nicht in ihrer URL; Redirects sind für diese API-Anfragen deaktiviert.
 
+## Materialisierte Root-Struktur und Migration
+
+Eine neue `DataVersion` oder eine geänderte Sichtbarkeitsregel startet für sich
+keinen Scan. Der installierte Emby-Task `Refresh Internet Channels` fragt den
+Provider-Root direkt ab; sein Standardtrigger ist ein 24-Stunden-Intervall.
+Er ist der manuelle Weg für bereits vorhandene alte Materialisierungen.
+
+[YouTubeRootMigration](../YouTubeRootMigration.cs) startet im normalen
+`PluginEntryPoint.Run` nach der frühen Datenschutz-/Admin-Initialisierung.
+Konfigurationsspeicherung, Hashpoll, Profiländerung und Benutzerberechtigung
+melden Revisionen synchron an denselben Worker. Die älteren Upgrade-/Surface-
+Benachrichtigungen nutzen ihn ebenfalls; Playlist-Inhaltsrefreshes bleiben normal.
+[YouTubeRootMaterialization](../YouTubeRootMaterialization.cs) fasst wiederholte
+Meldungen zusammen. Pro angenommener Generation gibt es einen Versuch; ändert
+sich die Admin-Identitätsrevision während des Scans selbst, ist höchstens ein
+interner Abgleich je externer Meldung erlaubt. Instabile Daten ergeben keinen
+endlosen Wiederholungszyklus. Neue echte Revisionen dürfen neue Arbeit auslösen.
+
+Der stabile Revisionshash enthält Formatmarker, Channel-Datenrevision,
+Inhaltskonfigurationshash, bestätigte Admin-Zuordnungen und aktive Profil-Scopes/
+Revisionen/Beitragstokens. Die prozesslokale Katalogrevision gehört nur zur
+laufenden Epoche. Der Stempel `youtube-root-materialization-v1.json` enthält
+explizites Schema 1, Revisionshash und Fingerprint der Provider-Root-IDs; weder
+Keys noch Profile oder Kanalnamen werden darin gespeichert. Ein passender
+Stempel genügt nur zusammen mit einem frischen gleichen nativen Root-Fingerprint.
+Fehlender/alter/korrupt gewordener Stempel oder abweichende native IDs verlangen
+einen neuen Nachweis, auch bei unveränderter Assemblyversion.
+
+Der Provider erfasst seine Epoche vor dem globalen Rootaufbau und meldet danach
+dessen tatsächliche erwartete IDs. Persönliche Unterenumerationen, `msg`-Roots,
+falsche Modus-Wrapper und unaufgelöste `channel_x_@handle`-Platzhalter sind kein
+Nachweis. Der globale Admin-Builder darf einen positiv belegten kanonischen
+Admin-Handle-Fallback nutzen; fehlt auch dieser, wird die gezielte Ausnahme bis
+zum nativen Aufrufer durchgereicht. Ein Fehler-Ordner als Ersatzliste würde sonst
+gute bestehende Roots löschen. Persönliche Schlüssel werden dabei nicht ersetzt.
+
+Der Strict-Invoker fordert `RefreshChannelContent` für die registrierte
+YouTube-Instanz mit aktueller Content-Tiefe und null Top-Level-Restriktion an.
+Er teilt das Gate mit den normalen Refreshpfaden und wartet auf das echte Taskende;
+Emby serialisiert zusätzlich intern pro Kanal. Aktivitätszähler bleiben bis zum
+jeweiligen wirklichen Ende erhalten, auch über das alte 120-Sekunden-Tracking
+hinaus und bei Cancellation. Ein älterer Abschluss darf keinen jüngeren Scan
+als inaktiv markieren.
+
+Erst nach dem echten Ende liest die Migration userlos alle direkten nativen
+YouTube-Root-Rows mit explizit geladener `ExternalId`, ohne PresentationGrouping.
+Leere ExternalIds sind keine Provider-Rows und werden entsprechend Embys
+Retirement-Regel nicht mitverglichen. Alle übrigen IDs müssen exakt zum aktuellen
+beobachteten Provider-Ergebnis passen, bevor der Stempel atomar geschrieben wird.
+Cancellation und Revision werden erneut geprüft. Wegen nativer abgefangener
+Unterordnerfehler belegt der Stempel nur die Root-Struktur, nicht jede tiefe
+Videoliste oder einen fehlerfreien Netzwerkabruf. Bei Fehlern bleibt der Stempel
+aus; dieselbe Generation wiederholt nicht automatisch. Die Datenschutzfilter
+wirken während der ganzen Migration weiter, alte private IDs werden nicht geöffnet.
+
 ## Gemeinsame Ordner und Medien
 
 | Partial-Datei | Zuständigkeit |

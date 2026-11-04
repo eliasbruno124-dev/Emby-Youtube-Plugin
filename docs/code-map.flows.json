@@ -4,7 +4,7 @@
     {
       "id": "startup",
       "title": "Plugin discovery and lifecycle",
-      "summary": "Emby discovers plugin/providers/services; PluginEntryPoint connects runtime services, hooks, caches, workers and timers. Reflection targets remain runtime capabilities, not build guarantees. A dedicated pre-startup entrypoint installs personal visibility before HTTP is opened; operational jobs stay in ordinary startup. After catalog reset, early startup restores key-free admin handle identities and resolves missing mappings with a bounded cache-first bootstrap before HTTP opens; it does not depend on a provider root refresh.",
+      "summary": "Emby discovers plugin/providers/services; PluginEntryPoint connects runtime services, hooks, caches, workers and timers. Reflection targets remain runtime capabilities, not build guarantees. A dedicated pre-startup entrypoint installs personal visibility before HTTP is opened; operational jobs stay in ordinary startup. After catalog reset, early startup restores key-free admin handle identities and resolves missing mappings with a bounded cache-first bootstrap before HTTP opens; it does not depend on a provider root refresh. Normal startup then schedules one coordinated root-materialization migration independent of assembly-version stamps; success requires a current provider-root observation and matching fresh native rows after actual registered-provider refresh completion.",
       "sources": [
         "Plugin.cs",
         "PluginEntryPoint.cs",
@@ -14,13 +14,15 @@
         "ManagedResolver/License.txt",
         "YouTubePersonalStartup.cs",
         "YouTubeAdminProvenance.cs",
-        "YouTubeChannelProvenance.cs"
+        "YouTubeChannelProvenance.cs",
+        "YouTubeRootMigration.cs",
+        "YouTubeRootMaterialization.cs"
       ]
     },
     {
       "id": "configuration",
       "title": "Settings and refresh",
-      "summary": "The AMD view serializes autosaves to the custom Admin endpoint; Plugin normalizes/persists settings and refreshes only content-affecting changes using shared configuration hashing.",
+      "summary": "The AMD view serializes autosaves to the custom Admin endpoint; Plugin normalizes/persists settings and refreshes only content-affecting changes using shared configuration hashing. Saves/hash polls and profile eligibility changes signal the root coordinator synchronously. Legacy upgrade/surface notices share that coordinator; genuine playlist-content polling remains separate. Strict native refresh owns the shared gate/activity unit until true completion.",
       "sources": [
         "Configuration/YouTubeConfiguration.html",
         "Configuration/YouTubeConfiguration.js",
@@ -29,7 +31,9 @@
         "YouTubeConfigSaveService.cs",
         "PluginEntryPoint.cs",
         "YouTubeChannel.cs",
-        "GuideImageService.cs"
+        "GuideImageService.cs",
+        "YouTubeRootMigration.cs",
+        "YouTubeRootMaterialization.cs"
       ]
     },
     {
@@ -127,7 +131,7 @@
     {
       "id": "personal-settings",
       "title": "Optional per-user keys and channel subscriptions",
-      "summary": "Independent default-off admin switches enable authenticated, revision-checked personal profile writes. Bounded encrypted owner-only storage retains disabled values without using them. Scoped native channel folders preserve raw video identities; OwnUser isolates personal browsing and Shared adds channel union to the global catalog with its global key. Exact structural native query/view/DTO bindings gate new personal publication; unknown future runtime surfaces require revalidation. Explicit owner/revision request contexts isolate personal API memory/in-flight cache, disable disk/stale fallback, reject stale work and keep global quota separate. Keys travel in headers, never transport URLs. Local subscriptions do not sync Google account subscriptions. Plugin.GetPages registers personal HTML with EnableInUserMenu=true and IsMainConfigPage=true to match Emby Web's PluginConfiguration query; users open avatar -> App settings -> My YouTube. The plugin card excludes user-menu pages, preserving the admin settings target; page classification grants no administration rights. Personal roots are separate from shared contribution profiles: OwnUser subscriptions become flat owner-scoped channel roots; Shared requires an enabled saved personal key. OwnUser folder descendants retain the mode and contribution token, so mode/subscription changes revoke stale materialized entries without refresh; root listing, authorization and requests share this rule; settings navigation is unchanged. Shared contribution folder IDs carry explicit provenance. Unmarked legacy roots require current positive proof: pairwise global admin handle identities persist without keys, bound only to normalized admin SavedItems. Early startup loads them and explicitly resolves missing aliases with a 30-second total wait budget; unproven entries remain denied. Shared legacy proof stays separate and ephemeral. A RAM admin-ID union is not an identity proof. Snapshot-bound publication rejects stale refreshes. User DTOs clear cached counts on request-local item copies. No initial-absence shortcut bypasses later legacy checks. Global DTO/view guards default to pass-through for unrelated native entity types and unmarked missing/cyclic ancestry. Unknown ancestry is denied only with an observed provider prefix; known foreign folder trees pass. Request copies and user-state resets apply only to positively verified YouTube channel ancestry.",
+      "summary": "Independent default-off admin switches enable authenticated, revision-checked personal profile writes. Bounded encrypted owner-only storage retains disabled values without using them. Scoped native channel folders preserve raw video identities; OwnUser isolates personal browsing and Shared adds channel union to the global catalog with its global key. Exact structural native query/view/DTO bindings gate new personal publication; unknown future runtime surfaces require revalidation. Explicit owner/revision request contexts isolate personal API memory/in-flight cache, disable disk/stale fallback, reject stale work and keep global quota separate. Keys travel in headers, never transport URLs. Local subscriptions do not sync Google account subscriptions. Plugin.GetPages registers personal HTML with EnableInUserMenu=true and IsMainConfigPage=true to match Emby Web's PluginConfiguration query; users open avatar -> App settings -> My YouTube. The plugin card excludes user-menu pages, preserving the admin settings target; page classification grants no administration rights. Personal roots are separate from shared contribution profiles: OwnUser subscriptions become flat owner-scoped channel roots; Shared requires an enabled saved personal key. OwnUser folder descendants retain the mode and contribution token, so mode/subscription changes revoke stale materialized entries without refresh; root listing, authorization and requests share this rule; settings navigation is unchanged. Shared contribution folder IDs carry explicit provenance. Unmarked legacy roots require current positive proof: pairwise global admin handle identities persist without keys, bound only to normalized admin SavedItems. Early startup loads them and explicitly resolves missing aliases with a 30-second total wait budget; unproven entries remain denied. Shared legacy proof stays separate and ephemeral. A RAM admin-ID union is not an identity proof. Snapshot-bound publication rejects stale refreshes. User DTOs clear cached counts on request-local item copies. No initial-absence shortcut bypasses later legacy checks. Global DTO/view guards default to pass-through for unrelated native entity types and unmarked missing/cyclic ancestry. Unknown ancestry is denied only with an observed provider prefix; known foreign folder trees pass. Request copies and user-state resets apply only to positively verified YouTube channel ancestry. Root changes are coalesced by generation and persisted as a key-free hashed shape witness only after current observed IDs match all nonempty direct native ExternalIds. Stale/failed/msg/unresolved-channel output cannot stamp; filters remain active throughout. A bounded internal reconciliation covers identity discovery during a scan.",
       "sources": [
         "YouTubePersonalProfiles.cs",
         "YouTubePersonalService.cs",
@@ -148,7 +152,9 @@
         "Configuration/YouTubeConfiguration.js",
         "YouTubeChannelProvenance.cs",
         "YouTubePersonalStartup.cs",
-        "YouTubeAdminProvenance.cs"
+        "YouTubeAdminProvenance.cs",
+        "YouTubeRootMigration.cs",
+        "YouTubeRootMaterialization.cs"
       ]
     },
     {
