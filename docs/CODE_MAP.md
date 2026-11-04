@@ -3549,7 +3549,7 @@ Plugin Compile source (SDK default); 17601 bytes; 256 lines.
 <a id="file-6cc42489af7678da"></a>
 ## [YouTubeAdminProvenance.cs](../YouTubeAdminProvenance.cs)
 
-Plugin Compile source (SDK default); 9956 bytes; 186 lines.
+Plugin Compile source (SDK default); 9979 bytes; 187 lines.
 
 <details>
 <summary>All 107 declarations / anchors</summary>
@@ -3588,10 +3588,10 @@ Plugin Compile source (SDK default); 9956 bytes; 186 lines.
 | parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Normalize.term | [29:37](../YouTubeAdminProvenance.cs#L29) |
 | method | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms | [30:5](../YouTubeAdminProvenance.cs#L30) |
 | parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.config | [30:35](../YouTubeAdminProvenance.cs#L30) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1332 | [31:16](../YouTubeAdminProvenance.cs#L31) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1332.term | [31:16](../YouTubeAdminProvenance.cs#L31) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1493 | [32:69](../YouTubeAdminProvenance.cs#L32) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1493.term | [32:69](../YouTubeAdminProvenance.cs#L32) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1327 | [31:16](../YouTubeAdminProvenance.cs#L31) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1327.term | [31:16](../YouTubeAdminProvenance.cs#L31) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1488 | [32:69](../YouTubeAdminProvenance.cs#L32) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Terms.anonymous@1488.term | [32:69](../YouTubeAdminProvenance.cs#L32) |
 | method | Emby.YouTubePlugin.YouTubeAdminProvenance.Revision | [33:5](../YouTubeAdminProvenance.cs#L33) |
 | parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Revision.config | [33:37](../YouTubeAdminProvenance.cs#L33) |
 | method | Emby.YouTubePlugin.YouTubeAdminProvenance.Current | [35:5](../YouTubeAdminProvenance.cs#L35) |
@@ -3629,40 +3629,40 @@ Plugin Compile source (SDK default); 9956 bytes; 186 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.temporary | [109:17](../YouTubeAdminProvenance.cs#L109) |
 | local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.path | [112:17](../YouTubeAdminProvenance.cs#L112) |
 | local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes | [115:17](../YouTubeAdminProvenance.cs#L115) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6304 | [118:51](../YouTubeAdminProvenance.cs#L118) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6304.pair | [118:51](../YouTubeAdminProvenance.cs#L118) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6374 | [119:29](../YouTubeAdminProvenance.cs#L119) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6374.pair | [119:29](../YouTubeAdminProvenance.cs#L119) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.stream | [123:24](../YouTubeAdminProvenance.cs#L123) |
-| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.error | [129:15](../YouTubeAdminProvenance.cs#L129) |
-| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.error | [135:23](../YouTubeAdminProvenance.cs#L135) |
-| method | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync | [139:5](../YouTubeAdminProvenance.cs#L139) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.cancellation | [139:41](../YouTubeAdminProvenance.cs#L139) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7490 | [140:9](../YouTubeAdminProvenance.cs#L140) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7490.key | [140:16](../YouTubeAdminProvenance.cs#L140) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7490.handle | [140:21](../YouTubeAdminProvenance.cs#L140) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7490.token | [140:29](../YouTubeAdminProvenance.cs#L140) |
-| method | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync | [143:5](../YouTubeAdminProvenance.cs#L143) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.resolve | [143:47](../YouTubeAdminProvenance.cs#L143) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.timeout | [144:9](../YouTubeAdminProvenance.cs#L144) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.cancellation | [144:27](../YouTubeAdminProvenance.cs#L144) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.config | [146:98](../YouTubeAdminProvenance.cs#L146) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.snapshot | [147:13](../YouTubeAdminProvenance.cs#L147) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.revision | [149:13](../YouTubeAdminProvenance.cs#L149) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.state | [150:13](../YouTubeAdminProvenance.cs#L150) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing | [151:13](../YouTubeAdminProvenance.cs#L151) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing.anonymous@8326 | [153:20](../YouTubeAdminProvenance.cs#L153) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing.anonymous@8326.handle | [153:20](../YouTubeAdminProvenance.cs#L153) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.deadline | [160:19](../YouTubeAdminProvenance.cs#L160) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.token | [162:13](../YouTubeAdminProvenance.cs#L162) |
-| local-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve | [163:9](../YouTubeAdminProvenance.cs#L163) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.handle | [163:28](../YouTubeAdminProvenance.cs#L163) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.channelId | [167:21](../YouTubeAdminProvenance.cs#L167) |
-| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.error | [172:19](../YouTubeAdminProvenance.cs#L172) |
-| method | Emby.YouTubePlugin.YouTubeAdminProvenance.Report | [180:5](../YouTubeAdminProvenance.cs#L180) |
-| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.revision | [180:32](../YouTubeAdminProvenance.cs#L180) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.final | [182:13](../YouTubeAdminProvenance.cs#L182) |
-| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.available | [183:13](../YouTubeAdminProvenance.cs#L183) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6327 | [119:51](../YouTubeAdminProvenance.cs#L119) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6327.pair | [119:51](../YouTubeAdminProvenance.cs#L119) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6397 | [120:29](../YouTubeAdminProvenance.cs#L120) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.bytes.anonymous@6397.pair | [120:29](../YouTubeAdminProvenance.cs#L120) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.stream | [124:24](../YouTubeAdminProvenance.cs#L124) |
+| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.error | [130:15](../YouTubeAdminProvenance.cs#L130) |
+| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Persist.error | [136:23](../YouTubeAdminProvenance.cs#L136) |
+| method | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync | [140:5](../YouTubeAdminProvenance.cs#L140) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.cancellation | [140:41](../YouTubeAdminProvenance.cs#L140) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7513 | [141:9](../YouTubeAdminProvenance.cs#L141) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7513.key | [141:16](../YouTubeAdminProvenance.cs#L141) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7513.handle | [141:21](../YouTubeAdminProvenance.cs#L141) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.anonymous@7513.token | [141:29](../YouTubeAdminProvenance.cs#L141) |
+| method | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync | [144:5](../YouTubeAdminProvenance.cs#L144) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.resolve | [144:47](../YouTubeAdminProvenance.cs#L144) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.timeout | [145:9](../YouTubeAdminProvenance.cs#L145) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.cancellation | [145:27](../YouTubeAdminProvenance.cs#L145) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.config | [147:98](../YouTubeAdminProvenance.cs#L147) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.snapshot | [148:13](../YouTubeAdminProvenance.cs#L148) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.revision | [150:13](../YouTubeAdminProvenance.cs#L150) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.state | [151:13](../YouTubeAdminProvenance.cs#L151) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing | [152:13](../YouTubeAdminProvenance.cs#L152) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing.anonymous@8349 | [154:20](../YouTubeAdminProvenance.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.missing.anonymous@8349.handle | [154:20](../YouTubeAdminProvenance.cs#L154) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.deadline | [161:19](../YouTubeAdminProvenance.cs#L161) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.token | [163:13](../YouTubeAdminProvenance.cs#L163) |
+| local-function | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve | [164:9](../YouTubeAdminProvenance.cs#L164) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.handle | [164:28](../YouTubeAdminProvenance.cs#L164) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.channelId | [168:21](../YouTubeAdminProvenance.cs#L168) |
+| catch-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.BootstrapAsync.Resolve.error | [173:19](../YouTubeAdminProvenance.cs#L173) |
+| method | Emby.YouTubePlugin.YouTubeAdminProvenance.Report | [181:5](../YouTubeAdminProvenance.cs#L181) |
+| parameter | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.revision | [181:32](../YouTubeAdminProvenance.cs#L181) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.final | [183:13](../YouTubeAdminProvenance.cs#L183) |
+| local-variable | Emby.YouTubePlugin.YouTubeAdminProvenance.Report.available | [184:13](../YouTubeAdminProvenance.cs#L184) |
 
 </details>
 

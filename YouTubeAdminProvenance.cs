@@ -21,7 +21,7 @@ internal static class YouTubeAdminProvenance
     }
     private sealed class Document
     {
-        public int Schema { get; set; } = 1;
+        public int Schema { get; set; }
         public string Revision { get; set; } = "";
         public Entry[] Mappings { get; set; } = Array.Empty<Entry>();
     }
@@ -114,6 +114,7 @@ internal static class YouTubeAdminProvenance
             if (File.Exists(path) && (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) return;
             var bytes = JsonSerializer.SerializeToUtf8Bytes(new Document
             {
+                Schema = 1,
                 Revision = state.Revision,
                 Mappings = state.Mappings.OrderBy(pair => pair.Key, StringComparer.Ordinal)
                     .Select(pair => new Entry { Handle = pair.Key, ChannelId = pair.Value }).ToArray()

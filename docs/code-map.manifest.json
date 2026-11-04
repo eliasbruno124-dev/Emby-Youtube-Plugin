@@ -183,7 +183,7 @@
     },
     {
       "path": "YouTubeAdminProvenance.cs",
-      "sha256": "844be7e341215c57d8e12df9592c7551dca72f98129082783f207e9446e161e0"
+      "sha256": "c15ddaf25ca63cb8fef1360ecd9a79c09ecf6cfdca1f53fa28d80d773ae63bec"
     },
     {
       "path": "YouTubeApi.cs",
@@ -457,11 +457,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "069bc07b6a4a5fc6df80a1d4219c4a9e205fe4399a62b4290d04fc87b82d2f7b"
+      "sha256": "a00fe5582b5950498665182f319bd60f5fb58a0a03a0fe94f0ff3dc5ed94c1fe"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "b219fc80614afe19824740f8e962ceb8fc8166d8c6d0874cd6d46f0efe1dbef1"
+      "sha256": "1eea742c9a1133422c493b15e0aac73e520a7df5c9949de672910833c8d85e8a"
     }
   ],
   "parsers": {

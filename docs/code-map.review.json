@@ -11,7 +11,7 @@
         "ManagedResolver/Upstream.json": "e5b3bdbdf6e64ffe2a7f2df8246f52482c8536014cdf977dfff559f28c86d3fe",
         "Plugin.cs": "3b339c831531d432c0fe5f34a7be2a5ebd3e0aac390557642f142b713af16718",
         "PluginEntryPoint.cs": "805d48a9a4e6d08b30c790c129b51aa6a3054d775bd769b24099893ee2ec6390",
-        "YouTubeAdminProvenance.cs": "844be7e341215c57d8e12df9592c7551dca72f98129082783f207e9446e161e0",
+        "YouTubeAdminProvenance.cs": "c15ddaf25ca63cb8fef1360ecd9a79c09ecf6cfdca1f53fa28d80d773ae63bec",
         "YouTubeChannelProvenance.cs": "8e7bc3ec9f8d70d78bb3caab93775b58baf49103921d15e09d93a74d0d399aca",
         "YouTubePersonalStartup.cs": "bd27b9d41aa2f24ba40d41580677352872adaab0b6d7537b808de2a3c0f0f50a"
       }
@@ -129,7 +129,7 @@
         "Plugin.cs": "3b339c831531d432c0fe5f34a7be2a5ebd3e0aac390557642f142b713af16718",
         "PluginConfiguration.cs": "006e98b719c3fe198c3e9c0a1bd9d415fce9e2371f1a40335625aeb829c6cc12",
         "PluginEntryPoint.cs": "805d48a9a4e6d08b30c790c129b51aa6a3054d775bd769b24099893ee2ec6390",
-        "YouTubeAdminProvenance.cs": "844be7e341215c57d8e12df9592c7551dca72f98129082783f207e9446e161e0",
+        "YouTubeAdminProvenance.cs": "c15ddaf25ca63cb8fef1360ecd9a79c09ecf6cfdca1f53fa28d80d773ae63bec",
         "YouTubeApi.cs": "b1bbeeb8d642c3f020abc06e3661023bd457e045ff4045c61db9ed7ce3c24bdb",
         "YouTubeChannel.Folders.cs": "3d064a8ed731d484c0e531b20208c8ee6a00981442aec34953c8de323be6c0f8",
         "YouTubeChannel.Personal.cs": "786dc8e487be8bc554b41b710a660391f39a56c1f8287b43421806342a81fa82",
