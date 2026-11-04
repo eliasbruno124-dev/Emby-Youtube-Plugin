@@ -1,4 +1,18 @@
+<p align="center">
+  <img src="docs/social-preview.jpg" alt="Emby YouTube Plugin – YouTube channels, playlists, Shorts and Trending inside Emby" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin/releases/latest"><img src="https://img.shields.io/github/v/release/eliasbruno124-dev/Emby-Youtube-Plugin?label=release&color=52B54B" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/eliasbruno124-dev/Emby-Youtube-Plugin?color=555" alt="MIT license"></a>
+  <a href="https://emby.media"><img src="https://img.shields.io/badge/plugin%20for-Emby-52B54B" alt="Plugin for Emby"></a>
+</p>
+
 # Emby YouTube Plugin
+
+**YouTube, right inside Emby.** Add your favourite YouTube channels and
+playlists once, and they show up in Emby as folders – next to your movies and
+shows. Trending, categories and Shorts are there too.
 
 An Emby channel plugin for browsing YouTube content with the official YouTube Data API v3.
 
@@ -54,8 +68,9 @@ The API key only needs access to public YouTube data. After installation, open t
 
 ## Installation
 
-1. Download the latest `Emby.YouTubePlugin.dll` release.
-2. Copy the DLL into Emby's  `programdata/plugins` folder.
+1. Download [`Emby.YouTubePlugin.dll`](https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin/releases/latest/download/Emby.YouTubePlugin.dll)
+   from the [latest release](https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin/releases/latest).
+2. Copy the DLL into Emby's `programdata/plugins` folder.
 3. Restart Emby.
 4. Open the YouTube plugin settings.
 5. Use the **Setup Guide** tab to create a YouTube Data API v3 key.
@@ -100,7 +115,8 @@ other endpoints share the regular 10,000-unit daily bucket.
 
 ## Notes
 
-- Uses the official YouTube API and player. Videos are not downloaded or re-encoded.
+- Since 2.0.12, videos play natively in Emby (up to 1080p at 30 fps, with audio tracks, subtitles and chapters); the YouTube embed player remains available as an option. Native playback can use Emby's FFmpeg, like any other video.
+- Video information comes from the official YouTube Data API v3.
 - The plugin requests captions off, but some TV and Android players may ignore this.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.
 - Private account data is not supported. Use channels and playlists accessible with your API key.
