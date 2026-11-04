@@ -343,7 +343,7 @@
     },
     {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "19e22f58864db1d3170ed52ab752371d844a18d2ddf7db57748e98e34d39e977"
+      "sha256": "4eb23310f2d8e9772ee25faf23131d3db0dbb81272ca67e2d5ea7101873a7ca7"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -371,7 +371,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "b483d74fc99c5095fe370102c575c75cfbccc23bb93680be7c2a2b04d14c7bab"
+      "sha256": "8a5b8c7b7123bbf24c014f5ffdb76907e50495826ce4c4dd65fd7b7df965682e"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -383,7 +383,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "c18542f00f6c446d5cecdbb3f8e18f215574a5da6adba97370e0ad978e49c1e3"
+      "sha256": "5c518d31256be179d5c8f0dc5ddf69640cdd7460a325f34489b79ce747547ca2"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -453,11 +453,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "4f7f3e69f2736b9b2532263b6da1b0bed1cd5e5bcc72c22635b0057399eb1040"
+      "sha256": "8a12a0e1e6881c8d4a860ec57508cea1dba315c24c33e616acf4b18b4a7c92af"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "eaaa22b978bab4efeb452f39121066faa264b286f3bc18e642cb13ef04952cf3"
+      "sha256": "36d6c65afcc0ed9725af06a88582ef8c79599630e54dc313ae24d07c19b4b906"
     }
   ],
   "parsers": {

@@ -297,19 +297,27 @@ namespace Emby.YouTubePlugin
             if (state == null) return !LooksGuarded(item.ExternalId);
             long channel = state.ChannelId();
             var guarded = new List<string>();
+            bool providerHint = false;
             var seen = new HashSet<long>();
             var cursor = item;
             // Ownership is meaningful only inside this provider's verified tree.
-            while (cursor != null && cursor.InternalId != channel && seen.Add(cursor.InternalId))
+            while (cursor != null && (channel <= 0 || cursor.InternalId != channel) && seen.Add(cursor.InternalId))
             {
+                providerHint |= LooksGuarded(cursor.ExternalId);
                 if (IsGuarded(cursor, channel)) guarded.Add(cursor.ExternalId);
-                // Unknown ancestry for a marked/legacy channel folder cannot
-                // constitute proof that it is public. Other libraries pass.
-                if (cursor.ParentId <= 0) return cursor is Folder && !LooksGuarded(cursor.ExternalId);
+                // Parentless persons/genres/studios and incomplete unrelated
+                // trees are native Emby content, not evidence of private data.
+                // A provider-prefixed orphan remains denied. A complete known
+                // foreign folder tree wins over coincidentally matching IDs.
+                if (cursor.ParentId <= 0)
+                    return !providerHint || cursor is Folder && !LooksGuarded(cursor.ExternalId);
                 cursor = state.Lookup(cursor.ParentId);
             }
-            if (cursor?.InternalId != channel) return false;
-            return guarded.All(externalId => Allowed(state, externalId, userId));
+            if (channel > 0 && cursor?.InternalId == channel)
+                return guarded.All(externalId => Allowed(state, externalId, userId));
+            // Missing or cyclic ancestry only fails closed with an actual
+            // provider prefix on this item or one of its observed ancestors.
+            return !providerHint;
         }
 
         private static bool LooksGuarded(string? id) => id?.StartsWith(Prefix, StringComparison.Ordinal) == true

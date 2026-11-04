@@ -84,6 +84,15 @@ lokal verwaltete Kanäle, keine OAuth-Synchronisierung mit Google-Abos.
 [YouTubePersonalVisibility](../YouTubePersonalVisibility.cs) ergänzt Embys native
 benutzerbezogene Abfragen, promovierte Kanalwurzeln und Item-DTOs. SQL-Ausschlüsse
 greifen vor Zählung und Seiteneinteilung. Berechtigungen werden nicht zwischengespeichert.
+Die DTO-/View-Hooks laufen global, schränken aber ausschließlich nachgewiesene
+YouTube-Kanalitems ein. Elternlose Personen, Genres, Studios und andere fremde
+Items passieren unverändert; fehlende oder zyklische fremde Ahnen allein sind
+kein Sperrgrund. Nur ein Providerpräfix am Item oder einem beobachteten Ahnen
+sperrt eine ungeklärte Kette. Eine vollständig bekannte fremde Folder-/Kanalwurzel
+hat Vorrang vor zufällig gleichen Präfixen. Unmarkierte verwaiste Raw-Items sind
+ohne Herkunftsnachweis nicht als YouTube-Inhalt klassifizierbar und passieren.
+DTO-Kopien samt Zurücksetzen von Counts/UserDataSet entstehen nur bei positiv
+verifizierter YouTube-Kanalzugehörigkeit; fremde Iteminstanzen bleiben identisch.
 Alte unmarkierte `channel_x_`-Wurzeln werden ebenfalls geprüft; eine negative
 Anfangsprüfung überspringt spätere Prüfungen nicht. [YouTubeChannelProvenance](../YouTubeChannelProvenance.cs)
 markiert neue gemeinsame Beiträge samt Ordnernachkommen mit `personalshared_x_`.
