@@ -4,9 +4,10 @@ Administrators can enable **Personal API keys** and **Personal subscriptions**
 separately in the plugin settings. Both are off by default; existing shared keys
 and channels stay unchanged.
 
-Users then open **My YouTube** in Emby Web's user menu to save an API key or add
-channels by `@handle` or `UC…` channel ID. The resulting content uses normal Emby
-channel folders, including in native clients. Reload the client after the first
+Users open their avatar menu in Emby Web, choose **App settings**, then
+**My YouTube** under their personal settings to save an API key or add channels
+by `@handle` or `UC…` channel ID. Version 2.0.12.1 fixes the missing settings entry
+in 2.0.12.0. The resulting content uses normal Emby channel folders, including in native clients. Reload the client after the first
 refresh. The settings page itself is a web page, not a custom TV settings screen.
 
 **Own user** keeps added channels in that user's My YouTube area. **Shared** also

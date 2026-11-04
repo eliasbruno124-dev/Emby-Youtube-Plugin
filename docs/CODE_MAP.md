@@ -2234,7 +2234,7 @@ Plugin Compile source (SDK default); 77319 bytes; 1710 lines.
 <a id="file-5a2f4e90167632d0"></a>
 ## [Plugin.cs](../Plugin.cs)
 
-Plugin Compile source (SDK default); 12747 bytes; 286 lines.
+Plugin Compile source (SDK default); 12838 bytes; 287 lines.
 
 <details>
 <summary>All 79 declarations / anchors</summary>
@@ -2286,40 +2286,40 @@ Plugin Compile source (SDK default); 12747 bytes; 286 lines.
 | property | Emby.YouTubePlugin.Plugin.Options | [80:9](../Plugin.cs#L80) |
 | property | Emby.YouTubePlugin.Plugin.ThumbImageFormat | [82:9](../Plugin.cs#L82) |
 | method | Emby.YouTubePlugin.Plugin.GetPages | [84:9](../Plugin.cs#L84) |
-| method | Emby.YouTubePlugin.Plugin.SaveConfiguration | [118:9](../Plugin.cs#L118) |
-| local-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.contentChanged | [129:17](../Plugin.cs#L129) |
-| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [140:19](../Plugin.cs#L140) |
-| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [153:19](../Plugin.cs#L153) |
-| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [156:19](../Plugin.cs#L156) |
-| anonymous-function | Emby.YouTubePlugin.Plugin.SaveConfiguration.anonymous@7090 | [161:49](../Plugin.cs#L161) |
-| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.anonymous@7090.ex | [164:23](../Plugin.cs#L164) |
-| method | Emby.YouTubePlugin.Plugin.GetPluginInfo | [168:9](../Plugin.cs#L168) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.info | [170:17](../Plugin.cs#L170) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.assemblyDir | [171:17](../Plugin.cs#L171) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.thumbPath | [172:17](../Plugin.cs#L172) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.imageTag | [176:21](../Plugin.cs#L176) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.pngBytes | [182:21](../Plugin.cs#L182) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.imageDataUrl | [183:21](../Plugin.cs#L183) |
-| method | Emby.YouTubePlugin.Plugin.GetThumbImage | [190:9](../Plugin.cs#L190) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetThumbImage.type | [192:17](../Plugin.cs#L192) |
-| local-variable | Emby.YouTubePlugin.Plugin.GetThumbImage.stream | [193:17](../Plugin.cs#L193) |
-| method | Emby.YouTubePlugin.Plugin.InitializePaths | [197:9](../Plugin.cs#L197) |
-| parameter | Emby.YouTubePlugin.Plugin.InitializePaths.applicationPaths | [197:45](../Plugin.cs#L197) |
-| local-variable | Emby.YouTubePlugin.Plugin.InitializePaths.candidate | [203:21](../Plugin.cs#L203) |
-| local-variable | Emby.YouTubePlugin.Plugin.InitializePaths.cacheDir | [207:21](../Plugin.cs#L207) |
-| catch-variable | Emby.YouTubePlugin.Plugin.InitializePaths.ex | [211:19](../Plugin.cs#L211) |
-| catch-variable | Emby.YouTubePlugin.Plugin.InitializePaths.error | [216:19](../Plugin.cs#L216) |
-| method | Emby.YouTubePlugin.Plugin.NormalizeConfiguration | [222:9](../Plugin.cs#L222) |
-| parameter | Emby.YouTubePlugin.Plugin.NormalizeConfiguration.config | [222:52](../Plugin.cs#L222) |
-| method | Emby.YouTubePlugin.Plugin.NormalizeSort | [255:9](../Plugin.cs#L255) |
-| parameter | Emby.YouTubePlugin.Plugin.NormalizeSort.sortBy | [255:45](../Plugin.cs#L255) |
-| method | Emby.YouTubePlugin.Plugin.IsRegionCodeShape | [269:9](../Plugin.cs#L269) |
-| parameter | Emby.YouTubePlugin.Plugin.IsRegionCodeShape.value | [269:47](../Plugin.cs#L269) |
-| method | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists | [274:9](../Plugin.cs#L274) |
-| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.target | [274:55](../Plugin.cs#L274) |
-| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.propertyName | [274:70](../Plugin.cs#L274) |
-| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.value | [274:91](../Plugin.cs#L274) |
-| local-variable | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.property | [276:17](../Plugin.cs#L276) |
+| method | Emby.YouTubePlugin.Plugin.SaveConfiguration | [119:9](../Plugin.cs#L119) |
+| local-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.contentChanged | [130:17](../Plugin.cs#L130) |
+| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [141:19](../Plugin.cs#L141) |
+| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [154:19](../Plugin.cs#L154) |
+| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.ex | [157:19](../Plugin.cs#L157) |
+| anonymous-function | Emby.YouTubePlugin.Plugin.SaveConfiguration.anonymous@7181 | [162:49](../Plugin.cs#L162) |
+| catch-variable | Emby.YouTubePlugin.Plugin.SaveConfiguration.anonymous@7181.ex | [165:23](../Plugin.cs#L165) |
+| method | Emby.YouTubePlugin.Plugin.GetPluginInfo | [169:9](../Plugin.cs#L169) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.info | [171:17](../Plugin.cs#L171) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.assemblyDir | [172:17](../Plugin.cs#L172) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.thumbPath | [173:17](../Plugin.cs#L173) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.imageTag | [177:21](../Plugin.cs#L177) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.pngBytes | [183:21](../Plugin.cs#L183) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetPluginInfo.imageDataUrl | [184:21](../Plugin.cs#L184) |
+| method | Emby.YouTubePlugin.Plugin.GetThumbImage | [191:9](../Plugin.cs#L191) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetThumbImage.type | [193:17](../Plugin.cs#L193) |
+| local-variable | Emby.YouTubePlugin.Plugin.GetThumbImage.stream | [194:17](../Plugin.cs#L194) |
+| method | Emby.YouTubePlugin.Plugin.InitializePaths | [198:9](../Plugin.cs#L198) |
+| parameter | Emby.YouTubePlugin.Plugin.InitializePaths.applicationPaths | [198:45](../Plugin.cs#L198) |
+| local-variable | Emby.YouTubePlugin.Plugin.InitializePaths.candidate | [204:21](../Plugin.cs#L204) |
+| local-variable | Emby.YouTubePlugin.Plugin.InitializePaths.cacheDir | [208:21](../Plugin.cs#L208) |
+| catch-variable | Emby.YouTubePlugin.Plugin.InitializePaths.ex | [212:19](../Plugin.cs#L212) |
+| catch-variable | Emby.YouTubePlugin.Plugin.InitializePaths.error | [217:19](../Plugin.cs#L217) |
+| method | Emby.YouTubePlugin.Plugin.NormalizeConfiguration | [223:9](../Plugin.cs#L223) |
+| parameter | Emby.YouTubePlugin.Plugin.NormalizeConfiguration.config | [223:52](../Plugin.cs#L223) |
+| method | Emby.YouTubePlugin.Plugin.NormalizeSort | [256:9](../Plugin.cs#L256) |
+| parameter | Emby.YouTubePlugin.Plugin.NormalizeSort.sortBy | [256:45](../Plugin.cs#L256) |
+| method | Emby.YouTubePlugin.Plugin.IsRegionCodeShape | [270:9](../Plugin.cs#L270) |
+| parameter | Emby.YouTubePlugin.Plugin.IsRegionCodeShape.value | [270:47](../Plugin.cs#L270) |
+| method | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists | [275:9](../Plugin.cs#L275) |
+| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.target | [275:55](../Plugin.cs#L275) |
+| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.propertyName | [275:70](../Plugin.cs#L275) |
+| parameter | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.value | [275:91](../Plugin.cs#L275) |
+| local-variable | Emby.YouTubePlugin.Plugin.SetStringPropertyIfExists.property | [277:17](../Plugin.cs#L277) |
 
 </details>
 
@@ -3301,7 +3301,7 @@ Plugin Compile source (SDK default); 15771 bytes; 423 lines.
 <a id="file-b335630551682c19"></a>
 ## [README.md](../README.md)
 
-Documentation/resource; 7916 bytes; 161 lines.
+Documentation/resource; 7822 bytes; 162 lines.
 
 <a id="file-03de83be30141261"></a>
 ## [YouTubeAdaptiveSourceBudget.cs](../YouTubeAdaptiveSourceBudget.cs)
@@ -9320,7 +9320,7 @@ Plugin Compile source (SDK default); 16238 bytes; 258 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 43513 bytes; 221 lines.
+Documentation/resource; 44426 bytes; 234 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -9330,12 +9330,12 @@ Documentation/resource; 6611 bytes; 54 lines.
 <a id="file-b0baa6a0de87a8db"></a>
 ## [docs/PERSONAL_YOUTUBE.md](../docs/PERSONAL_YOUTUBE.md)
 
-Documentation/resource; 2341 bytes; 39 lines.
+Documentation/resource; 2466 bytes; 40 lines.
 
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 11444 bytes; 83 lines.
+Documentation/resource; 11766 bytes; 83 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)

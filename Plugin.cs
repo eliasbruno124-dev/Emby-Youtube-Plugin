@@ -104,7 +104,8 @@ namespace Emby.YouTubePlugin
                     DisplayName = "My YouTube",
                     EmbeddedResourcePath = "Emby.YouTubePlugin.Configuration.YouTubePersonal.html",
                     EnableInUserMenu = true,
-                    IsMainConfigPage = false,
+                    // Emby lists only HTML marked as PluginConfiguration in user settings.
+                    IsMainConfigPage = true,
                     MenuIcon = "subscriptions"
                 },
                 new PluginPageInfo

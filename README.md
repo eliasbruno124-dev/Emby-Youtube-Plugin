@@ -102,10 +102,11 @@ The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes 
 ## My YouTube
 
 Administrators can enable **Allow personal API keys** and **Allow personal channels**
-independently in the plugin settings. Both are off by default. Users then open
-**My YouTube** from Emby Web's user menu to save their own key or follow channels
-by `@handle` or `UC...` channel ID. The resulting folders can also be browsed in
-native Emby clients; personal settings are managed through Emby Web.
+independently in the plugin settings. Both are off by default. In Emby Web,
+open your avatar menu, choose **App settings**, then **My YouTube** under your
+personal settings to save your own key or follow channels by `@handle` or `UC...`
+channel ID. Version 2.0.12.1 fixes the missing settings entry in 2.0.12.0.
+The resulting folders can also be browsed in native Emby clients; personal settings are managed through Emby Web.
 
 The administrator chooses **Only the owner** to keep these channels in each user's
 personal area, or **All users** to also add them to the common YouTube catalog.

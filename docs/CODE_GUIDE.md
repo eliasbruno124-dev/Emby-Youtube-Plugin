@@ -28,6 +28,19 @@ Die [Konfigurations-HTML](../Configuration/YouTubeConfiguration.html) bindet den
 
 ## Persönliche Schlüssel und Kanäle
 
+`Plugin.GetPages` registriert das persönliche HTML mit `EnableInUserMenu=true`
+und `IsMainConfigPage=true`. Im geprüften Emby Web 4.10.2.0 führt der Weg über
+Avatar → App-Einstellungen → My YouTube. Die Menüliste fordert
+`PageType=PluginConfiguration`; Embys `ConfigurationPageInfo` klassifiziert HTML
+mit `IsMainConfigPage=false` dagegen als `None`, sodass der Seitenfilter es
+entfernt. Die Plugin-Karte fragt `EnableInUserMenu=false` ab und behält dadurch
+`YouTubeConfiguration` als Admin-Einstellungsseite, unabhängig von der
+Sortierung. Der separate JavaScript-Eintrag ist wegen seiner Dateiendung kein
+Konfigurations-Menüeintrag. Diese Klassifikation gewährt keine Adminrechte;
+persönliche Daten bleiben durch den authentifizierten MySettings-Dienst
+benutzergebunden. Der Abgleich mit den tatsächlichen Server-/Clientfunktionen
+ersetzt keinen echten Nichtadmin-HTTP- oder Browser-Praxistest.
+
 `EnablePersonalApiKeys` und `EnablePersonalSubscriptions` sind unabhängige,
 standardmäßig ausgeschaltete Administratoreinstellungen. `PersonalChannelVisibility`
 bestimmt, ob hinzugefügte Kanäle nur im eigenen Bereich oder zusätzlich im
