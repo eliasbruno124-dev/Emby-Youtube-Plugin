@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "e82711793861742f3cfd7207e1b1d5954ca2a668d6172815fae507473c3efeec"
+      "sha256": "584d8e3a7bcde6c38729e5da3ea0aced85e08c15e99e18000acf654a7c074450"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -414,6 +414,10 @@
       "sha256": "b92198ba2c1316dbaa2ec15be903dc06c32c4ff2ebc8f79e84e4916d3342dedb"
     },
     {
+      "path": "docs/social-preview.jpg",
+      "sha256": "8969b8756e11bbb060a6f0e7d09634af1ca161191ef5ebf39f89fdf8d1000185"
+    },
+    {
       "path": "thumb.png",
       "sha256": "d047d8235fd29553f4972758d1d6186d1541b3bb25e89db1b070c735c8e406f0"
     },
@@ -441,11 +445,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "423258956ea877454cf11b681bc6ac2e0397900beceda71fd62999c2212a57a5"
+      "sha256": "3496895f610f2b7e8c5fa0b8ae985cd50e2f27879b7ddbca08347678f4174712"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "13537f264a4f295c5ca3db877a4ee22016363fb7a1aa467f46e8ecfaf442a5e4"
+      "sha256": "6a50daf8cd2244c828daf593f93cbf14b645de33f6b7ffb0ce779d4317c6ca81"
     }
   ],
   "parsers": {

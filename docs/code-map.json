@@ -35827,10 +35827,10 @@
     },
     {
       "path": "README.md",
-      "sha256": "e82711793861742f3cfd7207e1b1d5954ca2a668d6172815fae507473c3efeec",
-      "bytes": 4849,
+      "sha256": "584d8e3a7bcde6c38729e5da3ea0aced85e08c15e99e18000acf654a7c074450",
+      "bytes": 7916,
       "anchor": "file-b335630551682c19",
-      "lines": 121,
+      "lines": 161,
       "buildRole": "Documentation/resource",
       "symbols": [],
       "resources": []
@@ -106803,6 +106803,16 @@
       "sha256": "b92198ba2c1316dbaa2ec15be903dc06c32c4ff2ebc8f79e84e4916d3342dedb",
       "bytes": 1344479,
       "anchor": "file-ca941b12bd6e7d3d",
+      "lines": null,
+      "buildRole": "Documentation/resource",
+      "symbols": [],
+      "resources": []
+    },
+    {
+      "path": "docs/social-preview.jpg",
+      "sha256": "8969b8756e11bbb060a6f0e7d09634af1ca161191ef5ebf39f89fdf8d1000185",
+      "bytes": 323039,
+      "anchor": "file-7004dcdc146d3dda",
       "lines": null,
       "buildRole": "Documentation/resource",
       "symbols": [],

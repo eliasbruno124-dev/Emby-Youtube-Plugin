@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 109 files; 8559 syntax declarations/HTML anchors.
+Scope: 110 files; 8559 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -115,6 +115,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [docs/screenshots/setup 4.png](#file-991a05bbbd648bf8) | Documentation/resource | 0 |
 | [docs/screenshots/setup 5.png](#file-c296f1b827fce9f3) | Documentation/resource | 0 |
 | [docs/screenshots/trending videos.png](#file-ca941b12bd6e7d3d) | Documentation/resource | 0 |
+| [docs/social-preview.jpg](#file-7004dcdc146d3dda) | Documentation/resource | 0 |
 | [thumb.png](#file-8c560e4ae292c462) | EmbeddedResource + Content | 0 |
 | [tools/CodeMap/CodeMap.csproj](#file-f877f7ea17f46f5d) | Build definition | 0 |
 | [tools/CodeMap/Program.cs](#file-bf979a122640e0a8) | C# source excluded from plugin Compile | 98 |
@@ -3300,7 +3301,7 @@ Plugin Compile source (SDK default); 15771 bytes; 423 lines.
 <a id="file-b335630551682c19"></a>
 ## [README.md](../README.md)
 
-Documentation/resource; 4849 bytes; 121 lines.
+Documentation/resource; 7916 bytes; 161 lines.
 
 <a id="file-03de83be30141261"></a>
 ## [YouTubeAdaptiveSourceBudget.cs](../YouTubeAdaptiveSourceBudget.cs)
@@ -9380,6 +9381,11 @@ Documentation/resource; 179118 bytes.
 ## [docs/screenshots/trending videos.png](../docs/screenshots/trending%20videos.png)
 
 Documentation/resource; 1344479 bytes.
+
+<a id="file-7004dcdc146d3dda"></a>
+## [docs/social-preview.jpg](../docs/social-preview.jpg)
+
+Documentation/resource; 323039 bytes.
 
 <a id="file-8c560e4ae292c462"></a>
 ## [thumb.png](../thumb.png)

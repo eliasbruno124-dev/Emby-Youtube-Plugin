@@ -30,7 +30,8 @@ The plugin adds a YouTube entry to Emby and lets you browse saved channels, play
 - Hide empty playlists, categories, and Shorts folders.
 - Optionally show YouTube root folders at the top level and, on Emby 4.10+, add one latest-videos home row per saved channel while reversibly hiding both forms of combined YouTube-latest row.
 - Track estimated daily YouTube API quota usage.
-- Ad-free native playback in Emby (2.0.12+): videos are streamed directly into Emby's own player, so YouTube ads are not played. The optional YouTube embed player is YouTube's own player and can show ads.
+- Enable **My YouTube** with optional personal API keys and channel subscriptions for each Emby user.
+- Native playback in Emby (2.0.12+), up to 1080p with transcoded output capped at 30 fps. The optional YouTube embed player can show ads.
 
 
 ## Screenshots
@@ -86,7 +87,7 @@ Useful Google Cloud pages:
 
 ## Saved Content
 
-The **My YouTube Content** field accepts:
+The **Saved Content** field accepts:
 
 - `@handle`, for example `@MrBeast`
 - Channel IDs starting with `UC...`
@@ -97,6 +98,24 @@ Handles, channel IDs, and playlist IDs are the best options because they avoid t
 
 The **Watch Later Playlists** field accepts playlist IDs. Each playlist becomes its own top-level folder and can be checked regularly for new videos.
 
+
+## My YouTube
+
+Administrators can enable **Allow personal API keys** and **Allow personal channels**
+independently in the plugin settings. Both are off by default. Users then open
+**My YouTube** from Emby Web's user menu to save their own key or follow channels
+by `@handle` or `UC...` channel ID. The resulting folders can also be browsed in
+native Emby clients; personal settings are managed through Emby Web.
+
+The administrator chooses **Only the owner** to keep these channels in each user's
+personal area, or **All users** to also add them to the common YouTube catalog.
+Personal browsing uses the user's enabled key when present, otherwise the server
+key. A failing personal key does not silently fall back to the server key; the
+shared catalog always uses the server key.
+
+These are plugin-managed subscriptions, with no Google account sign-in or
+automatic import of your YouTube account's subscriptions. See
+[personal settings](docs/PERSONAL_YOUTUBE.md) for details and client limitations.
 
 ## Quota
 
@@ -112,15 +131,19 @@ Most browsing uses low-cost YouTube API endpoints:
 
 The plugin caches responses on disk. Search results are cached longer because
 `search.list` has a separate default limit of 100 calls per day, while most
-other endpoints share the regular 10,000-unit daily bucket.
+other endpoints share the regular 10,000-unit daily bucket. Cached channel upload
+lists expire after 55 minutes and refresh on the next request. The quota panel
+estimates requests using the shared server key; personal-key requests are kept
+separate.
 
 ## Notes
 
-- Since 2.0.12, videos play natively in Emby (up to 1080p at 30 fps, with audio tracks, subtitles and chapters); the YouTube embed player remains available as an option. Native playback can use Emby's FFmpeg, like any other video.
+- Native playback is enabled by default and uses Emby's server playback pipeline, up to 1080p with transcoded output capped at 30 fps on the supported runtime. To use YouTube embeds in compatible browser clients, disable **Use the Emby player** and reopen the app. Native playback failures do not automatically switch to embeds.
 - Video information comes from the official YouTube Data API v3.
-- The plugin requests captions off, but some TV and Android players may ignore this.
+- Available audio tracks, subtitles and chapters depend on the video; playback and track-selection behavior also depend on the Emby client.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.
-- Private account data is not supported. Use channels and playlists accessible with your API key.
+- No Google account login or access to private YouTube account data. Personal API keys and plugin-managed subscriptions are supported through **My YouTube**.
+- Verified on Emby Server 4.10.2.0 with Linux/Docker; physical-client confirmation and support on other platforms remain client-dependent.
 - After updating, restart Emby. If the web app still looks outdated, clear its browser cache.
 
 ## License
