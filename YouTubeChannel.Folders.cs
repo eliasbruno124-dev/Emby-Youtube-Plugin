@@ -82,9 +82,49 @@ namespace Emby.YouTubePlugin
         private static async Task AddSavedContentFoldersAsync(
             List<ChannelItemInfo> items, string apiKey, PluginConfiguration config, CancellationToken ct)
         {
-            var saved = SplitConfiguredItems(config.SavedItems);
-            if (YouTubePersonalRequestContext.Current == null)
-                saved = saved.Concat(YouTubePersonalCatalog.SharedChannels(config));
+            if (YouTubePersonalRequestContext.Current != null)
+            {
+                await AddConfiguredTermsAsync(items, apiKey, SplitConfiguredItems(config.SavedItems), ct).ConfigureAwait(false);
+                return;
+            }
+            var hash = PluginEntryPoint.ComputeConfigHash(config);
+            var revision = Interlocked.Read(ref YouTubePersonalCatalog.Revision);
+            var snapshot = YouTubeChannelProvenance.Copy(config);
+            if (PluginEntryPoint.ComputeConfigHash(snapshot) != hash)
+                throw new OperationCanceledException("YouTube configuration changed during snapshot capture.");
+            var shared = YouTubePersonalCatalog.SharedChannels(snapshot).ToArray();
+            YouTubeChannelProvenance.EnsureCurrent(hash, revision);
+            var adminItems = new List<ChannelItemInfo>();
+            await AddConfiguredTermsAsync(adminItems, apiKey, SplitConfiguredItems(snapshot.SavedItems), ct).ConfigureAwait(false);
+            var adminIds = adminItems.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
+            items.AddRange(adminItems);
+            var sharedIds = new List<string>();
+            foreach (var term in shared)
+            {
+                var contribution = new List<ChannelItemInfo>();
+                await AddConfiguredTermsAsync(contribution, apiKey, new[] { term }, ct).ConfigureAwait(false);
+                foreach (var item in contribution)
+                {
+                    sharedIds.Add(item.Id);
+                    if (adminIds.Add(item.Id))
+                    {
+                        item.Id = YouTubeChannelProvenance.Wrap(YouTubeChannelProvenance.Token(term), item.Id);
+                        items.Add(item);
+                    }
+                }
+            }
+            YouTubeChannelProvenance.Publish(hash, revision,
+                adminItems.Where(item => item.Id.StartsWith("channel_x_", StringComparison.Ordinal)
+                    && IsSupportedChannelId(item.Id.Substring("channel_x_".Length))).Select(item => item.Id), sharedIds, shared);
+            // Includes admin-only legacy roots: a later removal must never be
+            // bypassed by the visibility adapter's initial absence cache.
+            if (adminItems.Any(item => item.Id.StartsWith("channel_x_", StringComparison.Ordinal)) || sharedIds.Count > 0)
+                YouTubePersonalVisibility.MarkPersonalContent();
+        }
+
+        private static async Task AddConfiguredTermsAsync(List<ChannelItemInfo> items, string apiKey,
+            IEnumerable<string> saved, CancellationToken ct)
+        {
             foreach (var term in saved.Distinct(StringComparer.Ordinal))
             {
                 ct.ThrowIfCancellationRequested();
@@ -142,6 +182,9 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        internal static IEnumerable<string> ConfiguredTerms(string? value) => SplitConfiguredItems(value);
+        internal static bool IsCanonicalChannelId(string value) => IsSupportedChannelId(value);
+
         private static IEnumerable<string> SplitConfiguredItems(string? value) =>
             (value ?? string.Empty)
                 .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
@@ -155,6 +198,7 @@ namespace Emby.YouTubePlugin
         internal static bool IsSavedChannelRootExternalId(string? externalId) =>
             !string.IsNullOrEmpty(externalId)
             && (externalId.StartsWith($"channel{FolderSeparator}", StringComparison.Ordinal)
+                || YouTubeChannelProvenance.TryParse(externalId, out _, out var sharedInner) && sharedInner.StartsWith("channel_x_", StringComparison.Ordinal)
                 || YouTubePersonalCatalog.TryParse(externalId, out _, out var inner) && inner == "root");
 
         private static ChannelItemInfo Folder(string name, string id, string? imageUrl) =>

@@ -230,7 +230,6 @@ namespace Emby.YouTubePlugin
             if (state == null || userId <= 0) return;
             long channel = state.ChannelId();
             if (channel <= 0) return;
-            if (Volatile.Read(ref state.Presence) == 1) return;
             var folders = state.Read(new InternalItemsQuery
             {
                 AncestorIds = new[] { channel }, IsFolder = true, Recursive = true,
@@ -244,7 +243,7 @@ namespace Emby.YouTubePlugin
             foreach (var folder in folders)
             {
                 cancellation.ThrowIfCancellationRequested();
-                if (!IsPersonal(folder.ExternalId)) continue;
+                if (!IsGuarded(folder, channel)) continue;
                 containsPersonal = true;
                 if (!Allowed(state, folder.ExternalId, userId)) denied.Add(folder.InternalId);
             }
@@ -275,40 +274,72 @@ namespace Emby.YouTubePlugin
                 __result = __result.Where(item => CanSee(item, __1.InternalId)).ToArray();
         }
 
-        private static void OneDtoPrefix(BaseItem __0, User __2)
+        private static void OneDtoPrefix(ref BaseItem __0, User __2)
         {
-            if (__2?.InternalId > 0 && !CanSee(__0, __2.InternalId))
-                throw new ResourceNotFoundException(ResourceExceptionType.LibraryItem, string.Empty);
+            if (__2?.InternalId > 0)
+            {
+                if (!CanSee(__0, __2.InternalId))
+                    throw new ResourceNotFoundException(ResourceExceptionType.LibraryItem, string.Empty);
+                __0 = RequestItem(__0);
+            }
         }
 
         private static void ManyDtoPrefix(ref BaseItem[] __0, User __2)
         {
             if (__2?.InternalId > 0 && __0 != null)
-                __0 = __0.Where(item => CanSee(item, __2.InternalId)).ToArray();
+                __0 = __0.Where(item => CanSee(item, __2.InternalId)).Select(RequestItem).ToArray();
         }
 
         internal static bool CanSee(BaseItem? item, long userId)
         {
             var state = _state;
-            if (state == null || item == null || userId <= 0) return true;
-            if (Volatile.Read(ref state.Presence) == 1) return true;
+            if (item == null || userId <= 0) return true;
+            if (state == null) return !LooksGuarded(item.ExternalId);
             long channel = state.ChannelId();
-            if (channel <= 0) return true;
-            var personal = new List<string>();
+            var guarded = new List<string>();
             var seen = new HashSet<long>();
             var cursor = item;
-            // Never infer ownership solely from another plugin's ExternalId.
+            // Ownership is meaningful only inside this provider's verified tree.
             while (cursor != null && cursor.InternalId != channel && seen.Add(cursor.InternalId))
             {
-                if (IsPersonal(cursor.ExternalId)) personal.Add(cursor.ExternalId);
-                if (cursor.ParentId <= 0) return true;
+                if (IsGuarded(cursor, channel)) guarded.Add(cursor.ExternalId);
+                // Unknown ancestry for a marked/legacy channel folder cannot
+                // constitute proof that it is public. Other libraries pass.
+                if (cursor.ParentId <= 0) return cursor is Folder && !LooksGuarded(cursor.ExternalId);
                 cursor = state.Lookup(cursor.ParentId);
             }
-            if (cursor?.InternalId != channel) return personal.Count == 0;
-            return personal.All(externalId => Allowed(state, externalId, userId));
+            if (cursor?.InternalId != channel) return false;
+            return guarded.All(externalId => Allowed(state, externalId, userId));
         }
 
-        private static bool IsPersonal(string? externalId) => externalId?.StartsWith(Prefix, StringComparison.Ordinal) == true;
+        private static bool LooksGuarded(string? id) => id?.StartsWith(Prefix, StringComparison.Ordinal) == true
+            || id?.StartsWith("personalshared_x_", StringComparison.Ordinal) == true
+            || id?.StartsWith("channel_x_", StringComparison.Ordinal) == true;
+
+        private static bool IsGuarded(BaseItem item, long channel) =>
+            item.ExternalId?.StartsWith(Prefix, StringComparison.Ordinal) == true
+            || item.ExternalId?.StartsWith("personalshared_x_", StringComparison.Ordinal) == true
+            || item.ParentId == channel && item.ExternalId?.StartsWith("channel_x_", StringComparison.Ordinal) == true;
+
+        private static readonly MethodInfo ShallowCopy = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        private static BaseItem RequestItem(BaseItem item)
+        {
+            var state = _state;
+            if (state == null || item == null) return item!;
+            var channel = state.ChannelId();
+            var cursor = item;
+            var seen = new HashSet<long>();
+            while (cursor != null && cursor.InternalId != channel && seen.Add(cursor.InternalId))
+                cursor = cursor.ParentId > 0 ? state.Lookup(cursor.ParentId) : null;
+            if (channel <= 0 || cursor?.InternalId != channel) return item;
+            // Counts on cached BaseItem instances carry no UserId. The native
+            // DTO service must recompute them on a request-local instance.
+            var copy = (BaseItem)ShallowCopy.Invoke(item, null)!;
+            copy.UserDataSet = false;
+            copy.ChildCount = null;
+            copy.RecursiveItemCount = null;
+            return copy;
+        }
 
         private static bool Allowed(State state, string externalId, long userId)
         {

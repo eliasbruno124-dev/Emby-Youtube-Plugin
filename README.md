@@ -112,7 +112,10 @@ The administrator chooses **Only the owner** to keep these channels in each user
 personal area, or **All users** to also add them to the common YouTube catalog.
 With **All users**, there is no extra **My YouTube** folder, because the channels
 are already in the common list – unless a user has their own API key. The
-**My YouTube** settings page is always available.
+**My YouTube** settings page is always available. Historical channel folders with
+unverifiable ownership are hidden; an administrator-saved `@handle` may therefore
+remain hidden until a successful refresh resolves it (an explicit `UC...` ID is
+verifiable immediately).
 Personal browsing uses the user's enabled key when present, otherwise the server
 key. A failing personal key does not silently fall back to the server key; the
 shared catalog always uses the server key.

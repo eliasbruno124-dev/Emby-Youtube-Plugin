@@ -9,6 +9,7 @@ Die Karte beschreibt den Repository-Quellcode. Sie beweist weder, dass eine best
 | Aufgabe | Einstieg | Wesentliche Verbindung |
 |---|---|---|
 | Plugin registrieren, Einstellungen speichern | [Plugin.cs](../Plugin.cs): `Plugin`, `GetPages`, `SaveConfiguration` | Konfiguration, Webressourcen, Cache und Refresh |
+| Früher Datenschutzschutz | [YouTubePersonalStartup.cs](../YouTubePersonalStartup.cs): `Run` | Native Guards vor Embys HTTP-Freigabe; keine Refresh-/Home-Jobs |
 | Start/Ende und Hintergrundarbeit | [PluginEntryPoint.cs](../PluginEntryPoint.cs): `Run`, `Dispose` | Emby-Dienste, Ereignisse, Polling, Resume, Reparaturen |
 | Ordner und Videos liefern | [YouTubeChannel.cs](../YouTubeChannel.cs): `GetChannelItems` | Partielle Dateien für Ordner, Metadaten und dynamische Wiedergabe |
 | YouTube-Daten abrufen | [YouTubeApi.cs](../YouTubeApi.cs): Endpoint-Methoden, `TryGetCachedJsonAsync`, `GetJsonAsync` | Cache, gemeinsame laufende Requests, Quota, Transport |
@@ -76,9 +77,20 @@ lokal verwaltete Kanäle, keine OAuth-Synchronisierung mit Google-Abos.
 [YouTubePersonalVisibility](../YouTubePersonalVisibility.cs) ergänzt Embys native
 benutzerbezogene Abfragen, promovierte Kanalwurzeln und Item-DTOs. SQL-Ausschlüsse
 greifen vor Zählung und Seiteneinteilung. Berechtigungen werden nicht zwischengespeichert.
-Eine anfängliche Abwesenheitsprüfung vermeidet wiederholte zusätzliche Abfragen
-bei Installationen ohne persönliche Inhalte; vor dem ersten neuen Wurzelordner
-wird sie synchron ungültig. Ohne vollständige geprüfte Laufzeitbindung werden
+Alte unmarkierte `channel_x_`-Wurzeln werden ebenfalls geprüft; eine negative
+Anfangsprüfung überspringt spätere Prüfungen nicht. [YouTubeChannelProvenance](../YouTubeChannelProvenance.cs)
+markiert neue gemeinsame Beiträge samt Ordnernachkommen mit `personalshared_x_`.
+Ihre Berechtigung hängt vom aktuellen Modus und aktuellen aktiven Abos ab.
+Unmarkierte Altrows brauchen einen aktuellen expliziten Admin-UC-Eintrag oder
+positiv aufgelöste Herkunft aus einem globalen Refresh. Unbekannte Handles bleiben
+nach Start/Policywechsel konservativ unsichtbar, bis die Auflösung gelingt.
+Snapshot, Konfigurationshash und Katalogrevision sperren veraltete Publikationen;
+persönliche Aufrufe dürfen den globalen Herkunftsnachweis nicht befüllen.
+Der separate frühe EntryPoint installiert diese Guards vor der HTTP-Freigabe.
+DTO-Aufrufe erhalten eine lokale flache Kopie ohne vorbefüllte Child-/Recursive-
+Counts, damit native Benutzerabfragen die Zählung mit denselben SQL-Ausschlüssen
+neu berechnen; das geteilte Item wird nicht verändert.
+Ohne vollständige geprüfte Laufzeitbindung werden
 keine neuen persönlichen Ordner erzeugt. Exakte verbleibende DTO-/View-Bindungen
 sperren bestehende persönliche Einträge bei einem unvollständigen Query-Vertrag.
 Eine völlig veränderte künftige Emby-Laufzeit ist keine garantierte Datenschutzgrenze;

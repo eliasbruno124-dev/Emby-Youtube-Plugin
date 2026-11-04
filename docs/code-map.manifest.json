@@ -163,7 +163,7 @@
     },
     {
       "path": "PluginEntryPoint.cs",
-      "sha256": "6f115058461f73bdbb0222e7d6ec02a8da2b699cad191464a17fe1a7e4f0d488"
+      "sha256": "805d48a9a4e6d08b30c790c129b51aa6a3054d775bd769b24099893ee2ec6390"
     },
     {
       "path": "PluginFileLog.cs",
@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0c95426742e7ac2ae17e1681554b485be5bac5b883d01b7a9aa70eceaf67211d"
+      "sha256": "e1fcf5be26f3ab99fe477eb998b83617ad5b259883e1dc65d3efcbecbce9fbb9"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -215,7 +215,7 @@
     },
     {
       "path": "YouTubeChannel.Folders.cs",
-      "sha256": "18d8b038ed42c691c820fd73f2f04bab4969a7aea23477e637aeb5f0d705d3c4"
+      "sha256": "df593ce030a7f75ec4791c94e47143d36161e45d6adbd6dec19af7715c4219cd"
     },
     {
       "path": "YouTubeChannel.Live.cs",
@@ -231,7 +231,7 @@
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "2bf3e128f67cc723b52a913660845533ab705b90f9339ebd112fcbdcb99d26ff"
+      "sha256": "9e152d7bd8c2b4d1ad5f7345fc16dfd3ecc85684758374cb65336f4a879fc489"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -243,7 +243,11 @@
     },
     {
       "path": "YouTubeChannel.cs",
-      "sha256": "6ae7a82ec3bf5871ddf70ac28e32a3a719b02dbf085a37edf7838db4ae696caf"
+      "sha256": "9406d02bfc0e8df04ad9b21f1819539629b588be93626e8a62cbad13c9f9eeb5"
+    },
+    {
+      "path": "YouTubeChannelProvenance.cs",
+      "sha256": "b9464d8a3bffa9713d880412cd24882649c59e7d4e930ea27400d0e634a07e07"
     },
     {
       "path": "YouTubeChapterDtoInterceptor.cs",
@@ -334,8 +338,12 @@
       "sha256": "be922cdaa5a2f20ed3707c6dbbde7d79c9f594f34c922f82b879df3529839c6d"
     },
     {
+      "path": "YouTubePersonalStartup.cs",
+      "sha256": "5d0f6b264e04a04dfe3a13289fac77f75a733627cd271bacb6f6d3d60861afd8"
+    },
+    {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "387fef0e7d9d602495a7bc039c47be7349ece7de037be1deeba4c767004df2de"
+      "sha256": "19e22f58864db1d3170ed52ab752371d844a18d2ddf7db57748e98e34d39e977"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -363,7 +371,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "845f00530edea271daece358986dfb94f3b286484a8b9f4ab48833db36c069d4"
+      "sha256": "bb73479349a91207e3bcee26d9328495154a03f8c1e0edbbbeeb8ebf09e06640"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -375,7 +383,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "8627ea8192f6f37925864b6da2cfe3fb43bf9356cf4047ea699b11ad2e971e93"
+      "sha256": "38236fbe5269f6010871e5d469aa33eab556dd098b2d05d9177b078d47e227c8"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -445,11 +453,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "ab2ea8fc44f57eb37dedd75dab959321a015fb832ca9f20f45b42f84e01913cd"
+      "sha256": "678eb52fb3ac25bc6084587b8ab0cb59d495ce2f955f12d5cc693820ccdce1f1"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "727209fa0a323371ca25ce82826afcc71e40c31e5a138abd40534c9b4e6874ea"
+      "sha256": "8ceee6cd204741a44b1cef53d62b97290b053ba706412c5f34de076c94f528ae"
     }
   ],
   "parsers": {

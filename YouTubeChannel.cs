@@ -43,7 +43,7 @@ namespace Emby.YouTubePlugin
         public string Name => "YouTube";
         public string Description => "YouTube integration via official YouTube Data API v3.";
         public string Id => "youtube_channel_10";
-        private const string ChannelDataRevision = "20261104-personal-folder-policy";
+        private const string ChannelDataRevision = "20261104-channel-provenance-v1";
 
         // Emby caches the channel's folders/items keyed by DataVersion and only
         // re-queries GetChannelItems when it changes. A constant version means a
@@ -93,6 +93,9 @@ namespace Emby.YouTubePlugin
             ChannelRefreshInvoker.NoteChannelScanActivity();
             if (query.FolderId?.StartsWith(YouTubePersonalCatalog.Prefix, StringComparison.Ordinal) == true)
                 return await GetPersonalItemsAsync(query.FolderId, config, cancellationToken).ConfigureAwait(false);
+
+            if (query.FolderId?.StartsWith(YouTubeChannelProvenance.Prefix, StringComparison.Ordinal) == true)
+                return await GetSharedItemsAsync(query.FolderId, config, cancellationToken).ConfigureAwait(false);
 
             Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
 
@@ -161,7 +164,7 @@ namespace Emby.YouTubePlugin
 
                 return new ChannelItemResult { Items = items };
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
                 throw;
             }

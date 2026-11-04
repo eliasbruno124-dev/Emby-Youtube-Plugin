@@ -205,7 +205,6 @@ namespace Emby.YouTubePlugin
             // Capture PlaybackInfo before PlaybackStart so resume and
             // "play from beginning" can be told apart reliably.
             EmbeddedDependencyLoader.Register();
-            YouTubePersonalCatalog.Start(_libraryManager!, _userManager, _userViewManager);
             YouTubeDirectSeekCompatibility.Install();
             PlaybackIntentInterceptor.Install();
             DashboardYouTubePlayerInterceptor.Install();
@@ -2726,7 +2725,6 @@ namespace Emby.YouTubePlugin
             try { YouTubeDirectRangeProxy.Shutdown(); }
             catch { YouTubeChannel.LogPublic("[YT] Native range input shutdown did not complete cleanly."); }
             _captionOffGuard.Dispose();
-            YouTubePersonalCatalog.Stop();
             if (ReferenceEquals(_current, this))
                 _current = null;
             if (_libraryManager != null)

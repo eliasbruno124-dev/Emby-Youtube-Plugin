@@ -71,6 +71,28 @@ public partial class YouTubeChannel
         return result;
     }
 
+    private async Task<ChannelItemResult> GetSharedItemsAsync(string id, PluginConfiguration config, CancellationToken ct)
+    {
+        if (!YouTubePersonalVisibility.IsReady || !YouTubeChannelProvenance.TryParse(id, out var token, out var inner)
+            || !YouTubeChannelProvenance.SharedAllowed(token, config))
+            return new ChannelItemResult { Items = new List<ChannelItemInfo>() };
+        var hash = PluginEntryPoint.ComputeConfigHash(config);
+        var revision = Interlocked.Read(ref YouTubePersonalCatalog.Revision);
+        var snapshot = YouTubeChannelProvenance.Copy(config);
+            if (PluginEntryPoint.ComputeConfigHash(snapshot) != hash)
+                throw new OperationCanceledException("YouTube configuration changed during snapshot capture.");
+        YouTubeChannelProvenance.EnsureCurrent(hash, revision);
+        if (!YouTubeChannelProvenance.SharedAllowed(token, snapshot))
+            throw new OperationCanceledException("Shared contribution was revoked.");
+        var result = await GetStandardFolderAsync(inner, snapshot.ApiKey, snapshot, ct).ConfigureAwait(false);
+        YouTubeChannelProvenance.EnsureCurrent(hash, revision);
+        if (!YouTubeChannelProvenance.SharedAllowed(token, Plugin.Instance!.Options))
+            throw new OperationCanceledException("Shared contribution was revoked.");
+        foreach (var item in result.Items)
+            if (item.Type == ChannelItemType.Folder) item.Id = YouTubeChannelProvenance.Wrap(token, item.Id);
+        return result;
+    }
+
     private static async Task<ChannelItemResult> GetStandardFolderAsync(string folderId,
         string apiKey, PluginConfiguration config, CancellationToken ct)
     {
@@ -115,6 +137,7 @@ internal static class YouTubePersonalCatalog
 
     internal static void Start(ILibraryManager library, IUserManager users, IUserViewManager views)
     {
+        YouTubeChannelProvenance.Reset();
         _lifetime = new CancellationTokenSource();
         _channelId = 0;
         _refreshQueued = 0;
@@ -139,6 +162,8 @@ internal static class YouTubePersonalCatalog
                 var providerMethod = manager?.GetType().GetMethod("GetChannelProvider",
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                     null, new[] { typeof(Channel) }, null);
+                if (manager == null || providerMethod == null)
+                    throw new InvalidOperationException("YouTube channel ownership binding unavailable.");
                 foreach (var channel in channels)
                     if (providerMethod?.Invoke(manager, new object[] { channel }) is YouTubeChannel)
                         return _channelId = channel.InternalId;
@@ -176,10 +201,15 @@ internal static class YouTubePersonalCatalog
 
     private static bool MayView(string externalId, long userId)
     {
-        if (userId <= 0 || !TryParse(externalId, out var scope, out _)) return false;
+        if (userId <= 0) return false;
         var config = Plugin.Instance?.Options;
         var user = _users?.GetUserById(userId);
         if (config == null || user == null || _users!.GetUserPolicy(user).IsDisabled) return false;
+        if (YouTubeChannelProvenance.TryParse(externalId, out var sharedToken, out _))
+            return YouTubeChannelProvenance.SharedAllowed(sharedToken, config);
+        if (externalId.StartsWith("channel_x_", StringComparison.Ordinal))
+            return YouTubeChannelProvenance.LegacyAllowed(externalId, config);
+        if (!TryParse(externalId, out var scope, out _)) return false;
         return Volatile.Read(ref _profiles).Any(profile => profile.ScopeId == scope && profile.UserId == user.Id
             && HasPersonalRoot(profile, config));
     }
@@ -249,6 +279,7 @@ internal static class YouTubePersonalCatalog
 
     internal static void Stop()
     {
+        YouTubeChannelProvenance.Reset();
         YouTubePersonalProfiles.Changed -= ProfilesChanged;
         var lifetime = Interlocked.Exchange(ref _lifetime, null);
         lifetime?.Cancel();
