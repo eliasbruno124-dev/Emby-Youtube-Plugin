@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 115 files; 9008 syntax declarations/HTML anchors.
+Scope: 115 files; 9045 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -77,7 +77,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannelProvenance.cs](#file-bdce8e0e6df1ba72) | Plugin Compile source (SDK default) | 47 |
 | [YouTubeChapterDtoInterceptor.cs](#file-59ad88b2f7a15737) | Plugin Compile source (SDK default) | 46 |
 | [YouTubeChapterSync.cs](#file-90d85cea05c050fd) | Plugin Compile source (SDK default) | 135 |
-| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 125 |
+| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 126 |
 | [YouTubeDescriptionChapters.cs](#file-879f815509e709e7) | Plugin Compile source (SDK default) | 21 |
 | [YouTubeDirectHttp.cs](#file-1922be3cbc99a179) | Plugin Compile source (SDK default) | 181 |
 | [YouTubeDirectManifest.cs](#file-5a4b4574992dd577) | Plugin Compile source (SDK default) | 203 |
@@ -100,8 +100,8 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubePersonalStartup.cs](#file-e29c28a293aed316) | Plugin Compile source (SDK default) | 12 |
 | [YouTubePersonalVisibility.cs](#file-3c3889e240a93fde) | Plugin Compile source (SDK default) | 190 |
 | [YouTubeRequestBackoff.cs](#file-7a9c7096d206cd40) | Plugin Compile source (SDK default) | 27 |
-| [YouTubeRootMaterialization.cs](#file-d83451aba3d200d0) | Plugin Compile source (SDK default) | 103 |
-| [YouTubeRootMigration.cs](#file-9330046d20e24a92) | Plugin Compile source (SDK default) | 57 |
+| [YouTubeRootMaterialization.cs](#file-d83451aba3d200d0) | Plugin Compile source (SDK default) | 115 |
+| [YouTubeRootMigration.cs](#file-9330046d20e24a92) | Plugin Compile source (SDK default) | 81 |
 | [YouTubeSessionCommandRouter.cs](#file-8ca449cb8064e640) | Plugin Compile source (SDK default) | 36 |
 | [YouTubeSortNameRepairer.cs](#file-ff64b0c5af701f8e) | Plugin Compile source (SDK default) | 57 |
 | [YouTubeSourceBudget.cs](#file-28aab84e271eec1a) | Plugin Compile source (SDK default) | 92 |
@@ -6278,10 +6278,10 @@ Plugin Compile source (SDK default); 16877 bytes; 301 lines.
 <a id="file-afb9dc3e97044d5d"></a>
 ## [YouTubeConfigSaveService.cs](../YouTubeConfigSaveService.cs)
 
-Plugin Compile source (SDK default); 11390 bytes; 232 lines.
+Plugin Compile source (SDK default); 12050 bytes; 241 lines.
 
 <details>
-<summary>All 125 declarations / anchors</summary>
+<summary>All 126 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -6335,81 +6335,82 @@ Plugin Compile source (SDK default); 11390 bytes; 232 lines.
 | parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.request | [120:40](../YouTubeConfigSaveService.cs#L120) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.plugin | [122:17](../YouTubeConfigSaveService.cs#L122) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.dto | [130:17](../YouTubeConfigSaveService.cs#L130) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.config | [137:21](../YouTubeConfigSaveService.cs#L137) |
-| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [178:9](../YouTubeConfigSaveService.cs#L178) |
-| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [178:60](../YouTubeConfigSaveService.cs#L178) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [185:23](../YouTubeConfigSaveService.cs#L185) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [191:17](../YouTubeConfigSaveService.cs#L191) |
-| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [205:9](../YouTubeConfigSaveService.cs#L205) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [207:13](../YouTubeConfigSaveService.cs#L207) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [207:37](../YouTubeConfigSaveService.cs#L207) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [207:42](../YouTubeConfigSaveService.cs#L207) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [208:13](../YouTubeConfigSaveService.cs#L208) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [208:50](../YouTubeConfigSaveService.cs#L208) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [208:55](../YouTubeConfigSaveService.cs#L208) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [209:13](../YouTubeConfigSaveService.cs#L209) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [209:56](../YouTubeConfigSaveService.cs#L209) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [209:61](../YouTubeConfigSaveService.cs#L209) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [210:13](../YouTubeConfigSaveService.cs#L210) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [210:56](../YouTubeConfigSaveService.cs#L210) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [210:61](../YouTubeConfigSaveService.cs#L210) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [211:13](../YouTubeConfigSaveService.cs#L211) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [211:41](../YouTubeConfigSaveService.cs#L211) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [211:46](../YouTubeConfigSaveService.cs#L211) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [212:13](../YouTubeConfigSaveService.cs#L212) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [212:49](../YouTubeConfigSaveService.cs#L212) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [212:54](../YouTubeConfigSaveService.cs#L212) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [213:13](../YouTubeConfigSaveService.cs#L213) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [213:41](../YouTubeConfigSaveService.cs#L213) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [213:46](../YouTubeConfigSaveService.cs#L213) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [214:13](../YouTubeConfigSaveService.cs#L214) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [214:43](../YouTubeConfigSaveService.cs#L214) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [214:48](../YouTubeConfigSaveService.cs#L214) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [215:13](../YouTubeConfigSaveService.cs#L215) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [215:54](../YouTubeConfigSaveService.cs#L215) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [215:59](../YouTubeConfigSaveService.cs#L215) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [216:13](../YouTubeConfigSaveService.cs#L216) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [216:39](../YouTubeConfigSaveService.cs#L216) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [216:44](../YouTubeConfigSaveService.cs#L216) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [217:13](../YouTubeConfigSaveService.cs#L217) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [217:39](../YouTubeConfigSaveService.cs#L217) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [217:44](../YouTubeConfigSaveService.cs#L217) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [218:13](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [218:45](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [218:50](../YouTubeConfigSaveService.cs#L218) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [219:13](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [219:47](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [219:52](../YouTubeConfigSaveService.cs#L219) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [220:13](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [220:42](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [220:47](../YouTubeConfigSaveService.cs#L220) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [221:13](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [221:45](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [221:50](../YouTubeConfigSaveService.cs#L221) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [222:13](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [222:44](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [222:49](../YouTubeConfigSaveService.cs#L222) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [223:13](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [223:44](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [223:49](../YouTubeConfigSaveService.cs#L223) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [224:13](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [224:43](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [224:48](../YouTubeConfigSaveService.cs#L224) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [225:13](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [225:49](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [225:54](../YouTubeConfigSaveService.cs#L225) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [226:13](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [226:50](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [226:55](../YouTubeConfigSaveService.cs#L226) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [227:13](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [227:51](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [227:56](../YouTubeConfigSaveService.cs#L227) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [228:13](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [228:55](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [228:60](../YouTubeConfigSaveService.cs#L228) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [229:13](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [229:37](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [229:42](../YouTubeConfigSaveService.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.visibilityChanged | [134:18](../YouTubeConfigSaveService.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.config | [138:21](../YouTubeConfigSaveService.cs#L138) |
+| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [187:9](../YouTubeConfigSaveService.cs#L187) |
+| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [187:60](../YouTubeConfigSaveService.cs#L187) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [194:23](../YouTubeConfigSaveService.cs#L194) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [200:17](../YouTubeConfigSaveService.cs#L200) |
+| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [214:9](../YouTubeConfigSaveService.cs#L214) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [216:13](../YouTubeConfigSaveService.cs#L216) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [216:37](../YouTubeConfigSaveService.cs#L216) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [216:42](../YouTubeConfigSaveService.cs#L216) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [217:13](../YouTubeConfigSaveService.cs#L217) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [217:50](../YouTubeConfigSaveService.cs#L217) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [217:55](../YouTubeConfigSaveService.cs#L217) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [218:13](../YouTubeConfigSaveService.cs#L218) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [218:56](../YouTubeConfigSaveService.cs#L218) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [218:61](../YouTubeConfigSaveService.cs#L218) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [219:13](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [219:56](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [219:61](../YouTubeConfigSaveService.cs#L219) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [220:13](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [220:41](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [220:46](../YouTubeConfigSaveService.cs#L220) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [221:13](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [221:49](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [221:54](../YouTubeConfigSaveService.cs#L221) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [222:13](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [222:41](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [222:46](../YouTubeConfigSaveService.cs#L222) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [223:13](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [223:43](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [223:48](../YouTubeConfigSaveService.cs#L223) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [224:13](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [224:54](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [224:59](../YouTubeConfigSaveService.cs#L224) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [225:13](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [225:39](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [225:44](../YouTubeConfigSaveService.cs#L225) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [226:13](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [226:39](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [226:44](../YouTubeConfigSaveService.cs#L226) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [227:13](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [227:45](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [227:50](../YouTubeConfigSaveService.cs#L227) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [228:13](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [228:47](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [228:52](../YouTubeConfigSaveService.cs#L228) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [229:13](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [229:42](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [229:47](../YouTubeConfigSaveService.cs#L229) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [230:13](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [230:45](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [230:50](../YouTubeConfigSaveService.cs#L230) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [231:13](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [231:44](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [231:49](../YouTubeConfigSaveService.cs#L231) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [232:13](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [232:44](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [232:49](../YouTubeConfigSaveService.cs#L232) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [233:13](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [233:43](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [233:48](../YouTubeConfigSaveService.cs#L233) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [234:13](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [234:49](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [234:54](../YouTubeConfigSaveService.cs#L234) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [235:13](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [235:50](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [235:55](../YouTubeConfigSaveService.cs#L235) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [236:13](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [236:51](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [236:56](../YouTubeConfigSaveService.cs#L236) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [237:13](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [237:55](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [237:60](../YouTubeConfigSaveService.cs#L237) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [238:13](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [238:37](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [238:42](../YouTubeConfigSaveService.cs#L238) |
 
 </details>
 
@@ -9114,10 +9115,10 @@ Plugin Compile source (SDK default); 3951 bytes; 85 lines.
 <a id="file-d83451aba3d200d0"></a>
 ## [YouTubeRootMaterialization.cs](../YouTubeRootMaterialization.cs)
 
-Plugin Compile source (SDK default); 10286 bytes; 233 lines.
+Plugin Compile source (SDK default); 12139 bytes; 275 lines.
 
 <details>
-<summary>All 103 declarations / anchors</summary>
+<summary>All 115 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -9148,92 +9149,104 @@ Plugin Compile source (SDK default); 10286 bytes; 233 lines.
 | field | Emby.YouTubePlugin.YouTubeRootMaterialization._refresh | [23:58](../YouTubeRootMaterialization.cs#L23) |
 | field | Emby.YouTubePlugin.YouTubeRootMaterialization._stampPath | [24:36](../YouTubeRootMaterialization.cs#L24) |
 | field | Emby.YouTubePlugin.YouTubeRootMaterialization._log | [25:37](../YouTubeRootMaterialization.cs#L25) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._lifetime | [26:46](../YouTubeRootMaterialization.cs#L26) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._token | [27:40](../YouTubeRootMaterialization.cs#L27) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._requested | [28:32](../YouTubeRootMaterialization.cs#L28) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._generation | [29:18](../YouTubeRootMaterialization.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._attempted | [29:31](../YouTubeRootMaterialization.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._issuedRequest | [29:48](../YouTubeRootMaterialization.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._appliedRequest | [29:64](../YouTubeRootMaterialization.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._reconciledRequest | [29:81](../YouTubeRootMaterialization.cs#L29) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._pending | [30:18](../YouTubeRootMaterialization.cs#L30) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._force | [30:28](../YouTubeRootMaterialization.cs#L30) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._disposed | [30:36](../YouTubeRootMaterialization.cs#L30) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._worker | [31:19](../YouTubeRootMaterialization.cs#L31) |
-| field | Emby.YouTubePlugin.YouTubeRootMaterialization._observation | [32:26](../YouTubeRootMaterialization.cs#L32) |
-| constructor | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization | [34:5](../YouTubeRootMaterialization.cs#L34) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.capture | [34:41](../YouTubeRootMaterialization.cs#L34) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.readRoots | [35:9](../YouTubeRootMaterialization.cs#L35) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.refresh | [35:60](../YouTubeRootMaterialization.cs#L35) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.stampPath | [36:9](../YouTubeRootMaterialization.cs#L36) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.log | [36:34](../YouTubeRootMaterialization.cs#L36) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.lifetime | [36:54](../YouTubeRootMaterialization.cs#L36) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync | [44:5](../YouTubeRootMaterialization.cs#L44) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.reason | [44:32](../YouTubeRootMaterialization.cs#L44) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.force | [44:47](../YouTubeRootMaterialization.cs#L44) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.ticket | [46:14](../YouTubeRootMaterialization.cs#L46) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.current | [52:13](../YouTubeRootMaterialization.cs#L52) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.BeginRoot | [77:5](../YouTubeRootMaterialization.cs#L77) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.BeginRoot.current | [79:13](../YouTubeRootMaterialization.cs#L79) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot | [85:5](../YouTubeRootMaterialization.cs#L85) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.attempt | [85:31](../YouTubeRootMaterialization.cs#L85) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.expectedIds | [85:52](../YouTubeRootMaterialization.cs#L85) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.current | [87:13](../YouTubeRootMaterialization.cs#L87) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids | [88:13](../YouTubeRootMaterialization.cs#L88) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids.anonymous@3506 | [88:72](../YouTubeRootMaterialization.cs#L88) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids.anonymous@3506.id | [88:72](../YouTubeRootMaterialization.cs#L88) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.anonymous@3571 | [89:21](../YouTubeRootMaterialization.cs#L89) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.anonymous@3571.id | [89:21](../YouTubeRootMaterialization.cs#L89) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync | [98:5](../YouTubeRootMaterialization.cs#L98) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.layout | [102:31](../YouTubeRootMaterialization.cs#L102) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.generation | [103:18](../YouTubeRootMaterialization.cs#L103) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.force | [104:18](../YouTubeRootMaterialization.cs#L104) |
-| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.error | [117:19](../YouTubeRootMaterialization.cs#L117) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile | [123:5](../YouTubeRootMaterialization.cs#L123) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.completedGeneration | [123:28](../YouTubeRootMaterialization.cs#L123) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.current | [128:17](../YouTubeRootMaterialization.cs#L128) |
-| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.error | [142:15](../YouTubeRootMaterialization.cs#L142) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Current | [146:5](../YouTubeRootMaterialization.cs#L146) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.layout | [146:26](../YouTubeRootMaterialization.cs#L146) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.generation | [146:52](../YouTubeRootMaterialization.cs#L146) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.current | [148:13](../YouTubeRootMaterialization.cs#L148) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync | [154:5](../YouTubeRootMaterialization.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.layout | [154:35](../YouTubeRootMaterialization.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.generation | [154:61](../YouTubeRootMaterialization.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.force | [154:78](../YouTubeRootMaterialization.cs#L154) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.actual | [158:13](../YouTubeRootMaterialization.cs#L158) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.observed | [168:22](../YouTubeRootMaterialization.cs#L168) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.path | [174:13](../YouTubeRootMaterialization.cs#L174) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.bytes | [176:13](../YouTubeRootMaterialization.cs#L176) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.temporary | [178:13](../YouTubeRootMaterialization.cs#L178) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.stream | [181:24](../YouTubeRootMaterialization.cs#L181) |
-| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.error | [196:19](../YouTubeRootMaterialization.cs#L196) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp | [200:5](../YouTubeRootMaterialization.cs#L200) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.revision | [200:31](../YouTubeRootMaterialization.cs#L200) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.fingerprint | [200:48](../YouTubeRootMaterialization.cs#L200) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.path | [204:17](../YouTubeRootMaterialization.cs#L204) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.info | [206:17](../YouTubeRootMaterialization.cs#L206) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.bytes | [208:17](../YouTubeRootMaterialization.cs#L208) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.stamp | [210:17](../YouTubeRootMaterialization.cs#L210) |
-| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.error | [213:15](../YouTubeRootMaterialization.cs#L213) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint | [216:5](../YouTubeRootMaterialization.cs#L216) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.ids | [216:40](../YouTubeRootMaterialization.cs#L216) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.anonymous@9756 | [217:90](../YouTubeRootMaterialization.cs#L217) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.anonymous@9756.id | [217:90](../YouTubeRootMaterialization.cs#L217) |
-| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose | [219:5](../YouTubeRootMaterialization.cs#L219) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.worker | [221:15](../YouTubeRootMaterialization.cs#L221) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.anonymous@10146 | [230:38](../YouTubeRootMaterialization.cs#L230) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.anonymous@10146._ | [230:38](../YouTubeRootMaterialization.cs#L230) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._acceptExisting | [26:63](../YouTubeRootMaterialization.cs#L26) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._lifetime | [27:46](../YouTubeRootMaterialization.cs#L27) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._token | [28:40](../YouTubeRootMaterialization.cs#L28) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._requested | [29:32](../YouTubeRootMaterialization.cs#L29) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._generation | [30:18](../YouTubeRootMaterialization.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._attempted | [30:31](../YouTubeRootMaterialization.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._issuedRequest | [30:48](../YouTubeRootMaterialization.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._appliedRequest | [30:64](../YouTubeRootMaterialization.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._reconciledRequest | [30:81](../YouTubeRootMaterialization.cs#L30) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._pending | [31:18](../YouTubeRootMaterialization.cs#L31) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._force | [31:28](../YouTubeRootMaterialization.cs#L31) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._disposed | [31:36](../YouTubeRootMaterialization.cs#L31) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._worker | [32:19](../YouTubeRootMaterialization.cs#L32) |
+| field | Emby.YouTubePlugin.YouTubeRootMaterialization._observation | [33:26](../YouTubeRootMaterialization.cs#L33) |
+| constructor | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization | [35:5](../YouTubeRootMaterialization.cs#L35) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.capture | [35:41](../YouTubeRootMaterialization.cs#L35) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.readRoots | [36:9](../YouTubeRootMaterialization.cs#L36) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.refresh | [36:60](../YouTubeRootMaterialization.cs#L36) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.stampPath | [37:9](../YouTubeRootMaterialization.cs#L37) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.log | [37:34](../YouTubeRootMaterialization.cs#L37) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.lifetime | [37:54](../YouTubeRootMaterialization.cs#L37) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.YouTubeRootMaterialization.acceptExisting | [38:9](../YouTubeRootMaterialization.cs#L38) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync | [46:5](../YouTubeRootMaterialization.cs#L46) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.reason | [46:32](../YouTubeRootMaterialization.cs#L46) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.force | [46:47](../YouTubeRootMaterialization.cs#L46) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.ticket | [48:14](../YouTubeRootMaterialization.cs#L48) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RequestAsync.current | [54:13](../YouTubeRootMaterialization.cs#L54) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.EnsureCurrentAsync | [79:5](../YouTubeRootMaterialization.cs#L79) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.EnsureCurrentAsync.reason | [79:50](../YouTubeRootMaterialization.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.EnsureCurrentAsync.current | [83:13](../YouTubeRootMaterialization.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.EnsureCurrentAsync.actual | [85:13](../YouTubeRootMaterialization.cs#L85) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.EnsureCurrentAsync.confirmed | [86:13](../YouTubeRootMaterialization.cs#L86) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.BeginRoot | [93:5](../YouTubeRootMaterialization.cs#L93) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.BeginRoot.current | [95:13](../YouTubeRootMaterialization.cs#L95) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot | [101:5](../YouTubeRootMaterialization.cs#L101) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.attempt | [101:31](../YouTubeRootMaterialization.cs#L101) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.expectedIds | [101:52](../YouTubeRootMaterialization.cs#L101) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.current | [103:13](../YouTubeRootMaterialization.cs#L103) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids | [104:13](../YouTubeRootMaterialization.cs#L104) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids.anonymous@4315 | [104:72](../YouTubeRootMaterialization.cs#L104) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.ids.anonymous@4315.id | [104:72](../YouTubeRootMaterialization.cs#L104) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.anonymous@4380 | [105:21](../YouTubeRootMaterialization.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ObserveRoot.anonymous@4380.id | [105:21](../YouTubeRootMaterialization.cs#L105) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync | [114:5](../YouTubeRootMaterialization.cs#L114) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.layout | [118:31](../YouTubeRootMaterialization.cs#L118) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.generation | [119:18](../YouTubeRootMaterialization.cs#L119) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.force | [120:18](../YouTubeRootMaterialization.cs#L120) |
+| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.RunAsync.error | [133:19](../YouTubeRootMaterialization.cs#L133) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile | [139:5](../YouTubeRootMaterialization.cs#L139) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.completedGeneration | [139:28](../YouTubeRootMaterialization.cs#L139) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.current | [144:17](../YouTubeRootMaterialization.cs#L144) |
+| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Reconcile.error | [158:15](../YouTubeRootMaterialization.cs#L158) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Current | [162:5](../YouTubeRootMaterialization.cs#L162) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.layout | [162:26](../YouTubeRootMaterialization.cs#L162) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.generation | [162:52](../YouTubeRootMaterialization.cs#L162) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Current.current | [164:13](../YouTubeRootMaterialization.cs#L164) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync | [170:5](../YouTubeRootMaterialization.cs#L170) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.layout | [170:35](../YouTubeRootMaterialization.cs#L170) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.generation | [170:61](../YouTubeRootMaterialization.cs#L170) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.force | [170:78](../YouTubeRootMaterialization.cs#L170) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.actual | [174:13](../YouTubeRootMaterialization.cs#L174) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.adopt | [178:14](../YouTubeRootMaterialization.cs#L178) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.observed | [188:26](../YouTubeRootMaterialization.cs#L188) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.confirmed | [199:17](../YouTubeRootMaterialization.cs#L199) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.path | [203:13](../YouTubeRootMaterialization.cs#L203) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.bytes | [205:13](../YouTubeRootMaterialization.cs#L205) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.temporary | [207:13](../YouTubeRootMaterialization.cs#L207) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.stream | [210:24](../YouTubeRootMaterialization.cs#L210) |
+| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.ApplyAsync.error | [225:19](../YouTubeRootMaterialization.cs#L225) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.StampAbsent | [229:5](../YouTubeRootMaterialization.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.StampAbsent.path | [233:17](../YouTubeRootMaterialization.cs#L233) |
+| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.StampAbsent.error | [239:15](../YouTubeRootMaterialization.cs#L239) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp | [242:5](../YouTubeRootMaterialization.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.revision | [242:31](../YouTubeRootMaterialization.cs#L242) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.fingerprint | [242:48](../YouTubeRootMaterialization.cs#L242) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.path | [246:17](../YouTubeRootMaterialization.cs#L246) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.info | [248:17](../YouTubeRootMaterialization.cs#L248) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.bytes | [250:17](../YouTubeRootMaterialization.cs#L250) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.stamp | [252:17](../YouTubeRootMaterialization.cs#L252) |
+| catch-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.MatchesStamp.error | [255:15](../YouTubeRootMaterialization.cs#L255) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint | [258:5](../YouTubeRootMaterialization.cs#L258) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.ids | [258:40](../YouTubeRootMaterialization.cs#L258) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.anonymous@11609 | [259:90](../YouTubeRootMaterialization.cs#L259) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Fingerprint.anonymous@11609.id | [259:90](../YouTubeRootMaterialization.cs#L259) |
+| method | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose | [261:5](../YouTubeRootMaterialization.cs#L261) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.worker | [263:15](../YouTubeRootMaterialization.cs#L263) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.anonymous@11999 | [272:38](../YouTubeRootMaterialization.cs#L272) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMaterialization.Dispose.anonymous@11999._ | [272:38](../YouTubeRootMaterialization.cs#L272) |
 
 </details>
 
 <a id="file-9330046d20e24a92"></a>
 ## [YouTubeRootMigration.cs](../YouTubeRootMigration.cs)
 
-Plugin Compile source (SDK default); 6900 bytes; 118 lines.
+Plugin Compile source (SDK default); 10551 bytes; 179 lines.
 
 <details>
-<summary>All 57 declarations / anchors</summary>
+<summary>All 81 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -9254,46 +9267,70 @@ Plugin Compile source (SDK default); 6900 bytes; 118 lines.
 | parameter | Emby.YouTubePlugin.YouTubeRootMigration.TryRequest.force | [30:52](../YouTubeRootMigration.cs#L30) |
 | local-variable | Emby.YouTubePlugin.YouTubeRootMigration.TryRequest.engine | [32:13](../YouTubeRootMigration.cs#L32) |
 | catch-variable | Emby.YouTubePlugin.YouTubeRootMigration.TryRequest.error | [35:15](../YouTubeRootMigration.cs#L35) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.BeginRoot | [40:5](../YouTubeRootMigration.cs#L40) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot | [46:5](../YouTubeRootMigration.cs#L46) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.attempt | [46:38](../YouTubeRootMigration.cs#L46) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.result | [46:87](../YouTubeRootMigration.cs#L46) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2127 | [49:33](../YouTubeRootMigration.cs#L49) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2127.item | [49:33](../YouTubeRootMigration.cs#L49) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2340 | [50:79](../YouTubeRootMigration.cs#L50) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2340.item | [50:79](../YouTubeRootMigration.cs#L50) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId | [53:5](../YouTubeRootMigration.cs#L53) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.id | [53:40](../YouTubeRootMigration.cs#L53) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.inner | [55:64](../YouTubeRootMigration.cs#L55) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.shared | [61:71](../YouTubeRootMigration.cs#L61) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.Capture | [70:5](../YouTubeRootMigration.cs#L70) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.config | [72:87](../YouTubeRootMigration.cs#L72) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.hash | [73:13](../YouTubeRootMigration.cs#L73) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.revision | [74:13](../YouTubeRootMigration.cs#L74) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.snapshot | [75:13](../YouTubeRootMigration.cs#L75) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.adminIdentity | [76:13](../YouTubeRootMigration.cs#L76) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles | [77:13](../YouTubeRootMigration.cs#L77) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3693 | [77:80](../YouTubeRootMigration.cs#L77) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3693.profile | [77:80](../YouTubeRootMigration.cs#L77) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3765 | [78:21](../YouTubeRootMigration.cs#L78) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3765.profile | [78:21](../YouTubeRootMigration.cs#L78) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3765.anonymous@4100 | [83:30](../YouTubeRootMigration.cs#L83) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@3765.anonymous@4100.value | [83:30](../YouTubeRootMigration.cs#L83) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.stable | [91:13](../YouTubeRootMigration.cs#L91) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots | [96:5](../YouTubeRootMigration.cs#L96) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.library | [96:39](../YouTubeRootMigration.cs#L96) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.token | [96:64](../YouTubeRootMigration.cs#L96) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.manager | [99:13](../YouTubeRootMigration.cs#L99) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.provider | [100:13](../YouTubeRootMigration.cs#L100) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.channels | [102:13](../YouTubeRootMigration.cs#L102) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches | [104:13](../YouTubeRootMigration.cs#L104) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@5854 | [104:38](../YouTubeRootMigration.cs#L104) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@5854.channel | [104:38](../YouTubeRootMigration.cs#L104) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@6712 | [114:25](../YouTubeRootMigration.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@6712.item | [114:25](../YouTubeRootMigration.cs#L114) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@6767 | [114:80](../YouTubeRootMigration.cs#L114) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@6767.item | [114:80](../YouTubeRootMigration.cs#L114) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.Stop | [117:5](../YouTubeRootMigration.cs#L117) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.WaitForCurrentAsync | [40:5](../YouTubeRootMigration.cs#L40) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.WaitForCurrentAsync.engine | [42:13](../YouTubeRootMigration.cs#L42) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.BeginRoot | [47:5](../YouTubeRootMigration.cs#L47) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot | [53:5](../YouTubeRootMigration.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.attempt | [53:38](../YouTubeRootMigration.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.result | [53:87](../YouTubeRootMigration.cs#L53) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2442 | [56:33](../YouTubeRootMigration.cs#L56) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2442.item | [56:33](../YouTubeRootMigration.cs#L56) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2655 | [57:79](../YouTubeRootMigration.cs#L57) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ObserveRoot.anonymous@2655.item | [57:79](../YouTubeRootMigration.cs#L57) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId | [60:5](../YouTubeRootMigration.cs#L60) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.id | [60:40](../YouTubeRootMigration.cs#L60) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.inner | [62:64](../YouTubeRootMigration.cs#L62) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.ResolvedRootId.shared | [68:71](../YouTubeRootMigration.cs#L68) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.Capture | [77:5](../YouTubeRootMigration.cs#L77) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.config | [79:87](../YouTubeRootMigration.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.hash | [80:13](../YouTubeRootMigration.cs#L80) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.revision | [81:13](../YouTubeRootMigration.cs#L81) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.snapshot | [82:13](../YouTubeRootMigration.cs#L82) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.adminIdentity | [83:13](../YouTubeRootMigration.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles | [84:13](../YouTubeRootMigration.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4008 | [84:80](../YouTubeRootMigration.cs#L84) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4008.profile | [84:80](../YouTubeRootMigration.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4080 | [85:21](../YouTubeRootMigration.cs#L85) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4080.profile | [85:21](../YouTubeRootMigration.cs#L85) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4080.anonymous@4415 | [90:30](../YouTubeRootMigration.cs#L90) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.Capture.profiles.anonymous@4080.anonymous@4415.value | [90:30](../YouTubeRootMigration.cs#L90) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.Capture.stable | [98:13](../YouTubeRootMigration.cs#L98) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting | [105:5](../YouTubeRootMigration.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.layout | [105:40](../YouTubeRootMigration.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.actual | [105:66](../YouTubeRootMigration.cs#L105) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.config | [107:85](../YouTubeRootMigration.cs#L107) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.snapshot | [108:13](../YouTubeRootMigration.cs#L108) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.expected | [110:13](../YouTubeRootMigration.cs#L110) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.term | [113:9](../YouTubeRootMigration.cs#L113) |
+| local-function | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.Canonical | [118:9](../YouTubeRootMigration.cs#L118) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.Canonical.term | [118:27](../YouTubeRootMigration.cs#L118) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.term | [120:9](../YouTubeRootMigration.cs#L120) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.term.id | [122:17](../YouTubeRootMigration.cs#L122) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.common | [127:13](../YouTubeRootMigration.cs#L127) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile | [129:13](../YouTubeRootMigration.cs#L129) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.seen | [131:21](../YouTubeRootMigration.cs#L131) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term | [132:17](../YouTubeRootMigration.cs#L132) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.id | [134:25](../YouTubeRootMigration.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.prefix | [140:29](../YouTubeRootMigration.cs#L140) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.matches | [142:29](../YouTubeRootMigration.cs#L142) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.matches.anonymous@7912 | [142:52](../YouTubeRootMigration.cs#L142) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.matches.anonymous@7912.value | [142:52](../YouTubeRootMigration.cs#L142) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.matches.anonymous@8009 | [143:37](../YouTubeRootMigration.cs#L143) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.AcceptExisting.profile.term.matches.anonymous@8009.value | [143:37](../YouTubeRootMigration.cs#L143) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots | [157:5](../YouTubeRootMigration.cs#L157) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.library | [157:39](../YouTubeRootMigration.cs#L157) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.token | [157:64](../YouTubeRootMigration.cs#L157) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.manager | [160:13](../YouTubeRootMigration.cs#L160) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.provider | [161:13](../YouTubeRootMigration.cs#L161) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.channels | [163:13](../YouTubeRootMigration.cs#L163) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches | [165:13](../YouTubeRootMigration.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9505 | [165:38](../YouTubeRootMigration.cs#L165) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9505.channel | [165:38](../YouTubeRootMigration.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10363 | [175:25](../YouTubeRootMigration.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10363.item | [175:25](../YouTubeRootMigration.cs#L175) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10418 | [175:80](../YouTubeRootMigration.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10418.item | [175:80](../YouTubeRootMigration.cs#L175) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.Stop | [178:5](../YouTubeRootMigration.cs#L178) |
 
 </details>
 
@@ -9839,7 +9876,7 @@ Plugin Compile source (SDK default); 16238 bytes; 258 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 52384 bytes; 340 lines.
+Documentation/resource; 53118 bytes; 349 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -9854,7 +9891,7 @@ Documentation/resource; 3896 bytes; 60 lines.
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 15889 bytes; 235 lines.
+Documentation/resource; 16200 bytes; 235 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)

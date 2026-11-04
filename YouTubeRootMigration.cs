@@ -22,7 +22,7 @@ internal static class YouTubeRootMigration
             ChannelRefreshInvoker.RefreshMaterializationAsync,
             () => string.IsNullOrWhiteSpace(Plugin.DataPath) ? null
                 : Path.Combine(Plugin.DataPath, "youtube-root-materialization-v1.json"),
-            YouTubeChannel.LogPublic, lifetime);
+            YouTubeChannel.LogPublic, lifetime, AcceptExisting);
         Interlocked.Exchange(ref _current, engine)?.Dispose();
         TryRequest("startup", force);
     }
@@ -35,6 +35,13 @@ internal static class YouTubeRootMigration
         catch (Exception error) when (error is not OutOfMemoryException)
         { YouTubeChannel.LogPublic("[YT] Root migration request unavailable (" + error.GetType().Name + ")."); }
         return true;
+    }
+
+    internal static async Task<bool> WaitForCurrentAsync()
+    {
+        var engine = Volatile.Read(ref _current);
+        return engine != null && await engine.EnsureCurrentAsync("settings response").ConfigureAwait(false)
+            && ReferenceEquals(engine, Volatile.Read(ref _current));
     }
 
     internal static YouTubeRootMaterialization.RootAttempt? BeginRoot()
@@ -91,6 +98,60 @@ internal static class YouTubeRootMigration
         var stable = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
         { FormatRevision, ChannelFormat = YouTubeChannel.ChannelDataRevision, ContentHash = hash, AdminIdentity = adminIdentity, Profiles = profiles }))).ToLowerInvariant();
         return new YouTubeRootLayout(stable, stable + ":" + revision);
+    }
+
+    // On first installation the user may already have run Emby's task. Only
+    // adopt an exact offline-provable OwnUser layout; ambiguity keeps the scan.
+    private static bool AcceptExisting(YouTubeRootLayout layout, string[] actual)
+    {
+        if (Capture()?.Epoch != layout.Epoch || Plugin.Instance?.Options is not { } config) return false;
+        var snapshot = YouTubeChannelProvenance.Copy(config);
+        if (snapshot.PersonalChannelVisibility != "OwnUser" || string.IsNullOrWhiteSpace(snapshot.ApiKey)) return false;
+        var expected = new HashSet<string>(StringComparer.Ordinal);
+        if (snapshot.ShowTrending) expected.Add("trending_x_all");
+        if (snapshot.ShowCategories) expected.Add("categories_x_root");
+        foreach (var term in YouTubeChannel.ConfiguredTerms(snapshot.WatchLaterPlaylist))
+        {
+            if (!YouTubeChannel.IsSupportedPublicPlaylistId(term)) return false;
+            expected.Add("playlist_x_" + term);
+        }
+        string? Canonical(string term) => YouTubeChannel.IsCanonicalChannelId(term) ? term
+            : YouTubeChannel.IsCanonicalHandle(term) ? YouTubeAdminProvenance.KnownChannel(snapshot, term) : null;
+        foreach (var term in YouTubeChannel.ConfiguredTerms(snapshot.SavedItems))
+        {
+            var id = Canonical(term);
+            if (id != null) expected.Add("channel_x_" + id);
+            else if (YouTubeChannel.IsSupportedPublicPlaylistId(term)) expected.Add("playlist_x_" + term);
+            else return false;
+        }
+        var common = expected.ToHashSet(StringComparer.Ordinal);
+        if (snapshot.EnablePersonalSubscriptions)
+            foreach (var profile in YouTubePersonalCatalog.ActiveProfiles(snapshot))
+            {
+                var seen = common.ToHashSet(StringComparer.Ordinal);
+                foreach (var term in profile.Channels.Distinct(StringComparer.Ordinal))
+                {
+                    var id = Canonical(term);
+                    if (id == null && YouTubeChannel.IsCanonicalHandle(term))
+                    {
+                        // A pre-existing scoped row binds this current owner and
+                        // subscription token to one canonical channel. It proves
+                        // shape only; no global identity or permission is added.
+                        var prefix = YouTubePersonalCatalog.WrapOwn(profile.ScopeId,
+                            YouTubeChannelProvenance.Token(term), "channel_x_");
+                        var matches = actual.Where(value => value.StartsWith(prefix, StringComparison.Ordinal))
+                            .Select(value => value.Substring(prefix.Length))
+                            .Where(YouTubeChannel.IsCanonicalChannelId).Distinct(StringComparer.Ordinal).ToArray();
+                        if (matches.Length == 1) id = matches[0];
+                    }
+                    if (id == null) return false;
+                    if (seen.Add("channel_x_" + id))
+                        expected.Add(YouTubePersonalCatalog.WrapOwn(profile.ScopeId,
+                            YouTubeChannelProvenance.Token(term), "channel_x_" + id));
+                }
+            }
+        return actual.Length == expected.Count && expected.SetEquals(actual)
+            && actual.All(ResolvedRootId) && Capture()?.Epoch == layout.Epoch;
     }
 
     private static string[] ReadRoots(ILibraryManager library, CancellationToken token)

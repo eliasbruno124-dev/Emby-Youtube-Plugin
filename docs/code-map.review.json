@@ -3,7 +3,7 @@
   "flows": {
     "startup": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "b1c354046d1f90aca77036098d9873578b239b10ff77ed3a29dc81ad1ce14f73",
+      "definitionHash": "4d0f0f66abbd45813c1239fb86fa8edf8f4a38b08e6bcbca8a452e26adbcb709",
       "sourceHashes": {
         "EmbeddedDependencyLoader.cs": "894579e40db3d381c41ecf37eeb98fc1f65cd7bf81ae05b0ddbc627b81465c2e",
         "Emby.YouTubePlugin.csproj": "5db0bff6178912f556019dd460aa1708f9c32c7a51dddb2bb02d6b1acdb2a032",
@@ -14,13 +14,13 @@
         "YouTubeAdminProvenance.cs": "74c36811427022027c6477e83fba402cfb265bf207df9d2fce6761dee156a64e",
         "YouTubeChannelProvenance.cs": "8e7bc3ec9f8d70d78bb3caab93775b58baf49103921d15e09d93a74d0d399aca",
         "YouTubePersonalStartup.cs": "bd27b9d41aa2f24ba40d41580677352872adaab0b6d7537b808de2a3c0f0f50a",
-        "YouTubeRootMaterialization.cs": "16e4dfe8f2aff1fe0c438f72c7fbbbb35866d5aa1ea90badf9a8354c7d439150",
-        "YouTubeRootMigration.cs": "3c80c0a5c41849f0a54726d844159c60af6fd67950088f149fb6c876b2cc9c48"
+        "YouTubeRootMaterialization.cs": "1fd61ae74753f39a2c83fb8be1f42b6abed870e2b1f2bcdc3e75a7881f7983cf",
+        "YouTubeRootMigration.cs": "a98d1051f45192e0f74932b9c119aab6cd73c2ca09aa6e8e2780bf9ae769a9df"
       }
     },
     "configuration": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "9c04bb6e2449ba2cdafa97c3fac269e13aba889f1dbda13057d5d534c4a3a260",
+      "definitionHash": "ea3e56ec5c72d271000ec47597d3f95e13762775672673de9fb04098edde07ec",
       "sourceHashes": {
         "Configuration/YouTubeConfiguration.html": "75b0ebbaee32ca3785cc1c69a693880375466b2f0880397753c7d68d03daa3cc",
         "Configuration/YouTubeConfiguration.js": "58651ffaeb2bbd338424854fe685163166230d64d5d5802af24561a276fc7713",
@@ -29,14 +29,14 @@
         "PluginConfiguration.cs": "006e98b719c3fe198c3e9c0a1bd9d415fce9e2371f1a40335625aeb829c6cc12",
         "PluginEntryPoint.cs": "a7934c9a61e6e466e26ee6f06788824ce7b5646a82eadd20c2e9193443d9b0eb",
         "YouTubeChannel.cs": "ca728026afb5ecfd2fa1ed69d204517f383de364afe95126268574576096ffaf",
-        "YouTubeConfigSaveService.cs": "07b1a2d3cee2a2ad462774290088aa3e9abb53d0dc2ec9557c57fc1405b1c782",
-        "YouTubeRootMaterialization.cs": "16e4dfe8f2aff1fe0c438f72c7fbbbb35866d5aa1ea90badf9a8354c7d439150",
-        "YouTubeRootMigration.cs": "3c80c0a5c41849f0a54726d844159c60af6fd67950088f149fb6c876b2cc9c48"
+        "YouTubeConfigSaveService.cs": "bbd72e5f94a811fad7e9b4e3256a8a28a385d4f461e06c10a7b237d2cf9bbe48",
+        "YouTubeRootMaterialization.cs": "1fd61ae74753f39a2c83fb8be1f42b6abed870e2b1f2bcdc3e75a7881f7983cf",
+        "YouTubeRootMigration.cs": "a98d1051f45192e0f74932b9c119aab6cd73c2ca09aa6e8e2780bf9ae769a9df"
       }
     },
     "browsing": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "ef536cfd24157c233cf413a4f45daee48e05a19bb230102fc2024bab2eabce4a",
+      "definitionHash": "db70e0fc327601a7fa96e29ed1e8da21b65e4221413fe7b7cfd672cb4955a3c1",
       "sourceHashes": {
         "ChannelContentFlags.cs": "ebf0e9116d30c60fbefbe455a35b3764881a291965ef8a04d58e36fb1925aef0",
         "FolderIcons.cs": "d558dc6c9e059c89aaabd9692d51ff47f45473969b7ca41b74c72c885a5cb1ed",
@@ -55,7 +55,7 @@
     },
     "direct-playback": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "ca40da74009145e6de2c26858708cd15ac1337bde7b0e99601914e98e57a4b88",
+      "definitionHash": "849eb49540a07a2dabdf36be581583ca7a7292a7e6acef4baa12b9b60a536625",
       "sourceHashes": {
         "DashboardYouTubePlayerInterceptor.cs": "b6b972f5049133877f6009ad45151763e907437b127849352123aefd90d75b56",
         "ManagedResolver/Compatibility.cs": "b51561b057c5890f6568b633a53f91bd2d9c67ce3b77192c0c8fdd4e070d9891",
@@ -93,7 +93,7 @@
     },
     "direct-av-output": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "b48009f681894f69e684a63235ff1a29ce216a917a01e8b33b29b221fc335d54",
+      "definitionHash": "56ee618248b7a63148a18fca497cb4bca2f7960f7e033e2a220e625cfb0d97c5",
       "sourceHashes": {
         "PlaybackIntentInterceptor.cs": "e499d6d75ec94b06c3b811ee6e5c0ddf7cb2fd688fc0507966d298c36149c753",
         "YouTubeChannel.DirectPlayback.cs": "06a5aa3d960d2be0243ca2d91b52e94a6cf272fa5145d8aa6f4ded5604f6126b",
@@ -102,7 +102,7 @@
     },
     "managed-source": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "42fdecab914de1e46628e302a2c581c658aaa46085f3ec91d5ce55d7fa0bb206",
+      "definitionHash": "926cdddb236c82a1425f91565698d6681f24cb305bdeac3ce6356cc5e91e78d5",
       "sourceHashes": {
         "ManagedResolver/Compatibility.cs": "b51561b057c5890f6568b633a53f91bd2d9c67ce3b77192c0c8fdd4e070d9891",
         "ManagedResolver/License.txt": "0be76f79072fad21b789198003de6d29f04af9f7c96ef9185d407508ad5d167f",
@@ -124,7 +124,7 @@
     },
     "personal-settings": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "53d7c6929c5b1f8f70b7553140a57502e090bfa507f2a74060a764bd3b1aecc5",
+      "definitionHash": "f4d19c6a1765039171ce1cd0339c76cfb98cd47e6d3e17eede2600c7e8254412",
       "sourceHashes": {
         "Configuration/YouTubeConfiguration.html": "75b0ebbaee32ca3785cc1c69a693880375466b2f0880397753c7d68d03daa3cc",
         "Configuration/YouTubeConfiguration.js": "58651ffaeb2bbd338424854fe685163166230d64d5d5802af24561a276fc7713",
@@ -139,20 +139,20 @@
         "YouTubeChannel.Personal.cs": "209d7f13bd80b069840446060ff5ebd6597fd8addf942aa61fc1f0aafb5d66a0",
         "YouTubeChannel.cs": "ca728026afb5ecfd2fa1ed69d204517f383de364afe95126268574576096ffaf",
         "YouTubeChannelProvenance.cs": "8e7bc3ec9f8d70d78bb3caab93775b58baf49103921d15e09d93a74d0d399aca",
-        "YouTubeConfigSaveService.cs": "07b1a2d3cee2a2ad462774290088aa3e9abb53d0dc2ec9557c57fc1405b1c782",
+        "YouTubeConfigSaveService.cs": "bbd72e5f94a811fad7e9b4e3256a8a28a385d4f461e06c10a7b237d2cf9bbe48",
         "YouTubeHomeSectionManager.cs": "a6ed52517109f1208a2141351ff284b95e492569550813690336bd93236f8e09",
         "YouTubePersonalProfiles.cs": "64fc0698c90300ac0a1c725892447cd28c19586ec1ed273bcf607e9c174794a2",
         "YouTubePersonalRequestContext.cs": "ea8d3caebf0119497cb8a571ca0b3793edd9222aae627ab8718f93ed5c8ae13e",
         "YouTubePersonalService.cs": "be922cdaa5a2f20ed3707c6dbbde7d79c9f594f34c922f82b879df3529839c6d",
         "YouTubePersonalStartup.cs": "bd27b9d41aa2f24ba40d41580677352872adaab0b6d7537b808de2a3c0f0f50a",
         "YouTubePersonalVisibility.cs": "4eb23310f2d8e9772ee25faf23131d3db0dbb81272ca67e2d5ea7101873a7ca7",
-        "YouTubeRootMaterialization.cs": "16e4dfe8f2aff1fe0c438f72c7fbbbb35866d5aa1ea90badf9a8354c7d439150",
-        "YouTubeRootMigration.cs": "3c80c0a5c41849f0a54726d844159c60af6fd67950088f149fb6c876b2cc9c48"
+        "YouTubeRootMaterialization.cs": "1fd61ae74753f39a2c83fb8be1f42b6abed870e2b1f2bcdc3e75a7881f7983cf",
+        "YouTubeRootMigration.cs": "a98d1051f45192e0f74932b9c119aab6cd73c2ca09aa6e8e2780bf9ae769a9df"
       }
     },
     "api-cache": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "52b72bcd6aacbe115d632a9a7e6235120289a7388e892bb54e20d2744147c077",
+      "definitionHash": "3de9b6e38788158c9d500c8da783d737690f302113b85f009001e5ce7aa5b260",
       "sourceHashes": {
         "Plugin.cs": "6330563149c9b7f563ddd467d6cbeb5167643618aa55ed9fc397f0819eac5378",
         "QuotaTracker.cs": "ee9311c138b3a3bf72fc1134b4032fa06660e90dbc12b636bab9f87bb16276b1",
@@ -163,7 +163,7 @@
     },
     "polling": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "5e736724c49f3be7a8d6b45af26f841cc9f90617c1e611a343f72c66e2dfe1bc",
+      "definitionHash": "01229c34a933cf92ae4e580136f268f33308c50e225c49687158ac56edc6ac80",
       "sourceHashes": {
         "PluginConfiguration.cs": "006e98b719c3fe198c3e9c0a1bd9d415fce9e2371f1a40335625aeb829c6cc12",
         "PluginEntryPoint.cs": "a7934c9a61e6e466e26ee6f06788824ce7b5646a82eadd20c2e9193443d9b0eb",
@@ -173,7 +173,7 @@
     },
     "playback": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "c494a1cb63b5497edf5cf9374a06d7f1f3776d5a610e7928ae1a6e7ac9e1877b",
+      "definitionHash": "bbbb1d230fdae3fa518e4472932eeb66404f2018c9f609116fec3a397dc0d283",
       "sourceHashes": {
         "PlaybackIntentInterceptor.cs": "e499d6d75ec94b06c3b811ee6e5c0ddf7cb2fd688fc0507966d298c36149c753",
         "PluginEntryPoint.cs": "a7934c9a61e6e466e26ee6f06788824ce7b5646a82eadd20c2e9193443d9b0eb",
@@ -184,7 +184,7 @@
     },
     "web-and-captions": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "50464963101957a3c660c7296df1df6c2dc887b5921166ed2e4661808f5114db",
+      "definitionHash": "680899bda3394f324d32cba384e5b9d05760b075daa17da12e3a508d7998d008",
       "sourceHashes": {
         "DashboardYouTubePlayerInterceptor.cs": "b6b972f5049133877f6009ad45151763e907437b127849352123aefd90d75b56",
         "Emby.YouTubePlugin.csproj": "5db0bff6178912f556019dd460aa1708f9c32c7a51dddb2bb02d6b1acdb2a032",
@@ -197,7 +197,7 @@
     },
     "home-sections": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "4b42d4751d4c9dfb396f99aaf1cf0255c8b1da8653c0cd54710d0d8537af6a9a",
+      "definitionHash": "858095330526f7fc539b23f062476155454a59489063754be9e153cbf61d81ed",
       "sourceHashes": {
         "PluginConfiguration.cs": "006e98b719c3fe198c3e9c0a1bd9d415fce9e2371f1a40335625aeb829c6cc12",
         "PluginEntryPoint.cs": "a7934c9a61e6e466e26ee6f06788824ce7b5646a82eadd20c2e9193443d9b0eb",
@@ -208,7 +208,7 @@
     },
     "repairs-and-logs": {
       "inputSetHash": "d3757c7df5fbf2c7e8014abad1e1d4e6df7e70240ae48ffda7ea63688374c9ee",
-      "definitionHash": "abc5ff9e9dfe7468e1c7c7c69f9c8ed9877927f33bc43dd0318a64711a3540a2",
+      "definitionHash": "2c3c248d56c3cf23ff70a0621ff1d166c48d346e6e144d595d1d387f35178935",
       "sourceHashes": {
         "PluginEntryPoint.cs": "a7934c9a61e6e466e26ee6f06788824ce7b5646a82eadd20c2e9193443d9b0eb",
         "PluginFileLog.cs": "91f65b39f7278475aebe2f5e6e5be1e452ae90ed17fcf266949ac4e4b417b9e3",

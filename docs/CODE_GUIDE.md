@@ -150,6 +150,10 @@ Er ist der manuelle Weg für bereits vorhandene alte Materialisierungen.
 Konfigurationsspeicherung, Hashpoll, Profiländerung und Benutzerberechtigung
 melden Revisionen synchron an denselben Worker. Die älteren Upgrade-/Surface-
 Benachrichtigungen nutzen ihn ebenfalls; Playlist-Inhaltsrefreshes bleiben normal.
+Bei einem Sichtbarkeitswechsel wartet der Admin-Speicherendpunkt außerhalb seiner
+Locks auf den Worker und einen frischen aktuellen Stempelnachweis. Erst danach
+bestätigt er Erfolg; bei fehlendem Nachweis bleiben die Einstellungen gespeichert,
+aber der Endpunkt meldet einen Fehler statt einen fertigen Layoutwechsel.
 [YouTubeRootMaterialization](../YouTubeRootMaterialization.cs) fasst wiederholte
 Meldungen zusammen. Pro angenommener Generation gibt es einen Versuch; ändert
 sich die Admin-Identitätsrevision während des Scans selbst, ist höchstens ein
@@ -163,8 +167,13 @@ laufenden Epoche. Der Stempel `youtube-root-materialization-v1.json` enthält
 explizites Schema 1, Revisionshash und Fingerprint der Provider-Root-IDs; weder
 Keys noch Profile oder Kanalnamen werden darin gespeichert. Ein passender
 Stempel genügt nur zusammen mit einem frischen gleichen nativen Root-Fingerprint.
-Fehlender/alter/korrupt gewordener Stempel oder abweichende native IDs verlangen
-einen neuen Nachweis, auch bei unveränderter Assemblyversion.
+Ein neuer Nachweis ist auch bei unveränderter Assemblyversion erforderlich.
+Nur bei nachweislich fehlender Stempeldatei kann eine bereits exakt passende
+OwnUser-Struktur ohne Refresh übernommen werden: alle gemeinsamen IDs müssen
+konfiguriert und kanonisch belegt sein, persönliche IDs zu aktuellem Scope und
+Beitragstoken passen. Fehlende, zusätzliche oder mehrdeutige IDs verhindern das.
+Zwei frische Root-Lesungen und unveränderte Epoche sichern diese Übernahme ab.
+Ein vorhandener alter oder korrupter Stempel durchläuft dagegen den Refreshpfad.
 
 Der Provider erfasst seine Epoche vor dem globalen Rootaufbau und meldet danach
 dessen tatsächliche erwartete IDs. Persönliche Unterenumerationen, `msg`-Roots,

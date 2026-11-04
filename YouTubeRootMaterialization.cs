@@ -23,6 +23,7 @@ internal sealed class YouTubeRootMaterialization : IDisposable
     private readonly Func<CancellationToken, Task<bool>> _refresh;
     private readonly Func<string?> _stampPath;
     private readonly Action<string> _log;
+    private readonly Func<YouTubeRootLayout, string[], bool>? _acceptExisting;
     private readonly CancellationTokenSource _lifetime;
     private readonly CancellationToken _token;
     private YouTubeRootLayout? _requested;
@@ -33,10 +34,11 @@ internal sealed class YouTubeRootMaterialization : IDisposable
 
     internal YouTubeRootMaterialization(Func<YouTubeRootLayout?> capture,
         Func<CancellationToken, Task<string[]>> readRoots, Func<CancellationToken, Task<bool>> refresh,
-        Func<string?> stampPath, Action<string> log, CancellationToken lifetime = default)
+        Func<string?> stampPath, Action<string> log, CancellationToken lifetime = default,
+        Func<YouTubeRootLayout, string[], bool>? acceptExisting = null)
     {
         _capture = capture; _readRoots = readRoots; _refresh = refresh;
-        _stampPath = stampPath; _log = log;
+        _stampPath = stampPath; _log = log; _acceptExisting = acceptExisting;
         _lifetime = CancellationTokenSource.CreateLinkedTokenSource(lifetime);
         _token = _lifetime.Token;
     }
@@ -72,6 +74,20 @@ internal sealed class YouTubeRootMaterialization : IDisposable
             _force |= force;
             return _worker ??= Task.Run(RunAsync);
         }
+    }
+
+    internal async Task<bool> EnsureCurrentAsync(string reason)
+    {
+        await RequestAsync(reason).ConfigureAwait(false);
+        if (_token.IsCancellationRequested) return false;
+        var current = _capture();
+        if (current == null) return false;
+        var actual = await _readRoots(_token).ConfigureAwait(false);
+        var confirmed = _capture();
+        lock (_sync)
+            return !_disposed && !_token.IsCancellationRequested
+                && _requested?.Epoch == current.Epoch && confirmed?.Epoch == current.Epoch
+                && MatchesStamp(current.Revision, Fingerprint(actual));
     }
 
     internal RootAttempt? BeginRoot()
@@ -159,18 +175,31 @@ internal sealed class YouTubeRootMaterialization : IDisposable
         if (!Current(layout, generation)) return;
         if (!force && MatchesStamp(layout.Revision, Fingerprint(actual)))
         { _log("[YT] Root materialization already verified for current policy."); return; }
-        lock (_sync) _observation = null;
-        _log("[YT] Root materialization differs from current policy/format; requesting registered YouTube refresh.");
-        if (!await _refresh(_token).ConfigureAwait(false)) return;
-        _token.ThrowIfCancellationRequested();
-        actual = await _readRoots(_token).ConfigureAwait(false);
+        bool adopt = !force && StampAbsent() && _acceptExisting?.Invoke(layout, actual) == true;
         if (!Current(layout, generation)) return;
-        Observation? observed;
-        lock (_sync) observed = _observation;
-        if (observed == null || observed.Attempt.Generation != generation
-            || observed.Attempt.Layout.Epoch != layout.Epoch
-            || !actual.ToHashSet(StringComparer.Ordinal).SetEquals(observed.Ids))
-        { _log("[YT] Root refresh ended without a matching current materialization; no success stamp."); return; }
+        if (!adopt)
+        {
+            lock (_sync) _observation = null;
+            _log("[YT] Root materialization differs from current policy/format; requesting registered YouTube refresh.");
+            if (!await _refresh(_token).ConfigureAwait(false)) return;
+            _token.ThrowIfCancellationRequested();
+            actual = await _readRoots(_token).ConfigureAwait(false);
+            if (!Current(layout, generation)) return;
+            Observation? observed;
+            lock (_sync) observed = _observation;
+            if (observed == null || observed.Attempt.Generation != generation
+                || observed.Attempt.Layout.Epoch != layout.Epoch
+                || !actual.ToHashSet(StringComparer.Ordinal).SetEquals(observed.Ids))
+            { _log("[YT] Root refresh ended without a matching current materialization; no success stamp."); return; }
+        }
+        else
+        {
+            // Adoption is a read-only shape proof, not a provider rebuild.
+            // Confirm the same committed rows still exist before recording it.
+            var confirmed = await _readRoots(_token).ConfigureAwait(false);
+            if (!Current(layout, generation) || Fingerprint(confirmed) != Fingerprint(actual)
+                || _acceptExisting?.Invoke(layout, confirmed) != true) return;
+        }
         var path = _stampPath();
         if (path == null) return;
         var bytes = JsonSerializer.SerializeToUtf8Bytes(new Stamp
@@ -195,6 +224,19 @@ internal sealed class YouTubeRootMaterialization : IDisposable
             try { File.Delete(temporary); }
             catch (Exception error) when (error is not OutOfMemoryException) { }
         }
+    }
+
+    private bool StampAbsent()
+    {
+        try
+        {
+            var path = _stampPath();
+            if (path == null) return false;
+            _ = File.GetAttributes(path);
+            return false;
+        }
+        catch (FileNotFoundException) { return true; }
+        catch (Exception error) when (error is not OutOfMemoryException) { return false; }
     }
 
     private bool MatchesStamp(string revision, string fingerprint)

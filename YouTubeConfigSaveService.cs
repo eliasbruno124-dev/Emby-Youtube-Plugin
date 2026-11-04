@@ -131,6 +131,7 @@ namespace Emby.YouTubePlugin
             if (dto == null)
                 throw new ArgumentException("Empty or invalid YouTube configuration payload.");
 
+            bool visibilityChanged;
             lock (SaveLock)
             lock (YouTubePersonalProfiles.SyncRoot)
             {
@@ -138,6 +139,9 @@ namespace Emby.YouTubePlugin
                 if (dto.PersonalChannelVisibility != null
                     && dto.PersonalChannelVisibility is not ("OwnUser" or "Shared"))
                     throw new ArgumentException("Invalid personal channel visibility.");
+
+                visibilityChanged = dto.PersonalChannelVisibility != null
+                    && dto.PersonalChannelVisibility != config.PersonalChannelVisibility;
 
                 // Only overwrite fields the page actually sent. Strings/numbers/bools
                 // are nullable on the DTO so a partial payload can't wipe other values.
@@ -170,6 +174,11 @@ namespace Emby.YouTubePlugin
                 // changed — invalidates caches and kicks a channel refresh.
                 plugin.SaveConfiguration();
             }
+
+            // Do not acknowledge a mode switch while the next library request
+            // would still read the old structure. Never await inside either lock.
+            if (visibilityChanged && !await YouTubeRootMigration.WaitForCurrentAsync().ConfigureAwait(false))
+                throw new InvalidOperationException("YouTube settings were saved, but the new channel layout could not be verified. Check the plugin log before reloading the channel.");
 
             YouTubeChannel.LogPublic("[YT] Configuration saved via plugin endpoint (Emby 4.10 PluginService 500 bypass).");
             return new SaveYouTubeConfigurationResult { Saved = true };

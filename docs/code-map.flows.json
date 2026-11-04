@@ -4,7 +4,7 @@
     {
       "id": "startup",
       "title": "Plugin discovery and lifecycle",
-      "summary": "Emby discovers plugin/providers/services; PluginEntryPoint connects runtime services, hooks, caches, workers and timers. Reflection targets remain runtime capabilities, not build guarantees. A dedicated pre-startup entrypoint installs personal visibility before HTTP is opened; operational jobs stay in ordinary startup. After catalog reset, early startup restores key-free admin handle identities and resolves missing mappings with a bounded cache-first bootstrap before HTTP opens; it does not depend on a provider root refresh. Normal startup then schedules one coordinated root-materialization migration independent of assembly-version stamps; success requires a current provider-root observation and matching fresh native rows after actual registered-provider refresh completion.",
+      "summary": "Emby discovers plugin/providers/services; PluginEntryPoint connects runtime services, hooks, caches, workers and timers. Reflection targets remain runtime capabilities, not build guarantees. A dedicated pre-startup entrypoint installs personal visibility before HTTP is opened; operational jobs stay in ordinary startup. After catalog reset, early startup restores key-free admin handle identities and resolves missing mappings with a bounded cache-first bootstrap before HTTP opens; it does not depend on a provider root refresh. Normal startup then schedules one coordinated root-materialization migration independent of assembly-version stamps; success requires a current provider-root observation and matching fresh native rows after actual registered-provider refresh completion. With a provably absent first-installation stamp, an exact offline-provable current OwnUser layout can instead be adopted after two unchanged root reads without another refresh.",
       "sources": [
         "Plugin.cs",
         "PluginEntryPoint.cs",
@@ -22,7 +22,7 @@
     {
       "id": "configuration",
       "title": "Settings and refresh",
-      "summary": "The AMD view serializes autosaves to the custom Admin endpoint; Plugin normalizes/persists settings and refreshes only content-affecting changes using shared configuration hashing. Saves/hash polls and profile eligibility changes signal the root coordinator synchronously. Legacy upgrade/surface notices share that coordinator; genuine playlist-content polling remains separate. Strict native refresh owns the shared gate/activity unit until true completion.",
+      "summary": "The AMD view serializes autosaves to the custom Admin endpoint; Plugin normalizes/persists settings and refreshes only content-affecting changes using shared configuration hashing. Saves/hash polls and profile eligibility changes signal the root coordinator synchronously. Legacy upgrade/surface notices share that coordinator; genuine playlist-content polling remains separate. Strict native refresh owns the shared gate/activity unit until true completion. For visibility-mode changes the admin endpoint waits outside its locks for current verified materialization before reporting success.",
       "sources": [
         "Configuration/YouTubeConfiguration.html",
         "Configuration/YouTubeConfiguration.js",
