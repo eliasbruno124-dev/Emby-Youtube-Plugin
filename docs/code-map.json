@@ -11395,8 +11395,8 @@
     },
     {
       "path": "LICENSE",
-      "sha256": "4c51d98784cda9a5b12071dd7204dd6ab05a9b5944a9625eebbc7bb8b1417f48",
-      "bytes": 1021,
+      "sha256": "d8cd7f4298d11e8f90385de86cdcecb74ef76ff08737696efcc00bfab4240aeb",
+      "bytes": 1068,
       "anchor": "file-c693279643b8cd5d",
       "lines": null,
       "buildRole": "Repository support",

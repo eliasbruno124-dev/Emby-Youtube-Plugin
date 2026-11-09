@@ -1191,7 +1191,7 @@ Plugin Compile source (SDK default); 1669 bytes; 52 lines.
 <a id="file-c693279643b8cd5d"></a>
 ## [LICENSE](../LICENSE)
 
-Repository support; 1021 bytes.
+Repository support; 1068 bytes.
 
 <a id="file-813f15c5a6f705bb"></a>
 ## [ManagedResolver/Compatibility.cs](../ManagedResolver/Compatibility.cs)

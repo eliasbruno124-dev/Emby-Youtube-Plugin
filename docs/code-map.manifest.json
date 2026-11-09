@@ -87,7 +87,7 @@
     },
     {
       "path": "LICENSE",
-      "sha256": "4c51d98784cda9a5b12071dd7204dd6ab05a9b5944a9625eebbc7bb8b1417f48"
+      "sha256": "d8cd7f4298d11e8f90385de86cdcecb74ef76ff08737696efcc00bfab4240aeb"
     },
     {
       "path": "ManagedResolver/Compatibility.cs",
@@ -469,11 +469,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "46676c68f4a7114cf4065ed28a76d7d97a5769e2c14778206746440d57311583"
+      "sha256": "cdb968d21cd9fee9b539510dd7a1fff531ee50f599e6cdd09d2416767a05b368"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "fbd136ff077c6b0575aa56492e82f59f3f3289e100de18be90fb6d706473b9c7"
+      "sha256": "7c8bf1bdb6a447fc8fe33676fd0dd35850142ddeae53eb6aba81e33d6545779e"
     }
   ],
   "parsers": {
