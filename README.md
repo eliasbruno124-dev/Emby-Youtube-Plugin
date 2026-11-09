@@ -146,7 +146,7 @@ separate.
 ## Notes
 
 - Videos play in Emby's own player by default, up to 1080p (when Emby transcodes, the output is capped at 30 fps). To use the YouTube embed player in the browser instead, turn off **Use the Emby player** and reload the app. If Emby playback fails, the plugin does not switch to the embed player by itself.
-- **Play movie and series trailers in the Emby player** (off by default, needs **Use the Emby player**): the YouTube trailer links in your movie and series metadata become local trailers. The first time a trailer is opened, the plugin adds up to five trailer entries to that title; they hold no files and use no API quota. A trailer file of your own takes precedence. Turning the option off removes these entries again. Trailers play without subtitles; cinema mode intros are not affected. The Emby Trailers channel plugin is not needed.
+- **Play movie and series trailers in the Emby player** (off by default, independent of **Use the Emby player**): the YouTube trailer links in your movie and series metadata become local trailers. The first time a trailer is opened, the plugin adds up to five trailer entries to that title; they hold no files and use no API quota. A trailer file of your own takes precedence. Turning the option off removes these entries again. Trailers play without subtitles; cinema mode intros are not affected. The Emby Trailers channel plugin is not needed.
 - Video information comes from the official YouTube Data API v3.
 - Audio tracks, subtitles and chapters are available when the video has them; how you pick them depends on the Emby app.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.

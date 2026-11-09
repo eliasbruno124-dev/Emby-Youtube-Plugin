@@ -29,8 +29,9 @@ namespace Emby.YouTubePlugin
         private static readonly object Gate = new();
         private static int _cleanupQueued;
 
-        internal static bool Enabled =>
-            Plugin.Instance?.Options.NativeTrailersEnabled == true && YouTubeDirectPlayback.Enabled;
+        // Independent of "Use the Emby player": that option only decides how
+        // channel videos play. Trailers always use the native pipeline.
+        internal static bool Enabled => Plugin.Instance?.Options.NativeTrailersEnabled == true;
 
         internal static bool IsOwner(BaseItem? item) =>
             item is Movie or Series && !item.ExtraType.HasValue;
@@ -164,8 +165,8 @@ namespace Emby.YouTubePlugin
             }, owner, false);
         }
 
-        // Called on startup and after every save. Removing the option or the
-        // Emby player must not leave trailers that can no longer play.
+        // Called on startup and after every save. Removing the option must not
+        // leave trailers that can no longer play.
         internal static void QueueCleanupIfDisabled(string reason)
         {
             if (Enabled || Interlocked.Exchange(ref _cleanupQueued, 1) == 1) return;

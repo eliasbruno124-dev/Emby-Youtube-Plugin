@@ -31,7 +31,7 @@ namespace Emby.YouTubePlugin
             if (videoId == null || !VideoIdPattern.IsMatch(videoId)) throw Failure("Invalid YouTube video ID.");
             cancellationToken.ThrowIfCancellationRequested();
             var options = Plugin.Instance?.Options;
-            if (options?.DirectPlaybackEnabled != true) throw Failure("Direct YouTube playback is disabled.");
+            if (options == null || !YouTubeDirectPlayback.PipelineEnabled) throw Failure("Direct YouTube playback is disabled.");
             string key = videoId + "\n" + YouTubeManagedResolver.Revision;
             Flight flight;
             Task<YouTubeResolvedVideo>? invalidated = null;

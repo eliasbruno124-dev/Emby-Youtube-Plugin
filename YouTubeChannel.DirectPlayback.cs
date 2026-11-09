@@ -45,6 +45,9 @@ namespace Emby.YouTubePlugin
         private static Func<Uri, IReadOnlyDictionary<string, string>, int, CancellationToken, Task<byte[]>> _fetchMaster =
             YouTubeDirectHttp.GetBytesAsync;
         internal static bool Enabled => Plugin.Instance?.Options.DirectPlaybackEnabled == true;
+        // Channel videos use the native pipeline only in direct mode. Library
+        // trailers may use it on their own option, independent of that mode.
+        internal static bool PipelineEnabled => Enabled || Plugin.Instance?.Options.NativeTrailersEnabled == true;
         internal static bool IsVideoIdCharacter(char c) => c is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '_' or '-';
 
         internal static async Task<IEnumerable<MediaSourceInfo>> GetMediaSourcesAsync(string videoId, CancellationToken cancellationToken)
@@ -55,7 +58,7 @@ namespace Emby.YouTubePlugin
             {
                 var resolved = await YouTubeStreamResolver.ResolveAsync(videoId, cancellationToken).ConfigureAwait(false);
                 stage = "format selection";
-                if (!Enabled) throw new InvalidOperationException("Direct playback mode changed; retry playback.");
+                if (!PipelineEnabled) throw new InvalidOperationException("Direct playback mode changed; retry playback.");
                 var metadata = resolved.Metadata;
                 if (resolved.ExpiresUtc <= DateTime.UtcNow.AddSeconds(5))
                     throw new InvalidOperationException("Direct playback metadata has expired.");
@@ -197,7 +200,7 @@ namespace Emby.YouTubePlugin
                     source.MediaStreams.AddRange(audioStreams);
                 }
                 cancellationToken.ThrowIfCancellationRequested();
-                if (!Enabled || resolved.ExpiresUtc <= DateTime.UtcNow.AddSeconds(5))
+                if (!PipelineEnabled || resolved.ExpiresUtc <= DateTime.UtcNow.AddSeconds(5))
                     throw new InvalidOperationException("Direct playback metadata is no longer available.");
                 var isLive = Text(metadata, "live_status") == "is_live"
                     || metadata.TryGetProperty("is_live", out var live) && live.ValueKind == JsonValueKind.True;
@@ -674,7 +677,7 @@ namespace Emby.YouTubePlugin
         private static void PreferH264Prefix(object __0)
         {
             var binding = _binding;
-            if (!YouTubeDirectPlayback.Enabled || binding == null) return;
+            if (!YouTubeDirectPlayback.PipelineEnabled || binding == null) return;
             var source = binding.Source.GetValue(__0) as MediaSourceInfo;
             if (!IsCanonicalDirectSource(source)) return;
             var codecs = binding.SupportedCodecs.GetValue(__0) as string[];
@@ -706,7 +709,7 @@ namespace Emby.YouTubePlugin
         private static MediaStream? GetStereoOrUnknownAudio(object state, object outputStream)
         {
             var binding = _binding;
-            if (!YouTubeDirectPlayback.Enabled || binding == null || outputStream == null) return null;
+            if (!YouTubeDirectPlayback.PipelineEnabled || binding == null || outputStream == null) return null;
             var source = binding.Source.GetValue(state) as MediaSourceInfo;
             if (!IsCanonicalDirectSource(source)) return null;
             var audio = binding.OriginalAudioStream.GetValue(outputStream) as MediaStream;
@@ -782,7 +785,7 @@ namespace Emby.YouTubePlugin
         private static void ApplyOutputLimit(object state, object resolution)
         {
             var binding = _binding;
-            if (!YouTubeDirectPlayback.Enabled || binding == null) return;
+            if (!YouTubeDirectPlayback.PipelineEnabled || binding == null) return;
             var source = binding.Source.GetValue(state) as MediaSourceInfo;
             if (!IsCanonicalDirectSource(source)) return;
             try

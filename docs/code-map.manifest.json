@@ -19,7 +19,7 @@
     },
     {
       "path": "Configuration/YouTubeConfiguration.html",
-      "sha256": "f4043d09c835efa58260325dc1b7d6ad9375246da121666c405377317a2c56d6"
+      "sha256": "73f82be12a1345a920726adf6ad8d5f428e423f4742aec7173ab4124bbe9ee1a"
     },
     {
       "path": "Configuration/YouTubeConfiguration.js",
@@ -159,7 +159,7 @@
     },
     {
       "path": "PluginConfiguration.cs",
-      "sha256": "1e6721f5e661b5eb44b9b3ab0f6cb63192d97720e4d9d24b4f577ea5e2850d20"
+      "sha256": "a2f448e8b327826bb29ccddc6d9e86d2df6588de8c2e33653de1de0e84dd87b3"
     },
     {
       "path": "PluginEntryPoint.cs",
@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "68e50e1ad67db94816909eba9f3163e9def237a67cbcc2914396ba8ced30b0e7"
+      "sha256": "0cd9b0d0dcffbe4be50c20bff9887f912fdf499716f256c8600e1fe7d9d5288c"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -211,7 +211,7 @@
     },
     {
       "path": "YouTubeChannel.DirectPlayback.cs",
-      "sha256": "06a5aa3d960d2be0243ca2d91b52e94a6cf272fa5145d8aa6f4ded5604f6126b"
+      "sha256": "76c44377bdf51dd865dea2a9b266b261e53cb986d154808657aa6fd99dd999cd"
     },
     {
       "path": "YouTubeChannel.Enrichment.cs",
@@ -375,7 +375,7 @@
     },
     {
       "path": "YouTubeStreamResolver.cs",
-      "sha256": "784cdb92c5585e00cd1b0ac75cc9f43c00bbee9f371029962326cd8261b00f7f"
+      "sha256": "a5fd5ba4fc857e8c2c7ae74b1a1609e50065ddf7f01b971e556184ab616a3c35"
     },
     {
       "path": "YouTubeSubtitleDelivery.cs",
@@ -383,11 +383,11 @@
     },
     {
       "path": "YouTubeTrailers.cs",
-      "sha256": "5deb90d4c01df3bb303fb1a095e1abaf33eed989898080bd65ca2ba4e302c68c"
+      "sha256": "7b20a2b183675c231dbc8772e7d9bf57859b8635e27e4fdb8f27a324d8b3c172"
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "6049fc4284be010480d86bd7bda800500d7e90e0a05569aa69d9ab5d3b43f93a"
+      "sha256": "2d23bbfc91bc9030b753ea9bc573c25f271cb5246f69a348f1f4bbb17c0623ce"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -469,11 +469,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "17df94153f711c1192b10292842b3b4fddbf5ac8d6481019318269e496a51ea8"
+      "sha256": "46676c68f4a7114cf4065ed28a76d7d97a5769e2c14778206746440d57311583"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "b4fc9d871907bd6037fe9d2f4dfe6ed9ddada02886c241858dc191ee57418630"
+      "sha256": "fbd136ff077c6b0575aa56492e82f59f3f3289e100de18be90fb6d706473b9c7"
     }
   ],
   "parsers": {
