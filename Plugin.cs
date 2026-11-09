@@ -140,6 +140,9 @@ namespace Emby.YouTubePlugin
             try { PluginEntryPoint.MarkConfigSaved(Configuration); }
             catch (Exception ex) { YouTubeChannel.LogPublic($"[YT] MarkConfigSaved failed: {ex.Message}"); }
 
+            // Not a content field: it must act even when nothing else changed.
+            YouTubeTrailers.QueueCleanupIfDisabled("configuration save");
+
             if (!contentChanged)
                 return;
 

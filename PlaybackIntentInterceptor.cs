@@ -144,6 +144,7 @@ namespace Emby.YouTubePlugin
                     _harmony = harmony;
                     _harmonyType = harmonyType;
                     YouTubeChapterDtoInterceptor.Install(harmony, harmonyMethodType);
+                    YouTubeTrailers.Install(harmony, harmonyMethodType);
                     var subtitlePatches = YouTubeSubtitleDelivery.Install(harmony, harmonyMethodType);
                     YouTubeChannel.LogPublic(subtitlePatches > 0
                         ? "[YT] Native subtitle rendering installed (" + subtitlePatches + " patches)."

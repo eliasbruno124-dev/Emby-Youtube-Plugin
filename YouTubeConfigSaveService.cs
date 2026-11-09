@@ -165,6 +165,7 @@ namespace Emby.YouTubePlugin
                 if (dto.MaxSearchVideos.HasValue) config.MaxSearchVideos = dto.MaxSearchVideos.Value;
                 if (dto.WatchLaterPollMinutes.HasValue) config.WatchLaterPollMinutes = dto.WatchLaterPollMinutes.Value;
                 if (dto.DirectPlaybackEnabled.HasValue) config.DirectPlaybackEnabled = dto.DirectPlaybackEnabled.Value;
+                if (dto.NativeTrailersEnabled.HasValue) config.NativeTrailersEnabled = dto.NativeTrailersEnabled.Value;
                 if (dto.DirectPlaybackMaxHeight.HasValue) config.DirectPlaybackMaxHeight = dto.DirectPlaybackMaxHeight.Value;
                 if (dto.DirectPlaybackH264MaxHeight.HasValue) config.DirectPlaybackH264MaxHeight = dto.DirectPlaybackH264MaxHeight.Value;
                 if (dto.Donate != null) config.Donate = dto.Donate;
@@ -233,6 +234,7 @@ namespace Emby.YouTubePlugin
             public int? MaxSearchVideos { get; set; }
             public int? WatchLaterPollMinutes { get; set; }
             public bool? DirectPlaybackEnabled { get; set; }
+            public bool? NativeTrailersEnabled { get; set; }
             public int? DirectPlaybackMaxHeight { get; set; }
             public int? DirectPlaybackH264MaxHeight { get; set; }
             public string? Donate { get; set; }

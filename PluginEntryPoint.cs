@@ -207,6 +207,7 @@ namespace Emby.YouTubePlugin
             EmbeddedDependencyLoader.Register();
             YouTubeDirectSeekCompatibility.Install();
             PlaybackIntentInterceptor.Install();
+            YouTubeTrailers.QueueCleanupIfDisabled("startup");
             DashboardYouTubePlayerInterceptor.Install();
             YouTubeChannel.LoadShortsProbeCache();
             LoadResumeCheckpoints();

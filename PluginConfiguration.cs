@@ -50,6 +50,10 @@ namespace Emby.YouTubePlugin
 
         public bool DirectPlaybackEnabled { get; set; } = true;
 
+        // Plays movie/series trailers from metadata (YouTube watch URLs) as
+        // native local trailers. Requires DirectPlaybackEnabled.
+        public bool NativeTrailersEnabled { get; set; } = false;
+
         // Legacy serialized paths are ignored by the in-process resolver and
         // cleared on save. Retain the properties only for old configuration files.
         public string YtDlpPath { get; set; } = "";
