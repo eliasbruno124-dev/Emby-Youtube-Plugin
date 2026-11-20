@@ -2373,6 +2373,9 @@ namespace Emby.YouTubePlugin
                         libraryManager, () => ChannelRefreshInvoker.IsRefreshInProgress, CancellationToken.None).ConfigureAwait(false);
                     if (migrated > 0)
                         YouTubeChannel.LogPublic($"[YTIMG] Moved {migrated} existing thumbnails to plugin-side download.");
+                    // After the startup channel refresh has had time to run.
+                    await Task.Delay(TimeSpan.FromMinutes(3)).ConfigureAwait(false);
+                    YouTubeLazyImage.LogInventory(libraryManager, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {

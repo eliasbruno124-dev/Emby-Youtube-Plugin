@@ -80,6 +80,7 @@ namespace Emby.YouTubePlugin
 
                 var format = YouTubeLazyImage.DetectFormat(bytes);
                 var path = YouTubeLazyImage.WriteTemp(bytes, format);
+                YouTubeLazyImage.LogDelivered(itemId, bytes.Length, format);
                 return new DynamicImageResponse { Path = path, Format = format };
             }
 
@@ -262,6 +263,62 @@ namespace Emby.YouTubePlugin
             }
             catch (IOException) { }
             catch (UnauthorizedAccessException) { }
+        }
+
+        private static int _delivered;
+
+        // Proof in the log that Emby asked for thumbnails and got them: the
+        // first ones individually, then a running total.
+        internal static void LogDelivered(long itemId, int bytes, ImageFormat format)
+        {
+            var n = Interlocked.Increment(ref _delivered);
+            if (n <= 10)
+                YouTubeChannel.LogPublic($"[YTIMG] Thumbnail delivered to Emby (item {itemId}, {bytes} bytes, {format}).");
+            else if (n % 100 == 0)
+                YouTubeChannel.LogPublic($"[YTIMG] Thumbnails delivered to Emby since start: {n}.");
+        }
+
+        // What the channel handed to Emby: how many entries came with a
+        // thumbnail and how many without (those show as empty cards).
+        internal static void LogHandover(string? folderId, ChannelItemResult? result)
+        {
+            if (result?.Items == null || result.Items.Count == 0) return;
+            var without = result.Items.Count(info => string.IsNullOrEmpty(info.ImageUrl));
+            if (without > 0)
+                YouTubeChannel.LogPublic($"[YTIMG] Folder {(string.IsNullOrEmpty(folderId) ? "(root)" : folderId)}: {result.Items.Count} entries, {without} without a thumbnail source.");
+        }
+
+        // One line per start with the image state of everything the plugin
+        // owns in the library; tells apart "no image stored", "not downloaded
+        // yet" and "stored locally" without database access.
+        internal static void LogInventory(ILibraryManager library, CancellationToken token)
+        {
+            int total = 0, local = 0, lazy = 0, plain = 0, none = 0, missingFile = 0;
+            foreach (var channel in FindOwnChannels(library, token))
+            {
+                foreach (var item in library.GetItemList(new InternalItemsQuery
+                {
+                    AncestorIds = new[] { channel.InternalId },
+                    Recursive = true,
+                    EnableTotalRecordCount = false
+                }, token))
+                {
+                    total++;
+                    var image = item.GetImageInfo(ImageType.Primary, 0);
+                    if (image == null || string.IsNullOrEmpty(image.Path)) none++;
+                    else if (IsLazyPath(image.Path)) lazy++;
+                    else if (!image.IsLocalFile) plain++;
+                    else
+                    {
+                        local++;
+                        try { if (!File.Exists(image.Path)) missingFile++; }
+                        catch (Exception) { }
+                    }
+                }
+            }
+            YouTubeChannel.LogPublic($"[YTIMG] Library image state: {total} YouTube items; {local} stored locally"
+                + (missingFile > 0 ? $" ({missingFile} files missing on disk)" : "")
+                + $", {lazy} waiting for first display, {plain} with a plain URL, {none} without any image.");
         }
 
         // Thumbnail failures used to be invisible (Debug output only). Log the

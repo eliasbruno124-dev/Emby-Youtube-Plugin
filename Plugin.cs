@@ -30,6 +30,10 @@ namespace Emby.YouTubePlugin
         public static string? SystemConfigurationFilePath { get; private set; }
         public static IApplicationHost? AppHost { get; private set; }
         internal static ILogger? PluginLogger { get; private set; }
+        // Emby's own log (embyserver.txt). The Microsoft ILoggerFactory above
+        // is not surfaced there on every server, so a user's server log did
+        // not contain a single plugin line.
+        internal static MediaBrowser.Model.Logging.ILogger? ServerLogger { get; private set; }
 
         public Plugin(
             IApplicationPaths applicationPaths,
@@ -68,6 +72,11 @@ namespace Emby.YouTubePlugin
 
         private static void TryInitLogger(IApplicationHost applicationHost)
         {
+            if (ServerLogger == null)
+            {
+                try { ServerLogger = ResolveService<MediaBrowser.Model.Logging.ILogManager>(applicationHost)?.GetLogger("YouTube"); }
+                catch (Exception) { ServerLogger = null; }
+            }
             if (PluginLogger != null)
                 return;
 

@@ -27,8 +27,15 @@ namespace Emby.YouTubePlugin
         }
         public static void LogPublic(string msg)
         {
+            // Emby's server log first, so one log file is enough for support.
+            var server = Plugin.ServerLogger;
             var logger = Plugin.PluginLogger;
-            if (logger != null)
+            if (server != null)
+            {
+                try { server.Info(msg); }
+                catch (Exception) { /* logging must never break playback */ }
+            }
+            else if (logger != null)
                 logger.Log(LogLevel.Information, 0, msg, null, (s, _) => s);
             else
                 System.Diagnostics.Debug.WriteLine(msg);
@@ -83,6 +90,7 @@ namespace Emby.YouTubePlugin
             InternalChannelItemQuery query, CancellationToken cancellationToken)
         {
             var result = await GetChannelItemsCore(query, cancellationToken).ConfigureAwait(false);
+            YouTubeLazyImage.LogHandover(query.FolderId, result);
             // Thumbnails are fetched by the plugin (IPv4-first), not by Emby.
             YouTubeLazyImage.Apply(result);
             return result;
