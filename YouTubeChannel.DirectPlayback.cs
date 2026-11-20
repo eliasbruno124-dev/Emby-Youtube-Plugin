@@ -44,7 +44,11 @@ namespace Emby.YouTubePlugin
         // the fetch; URI, parser, budget, source and native seek code stay real.
         private static Func<Uri, IReadOnlyDictionary<string, string>, int, CancellationToken, Task<byte[]>> _fetchMaster =
             YouTubeDirectHttp.GetBytesAsync;
-        internal static bool Enabled => Plugin.Instance?.Options.DirectPlaybackEnabled == true;
+        // Direct mode needs the native seek hooks below. On a server where
+        // they cannot be installed, behave exactly as if the option were off
+        // (YouTube player) instead of failing every playback with an error.
+        internal static bool Enabled => Plugin.Instance?.Options.DirectPlaybackEnabled == true
+            && YouTubeDirectSeekCompatibility.Available;
         // Channel videos use the native pipeline only in direct mode. Library
         // trailers may use it on their own option, independent of that mode.
         internal static bool PipelineEnabled => Enabled || Plugin.Instance?.Options.NativeTrailersEnabled == true;
@@ -380,7 +384,8 @@ namespace Emby.YouTubePlugin
         }
     }
 
-    // Emby4.10.2 creates external audio inputs in MapStreams, but does not
+    // Emby (verified on 4.9.1.90, 4.10.2.0 and 4.11.0.13: real transcodes with
+    // a seek, identical audio at the seek position) creates external audio inputs in MapStreams, but does not
     // copy the primary input's start offset to them. Keep this compatibility
     // hook local to our validated separate-input sources. All ordinary media,
     // passes through unchanged. The owned local HLS path additionally needs a
@@ -393,6 +398,28 @@ namespace Emby.YouTubePlugin
         private static object? _harmony;
         private static Type? _harmonyType;
         private static Binding? _binding;
+        private static long _nextAttemptTicks;
+        private static string? _lastFailure;
+        private static bool _stopped;
+
+        // True once the hooks are installed. A failed attempt is repeated at
+        // most once a minute: this is read on every playback decision.
+        internal static bool Available
+        {
+            get
+            {
+                if (_binding != null) return true;
+                if (_stopped || DateTime.UtcNow.Ticks < Interlocked.Read(ref _nextAttemptTicks)) return false;
+                lock (Sync)
+                {
+                    // Threads that passed the check together must not each
+                    // repeat a failing installation.
+                    if (_binding == null && !_stopped && DateTime.UtcNow.Ticks >= Interlocked.Read(ref _nextAttemptTicks))
+                        Install();
+                    return _binding != null;
+                }
+            }
+        }
 
         private sealed record Binding(PropertyInfo Source, PropertyInfo OutputCodec,
             PropertyInfo Input0, PropertyInfo Inputs, PropertyInfo Url,
@@ -402,6 +429,20 @@ namespace Emby.YouTubePlugin
             PropertyInfo OriginalAudioStream, PropertyInfo BaseRequest, PropertyInfo StaticRequest,
             MethodInfo TargetFrameRate, PropertyInfo Output0, PropertyInfo OutputVideo,
             PropertyInfo VideoOptions, PropertyInfo OutputFrameRate, PropertyInfo SelectedAudioStreams);
+
+        internal static void Start()
+        {
+            lock (Sync) _stopped = false;
+            Install();
+        }
+
+        // Plugin shutdown: remove the hooks and keep later Enabled readers
+        // (session events during shutdown) from installing them again.
+        internal static void Stop()
+        {
+            lock (Sync) _stopped = true;
+            Uninstall();
+        }
 
         internal static void RequireInstalled()
         {
@@ -426,8 +467,14 @@ namespace Emby.YouTubePlugin
                     var output = FindType("Emby.Ffmpeg.Model.Output.OutputFile");
                     var http = FindType("Emby.Ffmpeg.Lib.InputProtocols.http");
                     var resolution = FindType(encoder + "ResolutionOptions");
-                    if (builder.Assembly.GetName().Version != new Version(4, 10, 2, 0))
+                    // The hooks bind by exact signature (checked below), which
+                    // holds for the 4.9 to 4.11 line. Other release lines are
+                    // untested: stay off there and let the YouTube player work.
+                    stage = "server version";
+                    var server = builder.Assembly.GetName().Version;
+                    if (server == null || server.Major != 4 || server.Minor < 9 || server.Minor > 11)
                         throw new InvalidOperationException();
+                    stage = "native signatures";
                     var map = ExactStaticMethod(builder, "MapStreams", state, command, input, output);
                     var setup = ExactStaticMethod(builder, "SetupInput", command, state);
                     var resolutionLimits = ExactStaticMethod(FindType(encoder + "EncodingHelpers"),
@@ -547,14 +594,21 @@ namespace Emby.YouTubePlugin
                     stage = "audio selector patch";
                     Add(audioSelector, nameof(PreferAacPrefix), true);
                     if (segmentPolicy != null) Add(segmentPolicy, nameof(SegmentLengthPostfix));
+                    _lastFailure = null;
                     YouTubeChannel.LogPublic("[YT] Native direct-input seek compatibility installed.");
                 }
                 catch (Exception error)
                 {
                     Uninstall();
+                    Interlocked.Exchange(ref _nextAttemptTicks, DateTime.UtcNow.AddMinutes(1).Ticks);
                     // Only static stage/type names, never messages/paths/URLs.
-                    YouTubeChannel.LogPublic("[YT] Native direct-input seek compatibility unavailable at "
-                        + stage + " (" + error.GetType().Name + "); separate-input and local HLS playback are disabled.");
+                    var failure = stage + " (" + error.GetType().Name + ")";
+                    if (failure != _lastFailure)
+                    {
+                        _lastFailure = failure;
+                        YouTubeChannel.LogPublic("[YT] Native direct-input seek compatibility unavailable at "
+                            + failure + "; direct playback is off on this server, videos use the YouTube player.");
+                    }
                 }
             }
         }

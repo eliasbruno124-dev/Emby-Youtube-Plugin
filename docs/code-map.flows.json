@@ -222,9 +222,10 @@
     {
       "id": "repairs-and-logs",
       "title": "Artwork, ordering and diagnostics",
-      "summary": "Providers and item-update hooks restore plugin-owned artwork; queued sort/image writes respect shared scan activity. Shared logging tees to a bounded plugin-owned file.",
+      "summary": "Thumbnails and folder icons are handed to Emby as a lazy image path and downloaded by the plugin's own IPv4-first client; the source URL travels as a provider id, older plain-URL items are migrated once. Providers and item-update hooks restore plugin-owned artwork; queued sort/image writes respect shared scan activity. Shared logging tees to a bounded plugin-owned file.",
       "sources": [
         "YouTubeImageProvider.cs",
+        "YouTubeLazyImage.cs",
         "YouTubeEpisodeMetadataProvider.cs",
         "YouTubeSortNameRepairer.cs",
         "PluginEntryPoint.cs",

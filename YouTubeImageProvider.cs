@@ -119,34 +119,27 @@ namespace Emby.YouTubePlugin
             var videoId = TryGetVideoId(result?.BaseItem);
             if (string.IsNullOrEmpty(videoId)) return response;
 
+            var lastReason = "no attempt";
             foreach (var url in GetThumbnailCandidates(videoId))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                try
+                var (bytes, reason, hostReachable) = await YouTubeLazyImage.DownloadAsync(url, cancellationToken).ConfigureAwait(false);
+                if (bytes == null)
                 {
-                    using var resp = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-                        .ConfigureAwait(false);
-                    if (!resp.IsSuccessStatusCode) continue;
-                    var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
-                    if (bytes == null || bytes.Length < 1024) continue; // Ignore tiny placeholder images.
-                    // We've got a usable thumbnail again. If the image ever
-                    // gets wiped later, future refreshes can retry normally.
-                    if (result?.BaseItem != null)
-                        _failedFetches.TryRemove(result.BaseItem.InternalId, out _);
-                    response.Format = ImageFormat.Jpg;
-                    response.Stream = new MemoryStream(bytes, writable: false);
-                    return response;
+                    lastReason = $"{url}: {reason}";
+                    if (!hostReachable) break;
+                    continue;
                 }
-                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
-                catch (OperationCanceledException ex)
-                {
-                    Debug.WriteLine($"[YouTubeImageProvider] Thumbnail fetch timed out for {url}: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[YouTubeImageProvider] Thumbnail fetch failed for {url}: {ex.Message}");
-                }
+                // We've got a usable thumbnail again. If the image ever
+                // gets wiped later, future refreshes can retry normally.
+                if (result?.BaseItem != null)
+                    _failedFetches.TryRemove(result.BaseItem.InternalId, out _);
+                response.Format = YouTubeLazyImage.DetectFormat(bytes);
+                response.Stream = new MemoryStream(bytes, writable: false);
+                return response;
             }
+
+            YouTubeLazyImage.LogFailure($"video {videoId}", lastReason);
 
             // Nothing worked. Video might be gone, unavailable, or still
             // waiting for YouTube to generate its thumbnails.
@@ -309,21 +302,16 @@ namespace Emby.YouTubePlugin
             if (item.HasImage(ImageType.Primary))
                 return false;
 
+            // Lazy path: the plugin downloads the thumbnail itself when a
+            // client asks for it (see YouTubeLazyImageProvider).
             var url = GetStableThumbnailUrl(videoId);
-            item.SetImage(new ItemImageInfo
-            {
-                Path = url,
-                Type = ImageType.Primary,
-                DateModified = DateTimeOffset.UtcNow,
-                Width = 320,
-                Height = 180
-            }, 0, true);
+            YouTubeLazyImage.UseLazyPrimary(item, url);
 
             YouTubeChannel.LogPublic($"[YTIMG] Restored primary image for YouTube item {item.InternalId} after {reason}: {url}");
             return true;
         }
 
-        private static IEnumerable<string> GetThumbnailCandidates(string videoId)
+        internal static IEnumerable<string> GetThumbnailCandidates(string videoId)
         {
             // mqdefault.jpg is the same stable URL we expose as a remote image.
             // Bigger variants are useful as a dynamic fallback, but lots of

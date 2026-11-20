@@ -75,7 +75,7 @@
     },
     {
       "path": "Emby.YouTubePlugin.csproj",
-      "sha256": "1ac8f736e646250d207581ef53fa5976750a5cb01581759d151b5b2c6fad4baa"
+      "sha256": "19e3e82e6c4a6fe23e4511e7a8a536823a7fea03b0ec7e47218c4480acc2109f"
     },
     {
       "path": "FolderIcons.cs",
@@ -83,7 +83,7 @@
     },
     {
       "path": "GuideImageService.cs",
-      "sha256": "0dda38427ef2e7589b2d914468ddc196f59b2ed3d107585ec47f0b9f080696ef"
+      "sha256": "e2995a6522eace5134e7fd54e59ba38aad8b13cf92b3e94d11d28aeebaf3535d"
     },
     {
       "path": "LICENSE",
@@ -163,7 +163,7 @@
     },
     {
       "path": "PluginEntryPoint.cs",
-      "sha256": "4f9b412964edf25640cc3c27769a9992a6b671469c99253ae47d75880d46afaf"
+      "sha256": "533ec39b4125f62eb561f7fb6889b94905d61070d548028f35eb63a40744a4d5"
     },
     {
       "path": "PluginFileLog.cs",
@@ -175,7 +175,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0cd9b0d0dcffbe4be50c20bff9887f912fdf499716f256c8600e1fe7d9d5288c"
+      "sha256": "67e576ad3e2ba7dd619105e30b8af993dcf7fc94c013b65591b8803f4382e86d"
     },
     {
       "path": "YouTubeAdaptiveSourceBudget.cs",
@@ -211,7 +211,7 @@
     },
     {
       "path": "YouTubeChannel.DirectPlayback.cs",
-      "sha256": "76c44377bdf51dd865dea2a9b266b261e53cb986d154808657aa6fd99dd999cd"
+      "sha256": "f6dff0a61980e1c99684eebf31d182230e652dc63531361eb04845904a57621c"
     },
     {
       "path": "YouTubeChannel.Enrichment.cs",
@@ -231,11 +231,11 @@
     },
     {
       "path": "YouTubeChannel.MediaFolders.cs",
-      "sha256": "f7ce174eb716322615310446969c54455e8c9119669dd7523f302ff8990aa027"
+      "sha256": "65f2c6e60a7668c3b996809e9b465cf5fd57cd05368abb7cb03a456a978ef22c"
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "209d7f13bd80b069840446060ff5ebd6597fd8addf942aa61fc1f0aafb5d66a0"
+      "sha256": "37eb6648efb79471f0a5044f3fc7f05f6fab21bbec6f98d4ba4cb4e2901d9ba2"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -247,7 +247,7 @@
     },
     {
       "path": "YouTubeChannel.cs",
-      "sha256": "ca728026afb5ecfd2fa1ed69d204517f383de364afe95126268574576096ffaf"
+      "sha256": "93ce8f6390cd40125352bc94797a17dbd93c732739faf9cbafba6fa0deec514a"
     },
     {
       "path": "YouTubeChannelProvenance.cs",
@@ -319,7 +319,11 @@
     },
     {
       "path": "YouTubeImageProvider.cs",
-      "sha256": "ac08cc5c70871bdd8616b401ae5138f164a3b2a8e71b42a8d25cf580e90dec49"
+      "sha256": "d115323bf928e61b05548bd8ca9ea10617a13e319c739171c624c7a9d52e9d74"
+    },
+    {
+      "path": "YouTubeLazyImage.cs",
+      "sha256": "496bfbd48331a98f521fd709fbd8ee826c05c9abf689d53c564ae60b77df465c"
     },
     {
       "path": "YouTubeManagedHttp.cs",
@@ -347,7 +351,7 @@
     },
     {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "4eb23310f2d8e9772ee25faf23131d3db0dbb81272ca67e2d5ea7101873a7ca7"
+      "sha256": "7c34dc997e2cf6adb8d28360a5ecec35e96ac77ddb6d48a510decde64bc6d51b"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -387,7 +391,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "2d23bbfc91bc9030b753ea9bc573c25f271cb5246f69a348f1f4bbb17c0623ce"
+      "sha256": "f48c0f39272920858010e32b7d0566cda2a3fe90f3d6e5b66b8ba6a4e69098fc"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -399,7 +403,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "6f582d708bc149e7a8ccdc1a9a0daf44ce5e52d6c3693dcbb58393fb737e56cf"
+      "sha256": "8aa7d2aaaa1ebde004de2c030d4a78a4bbd91a61aef59224976e51ce601d4eca"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -469,11 +473,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "cdb968d21cd9fee9b539510dd7a1fff531ee50f599e6cdd09d2416767a05b368"
+      "sha256": "d8c9a184b5d9cf8a07c6b9146a0898bf442c009dd341db9a976456a463cb6a0d"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "7c8bf1bdb6a447fc8fe33676fd0dd35850142ddeae53eb6aba81e33d6545779e"
+      "sha256": "11efc8a5daef2940e6c30b53872778906a54c81fc2f67d1bcb4222448e5cef6a"
     }
   ],
   "parsers": {

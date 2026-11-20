@@ -151,7 +151,7 @@ separate.
 - Audio tracks, subtitles and chapters are available when the video has them; how you pick them depends on the Emby app.
 - Resume and player cleanup depend on the Emby client. Bundled players may not use the server-side fixes.
 - There is no Google sign-in and no access to private YouTube data. Personal API keys and channel lists are set under **My YouTube**.
-- Tested with Emby Server 4.10.2 on Linux/Docker.
+- Tested with Emby Server 4.9.1, 4.10.2 and 4.11 (beta) on Linux/Docker.
 - After updating, restart Emby. If the web app still looks outdated, clear its browser cache.
 
 ## License

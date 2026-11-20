@@ -82,6 +82,15 @@ namespace Emby.YouTubePlugin
         public async Task<ChannelItemResult> GetChannelItems(
             InternalChannelItemQuery query, CancellationToken cancellationToken)
         {
+            var result = await GetChannelItemsCore(query, cancellationToken).ConfigureAwait(false);
+            // Thumbnails are fetched by the plugin (IPv4-first), not by Emby.
+            YouTubeLazyImage.Apply(result);
+            return result;
+        }
+
+        private async Task<ChannelItemResult> GetChannelItemsCore(
+            InternalChannelItemQuery query, CancellationToken cancellationToken)
+        {
             var items = new List<ChannelItemInfo>();
             var plugin = Plugin.Instance;
             if (plugin == null)

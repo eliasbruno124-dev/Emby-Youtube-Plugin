@@ -188,6 +188,50 @@ internal static class YouTubePersonalCatalog
         return inner.Length > 0 && !inner.StartsWith(Prefix, StringComparison.Ordinal);
     }
 
+    private static bool TryResolveChannelId(ILibraryManager library)
+    {
+        if (Interlocked.Read(ref _channelId) > 0) return true;
+        try
+        {
+            var manager = Plugin.ResolveService<IChannelManager>();
+            var providerMethod = manager?.GetType().GetMethod("GetChannelProvider",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null, new[] { typeof(Channel) }, null);
+            if (manager == null || providerMethod == null) return false;
+            var channels = library.GetItemList(new InternalItemsQuery
+                { IncludeItemTypes = new[] { "Channel" }, Recursive = true }, CancellationToken.None).OfType<Channel>();
+            foreach (var channel in channels)
+            {
+                if (providerMethod.Invoke(manager, new object[] { channel }) is YouTubeChannel)
+                {
+                    Interlocked.Exchange(ref _channelId, channel.InternalId);
+                    return true;
+                }
+            }
+        }
+        catch (Exception error) when (error is not OutOfMemoryException)
+        {
+            // Library not ready yet or binding unavailable: the poll retries.
+        }
+        return false;
+    }
+
+    private static void PollChannelId(ILibraryManager library, CancellationToken token)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                // Prompt while a fresh install creates its channel, relaxed
+                // afterwards (plugin installed but never opened).
+                var started = DateTime.UtcNow;
+                while (!token.IsCancellationRequested && !TryResolveChannelId(library))
+                    await Task.Delay(TimeSpan.FromSeconds(DateTime.UtcNow - started < TimeSpan.FromMinutes(5) ? 1 : 15), token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) { }
+        });
+    }
+
     internal static void Start(ILibraryManager library, IUserManager users, IUserViewManager views)
     {
         YouTubeChannelProvenance.Reset();
@@ -206,22 +250,16 @@ internal static class YouTubePersonalCatalog
             if (dto == null || harmonyType == null || methodType == null) return;
             _harmony = Activator.CreateInstance(harmonyType, HarmonyId);
             if (_harmony == null) return;
-            YouTubePersonalVisibility.Initialize(library, views, dto, () =>
-            {
-                if (_channelId > 0) return _channelId;
-                var channels = library.GetItemList(new InternalItemsQuery
-                    { IncludeItemTypes = new[] { "Channel" }, Recursive = true }, CancellationToken.None).OfType<Channel>();
-                var manager = Plugin.ResolveService<IChannelManager>();
-                var providerMethod = manager?.GetType().GetMethod("GetChannelProvider",
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                    null, new[] { typeof(Channel) }, null);
-                if (manager == null || providerMethod == null)
-                    throw new InvalidOperationException("YouTube channel ownership binding unavailable.");
-                foreach (var channel in channels)
-                    if (providerMethod?.Invoke(manager, new object[] { channel }) is YouTubeChannel)
-                        return _channelId = channel.InternalId;
-                return 0;
-            }, MayView);
+            // The visibility hooks run inside Emby's own item queries, which
+            // already hold a database connection. Looking the channel up from
+            // there took a second connection; with a writer queued in between
+            // (first channel refresh on a fresh install) neither side could
+            // continue and every library request hung until a restart. The
+            // hooks therefore only read the cached id; it is resolved here and,
+            // while the channel does not exist yet, by a background poll.
+            YouTubePersonalVisibility.Initialize(library, views, dto, () => Interlocked.Read(ref _channelId), MayView);
+            if (!TryResolveChannelId(library))
+                PollChannelId(library, _lifetime.Token);
             var count = YouTubePersonalVisibility.Install(_harmony, methodType);
             YouTubeChannel.LogPublic("[YT] Personal catalog visibility " + (YouTubePersonalVisibility.IsReady
                 ? "ready (" + count + " bindings)." : "unavailable; new personal folders are disabled. Check server compatibility."));

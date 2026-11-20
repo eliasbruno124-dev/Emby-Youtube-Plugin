@@ -309,8 +309,12 @@ namespace Emby.YouTubePlugin
                 // trees are native Emby content, not evidence of private data.
                 // A provider-prefixed orphan remains denied. A complete known
                 // foreign folder tree wins over coincidentally matching IDs.
+                // While the channel id is still unknown (first second after
+                // the channel is created) the tree cannot be verified: deny
+                // anything that carries a provider prefix instead of trusting
+                // the foreign-tree shortcut.
                 if (cursor.ParentId <= 0)
-                    return !providerHint || cursor is Folder && !LooksGuarded(cursor.ExternalId);
+                    return !providerHint || channel > 0 && cursor is Folder && !LooksGuarded(cursor.ExternalId);
                 cursor = state.Lookup(cursor.ParentId);
             }
             if (channel > 0 && cursor?.InternalId == channel)

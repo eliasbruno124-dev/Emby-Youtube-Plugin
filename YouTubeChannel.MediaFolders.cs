@@ -320,7 +320,7 @@ namespace Emby.YouTubePlugin
         {
             foreach (var item in batch)
             {
-                if (string.IsNullOrEmpty(item.ImageUrl))
+                if (string.IsNullOrEmpty(item.ImageUrl) || YouTubeLazyImage.IsLazyPath(item.ImageUrl))
                     continue;
 
                 if (MetaCache.TryGetValue(item.Id, out var existing))

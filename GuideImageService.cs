@@ -1,9 +1,14 @@
+using MediaBrowser.Controller.Net;
 using MediaBrowser.Model.Services;
 using System;
 using System.IO;
 
 namespace Emby.YouTubePlugin
 {
+    // Static help pictures from the plugin itself. <img> tags send no access
+    // token, so with Emby's default (authenticated) the setup guide showed
+    // broken images and logged "Access token is invalid or expired".
+    [Unauthenticated]
     [Route("/YouTubePlugin/GuideImage/{Name}", "GET", Summary = "Gets a setup guide image.")]
     public class GetYouTubeGuideImage : IReturn<Stream>
     {

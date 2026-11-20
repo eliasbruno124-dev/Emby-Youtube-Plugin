@@ -205,7 +205,7 @@ namespace Emby.YouTubePlugin
             // Capture PlaybackInfo before PlaybackStart so resume and
             // "play from beginning" can be told apart reliably.
             EmbeddedDependencyLoader.Register();
-            YouTubeDirectSeekCompatibility.Install();
+            YouTubeDirectSeekCompatibility.Start();
             PlaybackIntentInterceptor.Install();
             YouTubeTrailers.QueueCleanupIfDisabled("startup");
             DashboardYouTubePlayerInterceptor.Install();
@@ -214,6 +214,7 @@ namespace Emby.YouTubePlugin
             LoadPlaylistFingerprints();
             _sortNameRepairer.Start();
             AttachImageRepairHook();
+            QueueLazyThumbnailMigration();
             QueueExistingSortNameRepair("startup");
             AttachResumeSeekHook();
             _captionOffGuard.Start();
@@ -2354,6 +2355,32 @@ namespace Emby.YouTubePlugin
             });
         }
 
+        // Items created before 2.0.14 hold plain thumbnail URLs that Emby
+        // downloads itself (no IPv4 fallback). Hand them to the plugin's lazy
+        // image provider once per start.
+        private void QueueLazyThumbnailMigration()
+        {
+            var libraryManager = _libraryManager;
+            if (libraryManager == null)
+                return;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(20)).ConfigureAwait(false);
+                    var migrated = await YouTubeLazyImage.MigrateExistingAsync(
+                        libraryManager, () => ChannelRefreshInvoker.IsRefreshInProgress, CancellationToken.None).ConfigureAwait(false);
+                    if (migrated > 0)
+                        YouTubeChannel.LogPublic($"[YTIMG] Moved {migrated} existing thumbnails to plugin-side download.");
+                }
+                catch (Exception ex)
+                {
+                    YouTubeChannel.LogPublic($"[YTIMG] Thumbnail migration failed: {ex.Message}");
+                }
+            });
+        }
+
         private void QueueExistingSortNameRepair(string reason)
         {
             var libraryManager = _libraryManager;
@@ -2758,7 +2785,7 @@ namespace Emby.YouTubePlugin
             YouTubeRootMigration.Stop();
             DashboardYouTubePlayerInterceptor.Uninstall();
             PlaybackIntentInterceptor.Uninstall();
-            YouTubeDirectSeekCompatibility.Uninstall();
+            YouTubeDirectSeekCompatibility.Stop();
         }
     }
 
