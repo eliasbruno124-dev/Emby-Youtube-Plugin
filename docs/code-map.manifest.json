@@ -151,7 +151,7 @@
     },
     {
       "path": "PlaybackIntentInterceptor.cs",
-      "sha256": "584e4cc8ad978f28667862a3f98d5ef926f8eced45175fccac39c7474c950422"
+      "sha256": "820750800f22487ee56e7b756852565aed721486b5e494ed7a1e85481ed3963f"
     },
     {
       "path": "Plugin.cs",
@@ -318,6 +318,10 @@
       "sha256": "30b2ef895ee1a6a81608dc304a5944fa28b6d00805cf39978cfe84634b71f5b1"
     },
     {
+      "path": "YouTubeImageDiagnostics.cs",
+      "sha256": "a7fd3b9b68f6751767cae4440c6c7cc373552bc91673155c38502f1fce69f81f"
+    },
+    {
       "path": "YouTubeImageProvider.cs",
       "sha256": "d115323bf928e61b05548bd8ca9ea10617a13e319c739171c624c7a9d52e9d74"
     },
@@ -391,7 +395,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "3bf24fe8f97f07b3854f5d5a1ae5e32c76eaa4cc056883c6bc82dde4a923b261"
+      "sha256": "adb255d2e89fa9c452e9a51422c95485e422833eee3b359e71bf7f08d528e617"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -403,7 +407,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "8aa7d2aaaa1ebde004de2c030d4a78a4bbd91a61aef59224976e51ce601d4eca"
+      "sha256": "0c8485f3ea0e9c543e30c2c20cf6aaf215ed5eda32e8980b42b2cf383db362ae"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -473,11 +477,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "478d71300c6981c3aeff236f3d65ebeaee099ad69aedcff5e2bd5f9395317501"
+      "sha256": "4769d1dbfe2c9c2ad908d36b88cf77b8a740639730b198591a0699ff40518bbe"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "74aaac62bee34c936c5cfb9ebf6ee445b9df973dd0245b6cc84bb9dead1e2964"
+      "sha256": "44c748c9fdac881913121bcd0eb9187906bc5fa0afd6c37cbd700988f5ffeef0"
     }
   ],
   "parsers": {
