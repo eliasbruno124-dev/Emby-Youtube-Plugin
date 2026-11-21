@@ -19,7 +19,7 @@ namespace Emby.YouTubePlugin
     {
         internal const string MusicCategoryId = "10";
         internal const string FolderType = "musicgenre";
-        private const string IconCdn = "https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@master/color/618x618/";
+        private static string IconCdn => FolderIcons.Cdn;
 
         // YouTube topic ids (YouTube Data API, "Music topics").
         // Folder ids use the short key; topic ids contain '/' and stay internal.
@@ -45,7 +45,9 @@ namespace Emby.YouTubePlugin
             Genres.Where(g => string.Equals(g.Key, key, StringComparison.Ordinal)).Select(g => g.Id).FirstOrDefault();
 
         // Genre folders go first in the Music category, the category's trending
-        // videos follow unchanged.
+        // videos follow unchanged. Personal (per-user key) catalogs do not get
+        // them: their searches are not disk-cached and would cost 14 extra
+        // search calls per profile and day.
         internal static ChannelItemResult AddGenreFolders(string? categoryId, ChannelItemResult result, PluginConfiguration config)
         {
             if (categoryId != MusicCategoryId || !config.ShowMusicGenres || result?.Items == null)
@@ -53,7 +55,7 @@ namespace Emby.YouTubePlugin
             var folders = Genres.Select(g => new ChannelItemInfo
             {
                 Name = "🎵 " + g.Name,
-                Id = FolderType + "_x_" + g.Key,
+                Id = FolderType + YouTubeChannel.FolderSeparatorValue + g.Key,
                 Type = ChannelItemType.Folder,
                 FolderType = ChannelFolderType.Container,
                 MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
@@ -74,8 +76,20 @@ namespace Emby.YouTubePlugin
             var region = await YouTubeApi.ResolveContentRegionAsync(apiKey, configured, "US", ct).ConfigureAwait(false) ?? "US";
             // Rounded to the day so the URL (and with it the one-day cache key)
             // stays the same for a whole day.
-            var since = DateTime.UtcNow.Date.AddDays(-30).ToString("yyyy-MM-dd'T'00:00:00'Z'", System.Globalization.CultureInfo.InvariantCulture);
-            return await YouTubeApi.SearchMusicTopicAsync(apiKey, topicId, region, since, ct).ConfigureAwait(false);
+            var today = DateTime.UtcNow.Date;
+            string Since(DateTime day) => day.AddDays(-30).ToString("yyyy-MM-dd'T'00:00:00'Z'", System.Globalization.CultureInfo.InvariantCulture);
+            var fresh = await YouTubeApi.SearchMusicTopicAsync(apiKey, topicId, region, Since(today), ct).ConfigureAwait(false);
+            if (fresh != null) return fresh;
+            // The date in the URL changes at midnight UTC. If today's search
+            // fails (search quota used up until about 08:00 UTC, outage), keep
+            // the last answer of the previous days instead of an empty folder,
+            // which would make Emby delete the genre's videos.
+            for (var back = 1; back <= 7; back++)
+            {
+                var stale = YouTubeApi.TryReadStaleCopy(YouTubeApi.MusicTopicUrl(apiKey, topicId, region, Since(today.AddDays(-back))));
+                if (stale != null) return stale;
+            }
+            return null;
         }
     }
 }

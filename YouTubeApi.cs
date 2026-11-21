@@ -965,16 +965,32 @@ namespace Emby.YouTubePlugin
 
         // Most viewed music videos of one YouTube music topic (genre folders).
         // Same one-day cache as every other search.list call.
+        internal static string MusicTopicUrl(string apiKey, string topicId, string regionCode, string publishedAfter) =>
+            $"{ApiBase}/search?part=snippet&type=video&videoCategoryId=10&q=official%20music%20video" +
+            $"&topicId={Uri.EscapeDataString(topicId)}&order=viewCount" +
+            $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
+            $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+
         public static async Task<JsonDocument?> SearchMusicTopicAsync(
             string apiKey, string topicId, string regionCode, string publishedAfter, CancellationToken ct)
         {
             // "official music video" keeps real songs and drops most Shorts
             // (tested: Rock 25 of 50 Shorts without it, 0 with it).
-            var url = $"{ApiBase}/search?part=snippet&type=video&videoCategoryId=10&q=official%20music%20video" +
-                      $"&topicId={Uri.EscapeDataString(topicId)}&order=viewCount" +
-                      $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
-                      $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+            var url = MusicTopicUrl(apiKey, topicId, regionCode, publishedAfter);
             return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
+        }
+
+        // Read-only: an earlier answer for exactly this URL from the disk cache
+        // (up to 30 days old), without contacting YouTube. Used when a URL that
+        // embeds a date changed overnight and the new request failed.
+        internal static JsonDocument? TryReadStaleCopy(string url)
+        {
+            try
+            {
+                var hit = TryReadDiskCache(url, DiskCacheTtlMs, null);
+                return hit == null ? null : JsonDocument.Parse(hit.Json);
+            }
+            catch (JsonException) { return null; }
         }
 
         // Channel uploads come from the uploads playlist (1 quota unit) instead

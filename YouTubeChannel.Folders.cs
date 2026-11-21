@@ -298,7 +298,8 @@ namespace Emby.YouTubePlugin
                 .ConfigureAwait(false);
 
             var items = candidates
-                .Where(c => nonEmpty.ContainsKey(c.id))
+                .Where(c => nonEmpty.ContainsKey(c.id)
+                    || c.id == YouTubeMusicGenres.MusicCategoryId && config.ShowMusicGenres)
                 .Select(c => Folder(c.name, $"category{FolderSeparator}{c.id}", FolderIcons.ForCategory(c.id)))
                 .ToList();
 

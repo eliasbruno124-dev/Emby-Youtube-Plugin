@@ -122,7 +122,7 @@ namespace Emby.YouTubePlugin
                 }
             }
 
-            if (hasMore && pageRequests >= maxPageRequests)
+            if (hasMore && pageRequests >= maxPageRequests && type != YouTubeMusicGenres.FolderType)
                 Log($"[YT] Stopping {type} pagination for {term} after {maxPageRequests} pages.");
 
             UpdateChannelContentFlags(type, term, observedShorts, observedLive, reachedEnd);

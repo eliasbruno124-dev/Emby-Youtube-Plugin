@@ -8,6 +8,7 @@ namespace Emby.YouTubePlugin
         private const string ChannelIdPrefix = "UC";
         private const string HandlePrefix = "@";
         private const string FolderSeparator = "_x_";
+        internal const string FolderSeparatorValue = FolderSeparator;
         private const int MaxMetaCacheEntries = 2000;
 
         private record VideoMeta(

@@ -262,10 +262,12 @@ namespace Emby.YouTubePlugin
 
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
 
-                // search.list returns HTML-escaped titles ("&#39;", "&quot;").
-                var title = System.Net.WebUtility.HtmlDecode(YouTubeApi.GetNestedString(el, "snippet", "title") ?? "Untitled");
-                var author = System.Net.WebUtility.HtmlDecode(YouTubeApi.GetNestedString(el, "snippet", "channelTitle") ?? "Unknown");
-                var desc = YouTubeApi.GetNestedString(el, "snippet", "description");
+                // search.list returns HTML-escaped text ("&#39;", "&quot;");
+                // playlist items do not, so only search results are decoded.
+                string? Text(string field) { var v = YouTubeApi.GetNestedString(el, "snippet", field); return v == null || isPlaylist ? v : System.Net.WebUtility.HtmlDecode(v); }
+                var title = Text("title") ?? "Untitled";
+                var author = Text("channelTitle") ?? "Unknown";
+                var desc = Text("description");
                 var pubStr = YouTubeApi.GetNestedString(el, "snippet", "publishedAt");
                 var premiere = YouTubeApi.ParsePublishedAt(pubStr);
                 var thumb = YouTubeApi.GetStableVideoThumbnailUrl(

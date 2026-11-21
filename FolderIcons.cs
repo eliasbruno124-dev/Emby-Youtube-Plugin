@@ -8,7 +8,7 @@ namespace Emby.YouTubePlugin
     /// </summary>
     internal static class FolderIcons
     {
-        private const string Cdn = "https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@master/color/618x618/";
+        internal const string Cdn = "https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@master/color/618x618/";
 
         public static readonly string WatchLater = Cdn + "2B50.png";   // ⭐
         public static readonly string Trending = Cdn + "1F525.png";  // 🔥
