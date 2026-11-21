@@ -151,7 +151,7 @@
     },
     {
       "path": "PlaybackIntentInterceptor.cs",
-      "sha256": "820750800f22487ee56e7b756852565aed721486b5e494ed7a1e85481ed3963f"
+      "sha256": "7842d0a6b25c3ff790eeade34f373e64be1628896f2cd7fa6440159fe56745b8"
     },
     {
       "path": "Plugin.cs",
@@ -394,8 +394,12 @@
       "sha256": "7b20a2b183675c231dbc8772e7d9bf57859b8635e27e4fdb8f27a324d8b3c172"
     },
     {
+      "path": "YouTubeVideoPresentation.cs",
+      "sha256": "5265b42cb59b1db9b18f433f26d366e0f917d6d1a3e18a92d494d7c02fbce90b"
+    },
+    {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "adb255d2e89fa9c452e9a51422c95485e422833eee3b359e71bf7f08d528e617"
+      "sha256": "03db22d476dc8807dc5f43e685b6b841619ea9af0af269920633d61e31b3b947"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -407,7 +411,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "0c8485f3ea0e9c543e30c2c20cf6aaf215ed5eda32e8980b42b2cf383db362ae"
+      "sha256": "bc0e766dccdd2a490ccae85c49e1cee0067e570b48b7dec796c8505a95e7dda2"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -477,11 +481,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "4769d1dbfe2c9c2ad908d36b88cf77b8a740639730b198591a0699ff40518bbe"
+      "sha256": "e1bce1c10929d0ccebdbb8bbc1466da8839114980fc5a40507a9d6350049fdff"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "44c748c9fdac881913121bcd0eb9187906bc5fa0afd6c37cbd700988f5ffeef0"
+      "sha256": "d082606fbad91db93145d1f3168f60443b5952505f6c5c4c3726ef6331fc99de"
     }
   ],
   "parsers": {

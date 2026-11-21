@@ -211,6 +211,8 @@ wirken während der ganzen Migration weiter, alte private IDs werden nicht geöf
 
 ## Gemeinsame Ordner und Medien
 
+Kanalvideos sind in der Bibliothek Episoden (Serienname = YouTube-Kanal). [YouTubeVideoPresentation](../YouTubeVideoPresentation.cs) meldet sie in den Item-Daten an die Apps als `Video`: Mit der Benutzereinstellung „Spoiler bei ungesehenen Episoden ausblenden“ ignoriert Emby Web (4.11 `imagehelper.getImageUrl`) sonst das Primärbild jeder ungesehenen Episode und fragt es gar nicht erst an, die Karte bleibt leer. Gespeicherter Typ, IDs, Gesehen-Status, Fortsetzen und serverseitige Abfragen (z. B. Startseitenzeilen mit `IncludeItemTypes=Episode`) bleiben unverändert. Erkennung wie in der Bilddiagnose über Watch-Pfad und gespeicherten Episode-Typ, weil Listenabfragen keine Provider-IDs laden.
+
 | Partial-Datei | Zuständigkeit |
 |---|---|
 | [YouTubeChannel.State.cs](../YouTubeChannel.State.cs) | Geteilte Caches/Datentypen, ID-Prüfung, `_x_`, `LIVE_`, `REEL_` |

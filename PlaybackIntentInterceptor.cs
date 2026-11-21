@@ -147,6 +147,8 @@ namespace Emby.YouTubePlugin
                     YouTubeTrailers.Install(harmony, harmonyMethodType);
                     var subtitlePatches = YouTubeSubtitleDelivery.Install(harmony, harmonyMethodType);
                     var diagnosticPatches = YouTubeImageDiagnostics.Install(harmony, harmonyMethodType);
+                    var presentationPatches = YouTubeVideoPresentation.Install(harmony, harmonyMethodType);
+                    YouTubeChannel.LogPublic("[YT] Video presentation installed (" + presentationPatches + " patches).");
                     YouTubeChannel.LogPublic("[YTIMG] Image diagnostics installed (" + diagnosticPatches + " patches).");
                     YouTubeChannel.LogPublic(subtitlePatches > 0
                         ? "[YT] Native subtitle rendering installed (" + subtitlePatches + " patches)."
