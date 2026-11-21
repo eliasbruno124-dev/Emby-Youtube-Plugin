@@ -734,6 +734,7 @@ define([
                     setChecked(view, 'chkShowRootFoldersAtTopLevel', !!config.ShowRootFoldersAtTopLevel);
                     setChecked(view, 'chkShowTrending', config.ShowTrending !== false);
                     setChecked(view, 'chkShowCategories', config.ShowCategories !== false);
+                    setChecked(view, 'chkShowMusicGenres', config.ShowMusicGenres === true);
                     setChecked(view, 'chkShowShorts', config.HideShorts === true ? false : config.ShowShorts !== false);
                     const resetFromKnownRegions = populateTrendingRegions(
                         view,
@@ -806,6 +807,7 @@ define([
             config.ShowRootFoldersAtTopLevel = checked(view, 'chkShowRootFoldersAtTopLevel');
             config.ShowTrending = checked(view, 'chkShowTrending');
             config.ShowCategories = checked(view, 'chkShowCategories');
+            config.ShowMusicGenres = checked(view, 'chkShowMusicGenres');
             config.ShowShorts = checked(view, 'chkShowShorts');
             config.HideShorts = false;
             config.TrendingRegion = value(view, 'selectTrendingRegion').trim().toUpperCase();

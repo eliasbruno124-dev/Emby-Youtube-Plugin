@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 119 files; 9482 syntax declarations/HTML anchors.
+Scope: 120 files; 9532 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -16,7 +16,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [.gitignore](#file-bc37d034bad56458) | Repository support | 0 |
 | [AGENTS.md](#file-a54ff182c7e8acf5) | Documentation/resource | 0 |
 | [ChannelContentFlags.cs](#file-3fbcb901338e79fb) | Plugin Compile source (SDK default) | 29 |
-| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 53 |
+| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 55 |
 | [Configuration/YouTubeConfiguration.js](#file-44888eb7c4d56aef) | EmbeddedResource | 349 |
 | [Configuration/YouTubePersonal.html](#file-20908b7c57487625) | EmbeddedResource | 14 |
 | [Configuration/YouTubePersonal.js](#file-435be0d114ecb729) | EmbeddedResource | 92 |
@@ -51,14 +51,14 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [ManagedResolver/vendored/Videos/VideoId.cs](#file-c4d93fe674f77ff2) | Plugin Compile source (SDK default) | 40 |
 | [PlaybackIntentInterceptor.cs](#file-6ff472c354325e8c) | Plugin Compile source (SDK default) | 499 |
 | [Plugin.cs](#file-5a2f4e90167632d0) | Plugin Compile source (SDK default) | 82 |
-| [PluginConfiguration.cs](#file-224cbfdbaba3a683) | Plugin Compile source (SDK default) | 102 |
+| [PluginConfiguration.cs](#file-224cbfdbaba3a683) | Plugin Compile source (SDK default) | 105 |
 | [PluginEntryPoint.cs](#file-d27f2eafc5169b60) | Plugin Compile source (SDK default) | 707 |
 | [PluginFileLog.cs](#file-adad5fbc257fb6bf) | Plugin Compile source (SDK default) | 19 |
 | [QuotaTracker.cs](#file-942e26b5e5820665) | Plugin Compile source (SDK default) | 113 |
 | [README.md](#file-b335630551682c19) | Documentation/resource | 0 |
 | [YouTubeAdaptiveSourceBudget.cs](#file-03de83be30141261) | Plugin Compile source (SDK default) | 227 |
 | [YouTubeAdminProvenance.cs](#file-6cc42489af7678da) | Plugin Compile source (SDK default) | 118 |
-| [YouTubeApi.cs](#file-7011a74936995935) | Plugin Compile source (SDK default) | 399 |
+| [YouTubeApi.cs](#file-7011a74936995935) | Plugin Compile source (SDK default) | 406 |
 | [YouTubeAudioTracks.cs](#file-cf7aa53825fc61a7) | Plugin Compile source (SDK default) | 33 |
 | [YouTubeCaptionMetadata.cs](#file-914fdb518473aaa9) | C# source excluded from plugin Compile | 102 |
 | [YouTubeCaptionNormalizer.cs](#file-179571d4992d8567) | Plugin Compile source (SDK default) | 89 |
@@ -77,7 +77,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannelProvenance.cs](#file-bdce8e0e6df1ba72) | Plugin Compile source (SDK default) | 47 |
 | [YouTubeChapterDtoInterceptor.cs](#file-59ad88b2f7a15737) | Plugin Compile source (SDK default) | 46 |
 | [YouTubeChapterSync.cs](#file-90d85cea05c050fd) | Plugin Compile source (SDK default) | 135 |
-| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 132 |
+| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 135 |
 | [YouTubeDescriptionChapters.cs](#file-879f815509e709e7) | Plugin Compile source (SDK default) | 21 |
 | [YouTubeDirectHttp.cs](#file-1922be3cbc99a179) | Plugin Compile source (SDK default) | 181 |
 | [YouTubeDirectManifest.cs](#file-5a4b4574992dd577) | Plugin Compile source (SDK default) | 203 |
@@ -96,6 +96,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeLazyImage.cs](#file-902c642e89577cbb) | Plugin Compile source (SDK default) | 134 |
 | [YouTubeManagedHttp.cs](#file-bc134ac40739676b) | Plugin Compile source (SDK default) | 88 |
 | [YouTubeManagedResolver.cs](#file-d1109fcde8c29d7a) | Plugin Compile source (SDK default) | 194 |
+| [YouTubeMusicGenres.cs](#file-e640b5bdb19c5bed) | Plugin Compile source (SDK default) | 35 |
 | [YouTubePersonalProfiles.cs](#file-d3f3b55a76e60278) | Plugin Compile source (SDK default) | 223 |
 | [YouTubePersonalRequestContext.cs](#file-5a4637d17f32c0fe) | Plugin Compile source (SDK default) | 19 |
 | [YouTubePersonalService.cs](#file-cdd49be2d7ae99e3) | Plugin Compile source (SDK default) | 91 |
@@ -192,27 +193,27 @@ Plugin Compile source (SDK default); 1538 bytes; 52 lines.
 <a id="file-3265de6859f23663"></a>
 ## [Configuration/YouTubeConfiguration.html](../Configuration/YouTubeConfiguration.html)
 
-EmbeddedResource; 39275 bytes; 790 lines.
+EmbeddedResource; 40033 bytes; 800 lines.
 
 Resource/controller references:
 
 - Line [1](../Configuration/YouTubeConfiguration.html#L1): data-controller = `configurationpage?name=YouTubeConfigurationjs`
 - Line [345](../Configuration/YouTubeConfiguration.html#L345): href = `#`
 - Line [347](../Configuration/YouTubeConfiguration.html#L347): href = `#`
-- Line [667](../Configuration/YouTubeConfiguration.html#L667): href = `https://paypal.me/eliasbruno123`
-- Line [669](../Configuration/YouTubeConfiguration.html#L669): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
-- Line [683](../Configuration/YouTubeConfiguration.html#L683): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
-- Line [710](../Configuration/YouTubeConfiguration.html#L710): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
-- Line [713](../Configuration/YouTubeConfiguration.html#L713): href = `https://console.cloud.google.com/apis/credentials`
-- Line [725](../Configuration/YouTubeConfiguration.html#L725): data-guide-image = `step1.png`
-- Line [734](../Configuration/YouTubeConfiguration.html#L734): data-guide-image = `step2.png`
-- Line [744](../Configuration/YouTubeConfiguration.html#L744): data-guide-image = `step34.png`
-- Line [753](../Configuration/YouTubeConfiguration.html#L753): data-guide-image = `step5.png`
-- Line [773](../Configuration/YouTubeConfiguration.html#L773): data-guide-image = `step7.png`
-- Line [783](../Configuration/YouTubeConfiguration.html#L783): data-guide-image = `step8.png`
+- Line [677](../Configuration/YouTubeConfiguration.html#L677): href = `https://paypal.me/eliasbruno123`
+- Line [679](../Configuration/YouTubeConfiguration.html#L679): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
+- Line [693](../Configuration/YouTubeConfiguration.html#L693): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
+- Line [720](../Configuration/YouTubeConfiguration.html#L720): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
+- Line [723](../Configuration/YouTubeConfiguration.html#L723): href = `https://console.cloud.google.com/apis/credentials`
+- Line [735](../Configuration/YouTubeConfiguration.html#L735): data-guide-image = `step1.png`
+- Line [744](../Configuration/YouTubeConfiguration.html#L744): data-guide-image = `step2.png`
+- Line [754](../Configuration/YouTubeConfiguration.html#L754): data-guide-image = `step34.png`
+- Line [763](../Configuration/YouTubeConfiguration.html#L763): data-guide-image = `step5.png`
+- Line [783](../Configuration/YouTubeConfiguration.html#L783): data-guide-image = `step7.png`
+- Line [793](../Configuration/YouTubeConfiguration.html#L793): data-guide-image = `step8.png`
 
 <details>
-<summary>All 53 declarations / anchors</summary>
+<summary>All 55 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -254,28 +255,30 @@ Resource/controller references:
 | dom-id | div.trendingDescription | [545:33](../Configuration/YouTubeConfiguration.html#L545) |
 | dom-id | input.chkShowCategories | [551:37](../Configuration/YouTubeConfiguration.html#L551) |
 | dom-id | div.categoriesDescription | [555:33](../Configuration/YouTubeConfiguration.html#L555) |
-| dom-id | input.chkShowShorts | [561:37](../Configuration/YouTubeConfiguration.html#L561) |
-| dom-id | div.shortsDescription | [565:33](../Configuration/YouTubeConfiguration.html#L565) |
-| dom-id | select.selectTrendingRegion | [577:33](../Configuration/YouTubeConfiguration.html#L577) |
-| dom-id | select.selectTrendingCategory | [586:33](../Configuration/YouTubeConfiguration.html#L586) |
-| dom-id | select.selectChannelSortBy | [607:33](../Configuration/YouTubeConfiguration.html#L607) |
-| dom-id | input.chkShowLikeCount | [622:33](../Configuration/YouTubeConfiguration.html#L622) |
-| dom-id | input.chkShowCommentCount | [626:33](../Configuration/YouTubeConfiguration.html#L626) |
-| dom-id | input.numMaxChannelVideos | [641:33](../Configuration/YouTubeConfiguration.html#L641) |
-| dom-id | input.numMaxSearchVideos | [650:33](../Configuration/YouTubeConfiguration.html#L650) |
-| dom-id | a.btnDonate | [667:29](../Configuration/YouTubeConfiguration.html#L667) |
-| dom-id | p.youtubeConfigurationStatus | [679:21](../Configuration/YouTubeConfiguration.html#L679) |
-| dom-id | div.ytPluginCredits | [681:21](../Configuration/YouTubeConfiguration.html#L681) |
-| dom-id | span.ytPluginVersion | [695:47](../Configuration/YouTubeConfiguration.html#L695) |
-| dom-id | span.ytUpdateBadge | [696:25](../Configuration/YouTubeConfiguration.html#L696) |
-| dom-id | div.setupGuidePage | [703:13](../Configuration/YouTubeConfiguration.html#L703) |
+| dom-id | input.chkShowMusicGenres | [561:37](../Configuration/YouTubeConfiguration.html#L561) |
+| dom-id | div.musicGenresDescription | [565:33](../Configuration/YouTubeConfiguration.html#L565) |
+| dom-id | input.chkShowShorts | [571:37](../Configuration/YouTubeConfiguration.html#L571) |
+| dom-id | div.shortsDescription | [575:33](../Configuration/YouTubeConfiguration.html#L575) |
+| dom-id | select.selectTrendingRegion | [587:33](../Configuration/YouTubeConfiguration.html#L587) |
+| dom-id | select.selectTrendingCategory | [596:33](../Configuration/YouTubeConfiguration.html#L596) |
+| dom-id | select.selectChannelSortBy | [617:33](../Configuration/YouTubeConfiguration.html#L617) |
+| dom-id | input.chkShowLikeCount | [632:33](../Configuration/YouTubeConfiguration.html#L632) |
+| dom-id | input.chkShowCommentCount | [636:33](../Configuration/YouTubeConfiguration.html#L636) |
+| dom-id | input.numMaxChannelVideos | [651:33](../Configuration/YouTubeConfiguration.html#L651) |
+| dom-id | input.numMaxSearchVideos | [660:33](../Configuration/YouTubeConfiguration.html#L660) |
+| dom-id | a.btnDonate | [677:29](../Configuration/YouTubeConfiguration.html#L677) |
+| dom-id | p.youtubeConfigurationStatus | [689:21](../Configuration/YouTubeConfiguration.html#L689) |
+| dom-id | div.ytPluginCredits | [691:21](../Configuration/YouTubeConfiguration.html#L691) |
+| dom-id | span.ytPluginVersion | [705:47](../Configuration/YouTubeConfiguration.html#L705) |
+| dom-id | span.ytUpdateBadge | [706:25](../Configuration/YouTubeConfiguration.html#L706) |
+| dom-id | div.setupGuidePage | [713:13](../Configuration/YouTubeConfiguration.html#L713) |
 
 </details>
 
 <a id="file-44888eb7c4d56aef"></a>
 ## [Configuration/YouTubeConfiguration.js](../Configuration/YouTubeConfiguration.js)
 
-EmbeddedResource; 38121 bytes; 910 lines.
+EmbeddedResource; 38288 bytes; 912 lines.
 
 <details>
 <summary>All 349 declarations / anchors</summary>
@@ -611,26 +614,26 @@ EmbeddedResource; 38121 bytes; 910 lines.
 | function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549 | [711:65](../Configuration/YouTubeConfiguration.js#L711) |
 | parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.loadedConfig | [711:65](../Configuration/YouTubeConfiguration.js#L711) |
 | variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.config | [724:27](../Configuration/YouTubeConfiguration.js#L724) |
-| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.resetFromKnownRegions | [738:27](../Configuration/YouTubeConfiguration.js#L738) |
-| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31505 | [771:20](../Configuration/YouTubeConfiguration.js#L771) |
-| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31505.error | [771:20](../Configuration/YouTubeConfiguration.js#L771) |
-| method | define callback@113.anonymous-class@16681.saveData | [791:9](../Configuration/YouTubeConfiguration.js#L791) |
-| parameter | define callback@113.anonymous-class@16681.saveData.view | [791:18](../Configuration/YouTubeConfiguration.js#L791) |
-| variable | define callback@113.anonymous-class@16681.saveData.apiClient | [792:19](../Configuration/YouTubeConfiguration.js#L792) |
-| variable | define callback@113.anonymous-class@16681.saveData.config | [798:19](../Configuration/YouTubeConfiguration.js#L798) |
-| method | define callback@113.anonymous-class@16681.flushSaveQueue | [851:9](../Configuration/YouTubeConfiguration.js#L851) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending | [856:19](../Configuration/YouTubeConfiguration.js#L856) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.view | [863:19](../Configuration/YouTubeConfiguration.js#L863) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36420 | [870:21](../Configuration/YouTubeConfiguration.js#L870) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36420.savedApiKey | [875:27](../Configuration/YouTubeConfiguration.js#L875) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36963 | [880:16](../Configuration/YouTubeConfiguration.js#L880) |
-| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36963.error | [880:16](../Configuration/YouTubeConfiguration.js#L880) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37321 | [886:21](../Configuration/YouTubeConfiguration.js#L886) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37427 | [889:16](../Configuration/YouTubeConfiguration.js#L889) |
-| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37427.error | [889:16](../Configuration/YouTubeConfiguration.js#L889) |
-| method | define callback@113.anonymous-class@16681.scheduleAutoSave | [896:9](../Configuration/YouTubeConfiguration.js#L896) |
-| parameter | define callback@113.anonymous-class@16681.scheduleAutoSave.view | [896:26](../Configuration/YouTubeConfiguration.js#L896) |
-| function | define callback@113.anonymous-class@16681.scheduleAutoSave.setTimeout callback@37979 | [904:46](../Configuration/YouTubeConfiguration.js#L904) |
+| variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.resetFromKnownRegions | [739:27](../Configuration/YouTubeConfiguration.js#L739) |
+| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31598 | [772:20](../Configuration/YouTubeConfiguration.js#L772) |
+| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31598.error | [772:20](../Configuration/YouTubeConfiguration.js#L772) |
+| method | define callback@113.anonymous-class@16681.saveData | [792:9](../Configuration/YouTubeConfiguration.js#L792) |
+| parameter | define callback@113.anonymous-class@16681.saveData.view | [792:18](../Configuration/YouTubeConfiguration.js#L792) |
+| variable | define callback@113.anonymous-class@16681.saveData.apiClient | [793:19](../Configuration/YouTubeConfiguration.js#L793) |
+| variable | define callback@113.anonymous-class@16681.saveData.config | [799:19](../Configuration/YouTubeConfiguration.js#L799) |
+| method | define callback@113.anonymous-class@16681.flushSaveQueue | [853:9](../Configuration/YouTubeConfiguration.js#L853) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending | [858:19](../Configuration/YouTubeConfiguration.js#L858) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.view | [865:19](../Configuration/YouTubeConfiguration.js#L865) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36587 | [872:21](../Configuration/YouTubeConfiguration.js#L872) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36587.savedApiKey | [877:27](../Configuration/YouTubeConfiguration.js#L877) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@37130 | [882:16](../Configuration/YouTubeConfiguration.js#L882) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@37130.error | [882:16](../Configuration/YouTubeConfiguration.js#L882) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37488 | [888:21](../Configuration/YouTubeConfiguration.js#L888) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37594 | [891:16](../Configuration/YouTubeConfiguration.js#L891) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37594.error | [891:16](../Configuration/YouTubeConfiguration.js#L891) |
+| method | define callback@113.anonymous-class@16681.scheduleAutoSave | [898:9](../Configuration/YouTubeConfiguration.js#L898) |
+| parameter | define callback@113.anonymous-class@16681.scheduleAutoSave.view | [898:26](../Configuration/YouTubeConfiguration.js#L898) |
+| function | define callback@113.anonymous-class@16681.scheduleAutoSave.setTimeout callback@38146 | [906:46](../Configuration/YouTubeConfiguration.js#L906) |
 
 </details>
 
@@ -2342,10 +2345,10 @@ Plugin Compile source (SDK default); 13627 bytes; 300 lines.
 <a id="file-224cbfdbaba3a683"></a>
 ## [PluginConfiguration.cs](../PluginConfiguration.cs)
 
-Plugin Compile source (SDK default); 4915 bytes; 136 lines.
+Plugin Compile source (SDK default); 5194 bytes; 141 lines.
 
 <details>
-<summary>All 102 declarations / anchors</summary>
+<summary>All 105 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -2418,46 +2421,49 @@ Plugin Compile source (SDK default); 4915 bytes; 136 lines.
 | property | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos | [62:9](../PluginConfiguration.cs#L62) |
 | accessor | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos.get | [62:45](../PluginConfiguration.cs#L62) |
 | accessor | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos.set | [62:50](../PluginConfiguration.cs#L62) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath | [66:9](../PluginConfiguration.cs#L66) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.get | [66:35](../PluginConfiguration.cs#L66) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.set | [66:40](../PluginConfiguration.cs#L66) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled | [69:9](../PluginConfiguration.cs#L69) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.get | [69:46](../PluginConfiguration.cs#L69) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.set | [69:51](../PluginConfiguration.cs#L69) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath | [71:9](../PluginConfiguration.cs#L71) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.get | [71:44](../PluginConfiguration.cs#L71) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.set | [71:49](../PluginConfiguration.cs#L71) |
-| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackMaxHeight | [73:21](../PluginConfiguration.cs#L73) |
-| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight | [77:9](../PluginConfiguration.cs#L77) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.get | [79:13](../PluginConfiguration.cs#L79) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.set | [80:13](../PluginConfiguration.cs#L80) |
-| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackH264MaxHeight | [83:21](../PluginConfiguration.cs#L83) |
-| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight | [85:9](../PluginConfiguration.cs#L85) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.get | [87:13](../PluginConfiguration.cs#L87) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.set | [88:13](../PluginConfiguration.cs#L88) |
-| property | Emby.YouTubePlugin.PluginConfiguration.Donate | [91:9](../PluginConfiguration.cs#L91) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.get | [91:32](../PluginConfiguration.cs#L91) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.set | [91:37](../PluginConfiguration.cs#L91) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaStatus | [93:9](../PluginConfiguration.cs#L93) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaUsedToday | [99:9](../PluginConfiguration.cs#L99) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaDailyLimit | [102:9](../PluginConfiguration.cs#L102) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds | [105:9](../PluginConfiguration.cs#L105) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get | [108:13](../PluginConfiguration.cs#L108) |
-| local-variable | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get.sec | [110:21](../PluginConfiguration.cs#L110) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaLifetime | [115:9](../PluginConfiguration.cs#L115) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchCallsToday | [118:9](../PluginConfiguration.cs#L118) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchDailyLimit | [121:9](../PluginConfiguration.cs#L121) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherUnitsToday | [124:9](../PluginConfiguration.cs#L124) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherDailyLimit | [127:9](../PluginConfiguration.cs#L127) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalSearchCalls | [130:9](../PluginConfiguration.cs#L130) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalOtherUnits | [133:9](../PluginConfiguration.cs#L133) |
+| property | Emby.YouTubePlugin.PluginConfiguration.ShowMusicGenres | [67:9](../PluginConfiguration.cs#L67) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.ShowMusicGenres.get | [67:39](../PluginConfiguration.cs#L67) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.ShowMusicGenres.set | [67:44](../PluginConfiguration.cs#L67) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath | [71:9](../PluginConfiguration.cs#L71) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.get | [71:35](../PluginConfiguration.cs#L71) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.set | [71:40](../PluginConfiguration.cs#L71) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled | [74:9](../PluginConfiguration.cs#L74) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.get | [74:46](../PluginConfiguration.cs#L74) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.set | [74:51](../PluginConfiguration.cs#L74) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath | [76:9](../PluginConfiguration.cs#L76) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.get | [76:44](../PluginConfiguration.cs#L76) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.set | [76:49](../PluginConfiguration.cs#L76) |
+| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackMaxHeight | [78:21](../PluginConfiguration.cs#L78) |
+| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight | [82:9](../PluginConfiguration.cs#L82) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.get | [84:13](../PluginConfiguration.cs#L84) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.set | [85:13](../PluginConfiguration.cs#L85) |
+| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackH264MaxHeight | [88:21](../PluginConfiguration.cs#L88) |
+| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight | [90:9](../PluginConfiguration.cs#L90) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.get | [92:13](../PluginConfiguration.cs#L92) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.set | [93:13](../PluginConfiguration.cs#L93) |
+| property | Emby.YouTubePlugin.PluginConfiguration.Donate | [96:9](../PluginConfiguration.cs#L96) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.get | [96:32](../PluginConfiguration.cs#L96) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.set | [96:37](../PluginConfiguration.cs#L96) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaStatus | [98:9](../PluginConfiguration.cs#L98) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaUsedToday | [104:9](../PluginConfiguration.cs#L104) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaDailyLimit | [107:9](../PluginConfiguration.cs#L107) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds | [110:9](../PluginConfiguration.cs#L110) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get | [113:13](../PluginConfiguration.cs#L113) |
+| local-variable | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get.sec | [115:21](../PluginConfiguration.cs#L115) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaLifetime | [120:9](../PluginConfiguration.cs#L120) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchCallsToday | [123:9](../PluginConfiguration.cs#L123) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchDailyLimit | [126:9](../PluginConfiguration.cs#L126) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherUnitsToday | [129:9](../PluginConfiguration.cs#L129) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherDailyLimit | [132:9](../PluginConfiguration.cs#L132) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalSearchCalls | [135:9](../PluginConfiguration.cs#L135) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalOtherUnits | [138:9](../PluginConfiguration.cs#L138) |
 
 </details>
 
 <a id="file-d27f2eafc5169b60"></a>
 ## [PluginEntryPoint.cs](../PluginEntryPoint.cs)
 
-Plugin Compile source (SDK default); 136590 bytes; 3116 lines.
+Plugin Compile source (SDK default); 136650 bytes; 3117 lines.
 
 <details>
 <summary>All 707 declarations / anchors</summary>
@@ -3115,62 +3121,62 @@ Plugin Compile source (SDK default); 136590 bytes; 3116 lines.
 | parameter | Emby.YouTubePlugin.PluginEntryPoint.ComputeConfigHash.c | [2722:50](../PluginEntryPoint.cs#L2722) |
 | local-variable | Emby.YouTubePlugin.PluginEntryPoint.ComputeConfigHash.sha | [2724:23](../PluginEntryPoint.cs#L2724) |
 | local-variable | Emby.YouTubePlugin.PluginEntryPoint.ComputeConfigHash.blob | [2725:17](../PluginEntryPoint.cs#L2725) |
-| method | Emby.YouTubePlugin.PluginEntryPoint.Dispose | [2749:9](../PluginEntryPoint.cs#L2749) |
-| local-variable | Emby.YouTubePlugin.PluginEntryPoint.Dispose.pollStopped | [2779:17](../PluginEntryPoint.cs#L2779) |
-| type | Emby.YouTubePlugin.ChannelRefreshInvoker | [2795:5](../PluginEntryPoint.cs#L2795) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker.RootRefreshDepth | [2797:26](../PluginEntryPoint.cs#L2797) |
-| property | Emby.YouTubePlugin.ChannelRefreshInvoker.ContentRefreshDepth | [2798:9](../PluginEntryPoint.cs#L2798) |
-| pattern-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.ContentRefreshDepth.config | [2798:82](../PluginEntryPoint.cs#L2798) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._channelMgr | [2800:41](../PluginEntryPoint.cs#L2800) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._registeredChannel | [2801:34](../PluginEntryPoint.cs#L2801) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._refreshAgainRequested | [2802:28](../PluginEntryPoint.cs#L2802) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._nonSkippableRefreshRequested | [2803:28](../PluginEntryPoint.cs#L2803) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._nextRefreshDepth | [2804:28](../PluginEntryPoint.cs#L2804) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshGate | [2809:47](../PluginEntryPoint.cs#L2809) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._refreshActive | [2815:28](../PluginEntryPoint.cs#L2815) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker._lastChannelScanTicks | [2822:29](../PluginEntryPoint.cs#L2822) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker.ScanQuietWindowMs | [2830:28](../PluginEntryPoint.cs#L2830) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker.MaxScanWait | [2837:42](../PluginEntryPoint.cs#L2837) |
-| field | Emby.YouTubePlugin.ChannelRefreshInvoker.ScanWaitPollDelay | [2838:42](../PluginEntryPoint.cs#L2838) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.NoteChannelScanActivity | [2840:9](../PluginEntryPoint.cs#L2840) |
-| property | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress | [2843:9](../PluginEntryPoint.cs#L2843) |
-| accessor | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress.get | [2845:13](../PluginEntryPoint.cs#L2845) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress.get.last | [2850:21](../PluginEntryPoint.cs#L2850) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.Initialize | [2855:9](../PluginEntryPoint.cs#L2855) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.Initialize.channelManager | [2855:39](../PluginEntryPoint.cs#L2855) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync | [2861:9](../PluginEntryPoint.cs#L2861) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.requestedDepth | [2861:54](../PluginEntryPoint.cs#L2861) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.skipIfScanActive | [2861:93](../PluginEntryPoint.cs#L2861) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.refreshDepth | [2880:25](../PluginEntryPoint.cs#L2880) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.maySkipIfScanActive | [2881:25](../PluginEntryPoint.cs#L2881) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.maySkipIfScanActive | [2898:25](../PluginEntryPoint.cs#L2898) |
-| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.anonymous@126276 | [2899:34](../PluginEntryPoint.cs#L2899) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync | [2907:9](../PluginEntryPoint.cs#L2907) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.cancellation | [2907:70](../PluginEntryPoint.cs#L2907) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.ownsActivity | [2910:18](../PluginEntryPoint.cs#L2910) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.task | [2920:21](../PluginEntryPoint.cs#L2920) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.maySkip | [2933:25](../PluginEntryPoint.cs#L2933) |
-| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.anonymous@128287 | [2934:34](../PluginEntryPoint.cs#L2934) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync | [2939:9](../PluginEntryPoint.cs#L2939) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.refreshDepth | [2939:59](../PluginEntryPoint.cs#L2939) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.skipIfScanActive | [2939:77](../PluginEntryPoint.cs#L2939) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.waited | [2974:25](../PluginEntryPoint.cs#L2974) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.gateHandedOff | [2999:21](../PluginEntryPoint.cs#L2999) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.task | [3002:25](../PluginEntryPoint.cs#L3002) |
-| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.anonymous@132904 | [3018:25](../PluginEntryPoint.cs#L3018) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.anonymous@132904.completedTask | [3018:25](../PluginEntryPoint.cs#L3018) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.completed | [3032:25](../PluginEntryPoint.cs#L3032) |
-| catch-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.ex | [3054:19](../PluginEntryPoint.cs#L3054) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth | [3060:9](../PluginEntryPoint.cs#L3060) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.requestedDepth | [3060:51](../PluginEntryPoint.cs#L3060) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.normalized | [3062:17](../PluginEntryPoint.cs#L3062) |
-| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.current | [3066:21](../PluginEntryPoint.cs#L3066) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.ConsumeNextRefreshDepth | [3075:9](../PluginEntryPoint.cs#L3075) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.NormalizeRefreshDepth | [3081:9](../PluginEntryPoint.cs#L3081) |
-| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.NormalizeRefreshDepth.requestedDepth | [3081:50](../PluginEntryPoint.cs#L3081) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.EnsureChannelManager | [3089:9](../PluginEntryPoint.cs#L3089) |
-| method | Emby.YouTubePlugin.ChannelRefreshInvoker.FindRegisteredYouTubeChannel | [3100:9](../PluginEntryPoint.cs#L3100) |
-| catch-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.FindRegisteredYouTubeChannel.ex | [3109:19](../PluginEntryPoint.cs#L3109) |
+| method | Emby.YouTubePlugin.PluginEntryPoint.Dispose | [2750:9](../PluginEntryPoint.cs#L2750) |
+| local-variable | Emby.YouTubePlugin.PluginEntryPoint.Dispose.pollStopped | [2780:17](../PluginEntryPoint.cs#L2780) |
+| type | Emby.YouTubePlugin.ChannelRefreshInvoker | [2796:5](../PluginEntryPoint.cs#L2796) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker.RootRefreshDepth | [2798:26](../PluginEntryPoint.cs#L2798) |
+| property | Emby.YouTubePlugin.ChannelRefreshInvoker.ContentRefreshDepth | [2799:9](../PluginEntryPoint.cs#L2799) |
+| pattern-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.ContentRefreshDepth.config | [2799:82](../PluginEntryPoint.cs#L2799) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._channelMgr | [2801:41](../PluginEntryPoint.cs#L2801) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._registeredChannel | [2802:34](../PluginEntryPoint.cs#L2802) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._refreshAgainRequested | [2803:28](../PluginEntryPoint.cs#L2803) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._nonSkippableRefreshRequested | [2804:28](../PluginEntryPoint.cs#L2804) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._nextRefreshDepth | [2805:28](../PluginEntryPoint.cs#L2805) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshGate | [2810:47](../PluginEntryPoint.cs#L2810) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._refreshActive | [2816:28](../PluginEntryPoint.cs#L2816) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker._lastChannelScanTicks | [2823:29](../PluginEntryPoint.cs#L2823) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker.ScanQuietWindowMs | [2831:28](../PluginEntryPoint.cs#L2831) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker.MaxScanWait | [2838:42](../PluginEntryPoint.cs#L2838) |
+| field | Emby.YouTubePlugin.ChannelRefreshInvoker.ScanWaitPollDelay | [2839:42](../PluginEntryPoint.cs#L2839) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.NoteChannelScanActivity | [2841:9](../PluginEntryPoint.cs#L2841) |
+| property | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress | [2844:9](../PluginEntryPoint.cs#L2844) |
+| accessor | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress.get | [2846:13](../PluginEntryPoint.cs#L2846) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.IsRefreshInProgress.get.last | [2851:21](../PluginEntryPoint.cs#L2851) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.Initialize | [2856:9](../PluginEntryPoint.cs#L2856) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.Initialize.channelManager | [2856:39](../PluginEntryPoint.cs#L2856) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync | [2862:9](../PluginEntryPoint.cs#L2862) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.requestedDepth | [2862:54](../PluginEntryPoint.cs#L2862) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.skipIfScanActive | [2862:93](../PluginEntryPoint.cs#L2862) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.refreshDepth | [2881:25](../PluginEntryPoint.cs#L2881) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.maySkipIfScanActive | [2882:25](../PluginEntryPoint.cs#L2882) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.maySkipIfScanActive | [2899:25](../PluginEntryPoint.cs#L2899) |
+| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshAsync.anonymous@126336 | [2900:34](../PluginEntryPoint.cs#L2900) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync | [2908:9](../PluginEntryPoint.cs#L2908) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.cancellation | [2908:70](../PluginEntryPoint.cs#L2908) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.ownsActivity | [2911:18](../PluginEntryPoint.cs#L2911) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.task | [2921:21](../PluginEntryPoint.cs#L2921) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.maySkip | [2934:25](../PluginEntryPoint.cs#L2934) |
+| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.RefreshMaterializationAsync.anonymous@128347 | [2935:34](../PluginEntryPoint.cs#L2935) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync | [2940:9](../PluginEntryPoint.cs#L2940) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.refreshDepth | [2940:59](../PluginEntryPoint.cs#L2940) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.skipIfScanActive | [2940:77](../PluginEntryPoint.cs#L2940) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.waited | [2975:25](../PluginEntryPoint.cs#L2975) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.gateHandedOff | [3000:21](../PluginEntryPoint.cs#L3000) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.task | [3003:25](../PluginEntryPoint.cs#L3003) |
+| anonymous-function | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.anonymous@132964 | [3019:25](../PluginEntryPoint.cs#L3019) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.anonymous@132964.completedTask | [3019:25](../PluginEntryPoint.cs#L3019) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.completed | [3033:25](../PluginEntryPoint.cs#L3033) |
+| catch-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.TriggerRefreshCoreAsync.ex | [3055:19](../PluginEntryPoint.cs#L3055) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth | [3061:9](../PluginEntryPoint.cs#L3061) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.requestedDepth | [3061:51](../PluginEntryPoint.cs#L3061) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.normalized | [3063:17](../PluginEntryPoint.cs#L3063) |
+| local-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.RaiseNextRefreshDepth.current | [3067:21](../PluginEntryPoint.cs#L3067) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.ConsumeNextRefreshDepth | [3076:9](../PluginEntryPoint.cs#L3076) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.NormalizeRefreshDepth | [3082:9](../PluginEntryPoint.cs#L3082) |
+| parameter | Emby.YouTubePlugin.ChannelRefreshInvoker.NormalizeRefreshDepth.requestedDepth | [3082:50](../PluginEntryPoint.cs#L3082) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.EnsureChannelManager | [3090:9](../PluginEntryPoint.cs#L3090) |
+| method | Emby.YouTubePlugin.ChannelRefreshInvoker.FindRegisteredYouTubeChannel | [3101:9](../PluginEntryPoint.cs#L3101) |
+| catch-variable | Emby.YouTubePlugin.ChannelRefreshInvoker.FindRegisteredYouTubeChannel.ex | [3110:19](../PluginEntryPoint.cs#L3110) |
 
 </details>
 
@@ -3335,7 +3341,7 @@ Plugin Compile source (SDK default); 15771 bytes; 423 lines.
 <a id="file-b335630551682c19"></a>
 ## [README.md](../README.md)
 
-Documentation/resource; 8871 bytes; 169 lines.
+Documentation/resource; 9054 bytes; 171 lines.
 
 <a id="file-03de83be30141261"></a>
 ## [YouTubeAdaptiveSourceBudget.cs](../YouTubeAdaptiveSourceBudget.cs)
@@ -3711,10 +3717,10 @@ Plugin Compile source (SDK default); 10688 bytes; 202 lines.
 <a id="file-7011a74936995935"></a>
 ## [YouTubeApi.cs](../YouTubeApi.cs)
 
-Plugin Compile source (SDK default); 56867 bytes; 1283 lines.
+Plugin Compile source (SDK default); 57849 bytes; 1297 lines.
 
 <details>
-<summary>All 399 declarations / anchors</summary>
+<summary>All 406 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -4014,109 +4020,116 @@ Plugin Compile source (SDK default); 56867 bytes; 1283 lines.
 | parameter | Emby.YouTubePlugin.YouTubeApi.SearchVideosAsync.ct | [957:61](../YouTubeApi.cs#L957) |
 | local-variable | Emby.YouTubePlugin.YouTubeApi.SearchVideosAsync.q | [959:17](../YouTubeApi.cs#L959) |
 | local-variable | Emby.YouTubePlugin.YouTubeApi.SearchVideosAsync.url | [960:17](../YouTubeApi.cs#L960) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync | [969:9](../YouTubeApi.cs#L969) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.apiKey | [970:13](../YouTubeApi.cs#L970) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.channelId | [970:28](../YouTubeApi.cs#L970) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.pageToken | [970:46](../YouTubeApi.cs#L970) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.ct | [970:65](../YouTubeApi.cs#L970) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.sortBy | [971:13](../YouTubeApi.cs#L971) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.normalized | [975:17](../YouTubeApi.cs#L975) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.uploadsPlaylistId | [984:21](../YouTubeApi.cs#L984) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.url | [989:17](../YouTubeApi.cs#L989) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync | [999:9](../YouTubeApi.cs#L999) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.apiKey | [1000:13](../YouTubeApi.cs#L1000) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.playlistId | [1000:28](../YouTubeApi.cs#L1000) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.pageToken | [1000:47](../YouTubeApi.cs#L1000) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.ct | [1000:66](../YouTubeApi.cs#L1000) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.url | [1002:17](../YouTubeApi.cs#L1002) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync | [1021:9](../YouTubeApi.cs#L1021) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.apiKey | [1022:13](../YouTubeApi.cs#L1022) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.playlistId | [1022:28](../YouTubeApi.cs#L1022) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.maxItems | [1022:47](../YouTubeApi.cs#L1022) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.ct | [1022:61](../YouTubeApi.cs#L1022) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.snapshot | [1024:17](../YouTubeApi.cs#L1024) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync | [1029:9](../YouTubeApi.cs#L1029) |
-| tuple-element | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.VideoIds | [1029:35](../YouTubeApi.cs#L1029) |
-| tuple-element | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.TotalResults | [1029:58](../YouTubeApi.cs#L1029) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.apiKey | [1030:13](../YouTubeApi.cs#L1030) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.playlistId | [1030:28](../YouTubeApi.cs#L1030) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.maxItems | [1030:47](../YouTubeApi.cs#L1030) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ct | [1030:61](../YouTubeApi.cs#L1030) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ids | [1035:17](../YouTubeApi.cs#L1035) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.seenPageTokens | [1036:17](../YouTubeApi.cs#L1036) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.pageToken | [1037:21](../YouTubeApi.cs#L1037) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.totalResults | [1038:17](../YouTubeApi.cs#L1038) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.page | [1040:22](../YouTubeApi.cs#L1040) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.url | [1045:21](../YouTubeApi.cs#L1045) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.doc | [1055:31](../YouTubeApi.cs#L1055) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.items | [1056:74](../YouTubeApi.cs#L1056) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.pageInfo | [1064:81](../YouTubeApi.cs#L1064) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.totalResultsElement | [1066:81](../YouTubeApi.cs#L1066) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.item | [1073:21](../YouTubeApi.cs#L1073) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.item.vid | [1075:29](../YouTubeApi.cs#L1075) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ptEl | [1080:89](../YouTubeApi.cs#L1080) |
-| catch-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ex | [1088:23](../YouTubeApi.cs#L1088) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync | [1105:9](../YouTubeApi.cs#L1105) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.apiKey | [1106:13](../YouTubeApi.cs#L1106) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.regionCode | [1106:28](../YouTubeApi.cs#L1106) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.categoryId | [1106:48](../YouTubeApi.cs#L1106) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.ct | [1106:68](../YouTubeApi.cs#L1106) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.url | [1110:17](../YouTubeApi.cs#L1110) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync | [1122:9](../YouTubeApi.cs#L1122) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.apiKey | [1123:13](../YouTubeApi.cs#L1123) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.regionCode | [1123:28](../YouTubeApi.cs#L1123) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.ct | [1123:47](../YouTubeApi.cs#L1123) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.url | [1127:17](../YouTubeApi.cs#L1127) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync | [1134:9](../YouTubeApi.cs#L1134) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.apiKey | [1135:13](../YouTubeApi.cs#L1135) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.ct | [1136:13](../YouTubeApi.cs#L1136) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.url | [1138:17](../YouTubeApi.cs#L1138) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.doc | [1139:17](../YouTubeApi.cs#L1139) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.codes | [1143:17](../YouTubeApi.cs#L1143) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.items | [1144:65](../YouTubeApi.cs#L1144) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item | [1147:17](../YouTubeApi.cs#L1147) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.code | [1149:25](../YouTubeApi.cs#L1149) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.anonymous@51496 | [1152:37](../YouTubeApi.cs#L1152) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.anonymous@51496.character | [1152:37](../YouTubeApi.cs#L1152) |
-| method | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync | [1164:9](../YouTubeApi.cs#L1164) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.apiKey | [1165:13](../YouTubeApi.cs#L1165) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.regionCode | [1166:13](../YouTubeApi.cs#L1166) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.fallback | [1167:13](../YouTubeApi.cs#L1167) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.ct | [1168:13](../YouTubeApi.cs#L1168) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.normalized | [1170:17](../YouTubeApi.cs#L1170) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.supported | [1174:17](../YouTubeApi.cs#L1174) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.regionDocument | [1177:27](../YouTubeApi.cs#L1177) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync | [1193:9](../YouTubeApi.cs#L1193) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.apiKey | [1194:13](../YouTubeApi.cs#L1194) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.videoIds | [1194:28](../YouTubeApi.cs#L1194) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.ct | [1194:58](../YouTubeApi.cs#L1194) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.ids | [1196:17](../YouTubeApi.cs#L1196) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.url | [1199:17](../YouTubeApi.cs#L1199) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetString | [1207:9](../YouTubeApi.cs#L1207) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetString.el | [1207:41](../YouTubeApi.cs#L1207) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetString.name | [1207:57](../YouTubeApi.cs#L1207) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetString.p | [1210:50](../YouTubeApi.cs#L1210) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetNestedString | [1214:9](../YouTubeApi.cs#L1214) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.el | [1214:47](../YouTubeApi.cs#L1214) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.parent | [1214:63](../YouTubeApi.cs#L1214) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.child | [1214:78](../YouTubeApi.cs#L1214) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetNestedString.p | [1216:51](../YouTubeApi.cs#L1216) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail | [1221:9](../YouTubeApi.cs#L1221) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.el | [1221:48](../YouTubeApi.cs#L1221) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.snippet | [1223:55](../YouTubeApi.cs#L1223) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.thumbs | [1224:63](../YouTubeApi.cs#L1224) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality | [1228:13](../YouTubeApi.cs#L1228) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality.t | [1230:60](../YouTubeApi.cs#L1230) |
-| local-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality.url | [1232:25](../YouTubeApi.cs#L1232) |
-| method | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl | [1239:9](../YouTubeApi.cs#L1239) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl.videoId | [1239:57](../YouTubeApi.cs#L1239) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl.preferredUrl | [1239:73](../YouTubeApi.cs#L1239) |
-| method | Emby.YouTubePlugin.YouTubeApi.ParseDuration | [1252:9](../YouTubeApi.cs#L1252) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ParseDuration.duration | [1252:47](../YouTubeApi.cs#L1252) |
-| catch-variable | Emby.YouTubePlugin.YouTubeApi.ParseDuration.ex | [1263:19](../YouTubeApi.cs#L1263) |
-| method | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt | [1273:9](../YouTubeApi.cs#L1273) |
-| parameter | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.publishedAt | [1273:50](../YouTubeApi.cs#L1273) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.dt | [1278:29](../YouTubeApi.cs#L1278) |
+| method | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync | [968:9](../YouTubeApi.cs#L968) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.apiKey | [969:13](../YouTubeApi.cs#L969) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.topicId | [969:28](../YouTubeApi.cs#L969) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.regionCode | [969:44](../YouTubeApi.cs#L969) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.publishedAfter | [969:63](../YouTubeApi.cs#L969) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.ct | [969:86](../YouTubeApi.cs#L969) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.SearchMusicTopicAsync.url | [973:17](../YouTubeApi.cs#L973) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync | [983:9](../YouTubeApi.cs#L983) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.apiKey | [984:13](../YouTubeApi.cs#L984) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.channelId | [984:28](../YouTubeApi.cs#L984) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.pageToken | [984:46](../YouTubeApi.cs#L984) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.ct | [984:65](../YouTubeApi.cs#L984) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.sortBy | [985:13](../YouTubeApi.cs#L985) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.normalized | [989:17](../YouTubeApi.cs#L989) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.uploadsPlaylistId | [998:21](../YouTubeApi.cs#L998) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetChannelVideosAsync.url | [1003:17](../YouTubeApi.cs#L1003) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync | [1013:9](../YouTubeApi.cs#L1013) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.apiKey | [1014:13](../YouTubeApi.cs#L1014) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.playlistId | [1014:28](../YouTubeApi.cs#L1014) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.pageToken | [1014:47](../YouTubeApi.cs#L1014) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.ct | [1014:66](../YouTubeApi.cs#L1014) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideosAsync.url | [1016:17](../YouTubeApi.cs#L1016) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync | [1035:9](../YouTubeApi.cs#L1035) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.apiKey | [1036:13](../YouTubeApi.cs#L1036) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.playlistId | [1036:28](../YouTubeApi.cs#L1036) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.maxItems | [1036:47](../YouTubeApi.cs#L1036) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.ct | [1036:61](../YouTubeApi.cs#L1036) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistVideoIdsFreshAsync.snapshot | [1038:17](../YouTubeApi.cs#L1038) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync | [1043:9](../YouTubeApi.cs#L1043) |
+| tuple-element | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.VideoIds | [1043:35](../YouTubeApi.cs#L1043) |
+| tuple-element | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.TotalResults | [1043:58](../YouTubeApi.cs#L1043) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.apiKey | [1044:13](../YouTubeApi.cs#L1044) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.playlistId | [1044:28](../YouTubeApi.cs#L1044) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.maxItems | [1044:47](../YouTubeApi.cs#L1044) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ct | [1044:61](../YouTubeApi.cs#L1044) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ids | [1049:17](../YouTubeApi.cs#L1049) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.seenPageTokens | [1050:17](../YouTubeApi.cs#L1050) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.pageToken | [1051:21](../YouTubeApi.cs#L1051) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.totalResults | [1052:17](../YouTubeApi.cs#L1052) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.page | [1054:22](../YouTubeApi.cs#L1054) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.url | [1059:21](../YouTubeApi.cs#L1059) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.doc | [1069:31](../YouTubeApi.cs#L1069) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.items | [1070:74](../YouTubeApi.cs#L1070) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.pageInfo | [1078:81](../YouTubeApi.cs#L1078) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.totalResultsElement | [1080:81](../YouTubeApi.cs#L1080) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.item | [1087:21](../YouTubeApi.cs#L1087) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.item.vid | [1089:29](../YouTubeApi.cs#L1089) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ptEl | [1094:89](../YouTubeApi.cs#L1094) |
+| catch-variable | Emby.YouTubePlugin.YouTubeApi.GetPlaylistSnapshotFreshAsync.ex | [1102:23](../YouTubeApi.cs#L1102) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync | [1119:9](../YouTubeApi.cs#L1119) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.apiKey | [1120:13](../YouTubeApi.cs#L1120) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.regionCode | [1120:28](../YouTubeApi.cs#L1120) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.categoryId | [1120:48](../YouTubeApi.cs#L1120) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.ct | [1120:68](../YouTubeApi.cs#L1120) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetTrendingAsync.url | [1124:17](../YouTubeApi.cs#L1124) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync | [1136:9](../YouTubeApi.cs#L1136) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.apiKey | [1137:13](../YouTubeApi.cs#L1137) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.regionCode | [1137:28](../YouTubeApi.cs#L1137) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.ct | [1137:47](../YouTubeApi.cs#L1137) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoCategoriesAsync.url | [1141:17](../YouTubeApi.cs#L1141) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync | [1148:9](../YouTubeApi.cs#L1148) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.apiKey | [1149:13](../YouTubeApi.cs#L1149) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.ct | [1150:13](../YouTubeApi.cs#L1150) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.url | [1152:17](../YouTubeApi.cs#L1152) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.doc | [1153:17](../YouTubeApi.cs#L1153) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.codes | [1157:17](../YouTubeApi.cs#L1157) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.items | [1158:65](../YouTubeApi.cs#L1158) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item | [1161:17](../YouTubeApi.cs#L1161) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.code | [1163:25](../YouTubeApi.cs#L1163) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.anonymous@52478 | [1166:37](../YouTubeApi.cs#L1166) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetI18nRegionsAsync.item.anonymous@52478.character | [1166:37](../YouTubeApi.cs#L1166) |
+| method | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync | [1178:9](../YouTubeApi.cs#L1178) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.apiKey | [1179:13](../YouTubeApi.cs#L1179) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.regionCode | [1180:13](../YouTubeApi.cs#L1180) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.fallback | [1181:13](../YouTubeApi.cs#L1181) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.ct | [1182:13](../YouTubeApi.cs#L1182) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.normalized | [1184:17](../YouTubeApi.cs#L1184) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.supported | [1188:17](../YouTubeApi.cs#L1188) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.ResolveContentRegionAsync.regionDocument | [1191:27](../YouTubeApi.cs#L1191) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync | [1207:9](../YouTubeApi.cs#L1207) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.apiKey | [1208:13](../YouTubeApi.cs#L1208) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.videoIds | [1208:28](../YouTubeApi.cs#L1208) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.ct | [1208:58](../YouTubeApi.cs#L1208) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.ids | [1210:17](../YouTubeApi.cs#L1210) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetVideoDetailsBatchAsync.url | [1213:17](../YouTubeApi.cs#L1213) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetString | [1221:9](../YouTubeApi.cs#L1221) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetString.el | [1221:41](../YouTubeApi.cs#L1221) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetString.name | [1221:57](../YouTubeApi.cs#L1221) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetString.p | [1224:50](../YouTubeApi.cs#L1224) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetNestedString | [1228:9](../YouTubeApi.cs#L1228) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.el | [1228:47](../YouTubeApi.cs#L1228) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.parent | [1228:63](../YouTubeApi.cs#L1228) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetNestedString.child | [1228:78](../YouTubeApi.cs#L1228) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetNestedString.p | [1230:51](../YouTubeApi.cs#L1230) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail | [1235:9](../YouTubeApi.cs#L1235) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.el | [1235:48](../YouTubeApi.cs#L1235) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.snippet | [1237:55](../YouTubeApi.cs#L1237) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.thumbs | [1238:63](../YouTubeApi.cs#L1238) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality | [1242:13](../YouTubeApi.cs#L1242) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality.t | [1244:60](../YouTubeApi.cs#L1244) |
+| local-variable | Emby.YouTubePlugin.YouTubeApi.GetBestThumbnail.quality.url | [1246:25](../YouTubeApi.cs#L1246) |
+| method | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl | [1253:9](../YouTubeApi.cs#L1253) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl.videoId | [1253:57](../YouTubeApi.cs#L1253) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.GetStableVideoThumbnailUrl.preferredUrl | [1253:73](../YouTubeApi.cs#L1253) |
+| method | Emby.YouTubePlugin.YouTubeApi.ParseDuration | [1266:9](../YouTubeApi.cs#L1266) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ParseDuration.duration | [1266:47](../YouTubeApi.cs#L1266) |
+| catch-variable | Emby.YouTubePlugin.YouTubeApi.ParseDuration.ex | [1277:19](../YouTubeApi.cs#L1277) |
+| method | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt | [1287:9](../YouTubeApi.cs#L1287) |
+| parameter | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.publishedAt | [1287:50](../YouTubeApi.cs#L1287) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeApi.ParsePublishedAt.dt | [1292:29](../YouTubeApi.cs#L1292) |
 
 </details>
 
@@ -5326,7 +5339,7 @@ Plugin Compile source (SDK default); 6186 bytes; 120 lines.
 <a id="file-b5a9b427d9c6cb61"></a>
 ## [YouTubeChannel.Mapping.cs](../YouTubeChannel.Mapping.cs)
 
-Plugin Compile source (SDK default); 14971 bytes; 310 lines.
+Plugin Compile source (SDK default); 15119 bytes; 311 lines.
 
 <details>
 <summary>All 95 declarations / anchors</summary>
@@ -5412,29 +5425,29 @@ Plugin Compile source (SDK default); 14971 bytes; 310 lines.
 | pattern-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.snip | [245:65](../YouTubeChannel.Mapping.cs#L245) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.rid | [246:70](../YouTubeChannel.Mapping.cs#L246) |
 | pattern-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.idProp | [255:86](../YouTubeChannel.Mapping.cs#L255) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.title | [265:21](../YouTubeChannel.Mapping.cs#L265) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.author | [266:21](../YouTubeChannel.Mapping.cs#L266) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.desc | [267:21](../YouTubeChannel.Mapping.cs#L267) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.pubStr | [268:21](../YouTubeChannel.Mapping.cs#L268) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.premiere | [269:21](../YouTubeChannel.Mapping.cs#L269) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.thumb | [270:21](../YouTubeChannel.Mapping.cs#L270) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.liveBroadcastContent | [275:21](../YouTubeChannel.Mapping.cs#L275) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.isLive | [276:22](../YouTubeChannel.Mapping.cs#L276) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.overview | [278:25](../YouTubeChannel.Mapping.cs#L278) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.itemId | [280:24](../YouTubeChannel.Mapping.cs#L280) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.displayTitle | [281:24](../YouTubeChannel.Mapping.cs#L281) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.info | [283:21](../YouTubeChannel.Mapping.cs#L283) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ClampVideos | [306:9](../YouTubeChannel.Mapping.cs#L306) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ClampVideos.val | [306:40](../YouTubeChannel.Mapping.cs#L306) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ClampSearchVideos | [308:9](../YouTubeChannel.Mapping.cs#L308) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ClampSearchVideos.val | [308:46](../YouTubeChannel.Mapping.cs#L308) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.title | [266:21](../YouTubeChannel.Mapping.cs#L266) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.author | [267:21](../YouTubeChannel.Mapping.cs#L267) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.desc | [268:21](../YouTubeChannel.Mapping.cs#L268) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.pubStr | [269:21](../YouTubeChannel.Mapping.cs#L269) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.premiere | [270:21](../YouTubeChannel.Mapping.cs#L270) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.thumb | [271:21](../YouTubeChannel.Mapping.cs#L271) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.liveBroadcastContent | [276:21](../YouTubeChannel.Mapping.cs#L276) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.isLive | [277:22](../YouTubeChannel.Mapping.cs#L277) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.overview | [279:25](../YouTubeChannel.Mapping.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.itemId | [281:24](../YouTubeChannel.Mapping.cs#L281) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.displayTitle | [282:24](../YouTubeChannel.Mapping.cs#L282) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ExtractVideos.el.info | [284:21](../YouTubeChannel.Mapping.cs#L284) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ClampVideos | [307:9](../YouTubeChannel.Mapping.cs#L307) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ClampVideos.val | [307:40](../YouTubeChannel.Mapping.cs#L307) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ClampSearchVideos | [309:9](../YouTubeChannel.Mapping.cs#L309) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ClampSearchVideos.val | [309:46](../YouTubeChannel.Mapping.cs#L309) |
 
 </details>
 
 <a id="file-11faad7ba4aab64e"></a>
 ## [YouTubeChannel.MediaFolders.cs](../YouTubeChannel.MediaFolders.cs)
 
-Plugin Compile source (SDK default); 19062 bytes; 467 lines.
+Plugin Compile source (SDK default); 19407 bytes; 472 lines.
 
 <details>
 <summary>All 130 declarations / anchors</summary>
@@ -5462,122 +5475,122 @@ Plugin Compile source (SDK default); 19062 bytes; 467 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.pageRequests | [44:17](../YouTubeChannel.MediaFolders.cs#L44) |
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.usesSearchEndpoint | [45:17](../YouTubeChannel.MediaFolders.cs#L45) |
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.maxPageRequests | [48:17](../YouTubeChannel.MediaFolders.cs#L48) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.knownShortsIds | [52:30](../YouTubeChannel.MediaFolders.cs#L52) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.shortsProbe | [55:21](../YouTubeChannel.MediaFolders.cs#L55) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.requestedPageToken | [63:21](../YouTubeChannel.MediaFolders.cs#L63) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.doc | [71:27](../YouTubeChannel.MediaFolders.cs#L71) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.batch | [75:21](../YouTubeChannel.MediaFolders.cs#L75) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.videoIds | [88:21](../YouTubeChannel.MediaFolders.cs#L88) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4267 | [106:45](../YouTubeChannel.MediaFolders.cs#L106) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4267.item | [106:45](../YouTubeChannel.MediaFolders.cs#L106) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4376 | [107:43](../YouTubeChannel.MediaFolders.cs#L107) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4376.item | [107:43](../YouTubeChannel.MediaFolders.cs#L107) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.remaining | [110:21](../YouTubeChannel.MediaFolders.cs#L110) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync | [134:9](../YouTubeChannel.MediaFolders.cs#L134) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.apiKey | [135:13](../YouTubeChannel.MediaFolders.cs#L135) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.config | [136:13](../YouTubeChannel.MediaFolders.cs#L136) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.type | [137:13](../YouTubeChannel.MediaFolders.cs#L137) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.term | [138:13](../YouTubeChannel.MediaFolders.cs#L138) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.pageToken | [139:13](../YouTubeChannel.MediaFolders.cs#L139) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.ct | [140:13](../YouTubeChannel.MediaFolders.cs#L140) |
-| method | Emby.YouTubePlugin.YouTubeChannel.IsPlaylistDocument | [153:9](../YouTubeChannel.MediaFolders.cs#L153) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.IsPlaylistDocument.type | [153:48](../YouTubeChannel.MediaFolders.cs#L153) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken | [156:9](../YouTubeChannel.MediaFolders.cs#L156) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken.doc | [156:49](../YouTubeChannel.MediaFolders.cs#L156) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken.token | [158:76](../YouTubeChannel.MediaFolders.cs#L158) |
-| method | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems | [163:9](../YouTubeChannel.MediaFolders.cs#L163) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.pageItems | [164:13](../YouTubeChannel.MediaFolders.cs#L164) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.seenIds | [165:13](../YouTubeChannel.MediaFolders.cs#L165) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.videoIds | [167:17](../YouTubeChannel.MediaFolders.cs#L167) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.selected | [168:17](../YouTubeChannel.MediaFolders.cs#L168) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.item | [170:13](../YouTubeChannel.MediaFolders.cs#L170) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.item.rawId | [172:21](../YouTubeChannel.MediaFolders.cs#L172) |
-| method | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync | [183:9](../YouTubeChannel.MediaFolders.cs#L183) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.apiKey | [184:13](../YouTubeChannel.MediaFolders.cs#L184) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.config | [185:13](../YouTubeChannel.MediaFolders.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.channelId | [186:13](../YouTubeChannel.MediaFolders.cs#L186) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.ct | [187:13](../YouTubeChannel.MediaFolders.cs#L187) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.liveProbe | [189:17](../YouTubeChannel.MediaFolders.cs#L189) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.liveIds | [190:17](../YouTubeChannel.MediaFolders.cs#L190) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.limit | [202:17](../YouTubeChannel.MediaFolders.cs#L202) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.result | [203:17](../YouTubeChannel.MediaFolders.cs#L203) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.seenIds | [204:17](../YouTubeChannel.MediaFolders.cs#L204) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds | [205:17](../YouTubeChannel.MediaFolders.cs#L205) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds.anonymous@8423 | [205:46](../YouTubeChannel.MediaFolders.cs#L205) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds.anonymous@8423.id | [205:46](../YouTubeChannel.MediaFolders.cs#L205) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.allDetailLookupsSucceeded | [206:17](../YouTubeChannel.MediaFolders.cs#L206) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.effectiveRegion | [207:17](../YouTubeChannel.MediaFolders.cs#L207) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.index | [213:22](../YouTubeChannel.MediaFolders.cs#L213) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.chunk | [216:21](../YouTubeChannel.MediaFolders.cs#L216) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.doc | [217:27](../YouTubeChannel.MediaFolders.cs#L217) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.playableIds | [225:21](../YouTubeChannel.MediaFolders.cs#L225) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item | [226:17](../YouTubeChannel.MediaFolders.cs#L226) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.rawId | [228:25](../YouTubeChannel.MediaFolders.cs#L228) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.previousId | [232:25](../YouTubeChannel.MediaFolders.cs#L232) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.meta | [238:67](../YouTubeChannel.MediaFolders.cs#L238) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds | [268:9](../YouTubeChannel.MediaFolders.cs#L268) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.doc | [269:13](../YouTubeChannel.MediaFolders.cs#L269) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.candidateIds | [270:13](../YouTubeChannel.MediaFolders.cs#L270) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.playable | [272:17](../YouTubeChannel.MediaFolders.cs#L272) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.items | [273:66](../YouTubeChannel.MediaFolders.cs#L273) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail | [277:13](../YouTubeChannel.MediaFolders.cs#L277) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.id | [279:21](../YouTubeChannel.MediaFolders.cs#L279) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.status | [285:61](../YouTubeChannel.MediaFolders.cs#L285) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.privacy | [288:25](../YouTubeChannel.MediaFolders.cs#L288) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.embeddable | [291:69](../YouTubeChannel.MediaFolders.cs#L291) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.upload | [295:25](../YouTubeChannel.MediaFolders.cs#L295) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.contentDetails | [302:69](../YouTubeChannel.MediaFolders.cs#L302) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.contentRating | [304:79](../YouTubeChannel.MediaFolders.cs#L304) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.ytRating | [306:73](../YouTubeChannel.MediaFolders.cs#L306) |
-| method | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails | [319:9](../YouTubeChannel.MediaFolders.cs#L319) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.batch | [319:52](../YouTubeChannel.MediaFolders.cs#L319) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.item | [321:13](../YouTubeChannel.MediaFolders.cs#L321) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.item.existing | [326:60](../YouTubeChannel.MediaFolders.cs#L326) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters | [338:9](../YouTubeChannel.MediaFolders.cs#L338) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.batch | [339:13](../YouTubeChannel.MediaFolders.cs#L339) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.type | [339:42](../YouTubeChannel.MediaFolders.cs#L339) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.config | [339:55](../YouTubeChannel.MediaFolders.cs#L339) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14188 | [343:33](../YouTubeChannel.MediaFolders.cs#L343) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14188.item | [343:33](../YouTubeChannel.MediaFolders.cs#L343) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14458 | [348:33](../YouTubeChannel.MediaFolders.cs#L348) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14458.item | [348:33](../YouTubeChannel.MediaFolders.cs#L348) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14611 | [351:33](../YouTubeChannel.MediaFolders.cs#L351) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14611.item | [351:33](../YouTubeChannel.MediaFolders.cs#L351) |
-| method | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags | [354:9](../YouTubeChannel.MediaFolders.cs#L354) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.type | [355:13](../YouTubeChannel.MediaFolders.cs#L355) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.term | [356:13](../YouTubeChannel.MediaFolders.cs#L356) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.observedShorts | [357:13](../YouTubeChannel.MediaFolders.cs#L357) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.observedLive | [358:13](../YouTubeChannel.MediaFolders.cs#L358) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.reachedEnd | [359:13](../YouTubeChannel.MediaFolders.cs#L359) |
-| method | Emby.YouTubePlugin.YouTubeChannel.IsChannelId | [373:9](../YouTubeChannel.MediaFolders.cs#L373) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.IsChannelId.channelId | [373:41](../YouTubeChannel.MediaFolders.cs#L373) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync | [376:9](../YouTubeChannel.MediaFolders.cs#L376) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.apiKey | [377:13](../YouTubeChannel.MediaFolders.cs#L377) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.channelId | [377:28](../YouTubeChannel.MediaFolders.cs#L377) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.ct | [377:46](../YouTubeChannel.MediaFolders.cs#L377) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.cached | [382:17](../YouTubeChannel.MediaFolders.cs#L382) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.shortsProbe | [390:21](../YouTubeChannel.MediaFolders.cs#L390) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.hasShorts | [394:21](../YouTubeChannel.MediaFolders.cs#L394) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.ex | [402:19](../YouTubeChannel.MediaFolders.cs#L402) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync | [409:9](../YouTubeChannel.MediaFolders.cs#L409) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.apiKey | [410:13](../YouTubeChannel.MediaFolders.cs#L410) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.channelId | [410:28](../YouTubeChannel.MediaFolders.cs#L410) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.ct | [410:46](../YouTubeChannel.MediaFolders.cs#L410) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.cached | [415:17](../YouTubeChannel.MediaFolders.cs#L415) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.liveProbe | [422:21](../YouTubeChannel.MediaFolders.cs#L422) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.liveIds | [424:21](../YouTubeChannel.MediaFolders.cs#L424) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.hasLive | [428:21](../YouTubeChannel.MediaFolders.cs#L428) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.allDetailLookupsSucceeded | [429:21](../YouTubeChannel.MediaFolders.cs#L429) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.chunk | [430:17](../YouTubeChannel.MediaFolders.cs#L430) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.chunk.details | [432:31](../YouTubeChannel.MediaFolders.cs#L432) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.ex | [460:19](../YouTubeChannel.MediaFolders.cs#L460) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.knownShortsIds | [54:30](../YouTubeChannel.MediaFolders.cs#L54) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.shortsProbe | [57:21](../YouTubeChannel.MediaFolders.cs#L57) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.requestedPageToken | [65:21](../YouTubeChannel.MediaFolders.cs#L65) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.doc | [73:27](../YouTubeChannel.MediaFolders.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.batch | [77:21](../YouTubeChannel.MediaFolders.cs#L77) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.videoIds | [90:21](../YouTubeChannel.MediaFolders.cs#L90) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4410 | [108:45](../YouTubeChannel.MediaFolders.cs#L108) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4410.item | [108:45](../YouTubeChannel.MediaFolders.cs#L108) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4519 | [109:43](../YouTubeChannel.MediaFolders.cs#L109) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.anonymous@4519.item | [109:43](../YouTubeChannel.MediaFolders.cs#L109) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadMediaFolderAsync.remaining | [112:21](../YouTubeChannel.MediaFolders.cs#L112) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync | [136:9](../YouTubeChannel.MediaFolders.cs#L136) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.apiKey | [137:13](../YouTubeChannel.MediaFolders.cs#L137) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.config | [138:13](../YouTubeChannel.MediaFolders.cs#L138) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.type | [139:13](../YouTubeChannel.MediaFolders.cs#L139) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.term | [140:13](../YouTubeChannel.MediaFolders.cs#L140) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.pageToken | [141:13](../YouTubeChannel.MediaFolders.cs#L141) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetMediaPageAsync.ct | [142:13](../YouTubeChannel.MediaFolders.cs#L142) |
+| method | Emby.YouTubePlugin.YouTubeChannel.IsPlaylistDocument | [158:9](../YouTubeChannel.MediaFolders.cs#L158) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.IsPlaylistDocument.type | [158:48](../YouTubeChannel.MediaFolders.cs#L158) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken | [161:9](../YouTubeChannel.MediaFolders.cs#L161) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken.doc | [161:49](../YouTubeChannel.MediaFolders.cs#L161) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetNextPageToken.token | [163:76](../YouTubeChannel.MediaFolders.cs#L163) |
+| method | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems | [168:9](../YouTubeChannel.MediaFolders.cs#L168) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.pageItems | [169:13](../YouTubeChannel.MediaFolders.cs#L169) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.seenIds | [170:13](../YouTubeChannel.MediaFolders.cs#L170) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.videoIds | [172:17](../YouTubeChannel.MediaFolders.cs#L172) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.selected | [173:17](../YouTubeChannel.MediaFolders.cs#L173) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.item | [175:13](../YouTubeChannel.MediaFolders.cs#L175) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.KeepUniquePageItems.item.rawId | [177:21](../YouTubeChannel.MediaFolders.cs#L177) |
+| method | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync | [188:9](../YouTubeChannel.MediaFolders.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.apiKey | [189:13](../YouTubeChannel.MediaFolders.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.config | [190:13](../YouTubeChannel.MediaFolders.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.channelId | [191:13](../YouTubeChannel.MediaFolders.cs#L191) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.ct | [192:13](../YouTubeChannel.MediaFolders.cs#L192) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.liveProbe | [194:17](../YouTubeChannel.MediaFolders.cs#L194) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.liveIds | [195:17](../YouTubeChannel.MediaFolders.cs#L195) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.limit | [207:17](../YouTubeChannel.MediaFolders.cs#L207) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.result | [208:17](../YouTubeChannel.MediaFolders.cs#L208) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.seenIds | [209:17](../YouTubeChannel.MediaFolders.cs#L209) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds | [210:17](../YouTubeChannel.MediaFolders.cs#L210) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds.anonymous@8768 | [210:46](../YouTubeChannel.MediaFolders.cs#L210) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.orderedIds.anonymous@8768.id | [210:46](../YouTubeChannel.MediaFolders.cs#L210) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.allDetailLookupsSucceeded | [211:17](../YouTubeChannel.MediaFolders.cs#L211) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.effectiveRegion | [212:17](../YouTubeChannel.MediaFolders.cs#L212) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.index | [218:22](../YouTubeChannel.MediaFolders.cs#L218) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.chunk | [221:21](../YouTubeChannel.MediaFolders.cs#L221) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.doc | [222:27](../YouTubeChannel.MediaFolders.cs#L222) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.playableIds | [230:21](../YouTubeChannel.MediaFolders.cs#L230) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item | [231:17](../YouTubeChannel.MediaFolders.cs#L231) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.rawId | [233:25](../YouTubeChannel.MediaFolders.cs#L233) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.previousId | [237:25](../YouTubeChannel.MediaFolders.cs#L237) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.LoadLiveFolderAsync.item.meta | [243:67](../YouTubeChannel.MediaFolders.cs#L243) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds | [273:9](../YouTubeChannel.MediaFolders.cs#L273) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.doc | [274:13](../YouTubeChannel.MediaFolders.cs#L274) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.candidateIds | [275:13](../YouTubeChannel.MediaFolders.cs#L275) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.playable | [277:17](../YouTubeChannel.MediaFolders.cs#L277) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.items | [278:66](../YouTubeChannel.MediaFolders.cs#L278) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail | [282:13](../YouTubeChannel.MediaFolders.cs#L282) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.id | [284:21](../YouTubeChannel.MediaFolders.cs#L284) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.status | [290:61](../YouTubeChannel.MediaFolders.cs#L290) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.privacy | [293:25](../YouTubeChannel.MediaFolders.cs#L293) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.embeddable | [296:69](../YouTubeChannel.MediaFolders.cs#L296) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.upload | [300:25](../YouTubeChannel.MediaFolders.cs#L300) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.contentDetails | [307:69](../YouTubeChannel.MediaFolders.cs#L307) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.contentRating | [309:79](../YouTubeChannel.MediaFolders.cs#L309) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPlayableLiveVideoIds.detail.ytRating | [311:73](../YouTubeChannel.MediaFolders.cs#L311) |
+| method | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails | [324:9](../YouTubeChannel.MediaFolders.cs#L324) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.batch | [324:52](../YouTubeChannel.MediaFolders.cs#L324) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.item | [326:13](../YouTubeChannel.MediaFolders.cs#L326) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.CacheInitialThumbnails.item.existing | [331:60](../YouTubeChannel.MediaFolders.cs#L331) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters | [343:9](../YouTubeChannel.MediaFolders.cs#L343) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.batch | [344:13](../YouTubeChannel.MediaFolders.cs#L344) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.type | [344:42](../YouTubeChannel.MediaFolders.cs#L344) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.config | [344:55](../YouTubeChannel.MediaFolders.cs#L344) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14533 | [348:33](../YouTubeChannel.MediaFolders.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14533.item | [348:33](../YouTubeChannel.MediaFolders.cs#L348) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14803 | [353:33](../YouTubeChannel.MediaFolders.cs#L353) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14803.item | [353:33](../YouTubeChannel.MediaFolders.cs#L353) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14956 | [356:33](../YouTubeChannel.MediaFolders.cs#L356) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ApplyFolderFilters.anonymous@14956.item | [356:33](../YouTubeChannel.MediaFolders.cs#L356) |
+| method | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags | [359:9](../YouTubeChannel.MediaFolders.cs#L359) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.type | [360:13](../YouTubeChannel.MediaFolders.cs#L360) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.term | [361:13](../YouTubeChannel.MediaFolders.cs#L361) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.observedShorts | [362:13](../YouTubeChannel.MediaFolders.cs#L362) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.observedLive | [363:13](../YouTubeChannel.MediaFolders.cs#L363) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.UpdateChannelContentFlags.reachedEnd | [364:13](../YouTubeChannel.MediaFolders.cs#L364) |
+| method | Emby.YouTubePlugin.YouTubeChannel.IsChannelId | [378:9](../YouTubeChannel.MediaFolders.cs#L378) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.IsChannelId.channelId | [378:41](../YouTubeChannel.MediaFolders.cs#L378) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync | [381:9](../YouTubeChannel.MediaFolders.cs#L381) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.apiKey | [382:13](../YouTubeChannel.MediaFolders.cs#L382) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.channelId | [382:28](../YouTubeChannel.MediaFolders.cs#L382) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.ct | [382:46](../YouTubeChannel.MediaFolders.cs#L382) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.cached | [387:17](../YouTubeChannel.MediaFolders.cs#L387) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.shortsProbe | [395:21](../YouTubeChannel.MediaFolders.cs#L395) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.hasShorts | [399:21](../YouTubeChannel.MediaFolders.cs#L399) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasShortsAsync.ex | [407:19](../YouTubeChannel.MediaFolders.cs#L407) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync | [414:9](../YouTubeChannel.MediaFolders.cs#L414) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.apiKey | [415:13](../YouTubeChannel.MediaFolders.cs#L415) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.channelId | [415:28](../YouTubeChannel.MediaFolders.cs#L415) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.ct | [415:46](../YouTubeChannel.MediaFolders.cs#L415) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.cached | [420:17](../YouTubeChannel.MediaFolders.cs#L420) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.liveProbe | [427:21](../YouTubeChannel.MediaFolders.cs#L427) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.liveIds | [429:21](../YouTubeChannel.MediaFolders.cs#L429) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.hasLive | [433:21](../YouTubeChannel.MediaFolders.cs#L433) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.allDetailLookupsSucceeded | [434:21](../YouTubeChannel.MediaFolders.cs#L434) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.chunk | [435:17](../YouTubeChannel.MediaFolders.cs#L435) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.chunk.details | [437:31](../YouTubeChannel.MediaFolders.cs#L437) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChannel.ChannelHasLiveAsync.ex | [465:19](../YouTubeChannel.MediaFolders.cs#L465) |
 
 </details>
 
 <a id="file-ea131b3b3c2fe81c"></a>
 ## [YouTubeChannel.Personal.cs](../YouTubeChannel.Personal.cs)
 
-Plugin Compile source (SDK default); 22780 bytes; 393 lines.
+Plugin Compile source (SDK default); 22830 bytes; 393 lines.
 
 <details>
 <summary>All 173 declarations / anchors</summary>
@@ -5669,8 +5682,8 @@ Plugin Compile source (SDK default); 22780 bytes; 393 lines.
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.value | [170:38](../YouTubeChannel.Personal.cs#L170) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.token | [170:52](../YouTubeChannel.Personal.cs#L170) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.inner | [170:70](../YouTubeChannel.Personal.cs#L170) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10723 | [175:23](../YouTubeChannel.Personal.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10723.c | [175:23](../YouTubeChannel.Personal.cs#L175) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10773 | [175:23](../YouTubeChannel.Personal.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10773.c | [175:23](../YouTubeChannel.Personal.cs#L175) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse | [180:5](../YouTubeChannel.Personal.cs#L180) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.value | [180:35](../YouTubeChannel.Personal.cs#L180) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.scope | [180:50](../YouTubeChannel.Personal.cs#L180) |
@@ -5685,8 +5698,8 @@ Plugin Compile source (SDK default); 22780 bytes; 393 lines.
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId | [219:5](../YouTubeChannel.Personal.cs#L219) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.library | [219:39](../YouTubeChannel.Personal.cs#L219) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.token | [219:64](../YouTubeChannel.Personal.cs#L219) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@12899 | [221:22](../YouTubeChannel.Personal.cs#L221) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@12899.started | [227:21](../YouTubeChannel.Personal.cs#L227) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@12949 | [221:22](../YouTubeChannel.Personal.cs#L221) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@12949.started | [227:21](../YouTubeChannel.Personal.cs#L227) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.Start | [235:5](../YouTubeChannel.Personal.cs#L235) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.library | [235:32](../YouTubeChannel.Personal.cs#L235) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.users | [235:57](../YouTubeChannel.Personal.cs#L235) |
@@ -5695,28 +5708,28 @@ Plugin Compile source (SDK default); 22780 bytes; 393 lines.
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.assembly | [247:17](../YouTubeChannel.Personal.cs#L247) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.harmonyType | [248:17](../YouTubeChannel.Personal.cs#L248) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.methodType | [249:17](../YouTubeChannel.Personal.cs#L249) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@14942 | [260:71](../YouTubeChannel.Personal.cs#L260) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@14992 | [260:71](../YouTubeChannel.Personal.cs#L260) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.count | [263:17](../YouTubeChannel.Personal.cs#L263) |
 | catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.error | [267:15](../YouTubeChannel.Personal.cs#L267) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles | [273:5](../YouTubeChannel.Personal.cs#L273) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.config | [273:71](../YouTubeChannel.Personal.cs#L273) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.users | [276:13](../YouTubeChannel.Personal.cs#L276) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled | [277:13](../YouTubeChannel.Personal.cs#L277) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@15996 | [277:35](../YouTubeChannel.Personal.cs#L277) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@15996.user | [277:35](../YouTubeChannel.Personal.cs#L277) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16052 | [277:91](../YouTubeChannel.Personal.cs#L277) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16052.user | [277:91](../YouTubeChannel.Personal.cs#L277) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16132 | [278:51](../YouTubeChannel.Personal.cs#L278) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16132.profile | [278:51](../YouTubeChannel.Personal.cs#L278) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16046 | [277:35](../YouTubeChannel.Personal.cs#L277) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16046.user | [277:35](../YouTubeChannel.Personal.cs#L277) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16102 | [277:91](../YouTubeChannel.Personal.cs#L277) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16102.user | [277:91](../YouTubeChannel.Personal.cs#L277) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16182 | [278:51](../YouTubeChannel.Personal.cs#L278) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16182.profile | [278:51](../YouTubeChannel.Personal.cs#L278) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels | [283:5](../YouTubeChannel.Personal.cs#L283) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.config | [283:45](../YouTubeChannel.Personal.cs#L283) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16586 | [285:49](../YouTubeChannel.Personal.cs#L285) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16586.profile | [285:49](../YouTubeChannel.Personal.cs#L285) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16636 | [285:49](../YouTubeChannel.Personal.cs#L285) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16636.profile | [285:49](../YouTubeChannel.Personal.cs#L285) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor | [288:5](../YouTubeChannel.Personal.cs#L288) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.config | [288:40](../YouTubeChannel.Personal.cs#L288) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.userId | [288:68](../YouTubeChannel.Personal.cs#L288) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@16814 | [289:36](../YouTubeChannel.Personal.cs#L289) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@16814.profile | [289:36](../YouTubeChannel.Personal.cs#L289) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@16864 | [289:36](../YouTubeChannel.Personal.cs#L289) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@16864.profile | [289:36](../YouTubeChannel.Personal.cs#L289) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView | [294:5](../YouTubeChannel.Personal.cs#L294) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.externalId | [294:33](../YouTubeChannel.Personal.cs#L294) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.userId | [294:52](../YouTubeChannel.Personal.cs#L294) |
@@ -5727,20 +5740,20 @@ Plugin Compile source (SDK default); 22780 bytes; 393 lines.
 | pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.inner | [304:58](../YouTubeChannel.Personal.cs#L304) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.own | [306:13](../YouTubeChannel.Personal.cs#L306) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.contribution | [307:13](../YouTubeChannel.Personal.cs#L307) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18269 | [309:49](../YouTubeChannel.Personal.cs#L309) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18269.profile | [309:49](../YouTubeChannel.Personal.cs#L309) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18269.anonymous@18427 | [311:46](../YouTubeChannel.Personal.cs#L311) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18269.anonymous@18427.term | [311:46](../YouTubeChannel.Personal.cs#L311) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18319 | [309:49](../YouTubeChannel.Personal.cs#L309) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18319.profile | [309:49](../YouTubeChannel.Personal.cs#L309) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18319.anonymous@18477 | [311:46](../YouTubeChannel.Personal.cs#L311) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18319.anonymous@18477.term | [311:46](../YouTubeChannel.Personal.cs#L311) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent | [314:5](../YouTubeChannel.Personal.cs#L314) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.original | [314:36](../YouTubeChannel.Personal.cs#L314) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.configurationHash | [314:79](../YouTubeChannel.Personal.cs#L314) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.catalogRevision | [314:105](../YouTubeChannel.Personal.cs#L314) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.config | [318:13](../YouTubeChannel.Personal.cs#L318) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user | [320:13](../YouTubeChannel.Personal.cs#L320) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19017 | [320:72](../YouTubeChannel.Personal.cs#L320) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19017.candidate | [320:72](../YouTubeChannel.Personal.cs#L320) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19194 | [322:49](../YouTubeChannel.Personal.cs#L322) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19194.profile | [322:49](../YouTubeChannel.Personal.cs#L322) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19067 | [320:72](../YouTubeChannel.Personal.cs#L320) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19067.candidate | [320:72](../YouTubeChannel.Personal.cs#L320) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19244 | [322:49](../YouTubeChannel.Personal.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19244.profile | [322:49](../YouTubeChannel.Personal.cs#L322) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot | [328:5](../YouTubeChannel.Personal.cs#L328) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.profile | [328:42](../YouTubeChannel.Personal.cs#L328) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.config | [328:84](../YouTubeChannel.Personal.cs#L328) |
@@ -5752,8 +5765,8 @@ Plugin Compile source (SDK default); 22780 bytes; 393 lines.
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged | [348:5](../YouTubeChannel.Personal.cs#L348) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.lifetime | [352:13](../YouTubeChannel.Personal.cs#L352) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.token | [354:27](../YouTubeChannel.Personal.cs#L354) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21111 | [358:22](../YouTubeChannel.Personal.cs#L358) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21111.error | [370:19](../YouTubeChannel.Personal.cs#L370) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21161 | [358:22](../YouTubeChannel.Personal.cs#L358) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21161.error | [370:19](../YouTubeChannel.Personal.cs#L370) |
 | method | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop | [378:5](../YouTubeChannel.Personal.cs#L378) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.lifetime | [382:13](../YouTubeChannel.Personal.cs#L382) |
 | catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.error | [386:15](../YouTubeChannel.Personal.cs#L386) |
@@ -5989,7 +6002,7 @@ Plugin Compile source (SDK default); 4189 bytes; 86 lines.
 <a id="file-aa77154cbf6e5636"></a>
 ## [YouTubeChannel.cs](../YouTubeChannel.cs)
 
-Plugin Compile source (SDK default); 11020 bytes; 256 lines.
+Plugin Compile source (SDK default); 11098 bytes; 257 lines.
 
 <details>
 <summary>All 55 declarations / anchors</summary>
@@ -6036,21 +6049,21 @@ Plugin Compile source (SDK default); 11020 bytes; 256 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelItemsCore.type | [153:28](../YouTubeChannel.cs#L153) |
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelItemsCore.term | [154:28](../YouTubeChannel.cs#L154) |
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelItemsCore.region | [181:29](../YouTubeChannel.cs#L181) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelItemsCore.ex | [201:19](../YouTubeChannel.cs#L201) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetSupportedChannelImages | [208:9](../YouTubeChannel.cs#L208) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage | [211:9](../YouTubeChannel.cs#L211) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.type | [212:13](../YouTubeChannel.cs#L212) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.cancellationToken | [212:29](../YouTubeChannel.cs#L212) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.response | [214:17](../YouTubeChannel.cs#L214) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.t | [215:17](../YouTubeChannel.cs#L215) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.stream | [216:17](../YouTubeChannel.cs#L216) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.assemblyDir | [223:17](../YouTubeChannel.cs#L223) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.filePath | [224:17](../YouTubeChannel.cs#L224) |
-| method | Emby.YouTubePlugin.YouTubeChannel.Msg | [233:9](../YouTubeChannel.cs#L233) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.Msg.items | [233:46](../YouTubeChannel.cs#L233) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.Msg.msg | [233:75](../YouTubeChannel.cs#L233) |
-| method | Emby.YouTubePlugin.YouTubeChannel.ToResult | [248:9](../YouTubeChannel.cs#L248) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.ToResult.items | [248:51](../YouTubeChannel.cs#L248) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelItemsCore.ex | [202:19](../YouTubeChannel.cs#L202) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetSupportedChannelImages | [209:9](../YouTubeChannel.cs#L209) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage | [212:9](../YouTubeChannel.cs#L212) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.type | [213:13](../YouTubeChannel.cs#L213) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.cancellationToken | [213:29](../YouTubeChannel.cs#L213) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.response | [215:17](../YouTubeChannel.cs#L215) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.t | [216:17](../YouTubeChannel.cs#L216) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.stream | [217:17](../YouTubeChannel.cs#L217) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.assemblyDir | [224:17](../YouTubeChannel.cs#L224) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetChannelImage.filePath | [225:17](../YouTubeChannel.cs#L225) |
+| method | Emby.YouTubePlugin.YouTubeChannel.Msg | [234:9](../YouTubeChannel.cs#L234) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.Msg.items | [234:46](../YouTubeChannel.cs#L234) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.Msg.msg | [234:75](../YouTubeChannel.cs#L234) |
+| method | Emby.YouTubePlugin.YouTubeChannel.ToResult | [249:9](../YouTubeChannel.cs#L249) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.ToResult.items | [249:51](../YouTubeChannel.cs#L249) |
 
 </details>
 
@@ -6324,10 +6337,10 @@ Plugin Compile source (SDK default); 16877 bytes; 301 lines.
 <a id="file-afb9dc3e97044d5d"></a>
 ## [YouTubeConfigSaveService.cs](../YouTubeConfigSaveService.cs)
 
-Plugin Compile source (SDK default); 12412 bytes; 245 lines.
+Plugin Compile source (SDK default); 12569 bytes; 247 lines.
 
 <details>
-<summary>All 132 declarations / anchors</summary>
+<summary>All 135 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -6383,86 +6396,89 @@ Plugin Compile source (SDK default); 12412 bytes; 245 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.dto | [130:17](../YouTubeConfigSaveService.cs#L130) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.visibilityChanged | [134:18](../YouTubeConfigSaveService.cs#L134) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.config | [138:21](../YouTubeConfigSaveService.cs#L138) |
-| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [189:9](../YouTubeConfigSaveService.cs#L189) |
-| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [189:60](../YouTubeConfigSaveService.cs#L189) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [196:23](../YouTubeConfigSaveService.cs#L196) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [202:17](../YouTubeConfigSaveService.cs#L202) |
-| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [216:9](../YouTubeConfigSaveService.cs#L216) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [218:13](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [218:37](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [218:42](../YouTubeConfigSaveService.cs#L218) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [219:13](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [219:50](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [219:55](../YouTubeConfigSaveService.cs#L219) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [220:13](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [220:56](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [220:61](../YouTubeConfigSaveService.cs#L220) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [221:13](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [221:56](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [221:61](../YouTubeConfigSaveService.cs#L221) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [222:13](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [222:41](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [222:46](../YouTubeConfigSaveService.cs#L222) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [223:13](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [223:49](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [223:54](../YouTubeConfigSaveService.cs#L223) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [224:13](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [224:41](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [224:46](../YouTubeConfigSaveService.cs#L224) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [225:13](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [225:43](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [225:48](../YouTubeConfigSaveService.cs#L225) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [226:13](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [226:54](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [226:59](../YouTubeConfigSaveService.cs#L226) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [227:13](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [227:39](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [227:44](../YouTubeConfigSaveService.cs#L227) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [228:13](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [228:39](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [228:44](../YouTubeConfigSaveService.cs#L228) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [229:13](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [229:45](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [229:50](../YouTubeConfigSaveService.cs#L229) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [230:13](../YouTubeConfigSaveService.cs#L230) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [230:47](../YouTubeConfigSaveService.cs#L230) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [230:52](../YouTubeConfigSaveService.cs#L230) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [231:13](../YouTubeConfigSaveService.cs#L231) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [231:42](../YouTubeConfigSaveService.cs#L231) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [231:47](../YouTubeConfigSaveService.cs#L231) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [232:13](../YouTubeConfigSaveService.cs#L232) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [232:45](../YouTubeConfigSaveService.cs#L232) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [232:50](../YouTubeConfigSaveService.cs#L232) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [233:13](../YouTubeConfigSaveService.cs#L233) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [233:44](../YouTubeConfigSaveService.cs#L233) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [233:49](../YouTubeConfigSaveService.cs#L233) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [234:13](../YouTubeConfigSaveService.cs#L234) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [234:44](../YouTubeConfigSaveService.cs#L234) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [234:49](../YouTubeConfigSaveService.cs#L234) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [235:13](../YouTubeConfigSaveService.cs#L235) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [235:43](../YouTubeConfigSaveService.cs#L235) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [235:48](../YouTubeConfigSaveService.cs#L235) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [236:13](../YouTubeConfigSaveService.cs#L236) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [236:49](../YouTubeConfigSaveService.cs#L236) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [236:54](../YouTubeConfigSaveService.cs#L236) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [237:13](../YouTubeConfigSaveService.cs#L237) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [237:50](../YouTubeConfigSaveService.cs#L237) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [237:55](../YouTubeConfigSaveService.cs#L237) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled | [238:13](../YouTubeConfigSaveService.cs#L238) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.get | [238:50](../YouTubeConfigSaveService.cs#L238) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.set | [238:55](../YouTubeConfigSaveService.cs#L238) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos | [239:13](../YouTubeConfigSaveService.cs#L239) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.get | [239:50](../YouTubeConfigSaveService.cs#L239) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.set | [239:55](../YouTubeConfigSaveService.cs#L239) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [240:13](../YouTubeConfigSaveService.cs#L240) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [240:51](../YouTubeConfigSaveService.cs#L240) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [240:56](../YouTubeConfigSaveService.cs#L240) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [241:13](../YouTubeConfigSaveService.cs#L241) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [241:55](../YouTubeConfigSaveService.cs#L241) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [241:60](../YouTubeConfigSaveService.cs#L241) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [242:13](../YouTubeConfigSaveService.cs#L242) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [242:37](../YouTubeConfigSaveService.cs#L242) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [242:42](../YouTubeConfigSaveService.cs#L242) |
+| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [190:9](../YouTubeConfigSaveService.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [190:60](../YouTubeConfigSaveService.cs#L190) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [197:23](../YouTubeConfigSaveService.cs#L197) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [203:17](../YouTubeConfigSaveService.cs#L203) |
+| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [217:9](../YouTubeConfigSaveService.cs#L217) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [219:13](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [219:37](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [219:42](../YouTubeConfigSaveService.cs#L219) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [220:13](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [220:50](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [220:55](../YouTubeConfigSaveService.cs#L220) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [221:13](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [221:56](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [221:61](../YouTubeConfigSaveService.cs#L221) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [222:13](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [222:56](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [222:61](../YouTubeConfigSaveService.cs#L222) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [223:13](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [223:41](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [223:46](../YouTubeConfigSaveService.cs#L223) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [224:13](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [224:49](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [224:54](../YouTubeConfigSaveService.cs#L224) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [225:13](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [225:41](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [225:46](../YouTubeConfigSaveService.cs#L225) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [226:13](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [226:43](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [226:48](../YouTubeConfigSaveService.cs#L226) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowMusicGenres | [227:13](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowMusicGenres.get | [227:44](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowMusicGenres.set | [227:49](../YouTubeConfigSaveService.cs#L227) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [228:13](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [228:54](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [228:59](../YouTubeConfigSaveService.cs#L228) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [229:13](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [229:39](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [229:44](../YouTubeConfigSaveService.cs#L229) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [230:13](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [230:39](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [230:44](../YouTubeConfigSaveService.cs#L230) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [231:13](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [231:45](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [231:50](../YouTubeConfigSaveService.cs#L231) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [232:13](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [232:47](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [232:52](../YouTubeConfigSaveService.cs#L232) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [233:13](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [233:42](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [233:47](../YouTubeConfigSaveService.cs#L233) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [234:13](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [234:45](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [234:50](../YouTubeConfigSaveService.cs#L234) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [235:13](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [235:44](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [235:49](../YouTubeConfigSaveService.cs#L235) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [236:13](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [236:44](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [236:49](../YouTubeConfigSaveService.cs#L236) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [237:13](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [237:43](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [237:48](../YouTubeConfigSaveService.cs#L237) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [238:13](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [238:49](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [238:54](../YouTubeConfigSaveService.cs#L238) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [239:13](../YouTubeConfigSaveService.cs#L239) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [239:50](../YouTubeConfigSaveService.cs#L239) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [239:55](../YouTubeConfigSaveService.cs#L239) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled | [240:13](../YouTubeConfigSaveService.cs#L240) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.get | [240:50](../YouTubeConfigSaveService.cs#L240) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.set | [240:55](../YouTubeConfigSaveService.cs#L240) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos | [241:13](../YouTubeConfigSaveService.cs#L241) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.get | [241:50](../YouTubeConfigSaveService.cs#L241) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.set | [241:55](../YouTubeConfigSaveService.cs#L241) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [242:13](../YouTubeConfigSaveService.cs#L242) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [242:51](../YouTubeConfigSaveService.cs#L242) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [242:56](../YouTubeConfigSaveService.cs#L242) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [243:13](../YouTubeConfigSaveService.cs#L243) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [243:55](../YouTubeConfigSaveService.cs#L243) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [243:60](../YouTubeConfigSaveService.cs#L243) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [244:13](../YouTubeConfigSaveService.cs#L244) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [244:37](../YouTubeConfigSaveService.cs#L244) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [244:42](../YouTubeConfigSaveService.cs#L244) |
 
 </details>
 
@@ -8739,6 +8755,54 @@ Plugin Compile source (SDK default); 23031 bytes; 342 lines.
 
 </details>
 
+<a id="file-e640b5bdb19c5bed"></a>
+## [YouTubeMusicGenres.cs](../YouTubeMusicGenres.cs)
+
+Plugin Compile source (SDK default); 4554 bytes; 81 lines.
+
+<details>
+<summary>All 35 declarations / anchors</summary>
+
+| Kind | Owner / name | Source |
+|---|---|---|
+| namespace | Emby.YouTubePlugin | [7:1](../YouTubeMusicGenres.cs#L7) |
+| type | Emby.YouTubePlugin.YouTubeMusicGenres | [18:5](../YouTubeMusicGenres.cs#L18) |
+| field | Emby.YouTubePlugin.YouTubeMusicGenres.MusicCategoryId | [20:31](../YouTubeMusicGenres.cs#L20) |
+| field | Emby.YouTubePlugin.YouTubeMusicGenres.FolderType | [21:31](../YouTubeMusicGenres.cs#L21) |
+| field | Emby.YouTubePlugin.YouTubeMusicGenres.IconCdn | [22:30](../YouTubeMusicGenres.cs#L22) |
+| tuple-element | Emby.YouTubePlugin.YouTubeMusicGenres.Key | [26:35](../YouTubeMusicGenres.cs#L26) |
+| tuple-element | Emby.YouTubePlugin.YouTubeMusicGenres.Id | [26:47](../YouTubeMusicGenres.cs#L26) |
+| tuple-element | Emby.YouTubePlugin.YouTubeMusicGenres.Name | [26:58](../YouTubeMusicGenres.cs#L26) |
+| tuple-element | Emby.YouTubePlugin.YouTubeMusicGenres.Icon | [26:71](../YouTubeMusicGenres.cs#L26) |
+| field | Emby.YouTubePlugin.YouTubeMusicGenres.Genres | [26:86](../YouTubeMusicGenres.cs#L26) |
+| method | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor | [44:9](../YouTubeMusicGenres.cs#L44) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor.key | [44:42](../YouTubeMusicGenres.cs#L44) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor.anonymous@2360 | [45:26](../YouTubeMusicGenres.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor.anonymous@2360.g | [45:26](../YouTubeMusicGenres.cs#L45) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor.anonymous@2425 | [45:91](../YouTubeMusicGenres.cs#L45) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.TopicFor.anonymous@2425.g | [45:91](../YouTubeMusicGenres.cs#L45) |
+| method | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders | [49:9](../YouTubeMusicGenres.cs#L49) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.categoryId | [49:59](../YouTubeMusicGenres.cs#L49) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.result | [49:79](../YouTubeMusicGenres.cs#L49) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.config | [49:105](../YouTubeMusicGenres.cs#L49) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.folders | [53:17](../YouTubeMusicGenres.cs#L53) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.folders.anonymous@2885 | [53:41](../YouTubeMusicGenres.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.folders.anonymous@2885.g | [53:41](../YouTubeMusicGenres.cs#L53) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.videos | [63:17](../YouTubeMusicGenres.cs#L63) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.videos.anonymous@3406 | [63:45](../YouTubeMusicGenres.cs#L63) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.AddGenreFolders.videos.anonymous@3406.i | [63:45](../YouTubeMusicGenres.cs#L63) |
+| method | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync | [69:9](../YouTubeMusicGenres.cs#L69) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.apiKey | [69:63](../YouTubeMusicGenres.cs#L69) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.key | [69:78](../YouTubeMusicGenres.cs#L69) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.config | [69:90](../YouTubeMusicGenres.cs#L69) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.ct | [69:118](../YouTubeMusicGenres.cs#L69) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.topicId | [71:17](../YouTubeMusicGenres.cs#L71) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.configured | [73:17](../YouTubeMusicGenres.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.region | [74:17](../YouTubeMusicGenres.cs#L74) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicGenres.SearchAsync.since | [77:17](../YouTubeMusicGenres.cs#L77) |
+
+</details>
+
 <a id="file-d3f3b55a76e60278"></a>
 ## [YouTubePersonalProfiles.cs](../YouTubePersonalProfiles.cs)
 
@@ -10369,7 +10433,7 @@ Plugin Compile source (SDK default); 4437 bytes; 90 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 60914 bytes; 370 lines.
+Documentation/resource; 61561 bytes; 372 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -10384,7 +10448,7 @@ Documentation/resource; 3896 bytes; 60 lines.
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 17138 bytes; 239 lines.
+Documentation/resource; 17255 bytes; 240 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)

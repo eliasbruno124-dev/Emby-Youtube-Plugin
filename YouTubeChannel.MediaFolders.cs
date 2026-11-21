@@ -31,7 +31,7 @@ namespace Emby.YouTubePlugin
                 return await LoadLiveFolderAsync(apiKey, config, term, ct).ConfigureAwait(false);
 
             var items = new List<ChannelItemInfo>();
-            var limit = type == "search"
+            var limit = type is "search" or YouTubeMusicGenres.FolderType
                 ? ClampSearchVideos(config.MaxSearchVideos)
                 : ClampVideos(config.MaxChannelVideos);
             var seenIds = new HashSet<string>(StringComparer.Ordinal);
@@ -45,7 +45,9 @@ namespace Emby.YouTubePlugin
             var usesSearchEndpoint = type == "search"
                 || ((type == "channelvideos" || type == "channelshorts")
                     && !string.Equals(config.ChannelSortBy, "date", StringComparison.OrdinalIgnoreCase));
-            var maxPageRequests = usesSearchEndpoint
+            var maxPageRequests = type == YouTubeMusicGenres.FolderType
+                ? 1 // one search.list call per genre
+                : usesSearchEndpoint
                 ? Math.Min(5, ((limit + 49) / 50) + 2)
                 : MaxMediaPageRequests;
 
@@ -142,6 +144,9 @@ namespace Emby.YouTubePlugin
             return type switch
             {
                 "search" => await YouTubeApi.SearchVideosAsync(apiKey, term, pageToken, ct).ConfigureAwait(false),
+                YouTubeMusicGenres.FolderType => pageToken == null
+                    ? await YouTubeMusicGenres.SearchAsync(apiKey, term, config, ct).ConfigureAwait(false)
+                    : null,
                 "channelvideos" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),
                 "channelshorts" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),
                 "channellive" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),

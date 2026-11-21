@@ -153,6 +153,7 @@ namespace Emby.YouTubePlugin
                 if (dto.WatchLaterPlaylist != null) config.WatchLaterPlaylist = dto.WatchLaterPlaylist;
                 if (dto.ShowTrending.HasValue) config.ShowTrending = dto.ShowTrending.Value;
                 if (dto.ShowCategories.HasValue) config.ShowCategories = dto.ShowCategories.Value;
+                if (dto.ShowMusicGenres.HasValue) config.ShowMusicGenres = dto.ShowMusicGenres.Value;
                 if (dto.ShowRootFoldersAtTopLevel.HasValue) config.ShowRootFoldersAtTopLevel = dto.ShowRootFoldersAtTopLevel.Value;
                 if (dto.ShowShorts.HasValue) config.ShowShorts = dto.ShowShorts.Value;
                 if (dto.HideShorts.HasValue) config.HideShorts = dto.HideShorts.Value;
@@ -223,6 +224,7 @@ namespace Emby.YouTubePlugin
             public string? WatchLaterPlaylist { get; set; }
             public bool? ShowTrending { get; set; }
             public bool? ShowCategories { get; set; }
+            public bool? ShowMusicGenres { get; set; }
             public bool? ShowRootFoldersAtTopLevel { get; set; }
             public bool? ShowShorts { get; set; }
             public bool? HideShorts { get; set; }

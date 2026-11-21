@@ -146,8 +146,8 @@ public partial class YouTubeChannel
         if (type == "trending") return await LoadTrending(apiKey, ct,
             (config.TrendingRegion ?? "").Trim(), (config.TrendingCategory ?? "").Trim()).ConfigureAwait(false);
         if (type == "categories" && term == "root") return await LoadCategoryRootAsync(apiKey, config, ct).ConfigureAwait(false);
-        if (type == "category") return await LoadTrending(apiKey, ct,
-            string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim(), term).ConfigureAwait(false);
+        if (type == "category") return YouTubeMusicGenres.AddGenreFolders(term, await LoadTrending(apiKey, ct,
+            string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim(), term).ConfigureAwait(false), config);
         return await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
     }
 }

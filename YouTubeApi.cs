@@ -963,6 +963,20 @@ namespace Emby.YouTubePlugin
             return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
         }
 
+        // Most viewed music videos of one YouTube music topic (genre folders).
+        // Same one-day cache as every other search.list call.
+        public static async Task<JsonDocument?> SearchMusicTopicAsync(
+            string apiKey, string topicId, string regionCode, string publishedAfter, CancellationToken ct)
+        {
+            // "official music video" keeps real songs and drops most Shorts
+            // (tested: Rock 25 of 50 Shorts without it, 0 with it).
+            var url = $"{ApiBase}/search?part=snippet&type=video&videoCategoryId=10&q=official%20music%20video" +
+                      $"&topicId={Uri.EscapeDataString(topicId)}&order=viewCount" +
+                      $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
+                      $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+            return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
+        }
+
         // Channel uploads come from the uploads playlist (1 quota unit) instead
         // of search.list.
 

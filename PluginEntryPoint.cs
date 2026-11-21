@@ -2734,6 +2734,7 @@ namespace Emby.YouTubePlugin
                 c.ShowRootFoldersAtTopLevel ? "1" : "0",
                 c.ShowTrending ? "1" : "0",
                 c.ShowCategories ? "1" : "0",
+                c.ShowMusicGenres ? "genres" : "no-genres",
                 c.ShortsEnabled ? "1" : "0",
                 (c.TrendingRegion ?? "").Trim(),
                 (c.TrendingCategory ?? "").Trim(),

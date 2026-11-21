@@ -25,6 +25,7 @@ Google – the built-in setup guide walks you through it.
 - Add search folders for occasional YouTube searches.
 - Create Watch Later-style folders from playlist IDs.
 - Show Trending and category folders for a selected region.
+- Optional genre folders (Pop, Hip Hop, Rock, ...) in the Music category.
 - Split channels into Videos and Shorts when those folders have content.
 - Hide Shorts globally if you prefer a long-form-only view.
 - Hide empty playlists, categories, and Shorts folders.
@@ -134,6 +135,7 @@ Most browsing uses low-cost YouTube API endpoints:
 | Playlist videos | `playlistItems.list` | 1 unit |
 | Video details | `videos.list` | 1 unit per batch |
 | Categories | `videoCategories.list` | 1 unit |
+| Music genres (optional) | `search.list`, one per genre, cached for a day | 14 Search Queries calls a day |
 | Search folders | `search.list` | 1 Search Queries call |
 
 The plugin caches responses on disk. Search results are cached longer because

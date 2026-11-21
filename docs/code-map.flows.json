@@ -39,7 +39,7 @@
     {
       "id": "browsing",
       "title": "Channel tree and media construction",
-      "summary": "The partial channel routes folder IDs, pages and enriches videos, classifies Shorts/live entries and persists stable watch-page identities. Direct mode replaces playback sources through a dynamic callback. Trending and live folders have distinct aggregate/probe paths. Item data sent to apps presents channel videos as Video instead of Episode, so the apps' episode-spoiler option does not hide their thumbnails; stored items stay Episodes.",
+      "summary": "The partial channel routes folder IDs, pages and enriches videos, classifies Shorts/live entries and persists stable watch-page identities. Direct mode replaces playback sources through a dynamic callback. Trending and live folders have distinct aggregate/probe paths. Item data sent to apps presents channel videos as Video instead of Episode, so the apps' episode-spoiler option does not hide their thumbnails; stored items stay Episodes. Optional genre folders in the Music category use one cached topic search per genre.",
       "sources": [
         "YouTubeChannel.cs",
         "YouTubeChannel.State.cs",
@@ -54,7 +54,8 @@
         "FolderIcons.cs",
         "YouTubeApi.cs",
         "YouTubeExternalId.cs",
-        "YouTubeVideoPresentation.cs"
+        "YouTubeVideoPresentation.cs",
+        "YouTubeMusicGenres.cs"
       ]
     },
     {

@@ -179,7 +179,8 @@ namespace Emby.YouTubePlugin
                     if (type == "category")
                     {
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
-                        return await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false);
+                        return YouTubeMusicGenres.AddGenreFolders(term,
+                            await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false), config);
                     }
 
                     return await LoadMediaFolderAsync(apiKey, config, type, term, cancellationToken)

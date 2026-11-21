@@ -262,8 +262,9 @@ namespace Emby.YouTubePlugin
 
                 if (string.IsNullOrWhiteSpace(videoId)) continue;
 
-                var title = YouTubeApi.GetNestedString(el, "snippet", "title") ?? "Untitled";
-                var author = YouTubeApi.GetNestedString(el, "snippet", "channelTitle") ?? "Unknown";
+                // search.list returns HTML-escaped titles ("&#39;", "&quot;").
+                var title = System.Net.WebUtility.HtmlDecode(YouTubeApi.GetNestedString(el, "snippet", "title") ?? "Untitled");
+                var author = System.Net.WebUtility.HtmlDecode(YouTubeApi.GetNestedString(el, "snippet", "channelTitle") ?? "Unknown");
                 var desc = YouTubeApi.GetNestedString(el, "snippet", "description");
                 var pubStr = YouTubeApi.GetNestedString(el, "snippet", "publishedAt");
                 var premiere = YouTubeApi.ParsePublishedAt(pubStr);
