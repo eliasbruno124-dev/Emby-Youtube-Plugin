@@ -69,7 +69,7 @@ namespace Emby.YouTubePlugin
 
         internal static void Apply(BaseItem? item, BaseItemDto? dto)
         {
-            if (item == null || dto == null || !IsChannelVideo(item)) return;
+            if (item == null || dto == null || Plugin.Instance?.Options.PresentVideosAsVideos == false || !IsChannelVideo(item)) return;
             if (string.Equals(dto.Type, "Episode", StringComparison.Ordinal))
                 dto.Type = "Video";
         }

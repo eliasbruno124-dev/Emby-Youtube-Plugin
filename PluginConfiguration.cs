@@ -54,6 +54,13 @@ namespace Emby.YouTubePlugin
         // native local trailers, independent of DirectPlaybackEnabled.
         public bool NativeTrailersEnabled { get; set; } = false;
 
+        // Presents channel videos to the Emby apps as "Video" instead of
+        // "Episode", so the apps' "hide episode spoilers" option does not
+        // blank their thumbnails. Presentation only; stored items stay
+        // episodes. Off restores the episode presentation (full date,
+        // next-episode autoplay rules).
+        public bool PresentVideosAsVideos { get; set; } = true;
+
         // Legacy serialized paths are ignored by the in-process resolver and
         // cleared on save. Retain the properties only for old configuration files.
         public string YtDlpPath { get; set; } = "";

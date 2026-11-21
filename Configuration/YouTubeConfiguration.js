@@ -748,6 +748,7 @@ define([
                     setValue(view, 'numWatchLaterPollMinutes', config.WatchLaterPollMinutes || 3);
                     setChecked(view, 'chkDirectPlayback', config.DirectPlaybackEnabled !== false);
                     setChecked(view, 'chkNativeTrailers', config.NativeTrailersEnabled === true);
+                    setChecked(view, 'chkPresentVideosAsVideos', config.PresentVideosAsVideos !== false);
                     renderQuota(view, config);
                     setDonateButton(view);
                     setStatus(view, '');
@@ -817,6 +818,7 @@ define([
             config.WatchLaterPollMinutes = numberValue(view, 'numWatchLaterPollMinutes', 3, 1, 60);
             config.DirectPlaybackEnabled = checked(view, 'chkDirectPlayback');
             config.NativeTrailersEnabled = checked(view, 'chkNativeTrailers');
+            config.PresentVideosAsVideos = checked(view, 'chkPresentVideosAsVideos');
             config.Donate = defaultDonateUrl;
             delete config.YtDlpPath;
             delete config.YtDlpJsRuntimePath;

@@ -19,11 +19,11 @@
     },
     {
       "path": "Configuration/YouTubeConfiguration.html",
-      "sha256": "73f82be12a1345a920726adf6ad8d5f428e423f4742aec7173ab4124bbe9ee1a"
+      "sha256": "1c276c1e989cb0749ec290105ea021d11317f63392823ccc05a2594807f9addc"
     },
     {
       "path": "Configuration/YouTubeConfiguration.js",
-      "sha256": "d2e7b30f395f12041f44f39f60367c3bff56ef33d31a16784e117ae94f4bdd17"
+      "sha256": "26d9825a43b56124d08bc5f0d926822a89c8a72dbf40e8b93ecd8997f877712b"
     },
     {
       "path": "Configuration/YouTubePersonal.html",
@@ -159,7 +159,7 @@
     },
     {
       "path": "PluginConfiguration.cs",
-      "sha256": "a2f448e8b327826bb29ccddc6d9e86d2df6588de8c2e33653de1de0e84dd87b3"
+      "sha256": "3f507fb78d72803fcda3dc98c60a77373248a46e9b3fae698f7ca88fb3705308"
     },
     {
       "path": "PluginEntryPoint.cs",
@@ -263,7 +263,7 @@
     },
     {
       "path": "YouTubeConfigSaveService.cs",
-      "sha256": "9a7367defd1a12d2b3cc9355d1779b98603d78ab139dd537cc4b6ed23ab57114"
+      "sha256": "e97e878b241160b061c42501bd78e9c460aaf0a5e158657f85b426b4031f5b10"
     },
     {
       "path": "YouTubeDescriptionChapters.cs",
@@ -395,11 +395,11 @@
     },
     {
       "path": "YouTubeVideoPresentation.cs",
-      "sha256": "5265b42cb59b1db9b18f433f26d366e0f917d6d1a3e18a92d494d7c02fbce90b"
+      "sha256": "c4061f4e9508d4e978984464ebf66adf285e280167b3cc9da7126879c5af088b"
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "03db22d476dc8807dc5f43e685b6b841619ea9af0af269920633d61e31b3b947"
+      "sha256": "175d3a57488c28b0b13dac34ab02441e1e94c767bbda07260968394221798dc5"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -481,11 +481,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "e1bce1c10929d0ccebdbb8bbc1466da8839114980fc5a40507a9d6350049fdff"
+      "sha256": "acdd9e61ffd7fc396b7c729b64f9927a173777980814d0a91215f26046607d2d"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "d082606fbad91db93145d1f3168f60443b5952505f6c5c4c3726ef6331fc99de"
+      "sha256": "abc8e3944bf398c62c9b1dbd6cf6e84b3bbac529deda2fc3bda7fb941787614c"
     }
   ],
   "parsers": {

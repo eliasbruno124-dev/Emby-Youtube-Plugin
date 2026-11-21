@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 119 files; 9475 syntax declarations/HTML anchors.
+Scope: 119 files; 9482 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -16,7 +16,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [.gitignore](#file-bc37d034bad56458) | Repository support | 0 |
 | [AGENTS.md](#file-a54ff182c7e8acf5) | Documentation/resource | 0 |
 | [ChannelContentFlags.cs](#file-3fbcb901338e79fb) | Plugin Compile source (SDK default) | 29 |
-| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 52 |
+| [Configuration/YouTubeConfiguration.html](#file-3265de6859f23663) | EmbeddedResource | 53 |
 | [Configuration/YouTubeConfiguration.js](#file-44888eb7c4d56aef) | EmbeddedResource | 349 |
 | [Configuration/YouTubePersonal.html](#file-20908b7c57487625) | EmbeddedResource | 14 |
 | [Configuration/YouTubePersonal.js](#file-435be0d114ecb729) | EmbeddedResource | 92 |
@@ -51,7 +51,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [ManagedResolver/vendored/Videos/VideoId.cs](#file-c4d93fe674f77ff2) | Plugin Compile source (SDK default) | 40 |
 | [PlaybackIntentInterceptor.cs](#file-6ff472c354325e8c) | Plugin Compile source (SDK default) | 499 |
 | [Plugin.cs](#file-5a2f4e90167632d0) | Plugin Compile source (SDK default) | 82 |
-| [PluginConfiguration.cs](#file-224cbfdbaba3a683) | Plugin Compile source (SDK default) | 99 |
+| [PluginConfiguration.cs](#file-224cbfdbaba3a683) | Plugin Compile source (SDK default) | 102 |
 | [PluginEntryPoint.cs](#file-d27f2eafc5169b60) | Plugin Compile source (SDK default) | 707 |
 | [PluginFileLog.cs](#file-adad5fbc257fb6bf) | Plugin Compile source (SDK default) | 19 |
 | [QuotaTracker.cs](#file-942e26b5e5820665) | Plugin Compile source (SDK default) | 113 |
@@ -77,7 +77,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannelProvenance.cs](#file-bdce8e0e6df1ba72) | Plugin Compile source (SDK default) | 47 |
 | [YouTubeChapterDtoInterceptor.cs](#file-59ad88b2f7a15737) | Plugin Compile source (SDK default) | 46 |
 | [YouTubeChapterSync.cs](#file-90d85cea05c050fd) | Plugin Compile source (SDK default) | 135 |
-| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 129 |
+| [YouTubeConfigSaveService.cs](#file-afb9dc3e97044d5d) | Plugin Compile source (SDK default) | 132 |
 | [YouTubeDescriptionChapters.cs](#file-879f815509e709e7) | Plugin Compile source (SDK default) | 21 |
 | [YouTubeDirectHttp.cs](#file-1922be3cbc99a179) | Plugin Compile source (SDK default) | 181 |
 | [YouTubeDirectManifest.cs](#file-5a4b4574992dd577) | Plugin Compile source (SDK default) | 203 |
@@ -192,27 +192,27 @@ Plugin Compile source (SDK default); 1538 bytes; 52 lines.
 <a id="file-3265de6859f23663"></a>
 ## [Configuration/YouTubeConfiguration.html](../Configuration/YouTubeConfiguration.html)
 
-EmbeddedResource; 38640 bytes; 782 lines.
+EmbeddedResource; 39275 bytes; 790 lines.
 
 Resource/controller references:
 
 - Line [1](../Configuration/YouTubeConfiguration.html#L1): data-controller = `configurationpage?name=YouTubeConfigurationjs`
 - Line [345](../Configuration/YouTubeConfiguration.html#L345): href = `#`
 - Line [347](../Configuration/YouTubeConfiguration.html#L347): href = `#`
-- Line [659](../Configuration/YouTubeConfiguration.html#L659): href = `https://paypal.me/eliasbruno123`
-- Line [661](../Configuration/YouTubeConfiguration.html#L661): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
-- Line [675](../Configuration/YouTubeConfiguration.html#L675): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
-- Line [702](../Configuration/YouTubeConfiguration.html#L702): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
-- Line [705](../Configuration/YouTubeConfiguration.html#L705): href = `https://console.cloud.google.com/apis/credentials`
-- Line [717](../Configuration/YouTubeConfiguration.html#L717): data-guide-image = `step1.png`
-- Line [726](../Configuration/YouTubeConfiguration.html#L726): data-guide-image = `step2.png`
-- Line [736](../Configuration/YouTubeConfiguration.html#L736): data-guide-image = `step34.png`
-- Line [745](../Configuration/YouTubeConfiguration.html#L745): data-guide-image = `step5.png`
-- Line [765](../Configuration/YouTubeConfiguration.html#L765): data-guide-image = `step7.png`
-- Line [775](../Configuration/YouTubeConfiguration.html#L775): data-guide-image = `step8.png`
+- Line [667](../Configuration/YouTubeConfiguration.html#L667): href = `https://paypal.me/eliasbruno123`
+- Line [669](../Configuration/YouTubeConfiguration.html#L669): src = `https://img.shields.io/badge/Donate%20with-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white`
+- Line [683](../Configuration/YouTubeConfiguration.html#L683): href = `https://github.com/eliasbruno124-dev/Emby-Youtube-Plugin`
+- Line [710](../Configuration/YouTubeConfiguration.html#L710): href = `https://console.cloud.google.com/apis/library/youtube.googleapis.com`
+- Line [713](../Configuration/YouTubeConfiguration.html#L713): href = `https://console.cloud.google.com/apis/credentials`
+- Line [725](../Configuration/YouTubeConfiguration.html#L725): data-guide-image = `step1.png`
+- Line [734](../Configuration/YouTubeConfiguration.html#L734): data-guide-image = `step2.png`
+- Line [744](../Configuration/YouTubeConfiguration.html#L744): data-guide-image = `step34.png`
+- Line [753](../Configuration/YouTubeConfiguration.html#L753): data-guide-image = `step5.png`
+- Line [773](../Configuration/YouTubeConfiguration.html#L773): data-guide-image = `step7.png`
+- Line [783](../Configuration/YouTubeConfiguration.html#L783): data-guide-image = `step8.png`
 
 <details>
-<summary>All 52 declarations / anchors</summary>
+<summary>All 53 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -247,34 +247,35 @@ Resource/controller references:
 | dom-id | input.numWatchLaterPollMinutes | [485:33](../Configuration/YouTubeConfiguration.html#L485) |
 | dom-id | input.chkDirectPlayback | [497:29](../Configuration/YouTubeConfiguration.html#L497) |
 | dom-id | input.chkNativeTrailers | [505:29](../Configuration/YouTubeConfiguration.html#L505) |
-| dom-id | input.chkShowRootFoldersAtTopLevel | [522:37](../Configuration/YouTubeConfiguration.html#L522) |
-| dom-id | div.homeRowsDescription | [526:33](../Configuration/YouTubeConfiguration.html#L526) |
-| dom-id | input.chkShowTrending | [533:37](../Configuration/YouTubeConfiguration.html#L533) |
-| dom-id | div.trendingDescription | [537:33](../Configuration/YouTubeConfiguration.html#L537) |
-| dom-id | input.chkShowCategories | [543:37](../Configuration/YouTubeConfiguration.html#L543) |
-| dom-id | div.categoriesDescription | [547:33](../Configuration/YouTubeConfiguration.html#L547) |
-| dom-id | input.chkShowShorts | [553:37](../Configuration/YouTubeConfiguration.html#L553) |
-| dom-id | div.shortsDescription | [557:33](../Configuration/YouTubeConfiguration.html#L557) |
-| dom-id | select.selectTrendingRegion | [569:33](../Configuration/YouTubeConfiguration.html#L569) |
-| dom-id | select.selectTrendingCategory | [578:33](../Configuration/YouTubeConfiguration.html#L578) |
-| dom-id | select.selectChannelSortBy | [599:33](../Configuration/YouTubeConfiguration.html#L599) |
-| dom-id | input.chkShowLikeCount | [614:33](../Configuration/YouTubeConfiguration.html#L614) |
-| dom-id | input.chkShowCommentCount | [618:33](../Configuration/YouTubeConfiguration.html#L618) |
-| dom-id | input.numMaxChannelVideos | [633:33](../Configuration/YouTubeConfiguration.html#L633) |
-| dom-id | input.numMaxSearchVideos | [642:33](../Configuration/YouTubeConfiguration.html#L642) |
-| dom-id | a.btnDonate | [659:29](../Configuration/YouTubeConfiguration.html#L659) |
-| dom-id | p.youtubeConfigurationStatus | [671:21](../Configuration/YouTubeConfiguration.html#L671) |
-| dom-id | div.ytPluginCredits | [673:21](../Configuration/YouTubeConfiguration.html#L673) |
-| dom-id | span.ytPluginVersion | [687:47](../Configuration/YouTubeConfiguration.html#L687) |
-| dom-id | span.ytUpdateBadge | [688:25](../Configuration/YouTubeConfiguration.html#L688) |
-| dom-id | div.setupGuidePage | [695:13](../Configuration/YouTubeConfiguration.html#L695) |
+| dom-id | input.chkPresentVideosAsVideos | [513:29](../Configuration/YouTubeConfiguration.html#L513) |
+| dom-id | input.chkShowRootFoldersAtTopLevel | [530:37](../Configuration/YouTubeConfiguration.html#L530) |
+| dom-id | div.homeRowsDescription | [534:33](../Configuration/YouTubeConfiguration.html#L534) |
+| dom-id | input.chkShowTrending | [541:37](../Configuration/YouTubeConfiguration.html#L541) |
+| dom-id | div.trendingDescription | [545:33](../Configuration/YouTubeConfiguration.html#L545) |
+| dom-id | input.chkShowCategories | [551:37](../Configuration/YouTubeConfiguration.html#L551) |
+| dom-id | div.categoriesDescription | [555:33](../Configuration/YouTubeConfiguration.html#L555) |
+| dom-id | input.chkShowShorts | [561:37](../Configuration/YouTubeConfiguration.html#L561) |
+| dom-id | div.shortsDescription | [565:33](../Configuration/YouTubeConfiguration.html#L565) |
+| dom-id | select.selectTrendingRegion | [577:33](../Configuration/YouTubeConfiguration.html#L577) |
+| dom-id | select.selectTrendingCategory | [586:33](../Configuration/YouTubeConfiguration.html#L586) |
+| dom-id | select.selectChannelSortBy | [607:33](../Configuration/YouTubeConfiguration.html#L607) |
+| dom-id | input.chkShowLikeCount | [622:33](../Configuration/YouTubeConfiguration.html#L622) |
+| dom-id | input.chkShowCommentCount | [626:33](../Configuration/YouTubeConfiguration.html#L626) |
+| dom-id | input.numMaxChannelVideos | [641:33](../Configuration/YouTubeConfiguration.html#L641) |
+| dom-id | input.numMaxSearchVideos | [650:33](../Configuration/YouTubeConfiguration.html#L650) |
+| dom-id | a.btnDonate | [667:29](../Configuration/YouTubeConfiguration.html#L667) |
+| dom-id | p.youtubeConfigurationStatus | [679:21](../Configuration/YouTubeConfiguration.html#L679) |
+| dom-id | div.ytPluginCredits | [681:21](../Configuration/YouTubeConfiguration.html#L681) |
+| dom-id | span.ytPluginVersion | [695:47](../Configuration/YouTubeConfiguration.html#L695) |
+| dom-id | span.ytUpdateBadge | [696:25](../Configuration/YouTubeConfiguration.html#L696) |
+| dom-id | div.setupGuidePage | [703:13](../Configuration/YouTubeConfiguration.html#L703) |
 
 </details>
 
 <a id="file-44888eb7c4d56aef"></a>
 ## [Configuration/YouTubeConfiguration.js](../Configuration/YouTubeConfiguration.js)
 
-EmbeddedResource; 37929 bytes; 908 lines.
+EmbeddedResource; 38121 bytes; 910 lines.
 
 <details>
 <summary>All 349 declarations / anchors</summary>
@@ -611,25 +612,25 @@ EmbeddedResource; 37929 bytes; 908 lines.
 | parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.loadedConfig | [711:65](../Configuration/YouTubeConfiguration.js#L711) |
 | variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.config | [724:27](../Configuration/YouTubeConfiguration.js#L724) |
 | variable | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@27549.resetFromKnownRegions | [738:27](../Configuration/YouTubeConfiguration.js#L738) |
-| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31399 | [770:20](../Configuration/YouTubeConfiguration.js#L770) |
-| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31399.error | [770:20](../Configuration/YouTubeConfiguration.js#L770) |
-| method | define callback@113.anonymous-class@16681.saveData | [790:9](../Configuration/YouTubeConfiguration.js#L790) |
-| parameter | define callback@113.anonymous-class@16681.saveData.view | [790:18](../Configuration/YouTubeConfiguration.js#L790) |
-| variable | define callback@113.anonymous-class@16681.saveData.apiClient | [791:19](../Configuration/YouTubeConfiguration.js#L791) |
-| variable | define callback@113.anonymous-class@16681.saveData.config | [797:19](../Configuration/YouTubeConfiguration.js#L797) |
-| method | define callback@113.anonymous-class@16681.flushSaveQueue | [849:9](../Configuration/YouTubeConfiguration.js#L849) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending | [854:19](../Configuration/YouTubeConfiguration.js#L854) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.view | [861:19](../Configuration/YouTubeConfiguration.js#L861) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36228 | [868:21](../Configuration/YouTubeConfiguration.js#L868) |
-| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36228.savedApiKey | [873:27](../Configuration/YouTubeConfiguration.js#L873) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36771 | [878:16](../Configuration/YouTubeConfiguration.js#L878) |
-| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36771.error | [878:16](../Configuration/YouTubeConfiguration.js#L878) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37129 | [884:21](../Configuration/YouTubeConfiguration.js#L884) |
-| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37235 | [887:16](../Configuration/YouTubeConfiguration.js#L887) |
-| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37235.error | [887:16](../Configuration/YouTubeConfiguration.js#L887) |
-| method | define callback@113.anonymous-class@16681.scheduleAutoSave | [894:9](../Configuration/YouTubeConfiguration.js#L894) |
-| parameter | define callback@113.anonymous-class@16681.scheduleAutoSave.view | [894:26](../Configuration/YouTubeConfiguration.js#L894) |
-| function | define callback@113.anonymous-class@16681.scheduleAutoSave.setTimeout callback@37787 | [902:46](../Configuration/YouTubeConfiguration.js#L902) |
+| function | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31505 | [771:20](../Configuration/YouTubeConfiguration.js#L771) |
+| parameter | define callback@113.anonymous-class@16681.loadData.requestWhenIdle.apiClient.getPluginConfiguration(pluginId).then callback@31505.error | [771:20](../Configuration/YouTubeConfiguration.js#L771) |
+| method | define callback@113.anonymous-class@16681.saveData | [791:9](../Configuration/YouTubeConfiguration.js#L791) |
+| parameter | define callback@113.anonymous-class@16681.saveData.view | [791:18](../Configuration/YouTubeConfiguration.js#L791) |
+| variable | define callback@113.anonymous-class@16681.saveData.apiClient | [792:19](../Configuration/YouTubeConfiguration.js#L792) |
+| variable | define callback@113.anonymous-class@16681.saveData.config | [798:19](../Configuration/YouTubeConfiguration.js#L798) |
+| method | define callback@113.anonymous-class@16681.flushSaveQueue | [851:9](../Configuration/YouTubeConfiguration.js#L851) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending | [856:19](../Configuration/YouTubeConfiguration.js#L856) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.view | [863:19](../Configuration/YouTubeConfiguration.js#L863) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36420 | [870:21](../Configuration/YouTubeConfiguration.js#L870) |
+| variable | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36420.savedApiKey | [875:27](../Configuration/YouTubeConfiguration.js#L875) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36963 | [880:16](../Configuration/YouTubeConfiguration.js#L880) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then callback@36963.error | [880:16](../Configuration/YouTubeConfiguration.js#L880) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37321 | [886:21](../Configuration/YouTubeConfiguration.js#L886) |
+| function | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37427 | [889:16](../Configuration/YouTubeConfiguration.js#L889) |
+| parameter | define callback@113.anonymous-class@16681.flushSaveQueue.pending.apiClient.ajax({                 type: 'POST',                 url: pending.apiClient.getUrl('YouTubePlugin/SaveConfiguration'),                 data: JSON.stringify(pending.config),                 contentType: 'application/json'             }).then(() =&gt; {                 this.config = pending.config;                 setDonateButton(view);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Saved automatically.');                     const savedApiKey = String(pending.config.ApiKey \|\| '').trim();                     if (savedApiKey !== this._regionLookupApiKey) {                         this.refreshTrendingRegions(view, pending.apiClient, null, savedApiKey);                     }                 }             }, error =&gt; {                 console.error('Error saving YouTube configuration:', error);                 if (!this._pendingSave && pending.revision === this._saveRevision) {                     setStatus(view, 'Could not save plugin settings.');                     showToast('error', 'Could not save YouTube settings');                 }             }).then callback@37427.error | [889:16](../Configuration/YouTubeConfiguration.js#L889) |
+| method | define callback@113.anonymous-class@16681.scheduleAutoSave | [896:9](../Configuration/YouTubeConfiguration.js#L896) |
+| parameter | define callback@113.anonymous-class@16681.scheduleAutoSave.view | [896:26](../Configuration/YouTubeConfiguration.js#L896) |
+| function | define callback@113.anonymous-class@16681.scheduleAutoSave.setTimeout callback@37979 | [904:46](../Configuration/YouTubeConfiguration.js#L904) |
 
 </details>
 
@@ -2341,10 +2342,10 @@ Plugin Compile source (SDK default); 13627 bytes; 300 lines.
 <a id="file-224cbfdbaba3a683"></a>
 ## [PluginConfiguration.cs](../PluginConfiguration.cs)
 
-Plugin Compile source (SDK default); 4517 bytes; 129 lines.
+Plugin Compile source (SDK default); 4915 bytes; 136 lines.
 
 <details>
-<summary>All 99 declarations / anchors</summary>
+<summary>All 102 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -2414,39 +2415,42 @@ Plugin Compile source (SDK default); 4517 bytes; 129 lines.
 | property | Emby.YouTubePlugin.PluginConfiguration.NativeTrailersEnabled | [55:9](../PluginConfiguration.cs#L55) |
 | accessor | Emby.YouTubePlugin.PluginConfiguration.NativeTrailersEnabled.get | [55:45](../PluginConfiguration.cs#L55) |
 | accessor | Emby.YouTubePlugin.PluginConfiguration.NativeTrailersEnabled.set | [55:50](../PluginConfiguration.cs#L55) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath | [59:9](../PluginConfiguration.cs#L59) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.get | [59:35](../PluginConfiguration.cs#L59) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.set | [59:40](../PluginConfiguration.cs#L59) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled | [62:9](../PluginConfiguration.cs#L62) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.get | [62:46](../PluginConfiguration.cs#L62) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.set | [62:51](../PluginConfiguration.cs#L62) |
-| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath | [64:9](../PluginConfiguration.cs#L64) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.get | [64:44](../PluginConfiguration.cs#L64) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.set | [64:49](../PluginConfiguration.cs#L64) |
-| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackMaxHeight | [66:21](../PluginConfiguration.cs#L66) |
-| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight | [70:9](../PluginConfiguration.cs#L70) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.get | [72:13](../PluginConfiguration.cs#L72) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.set | [73:13](../PluginConfiguration.cs#L73) |
-| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackH264MaxHeight | [76:21](../PluginConfiguration.cs#L76) |
-| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight | [78:9](../PluginConfiguration.cs#L78) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.get | [80:13](../PluginConfiguration.cs#L80) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.set | [81:13](../PluginConfiguration.cs#L81) |
-| property | Emby.YouTubePlugin.PluginConfiguration.Donate | [84:9](../PluginConfiguration.cs#L84) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.get | [84:32](../PluginConfiguration.cs#L84) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.set | [84:37](../PluginConfiguration.cs#L84) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaStatus | [86:9](../PluginConfiguration.cs#L86) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaUsedToday | [92:9](../PluginConfiguration.cs#L92) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaDailyLimit | [95:9](../PluginConfiguration.cs#L95) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds | [98:9](../PluginConfiguration.cs#L98) |
-| accessor | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get | [101:13](../PluginConfiguration.cs#L101) |
-| local-variable | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get.sec | [103:21](../PluginConfiguration.cs#L103) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaLifetime | [108:9](../PluginConfiguration.cs#L108) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchCallsToday | [111:9](../PluginConfiguration.cs#L111) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchDailyLimit | [114:9](../PluginConfiguration.cs#L114) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherUnitsToday | [117:9](../PluginConfiguration.cs#L117) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherDailyLimit | [120:9](../PluginConfiguration.cs#L120) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalSearchCalls | [123:9](../PluginConfiguration.cs#L123) |
-| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalOtherUnits | [126:9](../PluginConfiguration.cs#L126) |
+| property | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos | [62:9](../PluginConfiguration.cs#L62) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos.get | [62:45](../PluginConfiguration.cs#L62) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.PresentVideosAsVideos.set | [62:50](../PluginConfiguration.cs#L62) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath | [66:9](../PluginConfiguration.cs#L66) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.get | [66:35](../PluginConfiguration.cs#L66) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpPath.set | [66:40](../PluginConfiguration.cs#L66) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled | [69:9](../PluginConfiguration.cs#L69) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.get | [69:46](../PluginConfiguration.cs#L69) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpAutoUpdateEnabled.set | [69:51](../PluginConfiguration.cs#L69) |
+| property | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath | [71:9](../PluginConfiguration.cs#L71) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.get | [71:44](../PluginConfiguration.cs#L71) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.YtDlpJsRuntimePath.set | [71:49](../PluginConfiguration.cs#L71) |
+| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackMaxHeight | [73:21](../PluginConfiguration.cs#L73) |
+| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight | [77:9](../PluginConfiguration.cs#L77) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.get | [79:13](../PluginConfiguration.cs#L79) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackMaxHeight.set | [80:13](../PluginConfiguration.cs#L80) |
+| field | Emby.YouTubePlugin.PluginConfiguration._directPlaybackH264MaxHeight | [83:21](../PluginConfiguration.cs#L83) |
+| property | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight | [85:9](../PluginConfiguration.cs#L85) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.get | [87:13](../PluginConfiguration.cs#L87) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.DirectPlaybackH264MaxHeight.set | [88:13](../PluginConfiguration.cs#L88) |
+| property | Emby.YouTubePlugin.PluginConfiguration.Donate | [91:9](../PluginConfiguration.cs#L91) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.get | [91:32](../PluginConfiguration.cs#L91) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.Donate.set | [91:37](../PluginConfiguration.cs#L91) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaStatus | [93:9](../PluginConfiguration.cs#L93) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaUsedToday | [99:9](../PluginConfiguration.cs#L99) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaDailyLimit | [102:9](../PluginConfiguration.cs#L102) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds | [105:9](../PluginConfiguration.cs#L105) |
+| accessor | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get | [108:13](../PluginConfiguration.cs#L108) |
+| local-variable | Emby.YouTubePlugin.PluginConfiguration.QuotaResetSeconds.get.sec | [110:21](../PluginConfiguration.cs#L110) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaLifetime | [115:9](../PluginConfiguration.cs#L115) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchCallsToday | [118:9](../PluginConfiguration.cs#L118) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaSearchDailyLimit | [121:9](../PluginConfiguration.cs#L121) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherUnitsToday | [124:9](../PluginConfiguration.cs#L124) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaOtherDailyLimit | [127:9](../PluginConfiguration.cs#L127) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalSearchCalls | [130:9](../PluginConfiguration.cs#L130) |
+| property | Emby.YouTubePlugin.PluginConfiguration.QuotaTotalOtherUnits | [133:9](../PluginConfiguration.cs#L133) |
 
 </details>
 
@@ -6320,10 +6324,10 @@ Plugin Compile source (SDK default); 16877 bytes; 301 lines.
 <a id="file-afb9dc3e97044d5d"></a>
 ## [YouTubeConfigSaveService.cs](../YouTubeConfigSaveService.cs)
 
-Plugin Compile source (SDK default); 12231 bytes; 243 lines.
+Plugin Compile source (SDK default); 12412 bytes; 245 lines.
 
 <details>
-<summary>All 129 declarations / anchors</summary>
+<summary>All 132 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -6379,83 +6383,86 @@ Plugin Compile source (SDK default); 12231 bytes; 243 lines.
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.dto | [130:17](../YouTubeConfigSaveService.cs#L130) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.visibilityChanged | [134:18](../YouTubeConfigSaveService.cs#L134) |
 | local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.Post.config | [138:21](../YouTubeConfigSaveService.cs#L138) |
-| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [188:9](../YouTubeConfigSaveService.cs#L188) |
-| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [188:60](../YouTubeConfigSaveService.cs#L188) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [195:23](../YouTubeConfigSaveService.cs#L195) |
-| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [201:17](../YouTubeConfigSaveService.cs#L201) |
-| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [215:9](../YouTubeConfigSaveService.cs#L215) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [217:13](../YouTubeConfigSaveService.cs#L217) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [217:37](../YouTubeConfigSaveService.cs#L217) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [217:42](../YouTubeConfigSaveService.cs#L217) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [218:13](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [218:50](../YouTubeConfigSaveService.cs#L218) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [218:55](../YouTubeConfigSaveService.cs#L218) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [219:13](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [219:56](../YouTubeConfigSaveService.cs#L219) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [219:61](../YouTubeConfigSaveService.cs#L219) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [220:13](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [220:56](../YouTubeConfigSaveService.cs#L220) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [220:61](../YouTubeConfigSaveService.cs#L220) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [221:13](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [221:41](../YouTubeConfigSaveService.cs#L221) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [221:46](../YouTubeConfigSaveService.cs#L221) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [222:13](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [222:49](../YouTubeConfigSaveService.cs#L222) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [222:54](../YouTubeConfigSaveService.cs#L222) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [223:13](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [223:41](../YouTubeConfigSaveService.cs#L223) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [223:46](../YouTubeConfigSaveService.cs#L223) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [224:13](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [224:43](../YouTubeConfigSaveService.cs#L224) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [224:48](../YouTubeConfigSaveService.cs#L224) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [225:13](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [225:54](../YouTubeConfigSaveService.cs#L225) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [225:59](../YouTubeConfigSaveService.cs#L225) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [226:13](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [226:39](../YouTubeConfigSaveService.cs#L226) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [226:44](../YouTubeConfigSaveService.cs#L226) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [227:13](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [227:39](../YouTubeConfigSaveService.cs#L227) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [227:44](../YouTubeConfigSaveService.cs#L227) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [228:13](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [228:45](../YouTubeConfigSaveService.cs#L228) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [228:50](../YouTubeConfigSaveService.cs#L228) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [229:13](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [229:47](../YouTubeConfigSaveService.cs#L229) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [229:52](../YouTubeConfigSaveService.cs#L229) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [230:13](../YouTubeConfigSaveService.cs#L230) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [230:42](../YouTubeConfigSaveService.cs#L230) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [230:47](../YouTubeConfigSaveService.cs#L230) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [231:13](../YouTubeConfigSaveService.cs#L231) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [231:45](../YouTubeConfigSaveService.cs#L231) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [231:50](../YouTubeConfigSaveService.cs#L231) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [232:13](../YouTubeConfigSaveService.cs#L232) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [232:44](../YouTubeConfigSaveService.cs#L232) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [232:49](../YouTubeConfigSaveService.cs#L232) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [233:13](../YouTubeConfigSaveService.cs#L233) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [233:44](../YouTubeConfigSaveService.cs#L233) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [233:49](../YouTubeConfigSaveService.cs#L233) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [234:13](../YouTubeConfigSaveService.cs#L234) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [234:43](../YouTubeConfigSaveService.cs#L234) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [234:48](../YouTubeConfigSaveService.cs#L234) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [235:13](../YouTubeConfigSaveService.cs#L235) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [235:49](../YouTubeConfigSaveService.cs#L235) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [235:54](../YouTubeConfigSaveService.cs#L235) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [236:13](../YouTubeConfigSaveService.cs#L236) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [236:50](../YouTubeConfigSaveService.cs#L236) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [236:55](../YouTubeConfigSaveService.cs#L236) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled | [237:13](../YouTubeConfigSaveService.cs#L237) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.get | [237:50](../YouTubeConfigSaveService.cs#L237) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.set | [237:55](../YouTubeConfigSaveService.cs#L237) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [238:13](../YouTubeConfigSaveService.cs#L238) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [238:51](../YouTubeConfigSaveService.cs#L238) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [238:56](../YouTubeConfigSaveService.cs#L238) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [239:13](../YouTubeConfigSaveService.cs#L239) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [239:55](../YouTubeConfigSaveService.cs#L239) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [239:60](../YouTubeConfigSaveService.cs#L239) |
-| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [240:13](../YouTubeConfigSaveService.cs#L240) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [240:37](../YouTubeConfigSaveService.cs#L240) |
-| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [240:42](../YouTubeConfigSaveService.cs#L240) |
+| method | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync | [189:9](../YouTubeConfigSaveService.cs#L189) |
+| parameter | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.request | [189:60](../YouTubeConfigSaveService.cs#L189) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.reader | [196:23](../YouTubeConfigSaveService.cs#L196) |
+| local-variable | Emby.YouTubePlugin.YouTubeConfigSaveService.ReadDtoAsync.json | [202:17](../YouTubeConfigSaveService.cs#L202) |
+| type | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto | [216:9](../YouTubeConfigSaveService.cs#L216) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey | [218:13](../YouTubeConfigSaveService.cs#L218) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.get | [218:37](../YouTubeConfigSaveService.cs#L218) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ApiKey.set | [218:42](../YouTubeConfigSaveService.cs#L218) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys | [219:13](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.get | [219:50](../YouTubeConfigSaveService.cs#L219) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalApiKeys.set | [219:55](../YouTubeConfigSaveService.cs#L219) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions | [220:13](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.get | [220:56](../YouTubeConfigSaveService.cs#L220) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.EnablePersonalSubscriptions.set | [220:61](../YouTubeConfigSaveService.cs#L220) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility | [221:13](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.get | [221:56](../YouTubeConfigSaveService.cs#L221) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PersonalChannelVisibility.set | [221:61](../YouTubeConfigSaveService.cs#L221) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems | [222:13](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.get | [222:41](../YouTubeConfigSaveService.cs#L222) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.SavedItems.set | [222:46](../YouTubeConfigSaveService.cs#L222) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist | [223:13](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.get | [223:49](../YouTubeConfigSaveService.cs#L223) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPlaylist.set | [223:54](../YouTubeConfigSaveService.cs#L223) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending | [224:13](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.get | [224:41](../YouTubeConfigSaveService.cs#L224) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowTrending.set | [224:46](../YouTubeConfigSaveService.cs#L224) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories | [225:13](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.get | [225:43](../YouTubeConfigSaveService.cs#L225) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCategories.set | [225:48](../YouTubeConfigSaveService.cs#L225) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel | [226:13](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.get | [226:54](../YouTubeConfigSaveService.cs#L226) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowRootFoldersAtTopLevel.set | [226:59](../YouTubeConfigSaveService.cs#L226) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts | [227:13](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.get | [227:39](../YouTubeConfigSaveService.cs#L227) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowShorts.set | [227:44](../YouTubeConfigSaveService.cs#L227) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts | [228:13](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.get | [228:39](../YouTubeConfigSaveService.cs#L228) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.HideShorts.set | [228:44](../YouTubeConfigSaveService.cs#L228) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion | [229:13](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.get | [229:45](../YouTubeConfigSaveService.cs#L229) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingRegion.set | [229:50](../YouTubeConfigSaveService.cs#L229) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory | [230:13](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.get | [230:47](../YouTubeConfigSaveService.cs#L230) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.TrendingCategory.set | [230:52](../YouTubeConfigSaveService.cs#L230) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount | [231:13](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.get | [231:42](../YouTubeConfigSaveService.cs#L231) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowLikeCount.set | [231:47](../YouTubeConfigSaveService.cs#L231) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount | [232:13](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.get | [232:45](../YouTubeConfigSaveService.cs#L232) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ShowCommentCount.set | [232:50](../YouTubeConfigSaveService.cs#L232) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy | [233:13](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.get | [233:44](../YouTubeConfigSaveService.cs#L233) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.ChannelSortBy.set | [233:49](../YouTubeConfigSaveService.cs#L233) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos | [234:13](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.get | [234:44](../YouTubeConfigSaveService.cs#L234) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxChannelVideos.set | [234:49](../YouTubeConfigSaveService.cs#L234) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos | [235:13](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.get | [235:43](../YouTubeConfigSaveService.cs#L235) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.MaxSearchVideos.set | [235:48](../YouTubeConfigSaveService.cs#L235) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes | [236:13](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.get | [236:49](../YouTubeConfigSaveService.cs#L236) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.WatchLaterPollMinutes.set | [236:54](../YouTubeConfigSaveService.cs#L236) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled | [237:13](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.get | [237:50](../YouTubeConfigSaveService.cs#L237) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackEnabled.set | [237:55](../YouTubeConfigSaveService.cs#L237) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled | [238:13](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.get | [238:50](../YouTubeConfigSaveService.cs#L238) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.NativeTrailersEnabled.set | [238:55](../YouTubeConfigSaveService.cs#L238) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos | [239:13](../YouTubeConfigSaveService.cs#L239) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.get | [239:50](../YouTubeConfigSaveService.cs#L239) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.PresentVideosAsVideos.set | [239:55](../YouTubeConfigSaveService.cs#L239) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight | [240:13](../YouTubeConfigSaveService.cs#L240) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.get | [240:51](../YouTubeConfigSaveService.cs#L240) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackMaxHeight.set | [240:56](../YouTubeConfigSaveService.cs#L240) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight | [241:13](../YouTubeConfigSaveService.cs#L241) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.get | [241:55](../YouTubeConfigSaveService.cs#L241) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.DirectPlaybackH264MaxHeight.set | [241:60](../YouTubeConfigSaveService.cs#L241) |
+| property | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate | [242:13](../YouTubeConfigSaveService.cs#L242) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.get | [242:37](../YouTubeConfigSaveService.cs#L242) |
+| accessor | Emby.YouTubePlugin.YouTubeConfigSaveService.ConfigDto.Donate.set | [242:42](../YouTubeConfigSaveService.cs#L242) |
 
 </details>
 
@@ -10317,7 +10324,7 @@ Plugin Compile source (SDK default); 20426 bytes; 390 lines.
 <a id="file-39d5ac61905a017e"></a>
 ## [YouTubeVideoPresentation.cs](../YouTubeVideoPresentation.cs)
 
-Plugin Compile source (SDK default); 4378 bytes; 90 lines.
+Plugin Compile source (SDK default); 4437 bytes; 90 lines.
 
 <details>
 <summary>All 32 declarations / anchors</summary>
@@ -10362,7 +10369,7 @@ Plugin Compile source (SDK default); 4378 bytes; 90 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 60539 bytes; 370 lines.
+Documentation/resource; 60914 bytes; 370 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
