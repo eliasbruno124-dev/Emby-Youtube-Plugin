@@ -215,7 +215,7 @@
     },
     {
       "path": "YouTubeChannel.DirectPlayback.cs",
-      "sha256": "0e5c6c4601f7d959a904de8ff6381875de0358f1188aef1b5b81420dccb76bd4"
+      "sha256": "3926ed696ee10b047e6a60081eebafca2240692b2eea3c50db2ba561265e7784"
     },
     {
       "path": "YouTubeChannel.Enrichment.cs",
@@ -489,11 +489,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "16f70c035ba89897ddaf6b4a0bdd8329396da2495d52f27e70ff813bff8ea35f"
+      "sha256": "73a5ebbfd7be0d3792d4e89018ef69a9602ececb8ee19c2fa016244ad2a29565"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "a8f0820a0cfc09dac687a7755602f3f09a2999c5c4508682ff35fb9a763ce0ae"
+      "sha256": "dd62812df226a2b00dc35e0a43737a2db19afc1832cfc14112c78ea70fe5da81"
     }
   ],
   "parsers": {

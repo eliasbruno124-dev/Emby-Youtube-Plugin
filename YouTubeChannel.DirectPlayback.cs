@@ -677,7 +677,9 @@ namespace Emby.YouTubePlugin
                     {
                         _lastFailure = failure;
                         YouTubeChannel.LogPublic("[YT] Native direct-input seek compatibility unavailable at "
-                            + failure + "; direct playback is off on this server, videos use the YouTube player.");
+                            + failure + (_permanent
+                                ? "; videos still play in the Emby player as HLS without these hooks (one audio track, no extra quality limits)."
+                                : "; direct playback is off until the next attempt, videos use the YouTube player."));
                     }
                 }
             }
