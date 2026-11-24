@@ -2734,7 +2734,7 @@ namespace Emby.YouTubePlugin
                 c.ShowRootFoldersAtTopLevel ? "1" : "0",
                 c.ShowTrending ? "1" : "0",
                 // Appended only when on, so upgrading keeps existing hashes.
-                c.ShowCategories ? (c.ShowMusicGenres ? "1|genres" : "1") : "0",
+                c.ShowCategories ? (c.ShowMusicGenres ? "1|genres" : "1") : (c.ShowMusicGenres ? "0|genres" : "0"),
                 c.ShortsEnabled ? "1" : "0",
                 (c.TrendingRegion ?? "").Trim(),
                 (c.TrendingCategory ?? "").Trim(),

@@ -30,6 +30,8 @@ namespace Emby.YouTubePlugin
 
             if (config.ShowCategories)
                 items.Add(Folder("📂 Categories", "categories_x_root", FolderIcons.Categories));
+            else if (YouTubeMusicGenres.ShowsOwnRootFolder(config))
+                items.Add(Folder("🎵 Music", YouTubeMusicGenres.RootFolderId, FolderIcons.ForCategory(YouTubeMusicGenres.MusicCategoryId)));
 
             await AddSavedContentFoldersAsync(items, apiKey, config, ct).ConfigureAwait(false);
             await AddPersonalRootsAsync(items, config, ct).ConfigureAwait(false);

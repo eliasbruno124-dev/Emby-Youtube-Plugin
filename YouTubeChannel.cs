@@ -168,6 +168,10 @@ namespace Emby.YouTubePlugin
                             .ConfigureAwait(false);
                     }
 
+                    // Own music folder (genres without the categories browser).
+                    if (type + FolderSeparator + term == YouTubeMusicGenres.RootFolderId)
+                        return YouTubeMusicGenres.RootResult();
+
                     // Root of the categories browser.
                     if (type == "categories" && term == "root")
                     {

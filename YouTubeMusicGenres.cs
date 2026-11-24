@@ -41,6 +41,28 @@ namespace Emby.YouTubePlugin
             ("christian", "/m/02mscn", "Christian", "1F54A"),    // 🕊
         };
 
+        // Own top-level "Music" folder, used when Show Categories is off: the
+        // genres must not depend on a second switch to become visible.
+        internal const string RootFolderId = "musicgenres_x_root";
+
+        internal static List<ChannelItemInfo> GenreFolders() => Genres.Select(g => new ChannelItemInfo
+        {
+            Name = "🎵 " + g.Name,
+            Id = FolderType + YouTubeChannel.FolderSeparatorValue + g.Key,
+            Type = ChannelItemType.Folder,
+            FolderType = ChannelFolderType.Container,
+            MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
+            ImageUrl = IconCdn + g.Icon + ".png"
+        }).ToList();
+
+        internal static bool ShowsOwnRootFolder(PluginConfiguration config) => config.ShowMusicGenres && !config.ShowCategories;
+
+        internal static ChannelItemResult RootResult()
+        {
+            var folders = GenreFolders();
+            return new ChannelItemResult { Items = folders, TotalRecordCount = folders.Count };
+        }
+
         internal static string? TopicFor(string? key) =>
             Genres.Where(g => string.Equals(g.Key, key, StringComparison.Ordinal)).Select(g => g.Id).FirstOrDefault();
 
@@ -52,15 +74,7 @@ namespace Emby.YouTubePlugin
         {
             if (categoryId != MusicCategoryId || !config.ShowMusicGenres || result?.Items == null)
                 return result!;
-            var folders = Genres.Select(g => new ChannelItemInfo
-            {
-                Name = "🎵 " + g.Name,
-                Id = FolderType + YouTubeChannel.FolderSeparatorValue + g.Key,
-                Type = ChannelItemType.Folder,
-                FolderType = ChannelFolderType.Container,
-                MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
-                ImageUrl = IconCdn + g.Icon + ".png"
-            }).ToList();
+            var folders = GenreFolders();
             // A bare message entry ("No results.") is dropped; the genres still work.
             var videos = result.Items.Where(i => !string.Equals(i.Id, "msg", StringComparison.Ordinal)).ToList();
             result.Items = folders.Concat(videos).ToList();

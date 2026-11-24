@@ -110,6 +110,7 @@ internal static class YouTubeRootMigration
         var expected = new HashSet<string>(StringComparer.Ordinal);
         if (snapshot.ShowTrending) expected.Add("trending_x_all");
         if (snapshot.ShowCategories) expected.Add("categories_x_root");
+        else if (snapshot.ShowMusicGenres) expected.Add(YouTubeMusicGenres.RootFolderId);
         foreach (var term in YouTubeChannel.ConfiguredTerms(snapshot.WatchLaterPlaylist))
         {
             if (!YouTubeChannel.IsSupportedPublicPlaylistId(term)) return false;
