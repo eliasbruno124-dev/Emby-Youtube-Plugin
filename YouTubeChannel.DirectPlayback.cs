@@ -47,8 +47,12 @@ namespace Emby.YouTubePlugin
         // Direct mode needs the native seek hooks below. On a server where
         // they cannot be installed, behave exactly as if the option were off
         // (YouTube player) instead of failing every playback with an error.
+        // Direct mode needs the native seek hooks. A transient failure behaves
+        // as if the option were off (YouTube player). A permanent one (protected
+        // or reshaped Emby build, e.g. 4.11.0.18) plays HLS sources natively as
+        // ordinary HTTP input without hooks.
         internal static bool Enabled => Plugin.Instance?.Options.DirectPlaybackEnabled == true
-            && YouTubeDirectSeekCompatibility.Available;
+            && (YouTubeDirectSeekCompatibility.Available || YouTubeDirectSeekCompatibility.PermanentlyUnavailable);
         // Channel videos use the native pipeline only in direct mode. Library
         // trailers may use it on their own option, independent of that mode.
         internal static bool PipelineEnabled => Enabled || Plugin.Instance?.Options.NativeTrailersEnabled == true;
@@ -97,10 +101,13 @@ namespace Emby.YouTubePlugin
                     foreach (var header in Headers(hls[0])) headers[header.Key] = header.Value;
                     masterUri = YouTubeDirectHttp.ValidateMediaUri(Text(hls[0], "manifest_url"));
                 }
+                bool hookFree = !YouTubeDirectSeekCompatibility.Available && YouTubeDirectSeekCompatibility.PermanentlyUnavailable;
+                if (hookFree && masterUri == null)
+                    throw new InvalidOperationException("Direct playback without native hooks needs an HLS source.");
                 if (masterUri != null)
                 {
                     stage = "HLS input compatibility";
-                    YouTubeDirectSeekCompatibility.RequireInstalled();
+                    if (!hookFree) YouTubeDirectSeekCompatibility.RequireInstalled();
                     stage = "HLS master fetch";
                     var bytes = await _fetchMaster(masterUri, headers,
                         YouTubeDirectManifest.MaximumMasterBytes, cancellationToken).ConfigureAwait(false);
@@ -118,6 +125,32 @@ namespace Emby.YouTubePlugin
                     stage = "HLS source budget";
                     var selected = await YouTubeSourceBudget.SelectAsync(master, masterUri, headers,
                         maximumHeight, cancellationToken).ConfigureAwait(false);
+                    if (hookFree)
+                    {
+                        // One combined master (video variant + its audio
+                        // rendition) served on loopback. ffmpeg lists the
+                        // EXT-X-MEDIA rendition first, so audio is stream 0.
+                        stage = "hook-free HLS source";
+                        var playlist = YouTubeDirectRangeProxy.RegisterPlaylist(selected.Content);
+                        bool grouped = selected.AudioTracks.Count > 0;
+                        source = new MediaSourceInfo
+                        {
+                            Id = SourceId(videoId), Path = playlist, Protocol = MediaProtocol.Http,
+                            Container = "hls", Name = "YouTube Auto (bis " + selected.Height.ToString(CultureInfo.InvariantCulture) + "p)",
+                            Bitrate = selected.Bitrate, RequiredHttpHeaders = new Dictionary<string, string>(headers, StringComparer.OrdinalIgnoreCase),
+                            MediaStreams = new List<MediaStream>
+                            {
+                                new() { Type = MediaStreamType.Video, Index = grouped ? 1 : 0, Codec = selected.VideoCodec,
+                                    Width = selected.Width, Height = selected.Height, AverageFrameRate = selected.FrameRate,
+                                    BitRate = selected.Bitrate },
+                                // Metadata of the rendition actually inside Content.
+                                new() { Type = MediaStreamType.Audio, Index = grouped ? 0 : 1, Codec = selected.AudioCodec,
+                                    Channels = selected.AudioChannels, Language = selected.AudioLanguage, IsDefault = true }
+                            }
+                        };
+                    }
+                    else
+                    {
                     var manifestPath = await StoreManifestAsync(selected.VideoContent ?? selected.Content, cancellationToken).ConfigureAwait(false);
                     stage = "HLS source metadata";
                     source = new MediaSourceInfo
@@ -148,6 +181,7 @@ namespace Emby.YouTubePlugin
                         source.MediaStreams.Add(new MediaStream { Type = MediaStreamType.Audio, Index = 1,
                             Codec = selected.AudioCodec, Channels = selected.AudioChannels,
                             Language = selected.AudioLanguage, IsDefault = true });
+                    }
                 }
                 else
                 {
@@ -401,6 +435,11 @@ namespace Emby.YouTubePlugin
         private static long _nextAttemptTicks;
         private static string? _lastFailure;
         private static bool _stopped;
+        private static volatile bool _permanent;
+
+        // Set when the server's shapes or its code protection rule the hooks
+        // out for good; no retries until the next server start.
+        internal static bool PermanentlyUnavailable => _permanent;
 
         // True once the hooks are installed. A failed attempt is repeated at
         // most once a minute: this is read on every playback decision.
@@ -409,7 +448,7 @@ namespace Emby.YouTubePlugin
             get
             {
                 if (_binding != null) return true;
-                if (_stopped || DateTime.UtcNow.Ticks < Interlocked.Read(ref _nextAttemptTicks)) return false;
+                if (_permanent || _stopped || DateTime.UtcNow.Ticks < Interlocked.Read(ref _nextAttemptTicks)) return false;
                 lock (Sync)
                 {
                     // Threads that passed the check together must not each
@@ -467,12 +506,12 @@ namespace Emby.YouTubePlugin
                     var output = FindType("Emby.Ffmpeg.Model.Output.OutputFile");
                     var http = FindType("Emby.Ffmpeg.Lib.InputProtocols.http");
                     var resolution = FindType(encoder + "ResolutionOptions");
-                    // The hooks bind by exact signature (checked below), which
-                    // holds for the 4.9 to 4.11 line. Other release lines are
-                    // untested: stay off there and let the YouTube player work.
+                    // The hooks bind by exact signature/shape (checked below), not
+                    // by release number: a later build that keeps the shapes keeps
+                    // working, one that changes them stays off (YouTube player).
                     stage = "server version";
                     var server = builder.Assembly.GetName().Version;
-                    if (server == null || server.Major != 4 || server.Minor < 9 || server.Minor > 11)
+                    if (server == null || server.Major != 4 || server.Minor < 9)
                         throw new InvalidOperationException();
                     stage = "native signatures";
                     var map = ExactStaticMethod(builder, "MapStreams", state, command, input, output);
@@ -488,30 +527,53 @@ namespace Emby.YouTubePlugin
                     // Enumerating this signature resolves its lazily loaded
                     // interface assembly before binding. Do not depend on that
                     // assembly having been touched by an earlier playback.
-                    var audioSelector = FindType(encoder + "EncodingHelpers")
-                        .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                        .Single(m => m.Name == "GetOutputAudioCodec" && m.ReturnType == typeof(string)
+                    // Bound by shape: Emby 4.11.0.18 obfuscates private names.
+                    bool AudioShape(MethodInfo m) => m.ReturnType == typeof(string)
                             && m.GetParameters() is var p && p.Length == 4
                             && p[0].ParameterType == state && p[1].ParameterType == outputStream
                             && p[2].ParameterType == typeof(string[])
-                            && p[3].ParameterType.FullName == "MediaBrowser.Controller.MediaEncoding.IFfmpegManager");
+                            && p[3].ParameterType.FullName == "MediaBrowser.Controller.MediaEncoding.IFfmpegManager";
+                    var audioCandidates = FindType(encoder + "EncodingHelpers")
+                        .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                        .Where(AudioShape).ToArray();
+                    var audioSelector = audioCandidates.Length == 1 ? audioCandidates[0]
+                        : audioCandidates.Single(m => m.Name == "GetOutputAudioCodec");
                     stage = "video signature";
-                    var codecSelector = FindType("Emby.Server.MediaEncoding.Api.BaseStreamingService")
-                        .GetMethod("GetOutputVideoCodec", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                            null, new[] { FindType("Emby.Server.MediaEncoding.Api.StreamState") }, null);
-                    if (codecSelector?.ReturnType != typeof(string)) throw new InvalidOperationException();
+                    // The selector only receives the stream state; the prefix
+                    // reorders that state's codec list for owned sources. Older
+                    // builds name it GetOutputVideoCodec; obfuscated builds keep
+                    // only its shape, so every private (StreamState) -> string
+                    // method gets the idempotent prefix.
+                    var streamState = FindType("Emby.Server.MediaEncoding.Api.StreamState");
+                    var streaming = FindType("Emby.Server.MediaEncoding.Api.BaseStreamingService");
+                    var namedSelector = streaming.GetMethod("GetOutputVideoCodec", BindingFlags.NonPublic | BindingFlags.Instance,
+                        null, new[] { streamState }, null);
+                    var codecSelectors = namedSelector != null ? new[] { namedSelector }
+                        : streaming.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                            .Where(m => m.IsPrivate && m.ReturnType == typeof(string)
+                                && m.GetParameters() is var p && p.Length == 1 && p[0].ParameterType == streamState)
+                            .ToArray();
+                    if (codecSelectors.Length == 0 || codecSelectors.Length > 2
+                        || codecSelectors.Any(m => m.ReturnType != typeof(string))) throw new InvalidOperationException();
                     stage = "frame rate signature";
                     var frameRateSelector = state.GetMethod("GetTargetFramerate",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
                         null, new[] { typeof(string), typeof(bool) }, null);
                     if (frameRateSelector?.ReturnType != typeof(float?)) throw new InvalidOperationException();
+                    // 4.9 to 4.11.0.13: (state, decoder, encoder, command, path);
+                    // 4.11.0.18: (state, command, path). Same purpose and result.
+                    stage = "video arguments signature";
                     var videoArguments = builder.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                         .Single(m => m.Name == "SetVideoArguments"
-                            && m.ReturnType.FullName == "Emby.Server.MediaEncoding.Encoder.Pipelines.FilterBuilder.ClosedCaptionSource"
-                            && m.GetParameters() is var p && p.Length == 5 && p[0].ParameterType == state
-                            && p[1].ParameterType.FullName == "Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoDecoder"
-                            && p[2].ParameterType.FullName == "Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoEncoder"
-                            && p[3].ParameterType == command && p[4].ParameterType == typeof(string));
+                            && m.ReturnType.FullName?.EndsWith(".Pipelines.FilterBuilder.ClosedCaptionSource", StringComparison.Ordinal) == true
+                            && m.GetParameters() is var p && p.Length >= 3 && p[0].ParameterType == state
+                            && (p.Length == 5
+                                && p[1].ParameterType.FullName?.EndsWith(".Codecs.Common.Types.ConfiguredVideoDecoder", StringComparison.Ordinal) == true
+                                && p[2].ParameterType.FullName?.EndsWith(".Codecs.Common.Types.ConfiguredVideoEncoder", StringComparison.Ordinal) == true
+                                && p[3].ParameterType == command && p[4].ParameterType == typeof(string)
+                                || p.Length == 3 && p[1].ParameterType == command && p[2].ParameterType == typeof(string)));
+                    var videoArgumentsCallback = videoArguments.GetParameters().Length == 5
+                        ? nameof(VideoArgumentsPostfix) : nameof(VideoArgumentsCompactPostfix);
                     // Some installations add a VOD policy that rewrites3s to1s
                     // after a session's manifest was already built. It must not
                     // change the segment-index timeline for our direct sources.
@@ -560,6 +622,9 @@ namespace Emby.YouTubePlugin
                         || !typeof(IEnumerable).IsAssignableFrom(binding.Inputs.PropertyType)
                         || !typeof(IEnumerable).IsAssignableFrom(binding.SelectedAudioStreams.PropertyType))
                         throw new InvalidOperationException();
+                    stage = "protected targets";
+                    EmbyPatchSafety.RequirePatchable(new MethodBase?[] { map, setup, resolutionLimits, frameRateSelector,
+                        videoArguments, audioChannels, audioSelector, segmentPolicy }.Concat(codecSelectors));
                     stage = "Harmony load";
                     var assembly = EmbeddedDependencyLoader.LoadHarmonyAssembly();
                     _harmonyType = assembly?.GetType("HarmonyLib.Harmony") ?? throw new InvalidOperationException();
@@ -586,9 +651,9 @@ namespace Emby.YouTubePlugin
                     Add(map, nameof(MapStreamsPostfix));
                     Add(setup, nameof(SetupInputPostfix));
                     Add(resolutionLimits, nameof(CodecResolutionPostfix));
-                    Add(codecSelector, nameof(PreferH264Prefix), true);
+                    foreach (var codecSelector in codecSelectors) Add(codecSelector, nameof(PreferH264Prefix), true);
                     Add(frameRateSelector, nameof(FrameRatePostfix));
-                    Add(videoArguments, nameof(VideoArgumentsPostfix));
+                    Add(videoArguments, videoArgumentsCallback);
                     stage = "audio channel patch";
                     Add(audioChannels, nameof(AudioChannelsPostfix));
                     stage = "audio selector patch";
@@ -601,8 +666,13 @@ namespace Emby.YouTubePlugin
                 {
                     Uninstall();
                     Interlocked.Exchange(ref _nextAttemptTicks, DateTime.UtcNow.AddMinutes(1).Ticks);
+                    // Missing/reshaped native members and protected targets do
+                    // not heal at runtime; Harmony load or patching errors may.
+                    if (stage != "Harmony load" && stage != "native patching" && stage != "audio channel patch"
+                        && stage != "audio selector patch") _permanent = true;
                     // Only static stage/type names, never messages/paths/URLs.
-                    var failure = stage + " (" + error.GetType().Name + ")";
+                    var failure = stage + " (" + error.GetType().Name
+                        + (error.Message.StartsWith("type ", StringComparison.Ordinal) ? ": " + error.Message : "") + ")";
                     if (failure != _lastFailure)
                     {
                         _lastFailure = failure;
@@ -668,6 +738,8 @@ namespace Emby.YouTubePlugin
                 throw new InvalidOperationException("Native YouTube frame rate limit could not be applied.");
             }
         }
+        // 4.11.0.18 shape (state, command, path): same work as the 5-argument form.
+        private static void VideoArgumentsCompactPostfix(object __0, object __1) => VideoArgumentsPostfix(__0, __1);
         private static void VideoArgumentsPostfix(object __0, object __3)
         {
             var binding = _binding;
@@ -941,8 +1013,44 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static Type FindType(string name) => AppDomain.CurrentDomain.GetAssemblies()
-            .Select(a => a.GetType(name, false)).FirstOrDefault(t => t != null) ?? throw new InvalidOperationException();
+        // Exact name first. Emby moves types between assemblies/namespaces
+        // (4.11.0.18: Emby.Server.MediaEncoding.Encoder.EncodingJobInfo ->
+        // Emby.MediaEncoding.Encoder.EncodingJobInfo in a new assembly), so a
+        // missing name falls back to the one public type with the same simple
+        // name and namespace tail in Emby's own assemblies, including those
+        // referenced but not yet loaded. Ambiguity fails closed.
+        internal static Type FindType(string name)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var exact = assembly.GetType(name, false);
+                if (exact != null) return exact;
+            }
+            var dot = name.LastIndexOf('.');
+            var simple = dot < 0 ? name : name.Substring(dot + 1);
+            var space = dot < 0 ? "" : name.Substring(0, dot);
+            var tail = space.Substring(space.LastIndexOf('.') + 1);
+            var assemblies = EmbyAssemblies();
+            var matches = assemblies.SelectMany(a => { try { return a.GetTypes(); } catch (ReflectionTypeLoadException e) { return e.Types.Where(t => t != null)!; } })
+                .Where(t => t != null && t.IsPublic && t.Name == simple && !t.IsNested
+                    && t.Assembly != typeof(YouTubeDirectSeekCompatibility).Assembly
+                    && (t.Namespace ?? "").Split('.').LastOrDefault() == tail)
+                .Distinct().ToArray();
+            if (matches.Length == 1) return matches[0]!;
+            throw new InvalidOperationException("type " + simple);
+        }
+
+        private static Assembly[] EmbyAssemblies()
+        {
+            static bool Own(string? n) => n != null && (n.StartsWith("Emby.", StringComparison.Ordinal) || n.StartsWith("MediaBrowser.", StringComparison.Ordinal));
+            var loaded = AppDomain.CurrentDomain.GetAssemblies().Where(a => Own(a.GetName().Name)).ToList();
+            foreach (var reference in loaded.ToArray().SelectMany(a => a.GetReferencedAssemblies()).Where(r => Own(r.Name)))
+            {
+                if (loaded.Any(a => a.GetName().Name == reference.Name)) continue;
+                try { loaded.Add(Assembly.Load(reference)); } catch { /* optional */ }
+            }
+            return loaded.Distinct().ToArray();
+        }
         private static PropertyInfo Property(Type type, string name, Type? expected = null, bool writable = false)
         {
             var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Instance) ?? throw new InvalidOperationException();

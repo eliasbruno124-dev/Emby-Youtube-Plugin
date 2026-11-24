@@ -31,7 +31,9 @@ namespace Emby.YouTubePlugin
                         && method.GetParameters().Any(parameter => parameter.Name == "postfix"));
                 if (service == null || patch == null) return 0;
                 int count = 0;
-                foreach (var target in YouTubeChapterDtoInterceptor.FindTargets(service.GetType()))
+                var targets = YouTubeChapterDtoInterceptor.FindTargets(service.GetType());
+                EmbyPatchSafety.RequirePatchable(targets);
+                foreach (var target in targets)
                 {
                     var method = typeof(YouTubeImageDiagnostics).GetMethod(
                         target.ReturnType == typeof(BaseItemDto[]) ? nameof(ManyPostfix) : nameof(OnePostfix),

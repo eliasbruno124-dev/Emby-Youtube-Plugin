@@ -220,6 +220,7 @@ namespace Emby.YouTubePlugin
 
                 void Add(MethodInfo original, string callback, string kind)
                 {
+                    EmbyPatchSafety.RequirePatchable(new[] { original });
                     var method = typeof(YouTubeTrailers).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!;
                     var harmonyMethod = Activator.CreateInstance(harmonyMethodType, method);
                     var parameters = patch.GetParameters();
@@ -241,6 +242,10 @@ namespace Emby.YouTubePlugin
                     YouTubeChannel.LogPublic("[YT] Native trailers unavailable (LocalTrailers endpoint not found).");
                 else
                 {
+                    // All or nothing: a protected DTO target keeps the endpoint hook off too.
+                    var dtoForCheck = Plugin.ResolveService<IDtoService>();
+                    EmbyPatchSafety.RequirePatchable(new MethodBase[] { localTrailers }
+                        .Concat(dtoForCheck == null ? Array.Empty<MethodBase>() : YouTubeChapterDtoInterceptor.FindTargets(dtoForCheck.GetType())));
                     Add(localTrailers, nameof(LocalTrailersPrefix), "prefix");
                     var dtoService = Plugin.ResolveService<IDtoService>();
                     if (dtoService != null)

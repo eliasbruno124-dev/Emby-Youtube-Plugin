@@ -1135,6 +1135,7 @@ function ytPluginDisposePlayback20260908(instance,triggerStopped){
 
         private static void InvokeHarmonyPatch(object harmony, MethodInfo original, object prefix)
         {
+            EmbyPatchSafety.RequirePatchable(new[] { original });
             var patchMethod = harmony.GetType()
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m =>

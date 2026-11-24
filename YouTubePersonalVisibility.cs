@@ -95,6 +95,7 @@ namespace Emby.YouTubePlugin
                             && method.GetParameters().Any(parameter => parameter.Name == "prefix")
                             && method.GetParameters().Any(parameter => parameter.Name == "postfix"));
                     if (patch == null) return 0;
+                    if (targets.Any(t => t != null && !EmbyPatchSafety.IsPatchable(t))) return 0;
                     string[] handlers = { nameof(QueryPostfix), nameof(ViewsPostfix), nameof(OneDtoPrefix), nameof(ManyDtoPrefix) };
                     for (int i = 0; i < targets.Length; i++)
                     {

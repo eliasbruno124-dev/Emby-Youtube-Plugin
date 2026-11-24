@@ -31,7 +31,9 @@ namespace Emby.YouTubePlugin
                     return 0;
                 }
                 int count = 0;
-                foreach (var target in FindTargets(service.GetType()))
+                var targets = FindTargets(service.GetType());
+                EmbyPatchSafety.RequirePatchable(targets);
+                foreach (var target in targets)
                 {
                     var method = typeof(YouTubeChapterDtoInterceptor).GetMethod(
                         target.ReturnType == typeof(BaseItemDto[]) ? nameof(ApplyManyPostfix) : nameof(ApplyOnePostfix),

@@ -113,6 +113,7 @@ namespace Emby.YouTubePlugin
                     .Select(name => Method(Find("Emby.Server.MediaEncoding.Encoder.Pipelines.Video.PipelineBuilder" + name),
                         "SetupVideoProcessing", pipelineArguments)).ToArray();
                 if (pipelines.Any(method => method.IsAbstract)) throw new InvalidOperationException();
+                EmbyPatchSafety.RequirePatchable(new MethodBase[] { nativeSource, software, target }.Concat(pipelines));
                 void Add(MethodInfo original, string? prefix, string? postfix)
                 {
                     var parameters = patch.GetParameters();

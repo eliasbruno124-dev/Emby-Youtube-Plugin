@@ -119,6 +119,9 @@ namespace Emby.YouTubePlugin
                         return;
                     }
 
+                    // Remember the instance before the first patch: a protected
+                    // second target must not leave an orphaned first patch.
+                    _harmony = harmony;
                     var patched = 0;
 
                     // Clients may use GET or POST PlaybackInfo depending on app
@@ -325,6 +328,7 @@ namespace Emby.YouTubePlugin
 
         private static void InvokeHarmonyPatch(object harmony, MethodInfo original, object prefix, object postfix)
         {
+            EmbyPatchSafety.RequirePatchable(new[] { original });
             var patchMethod = harmony.GetType()
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m =>

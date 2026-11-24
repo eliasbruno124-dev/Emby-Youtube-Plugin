@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -29,6 +30,9 @@ namespace Emby.YouTubePlugin
         private static readonly Regex VideoId = new("\\A[A-Za-z0-9_-]{11}\\z", RegexOptions.CultureInvariant);
         private static readonly Regex FormatId = new("\\A[A-Za-z0-9_.-]{1,80}\\z", RegexOptions.CultureInvariant);
         private static readonly Regex CapabilityPath = new("\\A/media/[0-9a-f]{64}\\z", RegexOptions.CultureInvariant);
+        private static readonly Regex PlaylistPath = new("\\A/hls/[0-9a-f]{64}\\.m3u8\\z", RegexOptions.CultureInvariant);
+        private const int MaximumPlaylists = 512;
+        private const int MaximumPlaylistBytes = 256 * 1024;
         private static Server? _server;
         private static bool _shutdown;
 
@@ -50,6 +54,22 @@ namespace Emby.YouTubePlugin
                 if (_shutdown) throw Failure();
                 _server ??= Server.Start();
                 return Task.FromResult(_server.Register(snapshot));
+            }
+        }
+
+        // Hook-free HLS (Emby builds whose transcoder cannot be patched, e.g.
+        // 4.11.0.18): serve the already validated combined master over the
+        // same loopback-only listener, so native ffmpeg reads it as ordinary
+        // HTTP HLS input without a protocol whitelist hook.
+        internal static string RegisterPlaylist(string content)
+        {
+            if (string.IsNullOrEmpty(content) || Encoding.UTF8.GetByteCount(content) > MaximumPlaylistBytes
+                || !content.StartsWith("#EXTM3U\n", StringComparison.Ordinal)) throw Failure();
+            lock (Gate)
+            {
+                if (_shutdown) throw Failure();
+                _server ??= Server.Start();
+                return _server.RegisterPlaylist(Encoding.UTF8.GetBytes(content));
             }
         }
 
@@ -246,6 +266,7 @@ namespace Emby.YouTubePlugin
             private readonly HttpListener _listener;
             private readonly CancellationTokenSource _stop = new();
             private readonly Dictionary<string, Entry> _entries = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, (byte[] Body, DateTime CreatedUtc)> _playlists = new(StringComparer.Ordinal);
             private readonly HashSet<HttpListenerContext> _contexts = new();
             private readonly string _origin;
             private bool _stopped;
@@ -300,10 +321,36 @@ namespace Emby.YouTubePlugin
                 }
             }
 
+            internal string RegisterPlaylist(byte[] body)
+            {
+                lock (_gate)
+                {
+                    if (_stopped) throw Failure();
+                    Prune();
+                    foreach (var known in _playlists)
+                        if (known.Value.Body.AsSpan().SequenceEqual(body))
+                        {
+                            _playlists[known.Key] = (known.Value.Body, DateTime.UtcNow);
+                            return _origin + "/hls/" + known.Key + ".m3u8";
+                        }
+                    if (_playlists.Count >= MaximumPlaylists)
+                        _playlists.Remove(_playlists.OrderBy(p => p.Value.CreatedUtc).First().Key);
+                    string token;
+                    do { token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant(); }
+                    while (_playlists.ContainsKey(token));
+                    _playlists.Add(token, (body, DateTime.UtcNow));
+                    return _origin + "/hls/" + token + ".m3u8";
+                }
+            }
+
             internal bool Owns(string value)
             {
                 lock (_gate)
                 {
+                    if (!_stopped && value != null && value.StartsWith(_origin + "/hls/", StringComparison.Ordinal)
+                        && PlaylistPath.IsMatch(value.Substring(_origin.Length)))
+                        return _playlists.TryGetValue(value.Substring(_origin.Length + 5, 64), out var known)
+                            && known.CreatedUtc.AddHours(12) > DateTime.UtcNow;
                     if (_stopped || value == null || !value.StartsWith(_origin + "/media/", StringComparison.Ordinal)) return false;
                     string path = value.Substring(_origin.Length);
                     if (!CapabilityPath.IsMatch(path) || !_entries.TryGetValue(path.Substring(7), out var entry)) return false;
@@ -315,6 +362,8 @@ namespace Emby.YouTubePlugin
 
             private void Prune()
             {
+                foreach (var key in _playlists.Where(p => p.Value.CreatedUtc.AddHours(12) <= DateTime.UtcNow).Select(p => p.Key).ToArray())
+                    _playlists.Remove(key);
                 foreach (var entry in _entries.Values.Where(e => e.ActiveRequests == 0
                     && e.Renewal?.IsCompleted != false && e.CreatedUtc.AddHours(12) <= DateTime.UtcNow).ToArray())
                     _entries.Remove(entry.Token);
@@ -356,6 +405,28 @@ namespace Emby.YouTubePlugin
                     { Reject(context, 400); return; }
                     if (request.HttpMethod is not ("GET" or "HEAD")) { Reject(context, 405); return; }
                     string path = request.RawUrl ?? "";
+                    if (PlaylistPath.IsMatch(path))
+                    {
+                        byte[]? body = null;
+                        lock (_gate)
+                        {
+                            Prune();
+                            if (!_stopped && _playlists.TryGetValue(path.Substring(5, 64), out var playlist)) body = playlist.Body;
+                        }
+                        if (body == null) { Reject(context, 404); return; }
+                        var playlistResponse = context.Response;
+                        playlistResponse.StatusCode = 200;
+                        playlistResponse.KeepAlive = false;
+                        playlistResponse.ContentType = "application/vnd.apple.mpegurl";
+                        playlistResponse.ContentLength64 = body.Length;
+                        playlistResponse.Headers["Cache-Control"] = "no-store";
+                        playlistResponse.Headers["X-Content-Type-Options"] = "nosniff";
+                        if (request.HttpMethod == "GET")
+                            await playlistResponse.OutputStream.WriteAsync(body.AsMemory(), deadline.Token).ConfigureAwait(false);
+                        committed = true;
+                        playlistResponse.Close();
+                        return;
+                    }
                     lock (_gate)
                     {
                         Prune();
