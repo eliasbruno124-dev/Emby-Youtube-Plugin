@@ -115,43 +115,108 @@ namespace Emby.YouTubePlugin
 
         internal static int Install(object harmony, Type harmonyMethodType)
         {
+            var count = 0;
             try
             {
-                var target = typeof(Folder).GetMethod("GetItemsInternal",
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
-                    new[] { typeof(InternalItemsQuery), typeof(IDataContext), typeof(CancellationToken) }, null);
                 var patch = harmony.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .FirstOrDefault(method => method.Name == "Patch"
                         && method.GetParameters().Length >= 3
                         && typeof(MethodBase).IsAssignableFrom(method.GetParameters()[0].ParameterType)
                         && method.GetParameters().Any(parameter => parameter.Name == "prefix"));
-                if (target == null || patch == null)
+                if (patch == null) throw new MissingMethodException("Harmony", "Patch");
+
+                void Add(MethodInfo target, string callback)
                 {
-                    YouTubeChannel.LogPublic("[YT] YouTube Music playlists cannot load on open (Folder.GetItemsInternal not found).");
-                    return 0;
+                    EmbyPatchSafety.RequirePatchable(new[] { target });
+                    var prefix = Activator.CreateInstance(harmonyMethodType,
+                        typeof(YouTubeMusicBrowse).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!);
+                    var parameters = patch.GetParameters();
+                    var arguments = new object?[parameters.Length];
+                    arguments[0] = target;
+                    for (int i = 1; i < parameters.Length; i++)
+                        if (parameters[i].Name == "prefix") arguments[i] = prefix;
+                    patch.Invoke(harmony, arguments);
+                    count++;
                 }
-                EmbyPatchSafety.RequirePatchable(new[] { target });
-                var prefix = Activator.CreateInstance(harmonyMethodType,
-                    typeof(YouTubeMusicBrowse).GetMethod(nameof(OpenPrefix), BindingFlags.NonPublic | BindingFlags.Static)!);
-                var parameters = patch.GetParameters();
-                var arguments = new object?[parameters.Length];
-                arguments[0] = target;
-                for (int i = 1; i < parameters.Length; i++)
-                    if (parameters[i].Name == "prefix") arguments[i] = prefix;
-                patch.Invoke(harmony, arguments);
-                return 1;
+
+                // The apps list a folder through GET /Items?ParentId=... . Its
+                // handler opens a database read transaction that holds back
+                // writes until the request ends, so a playlist can only be
+                // stored for the same request before that transaction starts.
+                var service = FindType("Emby.Api.UserLibrary.ItemsService");
+                var requestType = service?.Assembly.GetType("Emby.Api.UserLibrary.GetItems", false);
+                var get = requestType == null ? null : service!.GetMethod("Get",
+                    BindingFlags.Public | BindingFlags.Instance, null, new[] { requestType }, null);
+                if (get != null) Add(get, nameof(RequestPrefix));
+                else YouTubeChannel.LogPublic("[YT] YouTube Music: Items endpoint not found; playlists load in the background when opened.");
+
+                // Any other way into a folder (and the endpoint above if it
+                // could not be hooked): load in the background.
+                var folder = typeof(Folder).GetMethod("GetItemsInternal",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
+                    new[] { typeof(InternalItemsQuery), typeof(IDataContext), typeof(CancellationToken) }, null);
+                if (folder != null) Add(folder, nameof(OpenPrefix));
             }
             catch (Exception error) when (error is not OutOfMemoryException)
             {
                 YouTubeChannel.LogPublic("[YT] YouTube Music playlists cannot load on open (" + error.GetType().Name + ").");
-                return 0;
+            }
+            return count;
+        }
+
+        private static Type? FindType(string fullName)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    var type = assembly.GetType(fullName, false);
+                    if (type != null) return type;
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        // GET /Items: runs before Emby opens its read transaction. Stores an
+        // empty playlist right away (about a second), so this very request
+        // already lists its videos.
+        private static void RequestPrefix(object __0)
+        {
+            try
+            {
+                if (__0 is not MediaBrowser.Controller.Api.BaseItemsRequest request
+                    || string.IsNullOrEmpty(request.ParentId) || request.Limit == 0) return;
+                if (Plugin.Instance?.Options.ShowMusicGenres != true) return;
+                var library = Plugin.ResolveService<ILibraryManager>();
+                if (library == null) return;
+                var internalId = library.GetInternalId(request.ParentId);
+                if (internalId <= 0 || library.GetItemById(internalId) is not Folder folder) return;
+                var externalId = folder.ExternalId;
+                if (externalId == null) return;
+                if (externalId.StartsWith(SectionPrefix, StringComparison.Ordinal))
+                {
+                    SectionOpened(folder, externalId);
+                    return;
+                }
+                if (!externalId.StartsWith(PlaylistPrefix, StringComparison.Ordinal)) return;
+                var id = externalId.Substring(PlaylistPrefix.Length);
+                if (!YouTubeMusicCatalog.IsPlaylistId(id) || !MarkWanted(new[] { id }, opened: true)) return;
+                if (NothingToLoad(id) || HasVideos(folder)) return;
+                if (!Task.Run(() => FillAsync(folder, id)).Wait(OpenWait))
+                    YouTubeChannel.LogPublic($"[YT] YouTube Music: playlist {id} still loading after {OpenWait.TotalSeconds:0} s; it shows up when opened again.");
+            }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] YouTube Music request hook failed (" + error.GetType().Name + ").");
             }
         }
 
         // Runs for every folder listing in Emby: return at once unless a user
         // lists a YouTube Music section or playlist. Counting children for a
-        // card (Limit = 0) is not opening the folder.
-        private static void OpenPrefix(Folder __instance, InternalItemsQuery __0, ref IDataContext? __1)
+        // card (Limit = 0) is not opening the folder. Never waits here: the
+        // caller holds a read transaction that would block the store.
+        private static void OpenPrefix(Folder __instance, InternalItemsQuery __0)
         {
             try
             {
@@ -168,12 +233,7 @@ namespace Emby.YouTubePlugin
                 var id = externalId.Substring(PlaylistPrefix.Length);
                 if (!YouTubeMusicCatalog.IsPlaylistId(id) || !MarkWanted(new[] { id }, opened: true)) return;
                 if (NothingToLoad(id) || HasVideos(__instance!)) return;
-                // The request reads inside a transaction that started before
-                // the videos were stored and would not see them; without a
-                // data context Emby reads through a fresh connection.
-                var fill = Task.Run(() => FillAsync(__instance!, id));
-                if (fill.Wait(OpenWait)) __1 = null;
-                else YouTubeChannel.LogPublic($"[YT] YouTube Music: playlist {id} still loading after {OpenWait.TotalSeconds:0} s; it shows up when opened again.");
+                _ = Task.Run(() => FillAsync(__instance!, id));
             }
             catch (Exception error) when (error is not OutOfMemoryException)
             {

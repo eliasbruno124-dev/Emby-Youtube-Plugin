@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 123 files; 10164 syntax declarations/HTML anchors.
+Scope: 123 files; 10183 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -97,7 +97,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeLazyImage.cs](#file-902c642e89577cbb) | Plugin Compile source (SDK default) | 134 |
 | [YouTubeManagedHttp.cs](#file-bc134ac40739676b) | Plugin Compile source (SDK default) | 88 |
 | [YouTubeManagedResolver.cs](#file-d1109fcde8c29d7a) | Plugin Compile source (SDK default) | 194 |
-| [YouTubeMusicBrowse.cs](#file-4440da943efed19e) | Plugin Compile source (SDK default) | 165 |
+| [YouTubeMusicBrowse.cs](#file-4440da943efed19e) | Plugin Compile source (SDK default) | 184 |
 | [YouTubeMusicCatalog.cs](#file-fadb1fab6ec4f8f7) | Plugin Compile source (SDK default) | 265 |
 | [YouTubeMusicGenres.cs](#file-e640b5bdb19c5bed) | Plugin Compile source (SDK default) | 95 |
 | [YouTubePersonalProfiles.cs](#file-d3f3b55a76e60278) | Plugin Compile source (SDK default) | 223 |
@@ -8912,10 +8912,10 @@ Plugin Compile source (SDK default); 23031 bytes; 342 lines.
 <a id="file-4440da943efed19e"></a>
 ## [YouTubeMusicBrowse.cs](../YouTubeMusicBrowse.cs)
 
-Plugin Compile source (SDK default); 20594 bytes; 400 lines.
+Plugin Compile source (SDK default); 23664 bytes; 460 lines.
 
 <details>
-<summary>All 165 declarations / anchors</summary>
+<summary>All 184 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -8980,110 +8980,129 @@ Plugin Compile source (SDK default); 20594 bytes; 400 lines.
 | method | Emby.YouTubePlugin.YouTubeMusicBrowse.Install | [116:9](../YouTubeMusicBrowse.cs#L116) |
 | parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.harmony | [116:37](../YouTubeMusicBrowse.cs#L116) |
 | parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.harmonyMethodType | [116:53](../YouTubeMusicBrowse.cs#L116) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.target | [120:21](../YouTubeMusicBrowse.cs#L120) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch | [123:21](../YouTubeMusicBrowse.cs#L123) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6757 | [124:37](../YouTubeMusicBrowse.cs#L124) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6757.method | [124:37](../YouTubeMusicBrowse.cs#L124) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6757.anonymous@7010 | [127:55](../YouTubeMusicBrowse.cs#L127) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6757.anonymous@7010.parameter | [127:55](../YouTubeMusicBrowse.cs#L127) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.prefix | [134:21](../YouTubeMusicBrowse.cs#L134) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.parameters | [136:21](../YouTubeMusicBrowse.cs#L136) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.arguments | [137:21](../YouTubeMusicBrowse.cs#L137) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.i | [139:26](../YouTubeMusicBrowse.cs#L139) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.error | [144:19](../YouTubeMusicBrowse.cs#L144) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix | [154:9](../YouTubeMusicBrowse.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.__instance | [154:40](../YouTubeMusicBrowse.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.__0 | [154:59](../YouTubeMusicBrowse.cs#L154) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.__1 | [154:83](../YouTubeMusicBrowse.cs#L154) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.externalId | [158:21](../YouTubeMusicBrowse.cs#L158) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.id | [168:21](../YouTubeMusicBrowse.cs#L168) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.fill | [174:21](../YouTubeMusicBrowse.cs#L174) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.fill.anonymous@9712 | [174:37](../YouTubeMusicBrowse.cs#L174) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.error | [178:19](../YouTubeMusicBrowse.cs#L178) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted | [185:9](../YouTubeMusicBrowse.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.ids | [185:40](../YouTubeMusicBrowse.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.opened | [185:65](../YouTubeMusicBrowse.cs#L185) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.now | [187:17](../YouTubeMusicBrowse.cs#L187) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.wanted | [190:21](../YouTubeMusicBrowse.cs#L190) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.id | [192:17](../YouTubeMusicBrowse.cs#L192) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.id.mark | [194:57](../YouTubeMusicBrowse.cs#L194) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old | [207:21](../YouTubeMusicBrowse.cs#L207) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11216 | [207:56](../YouTubeMusicBrowse.cs#L207) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11216.pair | [207:56](../YouTubeMusicBrowse.cs#L207) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11250 | [207:90](../YouTubeMusicBrowse.cs#L207) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11250.pair | [207:90](../YouTubeMusicBrowse.cs#L207) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11347 | [208:73](../YouTubeMusicBrowse.cs#L208) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@11347.pair | [208:73](../YouTubeMusicBrowse.cs#L208) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened | [215:9](../YouTubeMusicBrowse.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.section | [215:43](../YouTubeMusicBrowse.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.externalId | [215:59](../YouTubeMusicBrowse.cs#L215) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.entries | [217:17](../YouTubeMusicBrowse.cs#L217) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids | [219:17](../YouTubeMusicBrowse.cs#L219) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids.anonymous@11849 | [219:68](../YouTubeMusicBrowse.cs#L219) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids.anonymous@11849.entry | [219:68](../YouTubeMusicBrowse.cs#L219) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.now | [221:17](../YouTubeMusicBrowse.cs#L221) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.last | [222:63](../YouTubeMusicBrowse.cs#L222) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos | [228:9](../YouTubeMusicBrowse.cs#L228) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos.folder | [228:39](../YouTubeMusicBrowse.cs#L228) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos.library | [230:17](../YouTubeMusicBrowse.cs#L230) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync | [240:9](../YouTubeMusicBrowse.cs#L240) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.folder | [240:46](../YouTubeMusicBrowse.cs#L240) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.id | [240:63](../YouTubeMusicBrowse.cs#L240) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate | [242:17](../YouTubeMusicBrowse.cs#L242) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate.anonymous@12823 | [242:64](../YouTubeMusicBrowse.cs#L242) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate.anonymous@12823._ | [242:64](../YouTubeMusicBrowse.cs#L242) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@12951 | [244:40](../YouTubeMusicBrowse.cs#L244) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@12951._ | [244:41](../YouTubeMusicBrowse.cs#L244) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@12951.running | [244:44](../YouTubeMusicBrowse.cs#L244) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.started | [248:21](../YouTubeMusicBrowse.cs#L248) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.error | [255:19](../YouTubeMusicBrowse.cs#L255) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@14000 | [262:44](../YouTubeMusicBrowse.cs#L262) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@14000._ | [262:45](../YouTubeMusicBrowse.cs#L262) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@14000.running | [262:48](../YouTubeMusicBrowse.cs#L262) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates | [269:9](../YouTubeMusicBrowse.cs#L269) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.folder | [269:46](../YouTubeMusicBrowse.cs#L269) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.library | [271:17](../YouTubeMusicBrowse.cs#L271) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra | [273:17](../YouTubeMusicBrowse.cs#L273) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14587 | [274:24](../YouTubeMusicBrowse.cs#L274) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14587.item | [274:24](../YouTubeMusicBrowse.cs#L274) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14660 | [275:26](../YouTubeMusicBrowse.cs#L275) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14660.item | [275:26](../YouTubeMusicBrowse.cs#L275) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14737 | [276:29](../YouTubeMusicBrowse.cs#L276) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14737.group | [276:29](../YouTubeMusicBrowse.cs#L276) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14737.anonymous@14760 | [276:52](../YouTubeMusicBrowse.cs#L276) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@14737.anonymous@14760.item | [276:52](../YouTubeMusicBrowse.cs#L276) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.item | [278:13](../YouTubeMusicBrowse.cs#L278) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.StartWorker | [284:9](../YouTubeMusicBrowse.cs#L284) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync | [292:9](../YouTubeMusicBrowse.cs#L292) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.library | [297:21](../YouTubeMusicBrowse.cs#L297) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.job | [298:68](../YouTubeMusicBrowse.cs#L298) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.wanted | [300:25](../YouTubeMusicBrowse.cs#L300) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders | [301:25](../YouTubeMusicBrowse.cs#L301) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@16062 | [302:32](../YouTubeMusicBrowse.cs#L302) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@16062.item | [302:32](../YouTubeMusicBrowse.cs#L302) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@16279 | [304:34](../YouTubeMusicBrowse.cs#L304) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@16279.item | [304:34](../YouTubeMusicBrowse.cs#L304) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folder | [306:21](../YouTubeMusicBrowse.cs#L306) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.error | [311:19](../YouTubeMusicBrowse.cs#L311) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.StatePath | [322:9](../YouTubeMusicBrowse.cs#L322) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.StatePath.root | [324:17](../YouTubeMusicBrowse.cs#L324) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.Load | [330:9](../YouTubeMusicBrowse.cs#L330) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.result | [333:17](../YouTubeMusicBrowse.cs#L333) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.path | [334:17](../YouTubeMusicBrowse.cs#L334) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.stored | [339:25](../YouTubeMusicBrowse.cs#L339) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.pair | [341:25](../YouTubeMusicBrowse.cs#L341) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.error | [349:19](../YouTubeMusicBrowse.cs#L349) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.error | [358:19](../YouTubeMusicBrowse.cs#L358) |
-| method | Emby.YouTubePlugin.YouTubeMusicBrowse.Save | [368:9](../YouTubeMusicBrowse.cs#L368) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.json | [370:20](../YouTubeMusicBrowse.cs#L370) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired | [374:17](../YouTubeMusicBrowse.cs#L374) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@19513 | [374:55](../YouTubeMusicBrowse.cs#L374) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@19513.pair | [374:55](../YouTubeMusicBrowse.cs#L374) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@19565 | [374:107](../YouTubeMusicBrowse.cs#L374) |
-| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@19565.pair | [374:107](../YouTubeMusicBrowse.cs#L374) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.temp | [379:21](../YouTubeMusicBrowse.cs#L379) |
-| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.path | [382:21](../YouTubeMusicBrowse.cs#L382) |
-| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.error | [389:19](../YouTubeMusicBrowse.cs#L389) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.count | [118:17](../YouTubeMusicBrowse.cs#L118) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch | [121:21](../YouTubeMusicBrowse.cs#L121) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6500 | [122:37](../YouTubeMusicBrowse.cs#L122) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6500.method | [122:37](../YouTubeMusicBrowse.cs#L122) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6500.anonymous@6753 | [125:55](../YouTubeMusicBrowse.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.patch.anonymous@6500.anonymous@6753.parameter | [125:55](../YouTubeMusicBrowse.cs#L125) |
+| local-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add | [128:17](../YouTubeMusicBrowse.cs#L128) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.target | [128:26](../YouTubeMusicBrowse.cs#L128) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.callback | [128:45](../YouTubeMusicBrowse.cs#L128) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.prefix | [131:25](../YouTubeMusicBrowse.cs#L131) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.parameters | [133:25](../YouTubeMusicBrowse.cs#L133) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.arguments | [134:25](../YouTubeMusicBrowse.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.Add.i | [136:30](../YouTubeMusicBrowse.cs#L136) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.service | [146:21](../YouTubeMusicBrowse.cs#L146) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.requestType | [147:21](../YouTubeMusicBrowse.cs#L147) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.get | [148:21](../YouTubeMusicBrowse.cs#L148) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.folder | [155:21](../YouTubeMusicBrowse.cs#L155) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Install.error | [160:19](../YouTubeMusicBrowse.cs#L160) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.FindType | [167:9](../YouTubeMusicBrowse.cs#L167) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FindType.fullName | [167:39](../YouTubeMusicBrowse.cs#L167) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FindType.assembly | [169:13](../YouTubeMusicBrowse.cs#L169) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FindType.assembly.type | [173:25](../YouTubeMusicBrowse.cs#L173) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix | [184:9](../YouTubeMusicBrowse.cs#L184) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.__0 | [184:43](../YouTubeMusicBrowse.cs#L184) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.request | [188:77](../YouTubeMusicBrowse.cs#L188) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.library | [191:21](../YouTubeMusicBrowse.cs#L191) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.internalId | [193:21](../YouTubeMusicBrowse.cs#L193) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.folder | [194:86](../YouTubeMusicBrowse.cs#L194) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.externalId | [195:21](../YouTubeMusicBrowse.cs#L195) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.id | [203:21](../YouTubeMusicBrowse.cs#L203) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.anonymous@11225 | [206:31](../YouTubeMusicBrowse.cs#L206) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RequestPrefix.error | [209:19](../YouTubeMusicBrowse.cs#L209) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix | [219:9](../YouTubeMusicBrowse.cs#L219) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.__instance | [219:40](../YouTubeMusicBrowse.cs#L219) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.__0 | [219:59](../YouTubeMusicBrowse.cs#L219) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.externalId | [223:21](../YouTubeMusicBrowse.cs#L223) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.id | [233:21](../YouTubeMusicBrowse.cs#L233) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.anonymous@13000 | [236:30](../YouTubeMusicBrowse.cs#L236) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.OpenPrefix.error | [238:19](../YouTubeMusicBrowse.cs#L238) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted | [245:9](../YouTubeMusicBrowse.cs#L245) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.ids | [245:40](../YouTubeMusicBrowse.cs#L245) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.opened | [245:65](../YouTubeMusicBrowse.cs#L245) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.now | [247:17](../YouTubeMusicBrowse.cs#L247) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.wanted | [250:21](../YouTubeMusicBrowse.cs#L250) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.id | [252:17](../YouTubeMusicBrowse.cs#L252) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.id.mark | [254:57](../YouTubeMusicBrowse.cs#L254) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old | [267:21](../YouTubeMusicBrowse.cs#L267) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14286 | [267:56](../YouTubeMusicBrowse.cs#L267) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14286.pair | [267:56](../YouTubeMusicBrowse.cs#L267) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14320 | [267:90](../YouTubeMusicBrowse.cs#L267) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14320.pair | [267:90](../YouTubeMusicBrowse.cs#L267) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14417 | [268:73](../YouTubeMusicBrowse.cs#L268) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.MarkWanted.old.anonymous@14417.pair | [268:73](../YouTubeMusicBrowse.cs#L268) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened | [275:9](../YouTubeMusicBrowse.cs#L275) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.section | [275:43](../YouTubeMusicBrowse.cs#L275) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.externalId | [275:59](../YouTubeMusicBrowse.cs#L275) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.entries | [277:17](../YouTubeMusicBrowse.cs#L277) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids | [279:17](../YouTubeMusicBrowse.cs#L279) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids.anonymous@14919 | [279:68](../YouTubeMusicBrowse.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.ids.anonymous@14919.entry | [279:68](../YouTubeMusicBrowse.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.now | [281:17](../YouTubeMusicBrowse.cs#L281) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.SectionOpened.last | [282:63](../YouTubeMusicBrowse.cs#L282) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos | [288:9](../YouTubeMusicBrowse.cs#L288) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos.folder | [288:39](../YouTubeMusicBrowse.cs#L288) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.HasVideos.library | [290:17](../YouTubeMusicBrowse.cs#L290) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync | [300:9](../YouTubeMusicBrowse.cs#L300) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.folder | [300:46](../YouTubeMusicBrowse.cs#L300) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.id | [300:63](../YouTubeMusicBrowse.cs#L300) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate | [302:17](../YouTubeMusicBrowse.cs#L302) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate.anonymous@15893 | [302:64](../YouTubeMusicBrowse.cs#L302) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.gate.anonymous@15893._ | [302:64](../YouTubeMusicBrowse.cs#L302) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@16021 | [304:40](../YouTubeMusicBrowse.cs#L304) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@16021._ | [304:41](../YouTubeMusicBrowse.cs#L304) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@16021.running | [304:44](../YouTubeMusicBrowse.cs#L304) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.started | [308:21](../YouTubeMusicBrowse.cs#L308) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.error | [315:19](../YouTubeMusicBrowse.cs#L315) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@17070 | [322:44](../YouTubeMusicBrowse.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@17070._ | [322:45](../YouTubeMusicBrowse.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.FillAsync.anonymous@17070.running | [322:48](../YouTubeMusicBrowse.cs#L322) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates | [329:9](../YouTubeMusicBrowse.cs#L329) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.folder | [329:46](../YouTubeMusicBrowse.cs#L329) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.library | [331:17](../YouTubeMusicBrowse.cs#L331) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra | [333:17](../YouTubeMusicBrowse.cs#L333) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17657 | [334:24](../YouTubeMusicBrowse.cs#L334) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17657.item | [334:24](../YouTubeMusicBrowse.cs#L334) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17730 | [335:26](../YouTubeMusicBrowse.cs#L335) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17730.item | [335:26](../YouTubeMusicBrowse.cs#L335) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17807 | [336:29](../YouTubeMusicBrowse.cs#L336) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17807.group | [336:29](../YouTubeMusicBrowse.cs#L336) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17807.anonymous@17830 | [336:52](../YouTubeMusicBrowse.cs#L336) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.extra.anonymous@17807.anonymous@17830.item | [336:52](../YouTubeMusicBrowse.cs#L336) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RemoveDuplicates.item | [338:13](../YouTubeMusicBrowse.cs#L338) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.StartWorker | [344:9](../YouTubeMusicBrowse.cs#L344) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync | [352:9](../YouTubeMusicBrowse.cs#L352) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.library | [357:21](../YouTubeMusicBrowse.cs#L357) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.job | [358:68](../YouTubeMusicBrowse.cs#L358) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.wanted | [360:25](../YouTubeMusicBrowse.cs#L360) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders | [361:25](../YouTubeMusicBrowse.cs#L361) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@19132 | [362:32](../YouTubeMusicBrowse.cs#L362) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@19132.item | [362:32](../YouTubeMusicBrowse.cs#L362) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@19349 | [364:34](../YouTubeMusicBrowse.cs#L364) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folders.anonymous@19349.item | [364:34](../YouTubeMusicBrowse.cs#L364) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.folder | [366:21](../YouTubeMusicBrowse.cs#L366) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.RunAsync.error | [371:19](../YouTubeMusicBrowse.cs#L371) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.StatePath | [382:9](../YouTubeMusicBrowse.cs#L382) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.StatePath.root | [384:17](../YouTubeMusicBrowse.cs#L384) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.Load | [390:9](../YouTubeMusicBrowse.cs#L390) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.result | [393:17](../YouTubeMusicBrowse.cs#L393) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.path | [394:17](../YouTubeMusicBrowse.cs#L394) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.stored | [399:25](../YouTubeMusicBrowse.cs#L399) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.pair | [401:25](../YouTubeMusicBrowse.cs#L401) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.error | [409:19](../YouTubeMusicBrowse.cs#L409) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Load.error | [418:19](../YouTubeMusicBrowse.cs#L418) |
+| method | Emby.YouTubePlugin.YouTubeMusicBrowse.Save | [428:9](../YouTubeMusicBrowse.cs#L428) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.json | [430:20](../YouTubeMusicBrowse.cs#L430) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired | [434:17](../YouTubeMusicBrowse.cs#L434) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@22583 | [434:55](../YouTubeMusicBrowse.cs#L434) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@22583.pair | [434:55](../YouTubeMusicBrowse.cs#L434) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@22635 | [434:107](../YouTubeMusicBrowse.cs#L434) |
+| parameter | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.expired.anonymous@22635.pair | [434:107](../YouTubeMusicBrowse.cs#L434) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.temp | [439:21](../YouTubeMusicBrowse.cs#L439) |
+| local-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.path | [442:21](../YouTubeMusicBrowse.cs#L442) |
+| catch-variable | Emby.YouTubePlugin.YouTubeMusicBrowse.Save.error | [449:19](../YouTubeMusicBrowse.cs#L449) |
 
 </details>
 
@@ -11107,7 +11126,7 @@ Plugin Compile source (SDK default); 4535 bytes; 92 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 65615 bytes; 374 lines.
+Documentation/resource; 65825 bytes; 374 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
