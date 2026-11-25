@@ -49,19 +49,54 @@ namespace Emby.YouTubePlugin
         // that is opened again without having been served is loaded again
         // (its first load may have failed or waited behind a scan).
         private static readonly ConcurrentDictionary<string, byte> Served = new(StringComparer.Ordinal);
+        // Folder -> last time it was queued because it had not been served.
+        // Such a playlist may never deliver videos (all unplayable), so it is
+        // queued again at most every few minutes.
+        private static readonly ConcurrentDictionary<string, DateTime> Requeued = new(StringComparer.Ordinal);
+        private static readonly TimeSpan RequeueInterval = TimeSpan.FromMinutes(5);
+        // Playlist -> until when it is not asked again after the Data API
+        // did not hand it out (deleted, private, error). Failed requests are
+        // not cached, so without this every scan would pay for it again.
+        private static readonly ConcurrentDictionary<string, DateTime> Failed = new(StringComparer.Ordinal);
+        private static readonly TimeSpan FailedPause = TimeSpan.FromHours(6);
+        private static DateTime _lastReadError;
         private static bool _dirty;
         private static readonly ConcurrentDictionary<string, int> Pending = new(StringComparer.Ordinal);
         private static int _workerRunning;
 
         private static bool Alive(Mark mark, DateTime now) => now - mark.Last < (mark.Opened ? KeepOpened : KeepPrefetched);
 
-        internal static bool IsWanted(string playlistId)
+        // Null while the list cannot be read: the caller must then keep what
+        // Emby stored instead of answering "not wanted" (an empty playlist).
+        internal static bool? IsWanted(string playlistId)
         {
             lock (Sync)
-                return Load().TryGetValue(playlistId, out var mark) && Alive(mark, DateTime.UtcNow);
+            {
+                var wanted = Load();
+                if (wanted == null) return null;
+                return wanted.TryGetValue(playlistId, out var mark) && Alive(mark, DateTime.UtcNow);
+            }
         }
 
-        internal static void NoteServed(string playlistId) => Served[playlistId] = 0;
+        internal static bool StateKnown
+        {
+            get { lock (Sync) return Load() != null; }
+        }
+
+        internal static void NoteServed(string playlistId)
+        {
+            Served[playlistId] = 0;
+            Failed.TryRemove(playlistId, out _);
+        }
+
+        internal static bool RecentlyFailed(string playlistId) =>
+            Failed.TryGetValue(playlistId, out var until) && DateTime.UtcNow < until;
+
+        internal static void NoteFailed(string playlistId)
+        {
+            Failed[playlistId] = DateTime.UtcNow + FailedPause;
+            YouTubeChannel.LogPublic($"[YT] YouTube Music: playlist {playlistId} is not available from the YouTube API; asked again in {FailedPause.TotalHours:0} hours.");
+        }
 
         internal static int Install(object harmony, Type harmonyMethodType)
         {
@@ -141,14 +176,17 @@ namespace Emby.YouTubePlugin
                 direct = false;
             }
 
-            var needsFill = false;
+            var newMarks = false;
+            var unserved = false;
             lock (Sync)
             {
                 var wanted = Load();
+                if (wanted == null) return;
                 foreach (var id in ids)
                 {
                     var known = wanted.TryGetValue(id, out var mark) && Alive(mark!, now);
-                    needsFill |= !known || !Served.ContainsKey(id);
+                    newMarks |= !known;
+                    unserved |= known && !Served.ContainsKey(id) && !RecentlyFailed(id);
                     if (!known)
                     {
                         wanted[id] = new Mark { Last = now, Opened = direct };
@@ -167,6 +205,13 @@ namespace Emby.YouTubePlugin
                         wanted.Remove(old);
             }
 
+            var needsFill = newMarks;
+            if (!needsFill && unserved
+                && (!Requeued.TryGetValue(externalId, out var queuedAt) || now - queuedAt > RequeueInterval))
+            {
+                Requeued[externalId] = now;
+                needsFill = true;
+            }
             if (needsFill)
             {
                 YouTubeChannel.LogPublic($"[YT] YouTube Music: loading {(depth == 2 ? "playlist" : "section")} {externalId} after it was opened.");
@@ -212,8 +257,9 @@ namespace Emby.YouTubePlugin
             return string.IsNullOrEmpty(root) ? null : Path.Combine(root, StateFile);
         }
 
-        // Caller holds Sync.
-        private static Dictionary<string, Mark> Load()
+        // Caller holds Sync. Null when the file exists but cannot be read
+        // right now (tried again on the next call).
+        private static Dictionary<string, Mark>? Load()
         {
             if (_wanted != null) return _wanted;
             var result = new Dictionary<string, Mark>(StringComparer.Ordinal);
@@ -232,12 +278,21 @@ namespace Emby.YouTubePlugin
                         }
                 }
             }
-            catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException or NotSupportedException)
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
             {
-                // Keep the unreadable file for inspection instead of
-                // overwriting it with the next save.
-                YouTubeChannel.LogPublic("[YT] YouTube Music: opened playlists could not be read (" + error.GetType().Name + ").");
+                if (DateTime.UtcNow - _lastReadError > TimeSpan.FromMinutes(10))
+                {
+                    _lastReadError = DateTime.UtcNow;
+                    YouTubeChannel.LogPublic("[YT] YouTube Music: opened playlists cannot be read right now (" + error.GetType().Name + "); stored music folders are kept.");
+                }
+                return null;
+            }
+            catch (Exception error) when (error is JsonException or NotSupportedException)
+            {
+                // Damaged beyond use: keep it for inspection, start empty.
+                YouTubeChannel.LogPublic("[YT] YouTube Music: opened playlists file is damaged (" + error.GetType().Name + "); moved aside.");
                 if (path != null) try { File.Move(path, path + ".bad", overwrite: true); } catch { }
+                result.Clear();
             }
             return _wanted = result;
         }

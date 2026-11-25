@@ -155,7 +155,7 @@
     },
     {
       "path": "PlaybackIntentInterceptor.cs",
-      "sha256": "37bfadd989dd4545fc7fe3479c373a5076a0c4c9fcd3be11644020d7297d86d4"
+      "sha256": "c07b11c6a9e3bca02590de1e7c521a79140f21739ca32837321ab263853e10e9"
     },
     {
       "path": "Plugin.cs",
@@ -235,7 +235,7 @@
     },
     {
       "path": "YouTubeChannel.MediaFolders.cs",
-      "sha256": "afa1bb610aa0d1a6dba1451e4125125be09cb435bb36aaffa26d892236758323"
+      "sha256": "3d7c453e9ffe0615f968d32058bc54d7ba1b75ca3110e3e594d8e85201846499"
     },
     {
       "path": "YouTubeChannel.Personal.cs",
@@ -343,7 +343,7 @@
     },
     {
       "path": "YouTubeMusicBrowse.cs",
-      "sha256": "a7060112dd38da2843513004d8c6db4070f0cda05eaaa3f0dcc49b7117181cf6"
+      "sha256": "13a02c1b74112805a60b79ca04267020a930c646294bfad43ff275e1e18185b5"
     },
     {
       "path": "YouTubeMusicCatalog.cs",
@@ -351,7 +351,7 @@
     },
     {
       "path": "YouTubeMusicGenres.cs",
-      "sha256": "f043bbe4e8e352d3622f03ff74f628d6f9ad0ba2e09b3644dc95972b39a0af38"
+      "sha256": "48d40c1f6cd84bf30bf932151888abdb7bd2df5fe135cfa808fa3a4d1befea0e"
     },
     {
       "path": "YouTubePersonalProfiles.cs",
@@ -497,11 +497,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "4227cb11ad00229d1b45a9a8aaeb2ac4828e6b4079dbf198d1633caefe973cd9"
+      "sha256": "6eb730f9448a950755c935dcabbd8836cfae3f137a060c6452e30f46278d902a"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "3bd063af6040f8f48521d80d126976c3f1a00c2891c4e6e579c2054d903b149a"
+      "sha256": "c07ba4bc67488d513425dab1864aa347d300bb9f4e10f104a92a1280aedc21b8"
     }
   ],
   "parsers": {

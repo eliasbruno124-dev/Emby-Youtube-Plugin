@@ -83,11 +83,6 @@ namespace Emby.YouTubePlugin
                     // MediaInfoService is internal to Emby. Looking it up at
                     // runtime lets unsupported Emby versions fall back cleanly.
                     var mediaInfoServiceType = FindLoadedType("Emby.Server.MediaEncoding.Api.MediaInfoService");
-                    if (mediaInfoServiceType == null)
-                    {
-                        YouTubeChannel.LogPublic("[YT] Playback intent interceptor disabled; MediaInfoService not found.");
-                        return;
-                    }
 
                     // Harmony is embedded and loaded by reflection so the plugin
                     // still ships as a single DLL and Emby's type scan stays safe.
@@ -129,6 +124,12 @@ namespace Emby.YouTubePlugin
                     // Music playlists would never get their videos.
                     if (YouTubeMusicBrowse.Install(harmony, harmonyMethodType) > 0)
                         YouTubeChannel.LogPublic("[YT] YouTube Music playlists load when opened.");
+
+                    if (mediaInfoServiceType == null)
+                    {
+                        YouTubeChannel.LogPublic("[YT] Playback intent interceptor disabled; MediaInfoService not found.");
+                        return;
+                    }
 
                     // Clients may use GET or POST PlaybackInfo depending on app
                     // and Emby version. Patch both shapes when they exist.

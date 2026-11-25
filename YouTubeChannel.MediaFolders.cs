@@ -27,6 +27,19 @@ namespace Emby.YouTubePlugin
         {
             var folders = await YouTubeMusicGenres.GetFoldersAsync(type, term, config, ct).ConfigureAwait(false);
             if (folders != null) return folders;
+            if (type == YouTubeMusicGenres.PlaylistType)
+            {
+                // A playlist the Data API does not hand out keeps what Emby
+                // stored and is asked again only after a pause. The probe is
+                // the first page the load below reads anyway (cached).
+                if (YouTubeMusicBrowse.RecentlyFailed(term)) throw new YouTubeMusicGenres.UnavailableException();
+                using var probe = await YouTubeApi.GetPlaylistVideosAsync(apiKey, term, null, ct, music: true).ConfigureAwait(false);
+                if (probe == null)
+                {
+                    YouTubeMusicBrowse.NoteFailed(term);
+                    throw new YouTubeMusicGenres.UnavailableException();
+                }
+            }
             var videos = await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
             if (type == YouTubeMusicGenres.PlaylistType
                 && videos.Items?.Any(item => item.Type == ChannelItemType.Media) == true)

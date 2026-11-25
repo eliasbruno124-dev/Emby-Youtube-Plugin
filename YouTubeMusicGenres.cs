@@ -102,6 +102,10 @@ namespace Emby.YouTubePlugin
             {
                 case GroupType:
                 {
+                    // Without the list of opened playlists every playlist
+                    // would answer empty and lose its videos. Stop here, so
+                    // Emby keeps everything below.
+                    if (!YouTubeMusicBrowse.StateKnown) throw new UnavailableException();
                     var groups = await YouTubeMusicCatalog.GetGroupsAsync(config, ct).ConfigureAwait(false)
                         ?? throw new UnavailableException();
                     if (!int.TryParse(term, out var index) || index < 0 || index >= groups.Count)
@@ -143,7 +147,12 @@ namespace Emby.YouTubePlugin
                 }
                 case PlaylistType:
                     // Unopened playlists stay empty; see YouTubeMusicBrowse.
-                    return YouTubeMusicBrowse.IsWanted(term) ? null : Result(new List<ChannelItemInfo>());
+                    return YouTubeMusicBrowse.IsWanted(term) switch
+                    {
+                        true => null,
+                        false => Result(new List<ChannelItemInfo>()),
+                        null => throw new UnavailableException()
+                    };
             }
             return Result(new List<ChannelItemInfo>());
         }
