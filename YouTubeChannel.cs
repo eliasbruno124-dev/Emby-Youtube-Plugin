@@ -168,9 +168,10 @@ namespace Emby.YouTubePlugin
                             .ConfigureAwait(false);
                     }
 
-                    // Own music folder (genres without the categories browser).
-                    if (type + FolderSeparator + term == YouTubeMusicGenres.RootFolderId)
-                        return YouTubeMusicGenres.RootResult();
+                    // YouTube Music folders (own Music folder or inside Categories > Music).
+                    if (YouTubeMusicGenres.IsMusicFolder(type, term))
+                        return await LoadMusicFolderAsync(apiKey, config, type, term, cancellationToken)
+                            .ConfigureAwait(false);
 
                     // Root of the categories browser.
                     if (type == "categories" && term == "root")
@@ -183,8 +184,9 @@ namespace Emby.YouTubePlugin
                     if (type == "category")
                     {
                         var region = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
-                        return YouTubeMusicGenres.AddGenreFolders(term,
-                            await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false), config);
+                        return await YouTubeMusicGenres.AddGenreFoldersAsync(term,
+                            await LoadTrending(apiKey, cancellationToken, region, term).ConfigureAwait(false), config,
+                            cancellationToken).ConfigureAwait(false);
                     }
 
                     return await LoadMediaFolderAsync(apiKey, config, type, term, cancellationToken)
@@ -195,6 +197,12 @@ namespace Emby.YouTubePlugin
             }
             catch (OperationCanceledException)
             {
+                throw;
+            }
+            catch (YouTubeMusicGenres.UnavailableException)
+            {
+                // Same reason: keep the stored music folders until YouTube
+                // Music answers again.
                 throw;
             }
             catch (ChannelIdentityUnavailableException)

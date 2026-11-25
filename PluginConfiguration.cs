@@ -61,9 +61,9 @@ namespace Emby.YouTubePlugin
         // next-episode autoplay rules).
         public bool PresentVideosAsVideos { get; set; } = true;
 
-        // Genre subfolders (Pop, Hip Hop, Rock, ...) in the Music category.
-        // Off by default: Emby's channel refresh opens every folder, so the 14
-        // genres cost 14 of the 100 daily search.list calls.
+        // YouTube Music's moods and genres (YouTubeMusicGenres) in the Music
+        // category or as an own Music folder. Off by default: it adds a large
+        // folder tree (41 categories, thousands of playlists) to the library.
         public bool ShowMusicGenres { get; set; } = false;
 
         // Legacy serialized paths are ignored by the in-process resolver and

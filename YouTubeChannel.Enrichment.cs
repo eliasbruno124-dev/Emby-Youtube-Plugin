@@ -137,8 +137,13 @@ namespace Emby.YouTubePlugin
             string apiKey, List<ChannelItemInfo> batch, List<string> videoIds,
             CancellationToken ct,
             HashSet<string>? knownShortsIds = null,
-            bool excludeUnknownShortCandidates = false)
+            bool excludeUnknownShortCandidates = false,
+            bool music = false)
         {
+            // YouTube Music lists songs, not Shorts: no per-video Shorts probe
+            // (one youtube.com request per video under four minutes), and the
+            // details are cached for a day (see GetVideoDetailsBatchAsync).
+            var probeShorts = !music;
             // Remember which IDs YouTube actually returned. If a successful
             // request does not return an ID, the video is gone for this key/region
             // and we drop it.
@@ -172,7 +177,7 @@ namespace Emby.YouTubePlugin
                 for (int i = 0; i < videoIds.Count; i += 50)
                 {
                     var chunkList = videoIds.Skip(i).Take(50).ToList();
-                    using var doc = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, chunkList, ct)
+                    using var doc = await YouTubeApi.GetVideoDetailsBatchAsync(apiKey, chunkList, ct, music)
                         .ConfigureAwait(false);
                     if (doc == null) continue; // network blip, leave this chunk alone
                     foreach (var qid in chunkList) queriedIds.Add(qid);
@@ -225,7 +230,7 @@ namespace Emby.YouTubePlugin
                             }
                             var durStr = YouTubeApi.GetNestedString(det, "contentDetails", "duration");
                             var tsDet = YouTubeApi.ParseDuration(durStr);
-                            if (tsDet.HasValue && tsDet.Value.TotalSeconds > 0 && tsDet.Value.TotalSeconds <= 240)
+                            if (probeShorts && tsDet.HasValue && tsDet.Value.TotalSeconds > 0 && tsDet.Value.TotalSeconds <= 240)
                                 probeCandidates.Add(vid);
                         }
                         if (probeCandidates.Count > 0)
@@ -370,6 +375,10 @@ namespace Emby.YouTubePlugin
                                      && knownShortsIds.Contains(rawId))
                             {
                                 shortsClassification = ShortsClassification.Short;
+                            }
+                            else if (durationAllowsShort && !probeShorts)
+                            {
+                                shortsClassification = ShortsClassification.Regular;
                             }
                             else if (durationAllowsShort)
                             {

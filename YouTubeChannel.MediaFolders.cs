@@ -20,6 +20,15 @@ namespace Emby.YouTubePlugin
     {
         private const int MaxMediaPageRequests = 10;
 
+        // YouTube Music folders list folders, except song/video sections and
+        // opened playlists, which load like any playlist.
+        private static async Task<ChannelItemResult> LoadMusicFolderAsync(
+            string apiKey, PluginConfiguration config, string type, string term, CancellationToken ct)
+        {
+            var folders = await YouTubeMusicGenres.GetFoldersAsync(type, term, config, ct).ConfigureAwait(false);
+            return folders ?? await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
+        }
+
         private static async Task<ChannelItemResult> LoadMediaFolderAsync(
             string apiKey,
             PluginConfiguration config,
@@ -31,9 +40,10 @@ namespace Emby.YouTubePlugin
                 return await LoadLiveFolderAsync(apiKey, config, term, ct).ConfigureAwait(false);
 
             var items = new List<ChannelItemInfo>();
-            var limit = type is "search" or YouTubeMusicGenres.FolderType
+            var limit = type == "search"
                 ? ClampSearchVideos(config.MaxSearchVideos)
                 : ClampVideos(config.MaxChannelVideos);
+            var music = YouTubeMusicGenres.HoldsVideos(type);
             var seenIds = new HashSet<string>(StringComparer.Ordinal);
             var seenPageTokens = new HashSet<string>(StringComparer.Ordinal);
             string? pageToken = null;
@@ -45,8 +55,8 @@ namespace Emby.YouTubePlugin
             var usesSearchEndpoint = type == "search"
                 || ((type == "channelvideos" || type == "channelshorts")
                     && !string.Equals(config.ChannelSortBy, "date", StringComparison.OrdinalIgnoreCase));
-            var maxPageRequests = type == YouTubeMusicGenres.FolderType
-                ? 1 // one search.list call per genre
+            var maxPageRequests = type == YouTubeMusicGenres.SectionType
+                ? 1 // a section is a single list
                 : usesSearchEndpoint
                 ? Math.Min(5, ((limit + 49) / 50) + 2)
                 : MaxMediaPageRequests;
@@ -96,7 +106,8 @@ namespace Emby.YouTubePlugin
                             videoIds,
                             ct,
                             knownShortsIds,
-                            excludeUnknownShortCandidates: !config.ShortsEnabled)
+                            excludeUnknownShortCandidates: !config.ShortsEnabled && !music,
+                            music: music)
                         .ConfigureAwait(false);
 
                 CacheInitialThumbnails(batch);
@@ -122,7 +133,7 @@ namespace Emby.YouTubePlugin
                 }
             }
 
-            if (hasMore && pageRequests >= maxPageRequests && type != YouTubeMusicGenres.FolderType)
+            if (hasMore && pageRequests >= maxPageRequests && type != YouTubeMusicGenres.SectionType)
                 Log($"[YT] Stopping {type} pagination for {term} after {maxPageRequests} pages.");
 
             UpdateChannelContentFlags(type, term, observedShorts, observedLive, reachedEnd);
@@ -144,9 +155,10 @@ namespace Emby.YouTubePlugin
             return type switch
             {
                 "search" => await YouTubeApi.SearchVideosAsync(apiKey, term, pageToken, ct).ConfigureAwait(false),
-                YouTubeMusicGenres.FolderType => pageToken == null
-                    ? await YouTubeMusicGenres.SearchAsync(apiKey, term, config, ct).ConfigureAwait(false)
+                YouTubeMusicGenres.SectionType => pageToken == null
+                    ? await YouTubeMusicGenres.SectionVideosAsync(term, config, ct).ConfigureAwait(false)
                     : null,
+                YouTubeMusicGenres.PlaylistType => await YouTubeApi.GetPlaylistVideosAsync(apiKey, term, pageToken, ct, music: true).ConfigureAwait(false),
                 "channelvideos" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),
                 "channelshorts" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),
                 "channellive" => await YouTubeApi.GetChannelVideosAsync(apiKey, term, pageToken, ct, config.ChannelSortBy).ConfigureAwait(false),
@@ -156,7 +168,8 @@ namespace Emby.YouTubePlugin
         }
 
         private static bool IsPlaylistDocument(string type) =>
-            type is "playlist" or "channelvideos" or "channelshorts" or "channellive";
+            type is "playlist" or "channelvideos" or "channelshorts" or "channellive"
+                or YouTubeMusicGenres.SectionType or YouTubeMusicGenres.PlaylistType;
 
         private static string? GetNextPageToken(JsonDocument doc)
         {

@@ -151,6 +151,8 @@ namespace Emby.YouTubePlugin
                     var subtitlePatches = YouTubeSubtitleDelivery.Install(harmony, harmonyMethodType);
                     var diagnosticPatches = YouTubeImageDiagnostics.Install(harmony, harmonyMethodType);
                     var presentationPatches = YouTubeVideoPresentation.Install(harmony, harmonyMethodType);
+                    if (YouTubeMusicBrowse.Install(harmony, harmonyMethodType) > 0)
+                        YouTubeChannel.LogPublic("[YT] YouTube Music playlists load when opened.");
                     YouTubeChannel.LogPublic("[YT] Video presentation installed (" + presentationPatches + " patches).");
                     YouTubeChannel.LogPublic("[YTIMG] Image diagnostics installed (" + diagnosticPatches + " patches).");
                     YouTubeChannel.LogPublic(subtitlePatches > 0

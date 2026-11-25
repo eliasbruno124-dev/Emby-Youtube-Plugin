@@ -9,169 +9,196 @@ using System.Threading.Tasks;
 
 namespace Emby.YouTubePlugin
 {
-    // Genre folders inside the Music category (forum request: "how do I get
-    // the Music category to show by genre"). YouTube's Music category has no
-    // sub-genres, but search.list can filter by YouTube's fixed music topic
-    // ids. Each genre folder lists the most viewed music videos of the last
-    // 30 days in that topic for the configured region.
+    // Music folders shaped like YouTube Music's "Moods & genres" page (forum
+    // request: the Music category by genre). Tree:
+    //   Music -> Moods & moments | Genres -> category (Chill, Hip-Hop, ...)
+    //     -> section as in the app (Featured playlists, Community playlists,
+    //        Songs, Music videos, Albums, ...) -> playlist/album -> videos.
+    // Song and video sections hold their videos directly.
     //
-    // Quota: one search.list call per genre, cached for a day like every
-    // other search. Emby's channel refresh opens all folders, so the 14 genres
-    // use 14 of the 100 daily search calls; the option is off by default.
+    // Emby fills every folder during its channel scan (the scheduled task
+    // walks eight levels), and YouTube Music lists about 3,000 playlists and
+    // 1,250 albums. Filling them all would put 150,000+ videos into the
+    // library and use the daily API quota. So every playlist is shown, but
+    // only playlists someone opened (or whose section someone opened) get
+    // their videos; see YouTubeMusicBrowse. The folder tree itself costs no
+    // quota (YouTubeMusicCatalog).
     internal static class YouTubeMusicGenres
     {
         internal const string MusicCategoryId = "10";
-        internal const string FolderType = "musicgenre";
-        private static string IconCdn => FolderIcons.Cdn;
-
-        // YouTube topic ids (YouTube Data API, "Music topics").
-        // Folder ids use the short key; topic ids contain '/' and stay internal.
-        internal static readonly (string Key, string Id, string Name, string Icon)[] Genres =
-        {
-            ("pop", "/m/064t9", "Pop", "1F3A4"),           // 🎤
-            ("hiphop", "/m/0glt670", "Hip Hop", "1F3A7"),     // 🎧
-            ("rock", "/m/06by7", "Rock", "1F3B8"),          // 🎸
-            ("electronic", "/m/02lkt", "Electronic", "1F39B"),    // 🎛
-            ("rnb", "/m/06j6l", "R&B", "1F3B7"),           // 🎷
-            ("soul", "/m/0gywn", "Soul", "1F3B6"),          // 🎶
-            ("country", "/m/01lyv", "Country", "1F920"),       // 🤠
-            ("jazz", "/m/03_d0", "Jazz", "1F3BA"),          // 🎺
-            ("classical", "/m/0ggq0m", "Classical", "1F3BB"),    // 🎻
-            ("reggae", "/m/06cqb", "Reggae", "1F334"),        // 🌴
-            ("latin", "/m/0g293", "Latin", "1F483"),         // 💃
-            ("asian", "/m/028sqc", "Asian", "1F3EE"),        // 🏮
-            ("independent", "/m/05rwpb", "Independent", "1F3BC"),  // 🎼
-            ("christian", "/m/02mscn", "Christian", "1F54A"),    // 🕊
-        };
-
-        // Own top-level "Music" folder, used when Show Categories is off: the
-        // genres must not depend on a second switch to become visible.
         internal const string RootFolderId = "musicgenres_x_root";
+        internal const string GroupType = "ytmgroup";
+        internal const string CategoryType = "ytmcat";
+        internal const string SectionType = "ytmsec";
+        internal const string PlaylistType = "ytmpl";
+        private static string Sep => YouTubeChannel.FolderSeparatorValue;
+        private static readonly string[] GroupIcons = { "1F3A7", "1F3BC" }; // 🎧 moods, 🎼 genres
+        private const string MusicIcon = "1F3B5";                          // 🎵
 
-        internal static List<ChannelItemInfo> GenreFolders() => Genres.Select(g => new ChannelItemInfo
+        // Section folders are "<category params>.<section key>"; params are
+        // base64url and never contain a dot.
+        private const char SectionSeparator = '.';
+
+        // Raised instead of returning an empty list when YouTube Music cannot
+        // be read: an empty answer would make Emby delete the folder's items.
+        internal sealed class UnavailableException : Exception
         {
-            Name = "🎵 " + g.Name,
-            Id = FolderType + YouTubeChannel.FolderSeparatorValue + g.Key,
-            Type = ChannelItemType.Folder,
-            FolderType = ChannelFolderType.Container,
-            MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
-            ImageUrl = IconCdn + g.Icon + ".png"
-        }).ToList();
+            internal UnavailableException() : base("YouTube Music is temporarily unavailable.") { }
+        }
 
         internal static bool ShowsOwnRootFolder(PluginConfiguration config) => config.ShowMusicGenres && !config.ShowCategories;
 
-        internal static ChannelItemResult RootResult()
+        internal static bool IsMusicFolder(string type, string term) =>
+            type is GroupType or CategoryType or SectionType or PlaylistType
+            || type + Sep + term == RootFolderId;
+
+        internal static bool HoldsVideos(string type) => type is SectionType or PlaylistType;
+
+        private static ChannelItemInfo Folder(string name, string id, string? image, string? overview = null) => new()
         {
-            var folders = GenreFolders();
-            return new ChannelItemResult { Items = folders, TotalRecordCount = folders.Count };
+            Name = name,
+            Id = id,
+            Overview = overview,
+            Type = ChannelItemType.Folder,
+            FolderType = ChannelFolderType.Container,
+            MediaType = MediaBrowser.Model.Channels.ChannelMediaType.Video,
+            ImageUrl = image
+        };
+
+        private static ChannelItemResult Result(List<ChannelItemInfo> items) =>
+            new() { Items = items, TotalRecordCount = items.Count };
+
+        private static async Task<List<ChannelItemInfo>> GroupFoldersAsync(PluginConfiguration config, CancellationToken ct)
+        {
+            var groups = await YouTubeMusicCatalog.GetGroupsAsync(config, ct).ConfigureAwait(false)
+                ?? throw new UnavailableException();
+            return groups.Select((group, index) => Folder(group.Name, GroupType + Sep + index,
+                FolderIcons.Cdn + GroupIcons[Math.Min(index, GroupIcons.Length - 1)] + ".png")).ToList();
         }
 
-        internal static string? TopicFor(string? key) =>
-            Genres.Where(g => string.Equals(g.Key, key, StringComparison.Ordinal)).Select(g => g.Id).FirstOrDefault();
-
-        // Genre folders go first in the Music category, the category's trending
-        // videos follow unchanged. Personal (per-user key) catalogs do not get
-        // them: their searches are not disk-cached and would cost 14 extra
-        // search calls per profile and day.
-        internal static ChannelItemResult AddGenreFolders(string? categoryId, ChannelItemResult result, PluginConfiguration config)
+        // Music folders go first in the Music category of the categories
+        // browser, the category's trending videos follow unchanged.
+        internal static async Task<ChannelItemResult> AddGenreFoldersAsync(string? categoryId, ChannelItemResult result,
+            PluginConfiguration config, CancellationToken ct)
         {
             if (categoryId != MusicCategoryId || !config.ShowMusicGenres || result?.Items == null)
                 return result!;
-            var folders = GenreFolders();
-            // A bare message entry ("No results.") is dropped; the genres still work.
+            var folders = await GroupFoldersAsync(config, ct).ConfigureAwait(false);
+            // A bare message entry ("No results.") is dropped; the music folders still work.
             var videos = result.Items.Where(i => !string.Equals(i.Id, "msg", StringComparison.Ordinal)).ToList();
             result.Items = folders.Concat(videos).ToList();
             result.TotalRecordCount = result.Items.Count;
             return result;
         }
 
-        // "Most viewed music video of the last 30 days" can be bought: new
-        // channels with AI music and bought views pushed suggestive titles
-        // ("Intense Kisses", "Lesbian Love Story") into the genre folders,
-        // and YouTube does not age-restrict them, so safeSearch=strict alone
-        // kept several. Measured on 2026-11-25: all of them came from
-        // channels younger than a year; established artists' channels are
-        // older. Only videos of channels at least two years old are kept,
-        // plus label-verified VEVO channels. Unknown age = dropped.
-        internal static readonly TimeSpan MinChannelAge = TimeSpan.FromDays(730);
-
-        internal static async Task<JsonDocument> KeepEstablishedChannelsAsync(string apiKey, JsonDocument doc, CancellationToken ct)
+        // Folder list of a music folder, or null when the folder holds videos
+        // (the caller loads them like any playlist).
+        internal static async Task<ChannelItemResult?> GetFoldersAsync(string type, string term, PluginConfiguration config, CancellationToken ct)
         {
-            if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
-                return doc;
-            var channelIds = items.EnumerateArray()
-                .Select(item => YouTubeApi.GetNestedString(item, "snippet", "channelId"))
-                .Where(id => !string.IsNullOrEmpty(id))
-                .Select(id => id!)
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-            var created = await YouTubeApi.GetChannelCreationDatesAsync(apiKey, channelIds, ct).ConfigureAwait(false)
-                ?? new Dictionary<string, DateTime>(StringComparer.Ordinal);
-            return FilterByChannelAge(doc, created, DateTime.UtcNow - MinChannelAge);
+            if (type + Sep + term == RootFolderId)
+                return Result(await GroupFoldersAsync(config, ct).ConfigureAwait(false));
+
+            switch (type)
+            {
+                case GroupType:
+                {
+                    var groups = await YouTubeMusicCatalog.GetGroupsAsync(config, ct).ConfigureAwait(false)
+                        ?? throw new UnavailableException();
+                    if (!int.TryParse(term, out var index) || index < 0 || index >= groups.Count)
+                        return Result(new List<ChannelItemInfo>());
+                    var categories = groups[index].Categories;
+                    // Each category shows the cover of its first playlist. The
+                    // pages are needed one level down anyway; load them now,
+                    // a few at a time.
+                    using var gate = new SemaphoreSlim(4);
+                    var covers = await Task.WhenAll(categories.Select(async category =>
+                    {
+                        await gate.WaitAsync(ct).ConfigureAwait(false);
+                        try
+                        {
+                            var page = await YouTubeMusicCatalog.GetPageAsync(category.Params, config, ct).ConfigureAwait(false);
+                            return page?.Sections.FirstOrDefault(s => !s.Videos)?.Entries.FirstOrDefault()?.Thumb
+                                ?? page?.Sections.FirstOrDefault()?.Entries.FirstOrDefault()?.Thumb;
+                        }
+                        finally { gate.Release(); }
+                    })).ConfigureAwait(false);
+                    return Result(categories.Select((category, i) => Folder(category.Name, CategoryType + Sep + category.Params,
+                        covers[i] ?? FolderIcons.Cdn + MusicIcon + ".png")).ToList());
+                }
+                case CategoryType:
+                {
+                    var page = await YouTubeMusicCatalog.GetPageAsync(term, config, ct).ConfigureAwait(false)
+                        ?? throw new UnavailableException();
+                    return Result(page.Sections.Select(section => Folder(section.Title,
+                        SectionType + Sep + term + SectionSeparator + section.Key,
+                        section.Entries.FirstOrDefault()?.Thumb ?? FolderIcons.Cdn + MusicIcon + ".png")).ToList());
+                }
+                case SectionType:
+                {
+                    var section = await GetSectionAsync(term, config, ct).ConfigureAwait(false);
+                    if (section == null) return Result(new List<ChannelItemInfo>());
+                    if (section.Videos) return null;
+                    return Result(section.Entries.Select(entry => Folder(entry.Title, PlaylistType + Sep + entry.Id,
+                        entry.Thumb, entry.Subtitle)).ToList());
+                }
+                case PlaylistType:
+                    // Unopened playlists stay empty; see YouTubeMusicBrowse.
+                    return YouTubeMusicBrowse.IsWanted(term) ? null : Result(new List<ChannelItemInfo>());
+            }
+            return Result(new List<ChannelItemInfo>());
         }
 
-        internal static JsonDocument FilterByChannelAge(JsonDocument doc, IReadOnlyDictionary<string, DateTime> created, DateTime cutoff)
+        internal static (string Params, string Key)? SplitSection(string term)
         {
-            if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
-                return doc;
+            var dot = term.LastIndexOf(SectionSeparator);
+            return dot <= 0 || dot == term.Length - 1 ? null : (term.Substring(0, dot), term.Substring(dot + 1));
+        }
 
-            bool Keep(JsonElement item)
-            {
-                var title = YouTubeApi.GetNestedString(item, "snippet", "channelTitle") ?? "";
-                if (title.EndsWith("VEVO", StringComparison.OrdinalIgnoreCase))
-                    return true;
-                var id = YouTubeApi.GetNestedString(item, "snippet", "channelId");
-                return id != null && created.TryGetValue(id, out var since) && since <= cutoff;
-            }
+        // Null when the section is gone from the page (Emby then removes its
+        // folder); throws when the page cannot be read at all.
+        private static async Task<YouTubeMusicCatalog.Section?> GetSectionAsync(string term, PluginConfiguration config, CancellationToken ct)
+        {
+            if (SplitSection(term) is not { } parts) return null;
+            var page = await YouTubeMusicCatalog.GetPageAsync(parts.Params, config, ct).ConfigureAwait(false)
+                ?? throw new UnavailableException();
+            return page.Sections.FirstOrDefault(s => string.Equals(s.Key, parts.Key, StringComparison.Ordinal));
+        }
 
+        internal static YouTubeMusicCatalog.Section? PeekSection(string term, PluginConfiguration? config)
+        {
+            if (SplitSection(term) is not { } parts) return null;
+            return YouTubeMusicCatalog.PeekPage(parts.Params, config)?.Sections
+                .FirstOrDefault(s => string.Equals(s.Key, parts.Key, StringComparison.Ordinal));
+        }
+
+        // The videos of a song or music-video section, shaped like a
+        // playlistItems answer so the normal playlist path (details,
+        // availability, age restriction) handles them.
+        internal static async Task<JsonDocument?> SectionVideosAsync(string term, PluginConfiguration config, CancellationToken ct)
+        {
+            var section = await GetSectionAsync(term, config, ct).ConfigureAwait(false);
+            if (section == null || !section.Videos) return null;
             using var buffer = new MemoryStream();
             using (var writer = new Utf8JsonWriter(buffer))
             {
                 writer.WriteStartObject();
-                foreach (var property in doc.RootElement.EnumerateObject())
+                writer.WriteStartArray("items");
+                foreach (var entry in section.Entries)
                 {
-                    if (property.NameEquals("items"))
-                    {
-                        writer.WritePropertyName("items");
-                        writer.WriteStartArray();
-                        foreach (var item in items.EnumerateArray())
-                            if (Keep(item))
-                                item.WriteTo(writer);
-                        writer.WriteEndArray();
-                    }
-                    else
-                    {
-                        property.WriteTo(writer);
-                    }
+                    writer.WriteStartObject();
+                    writer.WriteStartObject("contentDetails");
+                    writer.WriteString("videoId", entry.Id);
+                    writer.WriteEndObject();
+                    writer.WriteStartObject("snippet");
+                    writer.WriteString("title", entry.Title);
+                    if (entry.Subtitle != null) writer.WriteString("channelTitle", entry.Subtitle);
+                    writer.WriteEndObject();
+                    writer.WriteEndObject();
                 }
+                writer.WriteEndArray();
                 writer.WriteEndObject();
             }
-            doc.Dispose();
             return JsonDocument.Parse(buffer.ToArray());
-        }
-
-        internal static async Task<JsonDocument?> SearchAsync(string apiKey, string key, PluginConfiguration config, CancellationToken ct)
-        {
-            var topicId = TopicFor(key);
-            if (topicId == null) return null;
-            var configured = string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim();
-            var region = await YouTubeApi.ResolveContentRegionAsync(apiKey, configured, "US", ct).ConfigureAwait(false) ?? "US";
-            // Rounded to the day so the URL (and with it the one-day cache key)
-            // stays the same for a whole day.
-            var today = DateTime.UtcNow.Date;
-            string Since(DateTime day) => day.AddDays(-30).ToString("yyyy-MM-dd'T'00:00:00'Z'", System.Globalization.CultureInfo.InvariantCulture);
-            var fresh = await YouTubeApi.SearchMusicTopicAsync(apiKey, topicId, region, Since(today), ct).ConfigureAwait(false);
-            if (fresh != null) return await KeepEstablishedChannelsAsync(apiKey, fresh, ct).ConfigureAwait(false);
-            // The date in the URL changes at midnight UTC. If today's search
-            // fails (search quota used up until about 08:00 UTC, outage), keep
-            // the last answer of the previous days instead of an empty folder,
-            // which would make Emby delete the genre's videos.
-            for (var back = 1; back <= 7; back++)
-            {
-                var stale = YouTubeApi.TryReadStaleCopy(YouTubeApi.MusicTopicUrl(apiKey, topicId, region, Since(today.AddDays(-back))));
-                if (stale != null) return await KeepEstablishedChannelsAsync(apiKey, stale, ct).ConfigureAwait(false);
-            }
-            return null;
         }
     }
 }

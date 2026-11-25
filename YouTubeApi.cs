@@ -44,6 +44,8 @@ namespace Emby.YouTubePlugin
         // This response also contains status, live state, and statistics, so it
         // must not be kept for months like immutable metadata.
         private const long VideoDetailTtlMs = 15 * 60 * 1000;
+        // YouTube Music playlists and their songs (see GetVideoDetailsBatchAsync).
+        private const long MusicListTtlMs = 24 * 60 * 60 * 1000;
 
         // YouTube's API terms cap persisted API data at 30 days. Each call
         // gets the smaller of its own TTL and this disk limit.
@@ -963,68 +965,6 @@ namespace Emby.YouTubePlugin
             return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
         }
 
-        // Most viewed music videos of one YouTube music topic (genre folders).
-        // Same one-day cache as every other search.list call.
-        internal static string MusicTopicUrl(string apiKey, string topicId, string regionCode, string publishedAfter) =>
-            $"{ApiBase}/search?part=snippet&type=video&videoCategoryId=10&q=official%20music%20video" +
-            $"&topicId={Uri.EscapeDataString(topicId)}&order=viewCount" +
-            $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
-            $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&safeSearch=strict&key={Uri.EscapeDataString(apiKey)}";
-
-        private const long ChannelCreatedTtlMs = 7L * 24 * 60 * 60 * 1000; // A channel's creation date never changes.
-
-        // Creation dates of channels (50 per call, 1 quota unit each). Channels
-        // missing from the answer are missing from the result. Null when
-        // YouTube could not be asked at all.
-        public static async Task<Dictionary<string, DateTime>?> GetChannelCreationDatesAsync(
-            string apiKey, IReadOnlyList<string> channelIds, CancellationToken ct)
-        {
-            var result = new Dictionary<string, DateTime>(StringComparer.Ordinal);
-            var sorted = channelIds.OrderBy(id => id, StringComparer.Ordinal).ToList();
-            for (var i = 0; i < sorted.Count; i += 50)
-            {
-                var ids = string.Join(",", sorted.Skip(i).Take(50));
-                var url = $"{ApiBase}/channels?part=snippet&id={Uri.EscapeDataString(ids)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
-                using var doc = await TryGetCachedJsonAsync(url, ct, ChannelCreatedTtlMs).ConfigureAwait(false);
-                if (doc == null) return null;
-                if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
-                    continue;
-                foreach (var channel in items.EnumerateArray())
-                {
-                    var id = GetString(channel, "id");
-                    var published = GetNestedString(channel, "snippet", "publishedAt");
-                    if (!string.IsNullOrEmpty(id)
-                        && DateTime.TryParse(published, System.Globalization.CultureInfo.InvariantCulture,
-                            System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal,
-                            out var created))
-                        result[id] = created;
-                }
-            }
-            return result;
-        }
-
-        public static async Task<JsonDocument?> SearchMusicTopicAsync(
-            string apiKey, string topicId, string regionCode, string publishedAfter, CancellationToken ct)
-        {
-            // "official music video" keeps real songs and drops most Shorts
-            // (tested: Rock 25 of 50 Shorts without it, 0 with it).
-            var url = MusicTopicUrl(apiKey, topicId, regionCode, publishedAfter);
-            return await TryGetCachedJsonAsync(url, ct, SearchTtlMs).ConfigureAwait(false);
-        }
-
-        // Read-only: an earlier answer for exactly this URL from the disk cache
-        // (up to 30 days old), without contacting YouTube. Used when a URL that
-        // embeds a date changed overnight and the new request failed.
-        internal static JsonDocument? TryReadStaleCopy(string url)
-        {
-            try
-            {
-                var hit = TryReadDiskCache(url, DiskCacheTtlMs, null);
-                return hit == null ? null : JsonDocument.Parse(hit.Json);
-            }
-            catch (JsonException) { return null; }
-        }
-
         // Channel uploads come from the uploads playlist (1 quota unit) instead
         // of search.list.
 
@@ -1059,7 +999,7 @@ namespace Emby.YouTubePlugin
         // Playlist videos.
 
         public static async Task<JsonDocument?> GetPlaylistVideosAsync(
-            string apiKey, string playlistId, string? pageToken, CancellationToken ct)
+            string apiKey, string playlistId, string? pageToken, CancellationToken ct, bool music = false)
         {
             var url = $"{ApiBase}/playlistItems?part=snippet,contentDetails&playlistId={Uri.EscapeDataString(playlistId)}" +
                       $"&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
@@ -1070,7 +1010,8 @@ namespace Emby.YouTubePlugin
             return await TryGetCachedJsonAsync(
                     url,
                     ct,
-                    playlistId.StartsWith("UU", StringComparison.Ordinal) ? ChannelUploadsTtlMs : FreshListTtlMs,
+                    playlistId.StartsWith("UU", StringComparison.Ordinal) ? ChannelUploadsTtlMs
+                        : music ? MusicListTtlMs : FreshListTtlMs,
                     GetPlaylistCacheTag(playlistId))
                 .ConfigureAwait(false);
         }
@@ -1253,7 +1194,7 @@ namespace Emby.YouTubePlugin
         // Batch video details, up to 50 IDs per request.
 
         public static async Task<JsonDocument?> GetVideoDetailsBatchAsync(
-            string apiKey, IEnumerable<string> videoIds, CancellationToken ct)
+            string apiKey, IEnumerable<string> videoIds, CancellationToken ct, bool music = false)
         {
             var ids = string.Join(",", videoIds);
             // The status part lets us drop private, rejected and
@@ -1261,7 +1202,10 @@ namespace Emby.YouTubePlugin
             var url = $"{ApiBase}/videos?part=snippet,contentDetails,statistics,liveStreamingDetails,status" +
                       $"&id={Uri.EscapeDataString(ids)}&key={Uri.EscapeDataString(apiKey)}";
             // Availability, live state, and statistics can change quickly.
-            return await TryGetCachedJsonAsync(url, ct, VideoDetailTtlMs).ConfigureAwait(false);
+            // Songs in the YouTube Music folders are kept for a day: Emby's
+            // channel scan can run every 15 minutes and would otherwise ask
+            // again for every song and video section each time.
+            return await TryGetCachedJsonAsync(url, ct, music ? MusicListTtlMs : VideoDetailTtlMs).ConfigureAwait(false);
         }
 
         // Helper methods.

@@ -2937,6 +2937,37 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        // Fills one folder (and its subfolders down to refreshDepth) without a
+        // whole-channel scan: Emby lists the channel root, then continues only
+        // below the items whose external id matches. Used when a YouTube
+        // Music playlist is opened. Waits behind any running refresh.
+        internal static async Task RefreshFolderAsync(string externalFolderId, int refreshDepth)
+        {
+            await RefreshGate.WaitAsync().ConfigureAwait(false);
+            bool ownsActivity = false;
+            try
+            {
+                if (!EnsureChannelManager()) return;
+                Interlocked.Increment(ref _refreshActive); ownsActivity = true;
+                var task = _channelMgr!.RefreshChannelContent(_registeredChannel!, refreshDepth, externalFolderId, CancellationToken.None);
+                if (task != null) await task.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                YouTubeChannel.LogPublic($"[YT] Folder refresh of {externalFolderId} failed: {ex.Message}");
+            }
+            finally
+            {
+                if (ownsActivity) Interlocked.Decrement(ref _refreshActive);
+                RefreshGate.Release();
+                if (Interlocked.Exchange(ref _refreshAgainRequested, 0) == 1)
+                {
+                    var maySkip = Volatile.Read(ref _nonSkippableRefreshRequested) == 0;
+                    _ = Task.Run(() => TriggerRefreshAsync(RootRefreshDepth, maySkip));
+                }
+            }
+        }
+
         private static async Task TriggerRefreshCoreAsync(int refreshDepth, bool skipIfScanActive = false)
         {
             try

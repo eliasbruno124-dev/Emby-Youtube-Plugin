@@ -145,10 +145,10 @@ public partial class YouTubeChannel
         if (type == "channel") return await BuildChannelSubfoldersAsync(apiKey, config, term, ct).ConfigureAwait(false);
         if (type == "trending") return await LoadTrending(apiKey, ct,
             (config.TrendingRegion ?? "").Trim(), (config.TrendingCategory ?? "").Trim()).ConfigureAwait(false);
-        if (type + FolderSeparator + term == YouTubeMusicGenres.RootFolderId) return YouTubeMusicGenres.RootResult();
+        if (YouTubeMusicGenres.IsMusicFolder(type, term)) return await LoadMusicFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
         if (type == "categories" && term == "root") return await LoadCategoryRootAsync(apiKey, config, ct).ConfigureAwait(false);
-        if (type == "category") return YouTubeMusicGenres.AddGenreFolders(term, await LoadTrending(apiKey, ct,
-            string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim(), term).ConfigureAwait(false), config);
+        if (type == "category") return await YouTubeMusicGenres.AddGenreFoldersAsync(term, await LoadTrending(apiKey, ct,
+            string.IsNullOrWhiteSpace(config.TrendingRegion) ? "US" : config.TrendingRegion.Trim(), term).ConfigureAwait(false), config, ct).ConfigureAwait(false);
         return await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
     }
 }
