@@ -343,7 +343,7 @@
     },
     {
       "path": "YouTubeMusicBrowse.cs",
-      "sha256": "9c1474a14cca2f9f4438477883b048c2f253637fa9d30690aa2c9f530aab01db"
+      "sha256": "d6a369287003fc5ec39c817e6c90445d1bfc74c5c2c2a6e3c9cf2cfd80c171ae"
     },
     {
       "path": "YouTubeMusicCatalog.cs",
@@ -415,7 +415,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "b1faafa6ad8ebbc60b5514924dc3f40e5eb320744a854b92c54a6a889da7dae8"
+      "sha256": "23d7bb35fe225e404dbe3ea664b8dcc2f52a52925b6e26db58346359e0a12c56"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -497,11 +497,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "2f2d0aa990f9aca2aa1a97b139dced74136f0ec686c5a79a02bb7c360e8c7f91"
+      "sha256": "ec2eb200e61b6a4d41152fc7a580b765c5cb1b8d43d02d94baa41abcc69a73ba"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "235fe2be1dada067fd48bb01be1fbdfd49f1b5d295588cc19e89aad8e7e73cf6"
+      "sha256": "388b635cef385780fcae8cb6ba200b71a28184d0fd9cf24dbc49cae6eaf86029"
     }
   ],
   "parsers": {

@@ -167,8 +167,20 @@ namespace Emby.YouTubePlugin
                 var requestType = service?.Assembly.GetType("Emby.Api.UserLibrary.GetItems", false);
                 var get = requestType == null ? null : service!.GetMethod("Get",
                     BindingFlags.Public | BindingFlags.Instance, null, new[] { requestType }, null);
+                var before = count;
                 if (get != null) Add(get, nameof(RequestPrefix));
-                else YouTubeChannel.LogPublic("[YT] YouTube Music: Items endpoint not found; playlists load in the background when opened.");
+                if (count == before)
+                {
+                    // Emby 4.11.0.18 protects ItemsService. The handler asks
+                    // for the request's user before it opens its transaction,
+                    // and that method lives in the unprotected base class.
+                    var user = typeof(MediaBrowser.Controller.Api.BaseApiService).GetMethod("GetUserForRequest",
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null,
+                        new[] { typeof(MediaBrowser.Controller.Net.AuthorizationInfo), typeof(string), typeof(bool) }, null);
+                    if (user != null) Add(user, nameof(UserPrefix));
+                    if (count == before)
+                        YouTubeChannel.LogPublic("[YT] YouTube Music: playlists load in the background when opened (show their videos when opened again).");
+                }
 
                 // Any other way into a folder (and the endpoint above if it
                 // could not be hooked): load in the background.
@@ -203,14 +215,38 @@ namespace Emby.YouTubePlugin
         // already lists its videos.
         private static void RequestPrefix(object __0)
         {
+            if (__0 is MediaBrowser.Controller.Api.BaseItemsRequest request)
+                LoadBeforeTransaction(request.ParentId, request.Limit);
+        }
+
+        // Fallback for the same request when ItemsService is protected.
+        private static void UserPrefix(object __instance)
+        {
             try
             {
-                if (__0 is not MediaBrowser.Controller.Api.BaseItemsRequest request
-                    || string.IsNullOrEmpty(request.ParentId) || request.Limit == 0) return;
+                if (__instance?.GetType().FullName != "Emby.Api.UserLibrary.ItemsService"
+                    || __instance is not MediaBrowser.Controller.Api.BaseApiService service) return;
+                var query = service.Request?.QueryString;
+                if (query == null) return;
+                var parentId = query["ParentId"];
+                int? limit = int.TryParse(query["Limit"], out var value) ? value : null;
+                LoadBeforeTransaction(parentId, limit);
+            }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] YouTube Music request hook failed (" + error.GetType().Name + ").");
+            }
+        }
+
+        private static void LoadBeforeTransaction(string? parentId, int? limit)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(parentId) || limit == 0) return;
                 if (Plugin.Instance?.Options.ShowMusicGenres != true) return;
                 var library = Plugin.ResolveService<ILibraryManager>();
                 if (library == null) return;
-                var internalId = library.GetInternalId(request.ParentId);
+                var internalId = library.GetInternalId(parentId);
                 if (internalId <= 0 || library.GetItemById(internalId) is not Folder folder) return;
                 var externalId = folder.ExternalId;
                 if (externalId == null) return;
