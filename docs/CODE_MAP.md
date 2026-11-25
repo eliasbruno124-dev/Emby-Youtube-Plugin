@@ -196,7 +196,7 @@ Plugin Compile source (SDK default); 1538 bytes; 52 lines.
 <a id="file-3265de6859f23663"></a>
 ## [Configuration/YouTubeConfiguration.html](../Configuration/YouTubeConfiguration.html)
 
-EmbeddedResource; 40247 bytes; 800 lines.
+EmbeddedResource; 40206 bytes; 800 lines.
 
 Resource/controller references:
 

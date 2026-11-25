@@ -758,8 +758,8 @@
     },
     {
       "path": "Configuration/YouTubeConfiguration.html",
-      "sha256": "0ee1ceff819538921f043fb19eb9ae89912295e8d68260e057c062b5e8f93fc9",
-      "bytes": 40247,
+      "sha256": "19248a9b89f62e5903713c33f30e8b3521d854e7885ac0548ae4ec8c5ce338a1",
+      "bytes": 40206,
       "anchor": "file-3265de6859f23663",
       "lines": 800,
       "buildRole": "EmbeddedResource",
@@ -1251,7 +1251,7 @@
           "line": 571,
           "column": 37,
           "endLine": 572,
-          "start": 25857,
+          "start": 25816,
           "length": 140,
           "signature": "input#chkShowShorts",
           "language": "HTML"
@@ -1263,7 +1263,7 @@
           "line": 575,
           "column": 33,
           "endLine": 575,
-          "start": 26132,
+          "start": 26091,
           "length": 53,
           "signature": "div#shortsDescription",
           "language": "HTML"
@@ -1275,7 +1275,7 @@
           "line": 587,
           "column": 33,
           "endLine": 587,
-          "start": 26750,
+          "start": 26709,
           "length": 51,
           "signature": "select#selectTrendingRegion",
           "language": "HTML"
@@ -1287,7 +1287,7 @@
           "line": 596,
           "column": 33,
           "endLine": 596,
-          "start": 27347,
+          "start": 27306,
           "length": 53,
           "signature": "select#selectTrendingCategory",
           "language": "HTML"
@@ -1299,7 +1299,7 @@
           "line": 617,
           "column": 33,
           "endLine": 617,
-          "start": 28809,
+          "start": 28768,
           "length": 50,
           "signature": "select#selectChannelSortBy",
           "language": "HTML"
@@ -1311,7 +1311,7 @@
           "line": 632,
           "column": 33,
           "endLine": 632,
-          "start": 29753,
+          "start": 29712,
           "length": 66,
           "signature": "input#chkShowLikeCount",
           "language": "HTML"
@@ -1323,7 +1323,7 @@
           "line": 636,
           "column": 33,
           "endLine": 636,
-          "start": 30012,
+          "start": 29971,
           "length": 69,
           "signature": "input#chkShowCommentCount",
           "language": "HTML"
@@ -1335,7 +1335,7 @@
           "line": 651,
           "column": 33,
           "endLine": 652,
-          "start": 30873,
+          "start": 30832,
           "length": 138,
           "signature": "input#numMaxChannelVideos",
           "language": "HTML"
@@ -1347,7 +1347,7 @@
           "line": 660,
           "column": 33,
           "endLine": 661,
-          "start": 31501,
+          "start": 31460,
           "length": 137,
           "signature": "input#numMaxSearchVideos",
           "language": "HTML"
@@ -1359,7 +1359,7 @@
           "line": 677,
           "column": 29,
           "endLine": 678,
-          "start": 32476,
+          "start": 32435,
           "length": 131,
           "signature": "a#btnDonate",
           "language": "HTML"
@@ -1371,7 +1371,7 @@
           "line": 689,
           "column": 21,
           "endLine": 689,
-          "start": 33082,
+          "start": 33041,
           "length": 60,
           "signature": "p#youtubeConfigurationStatus",
           "language": "HTML"
@@ -1383,7 +1383,7 @@
           "line": 691,
           "column": 21,
           "endLine": 692,
-          "start": 33168,
+          "start": 33127,
           "length": 239,
           "signature": "div#ytPluginCredits",
           "language": "HTML"
@@ -1395,7 +1395,7 @@
           "line": 705,
           "column": 47,
           "endLine": 705,
-          "start": 34765,
+          "start": 34724,
           "length": 27,
           "signature": "span#ytPluginVersion",
           "language": "HTML"
@@ -1407,7 +1407,7 @@
           "line": 706,
           "column": 25,
           "endLine": 707,
-          "start": 34832,
+          "start": 34791,
           "length": 187,
           "signature": "span#ytUpdateBadge",
           "language": "HTML"
@@ -1419,7 +1419,7 @@
           "line": 713,
           "column": 13,
           "endLine": 713,
-          "start": 35154,
+          "start": 35113,
           "length": 63,
           "signature": "div#setupGuidePage",
           "language": "HTML"

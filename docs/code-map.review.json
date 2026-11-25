@@ -23,7 +23,7 @@
       "inputSetHash": "7d978c1d5703d5709d3edf22e6185688453a94dd5ce395322af1ab564253d45e",
       "definitionHash": "009188280ce207ddaa984d746880796626db4e1b4a1db236822b796a0a48ee4c",
       "sourceHashes": {
-        "Configuration/YouTubeConfiguration.html": "0ee1ceff819538921f043fb19eb9ae89912295e8d68260e057c062b5e8f93fc9",
+        "Configuration/YouTubeConfiguration.html": "19248a9b89f62e5903713c33f30e8b3521d854e7885ac0548ae4ec8c5ce338a1",
         "Configuration/YouTubeConfiguration.js": "d084dfa36a7cac07c78e049488849bfd2ca3a01a93aae3ec4ca7bbe019202aa8",
         "GuideImageService.cs": "e2995a6522eace5134e7fd54e59ba38aad8b13cf92b3e94d11d28aeebaf3535d",
         "Plugin.cs": "4bb86288b834aefd991f7bdc903dc826cda6431c4769cdab3a0303b33069d37e",
@@ -132,7 +132,7 @@
       "inputSetHash": "7d978c1d5703d5709d3edf22e6185688453a94dd5ce395322af1ab564253d45e",
       "definitionHash": "aa13af248f3b43bbc1e4cc1dc3d7cdeaa7e48910523c48e2b331abda9c29f558",
       "sourceHashes": {
-        "Configuration/YouTubeConfiguration.html": "0ee1ceff819538921f043fb19eb9ae89912295e8d68260e057c062b5e8f93fc9",
+        "Configuration/YouTubeConfiguration.html": "19248a9b89f62e5903713c33f30e8b3521d854e7885ac0548ae4ec8c5ce338a1",
         "Configuration/YouTubeConfiguration.js": "d084dfa36a7cac07c78e049488849bfd2ca3a01a93aae3ec4ca7bbe019202aa8",
         "Configuration/YouTubePersonal.html": "ac52c15758d1ee4496098c9941af42813a2f602aa306f302afeb16f65af6d8dc",
         "Configuration/YouTubePersonal.js": "549f83188c8b01711b6020fc44cb3059b54b0e4cb6262ab084c433a5e6bbb5e7",

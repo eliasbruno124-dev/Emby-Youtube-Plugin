@@ -19,7 +19,7 @@
     },
     {
       "path": "Configuration/YouTubeConfiguration.html",
-      "sha256": "0ee1ceff819538921f043fb19eb9ae89912295e8d68260e057c062b5e8f93fc9"
+      "sha256": "19248a9b89f62e5903713c33f30e8b3521d854e7885ac0548ae4ec8c5ce338a1"
     },
     {
       "path": "Configuration/YouTubeConfiguration.js",
@@ -497,11 +497,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "b94fdd92c2c6a67f82fd78d151451050b702134f4cdc20bdcd38d03511ce4c05"
+      "sha256": "16ac4cce9f8e5c81294f1150b8844e47af2053a6ed1dd5f316336b166595fdf6"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "7f75d97f9ecf5c6d50eaa8d4de3eeefdcea5a8d8cd3617db7b1032f4b6e989b6"
+      "sha256": "19cb4c56e3d6c9f3234df7dda9e1813d4646bb02f04aa851a7f8aaa0e8ad5c58"
     }
   ],
   "parsers": {
