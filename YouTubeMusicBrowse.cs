@@ -74,6 +74,7 @@ namespace Emby.YouTubePlugin
         private static DateTime _lastReadError;
         private static bool _dirty;
         private static int _workerRunning;
+        private static int _userPrefixSeen;
 
         private static bool Alive(Mark mark, DateTime now) => now - mark.Last < (mark.Opened ? KeepOpened : KeepPrefetched);
 
@@ -230,6 +231,10 @@ namespace Emby.YouTubePlugin
                 if (query == null) return;
                 var parentId = query["ParentId"];
                 int? limit = int.TryParse(query["Limit"], out var value) ? value : null;
+                // Once per start: if the JIT ever inlines the hooked method,
+                // the missing line shows that this path went quiet.
+                if (!string.IsNullOrEmpty(parentId) && Interlocked.Exchange(ref _userPrefixSeen, 1) == 0)
+                    YouTubeChannel.LogPublic("[YT] YouTube Music: request hook (GetUserForRequest) active.");
                 LoadBeforeTransaction(parentId, limit);
             }
             catch (Exception error) when (error is not OutOfMemoryException)

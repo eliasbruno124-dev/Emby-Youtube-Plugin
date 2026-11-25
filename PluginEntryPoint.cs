@@ -2973,10 +2973,20 @@ namespace Emby.YouTubePlugin
         private static MethodInfo? FindFillFolderMethod()
         {
             var signature = new[] { typeof(Channel), typeof(IChannel), typeof(InternalItemsQuery), typeof(CancellationToken) };
-            var method = _channelMgr?.GetType()
-                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .FirstOrDefault(candidate => candidate.ReturnType == typeof(Task<long[]>)
-                    && candidate.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(signature));
+            MethodInfo? method = null;
+            // Lazy keeps an exception for good; a failed lookup must mean
+            // "fall back", not "every fill fails".
+            try
+            {
+                method = _channelMgr?.GetType()
+                    .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                    .FirstOrDefault(candidate => candidate.ReturnType == typeof(Task<long[]>)
+                        && candidate.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(signature));
+            }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic($"[YT] Direct folder fill lookup failed ({error.GetType().Name}).");
+            }
             if (method == null)
                 YouTubeChannel.LogPublic("[YT] Direct folder fill unavailable on this Emby version; using a limited channel refresh.");
             return method;
