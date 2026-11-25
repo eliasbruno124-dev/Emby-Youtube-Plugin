@@ -2937,8 +2937,7 @@ namespace Emby.YouTubePlugin
             }
         }
 
-        private static MethodInfo? _fillFolderMethod;
-        private static int _fillFolderLookedUp;
+        private static readonly Lazy<MethodInfo?> FillFolderMethod = new(FindFillFolderMethod);
 
         // Fills one channel folder exactly like Emby's channel scan does for
         // each folder (ChannelManager.GetChannelItemsInternal, found by its
@@ -2952,17 +2951,7 @@ namespace Emby.YouTubePlugin
         internal static async Task<bool> FillFolderDirectAsync(BaseItem folder, CancellationToken cancellation)
         {
             if (!EnsureChannelManager() || folder.GetTopParent() is not Channel channel) return false;
-            if (Interlocked.Exchange(ref _fillFolderLookedUp, 1) == 0)
-            {
-                var signature = new[] { typeof(Channel), typeof(IChannel), typeof(InternalItemsQuery), typeof(CancellationToken) };
-                _fillFolderMethod = _channelMgr!.GetType()
-                    .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                    .FirstOrDefault(method => method.ReturnType == typeof(Task<long[]>)
-                        && method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(signature));
-                if (_fillFolderMethod == null)
-                    YouTubeChannel.LogPublic("[YT] Direct folder fill unavailable on this Emby version; using a limited channel refresh.");
-            }
-            var method = _fillFolderMethod;
+            var method = FillFolderMethod.Value;
             if (method == null) return false;
             Interlocked.Increment(ref _refreshActive);
             try
@@ -2979,6 +2968,18 @@ namespace Emby.YouTubePlugin
             {
                 Interlocked.Decrement(ref _refreshActive);
             }
+        }
+
+        private static MethodInfo? FindFillFolderMethod()
+        {
+            var signature = new[] { typeof(Channel), typeof(IChannel), typeof(InternalItemsQuery), typeof(CancellationToken) };
+            var method = _channelMgr?.GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .FirstOrDefault(candidate => candidate.ReturnType == typeof(Task<long[]>)
+                    && candidate.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(signature));
+            if (method == null)
+                YouTubeChannel.LogPublic("[YT] Direct folder fill unavailable on this Emby version; using a limited channel refresh.");
+            return method;
         }
 
         // Fills one folder (and its subfolders down to refreshDepth) without a

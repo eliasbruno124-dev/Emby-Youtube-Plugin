@@ -176,13 +176,6 @@ namespace Emby.YouTubePlugin
             return page.Sections.FirstOrDefault(s => string.Equals(s.Key, parts.Key, StringComparison.Ordinal));
         }
 
-        internal static YouTubeMusicCatalog.Section? PeekSection(string term, PluginConfiguration? config)
-        {
-            if (SplitSection(term) is not { } parts) return null;
-            return YouTubeMusicCatalog.PeekPage(parts.Params, config)?.Sections
-                .FirstOrDefault(s => string.Equals(s.Key, parts.Key, StringComparison.Ordinal));
-        }
-
         // The videos of a song or music-video section, shaped like a
         // playlistItems answer so the normal playlist path (details,
         // availability, age restriction) handles them.

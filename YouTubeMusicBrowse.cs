@@ -1,6 +1,8 @@
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Data;
+using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Querying;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
@@ -55,6 +57,7 @@ namespace Emby.YouTubePlugin
         private static readonly TimeSpan FailedPause = TimeSpan.FromHours(6);
         // How long a user's request waits for its playlist to be stored.
         private static readonly TimeSpan OpenWait = TimeSpan.FromSeconds(20);
+        private static readonly TimeSpan HandledWindow = TimeSpan.FromSeconds(30);
         // A section is pre-loaded at most this often.
         private static readonly TimeSpan SectionInterval = TimeSpan.FromMinutes(2);
         private static readonly ConcurrentDictionary<string, DateTime> SectionLoaded = new(StringComparer.Ordinal);
@@ -63,8 +66,11 @@ namespace Emby.YouTubePlugin
         private static readonly ConcurrentDictionary<string, int> Filling = new(StringComparer.Ordinal);
         // Set while this plugin stores a playlist itself, so its own provider
         // call is told apart from a channel scan reaching the same folder.
-        private static readonly AsyncLocal<bool> OwnFill = new();
-        private static readonly ConcurrentQueue<(long Section, string[] Ids)> Queue = new();
+        private static readonly AsyncLocal<string?> OwnFill = new();
+        // Folder -> when the Items hook last handled it, so the folder hook
+        // of the same request does not start a second fill.
+        private static readonly ConcurrentDictionary<long, DateTime> Handled = new();
+        private static readonly ConcurrentQueue<long> Queue = new(); // opened sections
         private static DateTime _lastReadError;
         private static bool _dirty;
         private static int _workerRunning;
@@ -111,7 +117,7 @@ namespace Emby.YouTubePlugin
         // A channel scan that reaches a playlist while this plugin is storing
         // it must not store it a second time (duplicate videos).
         internal static bool FillingElsewhere(string playlistId) =>
-            !OwnFill.Value && Filling.TryGetValue(playlistId, out var running) && running > 0;
+            OwnFill.Value != playlistId && Filling.TryGetValue(playlistId, out var running) && running > 0;
 
         internal static int Install(object harmony, Type harmonyMethodType)
         {
@@ -127,16 +133,30 @@ namespace Emby.YouTubePlugin
 
                 void Add(MethodInfo target, string callback)
                 {
-                    EmbyPatchSafety.RequirePatchable(new[] { target });
-                    var prefix = Activator.CreateInstance(harmonyMethodType,
-                        typeof(YouTubeMusicBrowse).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!);
-                    var parameters = patch.GetParameters();
-                    var arguments = new object?[parameters.Length];
-                    arguments[0] = target;
-                    for (int i = 1; i < parameters.Length; i++)
-                        if (parameters[i].Name == "prefix") arguments[i] = prefix;
-                    patch.Invoke(harmony, arguments);
-                    count++;
+                    // Each target on its own: Emby 4.11.0.18 protects parts of
+                    // its code, and one failing target must not keep the
+                    // other one off.
+                    try
+                    {
+                        if (!EmbyPatchSafety.IsPatchable(target))
+                        {
+                            YouTubeChannel.LogPublic($"[YT] YouTube Music: {target.DeclaringType?.Name}.{target.Name} is protected on this Emby version.");
+                            return;
+                        }
+                        var prefix = Activator.CreateInstance(harmonyMethodType,
+                            typeof(YouTubeMusicBrowse).GetMethod(callback, BindingFlags.NonPublic | BindingFlags.Static)!);
+                        var parameters = patch.GetParameters();
+                        var arguments = new object?[parameters.Length];
+                        arguments[0] = target;
+                        for (int i = 1; i < parameters.Length; i++)
+                            if (parameters[i].Name == "prefix") arguments[i] = prefix;
+                        patch.Invoke(harmony, arguments);
+                        count++;
+                    }
+                    catch (Exception error) when (error is not OutOfMemoryException)
+                    {
+                        YouTubeChannel.LogPublic($"[YT] YouTube Music: hook on {target.DeclaringType?.Name}.{target.Name} failed ({error.GetBaseException().GetType().Name}).");
+                    }
                 }
 
                 // The apps list a folder through GET /Items?ParentId=... . Its
@@ -202,6 +222,10 @@ namespace Emby.YouTubePlugin
                 if (!externalId.StartsWith(PlaylistPrefix, StringComparison.Ordinal)) return;
                 var id = externalId.Substring(PlaylistPrefix.Length);
                 if (!YouTubeMusicCatalog.IsPlaylistId(id) || !MarkWanted(new[] { id }, opened: true)) return;
+                Handled[folder.InternalId] = DateTime.UtcNow;
+                if (Handled.Count > 1000)
+                    foreach (var old in Handled.Where(pair => DateTime.UtcNow - pair.Value > HandledWindow).Select(pair => pair.Key).ToList())
+                        Handled.TryRemove(old, out _);
                 if (NothingToLoad(id) || HasVideos(folder)) return;
                 if (!Task.Run(() => FillAsync(folder, id)).Wait(OpenWait))
                     YouTubeChannel.LogPublic($"[YT] YouTube Music: playlist {id} still loading after {OpenWait.TotalSeconds:0} s; it shows up when opened again.");
@@ -214,8 +238,11 @@ namespace Emby.YouTubePlugin
 
         // Runs for every folder listing in Emby: return at once unless a user
         // lists a YouTube Music section or playlist. Counting children for a
-        // card (Limit = 0) is not opening the folder. Never waits here: the
-        // caller holds a read transaction that would block the store.
+        // card (Limit = 0) is not opening the folder. The caller holds one of
+        // Emby's pooled read connections inside a transaction: no database
+        // access and no waiting here. A writer takes every read connection
+        // before it writes, so a second read from this thread could wait for
+        // a writer that waits for this thread - Emby's whole database stops.
         private static void OpenPrefix(Folder __instance, InternalItemsQuery __0)
         {
             try
@@ -232,8 +259,10 @@ namespace Emby.YouTubePlugin
                 }
                 var id = externalId.Substring(PlaylistPrefix.Length);
                 if (!YouTubeMusicCatalog.IsPlaylistId(id) || !MarkWanted(new[] { id }, opened: true)) return;
-                if (NothingToLoad(id) || HasVideos(__instance!)) return;
-                _ = Task.Run(() => FillAsync(__instance!, id));
+                if (NothingToLoad(id)
+                    || Handled.TryGetValue(__instance!.InternalId, out var handled) && DateTime.UtcNow - handled < HandledWindow) return;
+                var folder = __instance!;
+                _ = Task.Run(() => FillAsync(folder, id));
             }
             catch (Exception error) when (error is not OutOfMemoryException)
             {
@@ -274,14 +303,10 @@ namespace Emby.YouTubePlugin
 
         private static void SectionOpened(Folder section, string externalId)
         {
-            var entries = YouTubeMusicGenres.PeekSection(externalId.Substring(SectionPrefix.Length), Plugin.Instance?.Options);
-            if (entries == null || entries.Videos) return;
-            var ids = entries.Entries.Take(SectionPrefetch).Select(entry => entry.Id).ToArray();
-            if (!MarkWanted(ids, opened: false)) return;
             var now = DateTime.UtcNow;
             if (SectionLoaded.TryGetValue(externalId, out var last) && now - last < SectionInterval) return;
             SectionLoaded[externalId] = now;
-            Queue.Enqueue((section.InternalId, ids));
+            Queue.Enqueue(section.InternalId);
             StartWorker();
         }
 
@@ -306,10 +331,16 @@ namespace Emby.YouTubePlugin
             {
                 if (HasVideos(folder) || NothingToLoad(id)) return;
                 var started = DateTime.UtcNow;
-                OwnFill.Value = true;
+                OwnFill.Value = id;
                 if (!await ChannelRefreshInvoker.FillFolderDirectAsync(folder, CancellationToken.None).ConfigureAwait(false))
                     await ChannelRefreshInvoker.RefreshFolderAsync(folder.ExternalId, 2).ConfigureAwait(false);
                 RemoveDuplicates(folder);
+                // A scan that read the playlist just before may still be storing.
+                _ = Task.Delay(TimeSpan.FromSeconds(30)).ContinueWith(_ =>
+                {
+                    try { RemoveDuplicates(folder); }
+                    catch (Exception error) when (error is not OutOfMemoryException) { }
+                }, TaskScheduler.Default);
                 YouTubeChannel.LogPublic($"[YT] YouTube Music: playlist {id} loaded in {(DateTime.UtcNow - started).TotalSeconds:0.0} s.");
             }
             catch (Exception error) when (error is not OutOfMemoryException)
@@ -318,7 +349,7 @@ namespace Emby.YouTubePlugin
             }
             finally
             {
-                OwnFill.Value = false;
+                OwnFill.Value = null;
                 Filling.AddOrUpdate(id, 0, (_, running) => Math.Max(0, running - 1));
                 gate.Release();
             }
@@ -355,14 +386,21 @@ namespace Emby.YouTubePlugin
             {
                 Save();
                 var library = Plugin.ResolveService<ILibraryManager>();
-                while (library != null && Queue.TryDequeue(out var job))
+                while (library != null && Queue.TryDequeue(out var section))
                 {
-                    var wanted = new HashSet<string>(job.Ids, StringComparer.Ordinal);
-                    var folders = library.GetItemList(new InternalItemsQuery { ParentIds = new[] { job.Section }, IsFolder = true })
-                        .Where(item => item.ExternalId?.StartsWith(PlaylistPrefix, StringComparison.Ordinal) == true
-                            && wanted.Contains(item.ExternalId.Substring(PlaylistPrefix.Length)))
-                        .OrderBy(item => Array.IndexOf(job.Ids, item.ExternalId!.Substring(PlaylistPrefix.Length)))
+                    // The first playlists as the apps list them (by name, not
+                    // in YouTube Music's order): those are on screen first.
+                    var folders = library.GetItemList(new InternalItemsQuery
+                        {
+                            ParentIds = new[] { section },
+                            IsFolder = true,
+                            OrderBy = new[] { (ItemSortBy.SortName, SortOrder.Ascending) }
+                        })
+                        .Where(item => item.ExternalId?.StartsWith(PlaylistPrefix, StringComparison.Ordinal) == true)
+                        .Take(SectionPrefetch)
                         .ToList();
+                    var ids = folders.Select(folder => folder.ExternalId!.Substring(PlaylistPrefix.Length)).ToList();
+                    if (!MarkWanted(ids, opened: false)) continue;
                     foreach (var folder in folders)
                         await FillAsync(folder, folder.ExternalId!.Substring(PlaylistPrefix.Length)).ConfigureAwait(false);
                     Save();

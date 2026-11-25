@@ -173,16 +173,6 @@ namespace Emby.YouTubePlugin
                     && fresh.Sections.Sum(x => x.Entries.Count) * 2 >= old.Sections.Sum(x => x.Entries.Count), ct);
         }
 
-        // The cached page only, never a network request. For the folder
-        // icons of the category list, which must not wait for 41 pages.
-        internal static Page? PeekPage(string categoryParams, PluginConfiguration? config)
-        {
-            var (hl, gl) = Locale(config);
-            var key = $"page-{hl}-{gl}-{ShortHash(categoryParams)}";
-            if (Memory.TryGetValue(key, out var hit) && hit.Model is Page page) return page;
-            return ReadDisk<Page>(key, StaleLimit)?.Model;
-        }
-
         internal static string ShortHash(string value) =>
             Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).Substring(0, 16).ToLowerInvariant();
 
