@@ -41,9 +41,13 @@ namespace Emby.YouTubePlugin
                 }
             }
             var videos = await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
-            if (type == YouTubeMusicGenres.PlaylistType
-                && videos.Items?.Any(item => item.Type == ChannelItemType.Media) == true)
-                YouTubeMusicBrowse.NoteServed(term);
+            if (type == YouTubeMusicGenres.PlaylistType)
+            {
+                if (videos.Items?.Any(item => item.Type == ChannelItemType.Media) == true)
+                    YouTubeMusicBrowse.NoteServed(term);
+                else
+                    YouTubeMusicBrowse.NoteEmpty(term);
+            }
             return videos;
         }
 

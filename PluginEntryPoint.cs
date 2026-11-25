@@ -2937,6 +2937,50 @@ namespace Emby.YouTubePlugin
             }
         }
 
+        private static MethodInfo? _fillFolderMethod;
+        private static int _fillFolderLookedUp;
+
+        // Fills one channel folder exactly like Emby's channel scan does for
+        // each folder (ChannelManager.GetChannelItemsInternal, found by its
+        // signature because it is private): asks this provider for the
+        // folder's items and stores them. Unlike RefreshChannelContent it does
+        // not wait for a running channel scan (about a minute with the YouTube
+        // Music folders) and does not list the channel root, so a playlist is
+        // stored within a second or two while the user waits for it. False
+        // when the method is not available; callers then fall back to
+        // RefreshFolderAsync.
+        internal static async Task<bool> FillFolderDirectAsync(BaseItem folder, CancellationToken cancellation)
+        {
+            if (!EnsureChannelManager() || folder.GetTopParent() is not Channel channel) return false;
+            if (Interlocked.Exchange(ref _fillFolderLookedUp, 1) == 0)
+            {
+                var signature = new[] { typeof(Channel), typeof(IChannel), typeof(InternalItemsQuery), typeof(CancellationToken) };
+                _fillFolderMethod = _channelMgr!.GetType()
+                    .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                    .FirstOrDefault(method => method.ReturnType == typeof(Task<long[]>)
+                        && method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(signature));
+                if (_fillFolderMethod == null)
+                    YouTubeChannel.LogPublic("[YT] Direct folder fill unavailable on this Emby version; using a limited channel refresh.");
+            }
+            var method = _fillFolderMethod;
+            if (method == null) return false;
+            Interlocked.Increment(ref _refreshActive);
+            try
+            {
+                var task = method.Invoke(_channelMgr, new object[]
+                {
+                    channel, _registeredChannel!, new InternalItemsQuery { ParentIds = new[] { folder.InternalId } }, cancellation
+                }) as Task<long[]>;
+                if (task == null) return false;
+                await task.ConfigureAwait(false);
+                return true;
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _refreshActive);
+            }
+        }
+
         // Fills one folder (and its subfolders down to refreshDepth) without a
         // whole-channel scan: Emby lists the channel root, then continues only
         // below the items whose external id matches. Used when a YouTube

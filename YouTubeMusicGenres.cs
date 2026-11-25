@@ -146,6 +146,9 @@ namespace Emby.YouTubePlugin
                         entry.Thumb, entry.Subtitle)).ToList());
                 }
                 case PlaylistType:
+                    // Being stored by YouTubeMusicBrowse right now: a scan
+                    // skips it instead of storing the videos a second time.
+                    if (YouTubeMusicBrowse.FillingElsewhere(term)) throw new UnavailableException();
                     // Unopened playlists stay empty; see YouTubeMusicBrowse.
                     return YouTubeMusicBrowse.IsWanted(term) switch
                     {
