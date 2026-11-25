@@ -1,5 +1,8 @@
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Channels;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,6 +85,71 @@ namespace Emby.YouTubePlugin
             return result;
         }
 
+        // "Most viewed music video of the last 30 days" can be bought: new
+        // channels with AI music and bought views pushed suggestive titles
+        // ("Intense Kisses", "Lesbian Love Story") into the genre folders,
+        // and YouTube does not age-restrict them, so safeSearch=strict alone
+        // kept several. Measured on 2026-11-25: all of them came from
+        // channels younger than a year; established artists' channels are
+        // older. Only videos of channels at least two years old are kept,
+        // plus label-verified VEVO channels. Unknown age = dropped.
+        internal static readonly TimeSpan MinChannelAge = TimeSpan.FromDays(730);
+
+        internal static async Task<JsonDocument> KeepEstablishedChannelsAsync(string apiKey, JsonDocument doc, CancellationToken ct)
+        {
+            if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
+                return doc;
+            var channelIds = items.EnumerateArray()
+                .Select(item => YouTubeApi.GetNestedString(item, "snippet", "channelId"))
+                .Where(id => !string.IsNullOrEmpty(id))
+                .Select(id => id!)
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+            var created = await YouTubeApi.GetChannelCreationDatesAsync(apiKey, channelIds, ct).ConfigureAwait(false)
+                ?? new Dictionary<string, DateTime>(StringComparer.Ordinal);
+            return FilterByChannelAge(doc, created, DateTime.UtcNow - MinChannelAge);
+        }
+
+        internal static JsonDocument FilterByChannelAge(JsonDocument doc, IReadOnlyDictionary<string, DateTime> created, DateTime cutoff)
+        {
+            if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
+                return doc;
+
+            bool Keep(JsonElement item)
+            {
+                var title = YouTubeApi.GetNestedString(item, "snippet", "channelTitle") ?? "";
+                if (title.EndsWith("VEVO", StringComparison.OrdinalIgnoreCase))
+                    return true;
+                var id = YouTubeApi.GetNestedString(item, "snippet", "channelId");
+                return id != null && created.TryGetValue(id, out var since) && since <= cutoff;
+            }
+
+            using var buffer = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(buffer))
+            {
+                writer.WriteStartObject();
+                foreach (var property in doc.RootElement.EnumerateObject())
+                {
+                    if (property.NameEquals("items"))
+                    {
+                        writer.WritePropertyName("items");
+                        writer.WriteStartArray();
+                        foreach (var item in items.EnumerateArray())
+                            if (Keep(item))
+                                item.WriteTo(writer);
+                        writer.WriteEndArray();
+                    }
+                    else
+                    {
+                        property.WriteTo(writer);
+                    }
+                }
+                writer.WriteEndObject();
+            }
+            doc.Dispose();
+            return JsonDocument.Parse(buffer.ToArray());
+        }
+
         internal static async Task<JsonDocument?> SearchAsync(string apiKey, string key, PluginConfiguration config, CancellationToken ct)
         {
             var topicId = TopicFor(key);
@@ -93,7 +161,7 @@ namespace Emby.YouTubePlugin
             var today = DateTime.UtcNow.Date;
             string Since(DateTime day) => day.AddDays(-30).ToString("yyyy-MM-dd'T'00:00:00'Z'", System.Globalization.CultureInfo.InvariantCulture);
             var fresh = await YouTubeApi.SearchMusicTopicAsync(apiKey, topicId, region, Since(today), ct).ConfigureAwait(false);
-            if (fresh != null) return fresh;
+            if (fresh != null) return await KeepEstablishedChannelsAsync(apiKey, fresh, ct).ConfigureAwait(false);
             // The date in the URL changes at midnight UTC. If today's search
             // fails (search quota used up until about 08:00 UTC, outage), keep
             // the last answer of the previous days instead of an empty folder,
@@ -101,7 +169,7 @@ namespace Emby.YouTubePlugin
             for (var back = 1; back <= 7; back++)
             {
                 var stale = YouTubeApi.TryReadStaleCopy(YouTubeApi.MusicTopicUrl(apiKey, topicId, region, Since(today.AddDays(-back))));
-                if (stale != null) return stale;
+                if (stale != null) return await KeepEstablishedChannelsAsync(apiKey, stale, ct).ConfigureAwait(false);
             }
             return null;
         }

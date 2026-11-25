@@ -969,7 +969,39 @@ namespace Emby.YouTubePlugin
             $"{ApiBase}/search?part=snippet&type=video&videoCategoryId=10&q=official%20music%20video" +
             $"&topicId={Uri.EscapeDataString(topicId)}&order=viewCount" +
             $"&publishedAfter={Uri.EscapeDataString(publishedAfter)}" +
-            $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+            $"&regionCode={Uri.EscapeDataString(regionCode)}&maxResults=50&safeSearch=strict&key={Uri.EscapeDataString(apiKey)}";
+
+        private const long ChannelCreatedTtlMs = 7L * 24 * 60 * 60 * 1000; // A channel's creation date never changes.
+
+        // Creation dates of channels (50 per call, 1 quota unit each). Channels
+        // missing from the answer are missing from the result. Null when
+        // YouTube could not be asked at all.
+        public static async Task<Dictionary<string, DateTime>?> GetChannelCreationDatesAsync(
+            string apiKey, IReadOnlyList<string> channelIds, CancellationToken ct)
+        {
+            var result = new Dictionary<string, DateTime>(StringComparer.Ordinal);
+            var sorted = channelIds.OrderBy(id => id, StringComparer.Ordinal).ToList();
+            for (var i = 0; i < sorted.Count; i += 50)
+            {
+                var ids = string.Join(",", sorted.Skip(i).Take(50));
+                var url = $"{ApiBase}/channels?part=snippet&id={Uri.EscapeDataString(ids)}&maxResults=50&key={Uri.EscapeDataString(apiKey)}";
+                using var doc = await TryGetCachedJsonAsync(url, ct, ChannelCreatedTtlMs).ConfigureAwait(false);
+                if (doc == null) return null;
+                if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
+                    continue;
+                foreach (var channel in items.EnumerateArray())
+                {
+                    var id = GetString(channel, "id");
+                    var published = GetNestedString(channel, "snippet", "publishedAt");
+                    if (!string.IsNullOrEmpty(id)
+                        && DateTime.TryParse(published, System.Globalization.CultureInfo.InvariantCulture,
+                            System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal,
+                            out var created))
+                        result[id] = created;
+                }
+            }
+            return result;
+        }
 
         public static async Task<JsonDocument?> SearchMusicTopicAsync(
             string apiKey, string topicId, string regionCode, string publishedAfter, CancellationToken ct)
