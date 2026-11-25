@@ -26,7 +26,12 @@ namespace Emby.YouTubePlugin
             string apiKey, PluginConfiguration config, string type, string term, CancellationToken ct)
         {
             var folders = await YouTubeMusicGenres.GetFoldersAsync(type, term, config, ct).ConfigureAwait(false);
-            return folders ?? await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
+            if (folders != null) return folders;
+            var videos = await LoadMediaFolderAsync(apiKey, config, type, term, ct).ConfigureAwait(false);
+            if (type == YouTubeMusicGenres.PlaylistType
+                && videos.Items?.Any(item => item.Type == ChannelItemType.Media) == true)
+                YouTubeMusicBrowse.NoteServed(term);
+            return videos;
         }
 
         private static async Task<ChannelItemResult> LoadMediaFolderAsync(

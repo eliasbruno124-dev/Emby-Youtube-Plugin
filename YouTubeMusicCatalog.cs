@@ -73,12 +73,18 @@ namespace Emby.YouTubePlugin
         // After a failed fetch the same page is not asked again for a while:
         // a channel scan opens every section of a category one after another.
         private static readonly TimeSpan FailureBackoff = TimeSpan.FromMinutes(10);
+        // A page that suddenly has far fewer categories or sections than the
+        // stored one is more likely a changed YouTube layout the parser half
+        // understands than a real change. Keeping the old page protects the
+        // filled playlists (Emby deletes folders that disappear); asked again
+        // after six hours, accepted once the old copy is 30 days old.
+        private static readonly TimeSpan ImplausibleBackoff = TimeSpan.FromHours(6);
         private const int MaxResponseBytes = 16 * 1024 * 1024;
 
         private static readonly HttpClient Http = CreateHttp();
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> Locks = new(StringComparer.Ordinal);
         private static readonly ConcurrentDictionary<string, (DateTime Loaded, object Model)> Memory = new(StringComparer.Ordinal);
-        private static readonly ConcurrentDictionary<string, DateTime> Failures = new(StringComparer.Ordinal);
+        private static readonly ConcurrentDictionary<string, DateTime> Failures = new(StringComparer.Ordinal); // key -> retry after (UTC)
         private static long _lastCleanupTicks;
 
         private static HttpClient CreateHttp()
@@ -152,7 +158,9 @@ namespace Emby.YouTubePlugin
         {
             var (hl, gl) = Locale(config);
             return LoadAsync($"root-{hl}-{gl}", RootTtl,
-                new Dictionary<string, object> { ["browseId"] = RootBrowseId }, hl, gl, ParseRoot, ct);
+                new Dictionary<string, object> { ["browseId"] = RootBrowseId }, hl, gl, ParseRoot,
+                (fresh, old) => fresh.Count >= old.Count
+                    && fresh.Sum(g => g.Categories.Count) * 2 >= old.Sum(g => g.Categories.Count), ct);
         }
 
         internal static Task<Page?> GetPageAsync(string categoryParams, PluginConfiguration? config, CancellationToken ct)
@@ -160,7 +168,9 @@ namespace Emby.YouTubePlugin
             var (hl, gl) = Locale(config);
             return LoadAsync($"page-{hl}-{gl}-{ShortHash(categoryParams)}", PageTtl,
                 new Dictionary<string, object> { ["browseId"] = CategoryBrowseId, ["params"] = categoryParams },
-                hl, gl, ParsePage, ct);
+                hl, gl, ParsePage,
+                (fresh, old) => fresh.Sections.Count * 2 >= old.Sections.Count
+                    && fresh.Sections.Sum(x => x.Entries.Count) * 2 >= old.Sections.Sum(x => x.Entries.Count), ct);
         }
 
         // The cached page only, never a network request. For the folder
@@ -177,7 +187,7 @@ namespace Emby.YouTubePlugin
             Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).Substring(0, 16).ToLowerInvariant();
 
         private static async Task<T?> LoadAsync<T>(string key, TimeSpan ttl, Dictionary<string, object> request,
-            string hl, string gl, Func<JsonElement, T?> parse, CancellationToken ct) where T : class
+            string hl, string gl, Func<JsonElement, T?> parse, Func<T, T, bool> plausible, CancellationToken ct) where T : class
         {
             if (Memory.TryGetValue(key, out var mem) && mem.Model is T fresh && DateTime.UtcNow - mem.Loaded < ttl)
                 return fresh;
@@ -197,7 +207,8 @@ namespace Emby.YouTubePlugin
                 }
 
                 T? model = null;
-                if (!Failures.TryGetValue(key, out var failedAt) || DateTime.UtcNow - failedAt > FailureBackoff)
+                var retry = FailureBackoff;
+                if (!Failures.TryGetValue(key, out var retryAfter) || DateTime.UtcNow >= retryAfter)
                 {
                     try
                     {
@@ -208,7 +219,17 @@ namespace Emby.YouTubePlugin
                     {
                         YouTubeChannel.LogPublic($"[YT] YouTube Music page {key} unavailable ({error.GetType().Name}: {error.Message}).");
                     }
-                    if (model == null) Failures[key] = DateTime.UtcNow;
+                    if (model != null && disk != null && !plausible(model, disk.Value.Model))
+                    {
+                        YouTubeChannel.LogPublic($"[YT] YouTube Music page {key} looks incomplete; keeping the stored version.");
+                        model = null;
+                        retry = ImplausibleBackoff;
+                    }
+                    if (model == null) Failures[key] = DateTime.UtcNow + retry;
+                }
+                else
+                {
+                    retry = retryAfter - DateTime.UtcNow;
                 }
 
                 if (model != null)
@@ -222,7 +243,7 @@ namespace Emby.YouTubePlugin
                 if (disk != null)
                 {
                     // Keep serving the last good copy; retried after the backoff.
-                    Memory[key] = (DateTime.UtcNow - ttl + FailureBackoff, disk.Value.Model);
+                    Memory[key] = (DateTime.UtcNow - ttl + retry, disk.Value.Model);
                     return disk.Value.Model;
                 }
                 return null;

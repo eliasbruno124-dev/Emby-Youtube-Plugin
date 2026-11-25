@@ -122,7 +122,13 @@ namespace Emby.YouTubePlugin
                     // Remember the instance before the first patch: a protected
                     // second target must not leave an orphaned first patch.
                     _harmony = harmony;
+                    _harmonyType = harmonyType;
                     var patched = 0;
+
+                    // Independent of PlaybackInfo: without this hook YouTube
+                    // Music playlists would never get their videos.
+                    if (YouTubeMusicBrowse.Install(harmony, harmonyMethodType) > 0)
+                        YouTubeChannel.LogPublic("[YT] YouTube Music playlists load when opened.");
 
                     // Clients may use GET or POST PlaybackInfo depending on app
                     // and Emby version. Patch both shapes when they exist.
@@ -151,8 +157,6 @@ namespace Emby.YouTubePlugin
                     var subtitlePatches = YouTubeSubtitleDelivery.Install(harmony, harmonyMethodType);
                     var diagnosticPatches = YouTubeImageDiagnostics.Install(harmony, harmonyMethodType);
                     var presentationPatches = YouTubeVideoPresentation.Install(harmony, harmonyMethodType);
-                    if (YouTubeMusicBrowse.Install(harmony, harmonyMethodType) > 0)
-                        YouTubeChannel.LogPublic("[YT] YouTube Music playlists load when opened.");
                     YouTubeChannel.LogPublic("[YT] Video presentation installed (" + presentationPatches + " patches).");
                     YouTubeChannel.LogPublic("[YTIMG] Image diagnostics installed (" + diagnosticPatches + " patches).");
                     YouTubeChannel.LogPublic(subtitlePatches > 0

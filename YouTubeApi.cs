@@ -419,7 +419,10 @@ namespace Emby.YouTubePlugin
             // First stop: in-memory cache.
             if (ResponseCache.TryGetValue(cacheIdentity, out var cached))
             {
-                if (now < cached.ExpiresAtMs)
+                // The same URL can be read with different lifetimes (a
+                // playlist in the music folders keeps a day, elsewhere six
+                // hours): fresh only within this caller's own lifetime.
+                if (now < cached.ExpiresAtMs && now - cached.CachedAtMs < memTtl)
                 {
                     try { personal?.EnsureCurrent(); return JsonDocument.Parse(cached.Json); }
                     catch (JsonException ex)
@@ -428,7 +431,7 @@ namespace Emby.YouTubePlugin
                         ResponseCache.TryRemove(cacheIdentity, out _);
                     }
                 }
-                else
+                else if (now >= cached.ExpiresAtMs)
                 {
                     ResponseCache.TryRemove(cacheIdentity, out _);
                 }

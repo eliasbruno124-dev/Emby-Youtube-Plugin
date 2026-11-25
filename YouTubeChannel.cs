@@ -115,7 +115,11 @@ namespace Emby.YouTubePlugin
             if (query.FolderId?.StartsWith(YouTubeChannelProvenance.Prefix, StringComparison.Ordinal) == true)
                 return await GetSharedItemsAsync(query.FolderId, config, cancellationToken).ConfigureAwait(false);
 
-            Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
+            // YouTube Music sections and playlists add about 6,000 folders to
+            // every channel scan; one line each would flood the log.
+            if (query.FolderId?.StartsWith(YouTubeMusicGenres.SectionType + FolderSeparator, StringComparison.Ordinal) != true
+                && query.FolderId?.StartsWith(YouTubeMusicGenres.PlaylistType + FolderSeparator, StringComparison.Ordinal) != true)
+                Log($"[YT] GetChannelItems called. FolderId={query.FolderId ?? "(root)"}, ApiKey={!string.IsNullOrEmpty(apiKey)}, SavedItems={config.SavedItems ?? "(empty)"}");
 
             // Mark the channel pipeline as active so the sort-name / image repair
             // queues pause their library.db writes. Covers refreshes started by
