@@ -195,9 +195,7 @@ internal static class YouTubePersonalCatalog
         try
         {
             var manager = Plugin.ResolveService<IChannelManager>();
-            var providerMethod = manager?.GetType().GetMethod("GetChannelProvider",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null, new[] { typeof(Channel) }, null);
+            var providerMethod = EmbyChannelBinding.ProviderMethod(manager);
             if (manager == null || providerMethod == null) return false;
             var channels = library.GetItemList(new InternalItemsQuery
                 { IncludeItemTypes = new[] { "Channel" }, Recursive = true }, CancellationToken.None).OfType<Channel>();

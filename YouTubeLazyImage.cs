@@ -423,9 +423,7 @@ namespace Emby.YouTubePlugin
         private static Channel[] FindOwnChannels(ILibraryManager library, CancellationToken token)
         {
             var manager = Plugin.ResolveService<IChannelManager>();
-            var provider = manager?.GetType().GetMethod("GetChannelProvider",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null, new[] { typeof(Channel) }, null);
+            var provider = EmbyChannelBinding.ProviderMethod(manager);
             if (manager == null || provider == null)
                 return Array.Empty<Channel>();
             return library.GetItemList(new InternalItemsQuery
