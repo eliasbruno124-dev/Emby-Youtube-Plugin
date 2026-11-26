@@ -243,7 +243,7 @@
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "86f7264ba6e0efa064191ee985c59308ba0af090ba3f41f7b7ebcb6f404eae63"
+      "sha256": "ff8202223ab151ebe0ea734a44e20b6b151071980eb6b88b5a9d4b9b3a389d75"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -375,7 +375,7 @@
     },
     {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "3de065d7d92bb6d1d4315245ee30b507a7c4c337187430139608b9797487a9b1"
+      "sha256": "23f30b970a0cba09bc15829ca41850b153c401a7ff39c047cba331144ad17e4c"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -407,7 +407,7 @@
     },
     {
       "path": "YouTubeSubtitleDelivery.cs",
-      "sha256": "087ce761a5d9063d165746687771736a26a392f2532ad360781a259e721743b5"
+      "sha256": "b60ea76d1c4dacb591754ea25093371770c67fb4c8ac1b2478a6c69e9d1813c2"
     },
     {
       "path": "YouTubeTrailers.cs",
@@ -419,7 +419,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "e4098ce28ee13652b974011194b7c8aa27b54502ab74642defb3baf613a5abbe"
+      "sha256": "4b20690f05c2c041a27793d87c054cb0f8240c711a96e7aab331755e67a4a403"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -501,11 +501,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "d6aa7b05deb16e305939a6c5cf483392bc9db7c44aade6492324b6c9cc14be1f"
+      "sha256": "8fe97f5b8b64ad14707e807b1b16b486110253d65f09112a09df7776df04248f"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "427bc867e666c05476a67a64da4627519749a7d85916795bc77abb9a213430a2"
+      "sha256": "5211cfdfedd4ea7c22bc70e43dc81a0a8e5b2e34fd96cf825aaff608ccb1c77c"
     }
   ],
   "parsers": {

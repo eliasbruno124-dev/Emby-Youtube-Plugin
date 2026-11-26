@@ -19,7 +19,8 @@ namespace Emby.YouTubePlugin
         private sealed record InputBinding(PropertyInfo Inputs, PropertyInfo Input0, PropertyInfo Url,
             PropertyInfo Subtitles0, PropertyInfo IsExternal, PropertyInfo SubtitlePath);
         private sealed record RenderBinding(MethodInfo EnsureSoftware, MethodInfo Legacy,
-            PropertyInfo Steps, PropertyInfo Demand, PropertyInfo InHardware);
+            PropertyInfo Steps, PropertyInfo Demand, PropertyInfo InHardware,
+            PropertyInfo? ForceStyle, PropertyInfo? FontFolder);
 
         // The caller must already have established an owned direct YouTube
         // request. This changes delivery, never the user's selected index/Off.
@@ -128,8 +129,15 @@ namespace Emby.YouTubePlugin
                 var hardware = Property(step, "WillDoInHardware", typeof(bool));
                 var steps = Property(plan, "ProcessingSteps");
                 if (!hardware.CanWrite || !typeof(IEnumerable).IsAssignableFrom(steps.PropertyType)) throw new InvalidOperationException();
+                PropertyInfo? Optional(string name)
+                {
+                    var property = demand.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+                    return property?.PropertyType == typeof(string) && property.CanRead ? property : null;
+                }
+                var forceStyle = Optional("ForceStyle");
                 _render = new RenderBinding(Method(pipeline, "EnsureSoftwareContext", tracking), legacy,
-                    steps, Property(step, "Demand"), hardware);
+                    steps, Property(step, "Demand"), hardware,
+                    forceStyle?.CanWrite == true ? forceStyle : null, Optional("DefaultFontFolder"));
                 var pipelineArguments = new[] { plan, demands, command,
                     Find("Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoDecoder"),
                     Find("Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoEncoder"), tracking };
@@ -238,8 +246,82 @@ namespace Emby.YouTubePlugin
             // handling. Only the text renderer changes to Emby's libass path;
             // the native pipeline still uploads again for hardware encoding.
             binding.EnsureSoftware.Invoke(__instance, new[] { __1 });
+            ApplyFont(binding, __2);
             binding.Legacy.Invoke(__instance, new[] { __1, __2 });
             return false;
+        }
+
+        // The Emby image has no system fonts, only Emby's font folder
+        // (GoNotoKurrent.ttf). libass looks for the default style's Arial,
+        // finds no fallback without fontconfig and draws nothing: the filter
+        // runs, the picture shows no text. Name the folder's own font in the
+        // style unless one is already set.
+        private static void ApplyFont(RenderBinding binding, object demand)
+        {
+            try
+            {
+                if (binding.ForceStyle == null || binding.FontFolder == null) return;
+                var family = FontFamily(binding.FontFolder.GetValue(demand) as string);
+                if (family == null) return;
+                var style = binding.ForceStyle.GetValue(demand) as string;
+                if (style?.IndexOf("FontName=", StringComparison.OrdinalIgnoreCase) >= 0) return;
+                binding.ForceStyle.SetValue(demand, string.IsNullOrEmpty(style) ? "FontName=" + family : style + ",FontName=" + family);
+            }
+            catch (Exception error) when (error is not OutOfMemoryException) { }
+        }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string?> Families = new(StringComparer.Ordinal);
+
+        private static string? FontFamily(string? folder)
+        {
+            if (string.IsNullOrWhiteSpace(folder)) return null;
+            return Families.GetOrAdd(folder, path =>
+            {
+                try
+                {
+                    if (!Directory.Exists(path)) return null;
+                    foreach (var file in Directory.EnumerateFiles(path).OrderBy(name => name, StringComparer.Ordinal))
+                    {
+                        var extension = Path.GetExtension(file);
+                        if (!extension.Equals(".ttf", StringComparison.OrdinalIgnoreCase)
+                            && !extension.Equals(".otf", StringComparison.OrdinalIgnoreCase)) continue;
+                        var name = ReadFamily(file);
+                        if (!string.IsNullOrWhiteSpace(name) && name.All(c => !char.IsControl(c) && c is not (',' or '\'' or ':' or '\\' or '=')))
+                            return name;
+                    }
+                }
+                catch (Exception error) when (error is not OutOfMemoryException) { }
+                return null;
+            });
+        }
+
+        // Family name (name ID 1) from an OpenType/TrueType 'name' table.
+        private static string? ReadFamily(string file)
+        {
+            var info = new FileInfo(file);
+            if (!info.Exists || info.Length < 12 || info.Length > 64 * 1024 * 1024) return null;
+            var data = File.ReadAllBytes(file);
+            int U16(int at) => at + 2 <= data.Length ? data[at] << 8 | data[at + 1] : throw new InvalidDataException();
+            long U32(int at) => (long)U16(at) << 16 | (uint)U16(at + 2);
+            int tables = U16(4);
+            for (int i = 0; i < tables; i++)
+            {
+                int record = 12 + 16 * i;
+                if (data[record] != 'n' || data[record + 1] != 'a' || data[record + 2] != 'm' || data[record + 3] != 'e') continue;
+                int table = checked((int)U32(record + 8));
+                int count = U16(table + 2), strings = table + U16(table + 4);
+                string? mac = null;
+                for (int j = 0; j < count; j++)
+                {
+                    int entry = table + 6 + 12 * j;
+                    int platform = U16(entry), id = U16(entry + 6), length = U16(entry + 8), offset = strings + U16(entry + 10);
+                    if (id != 1 || offset + length > data.Length) continue;
+                    if (platform == 3 || platform == 0) return System.Text.Encoding.BigEndianUnicode.GetString(data, offset, length);
+                    if (platform == 1) mac ??= System.Text.Encoding.Latin1.GetString(data, offset, length);
+                }
+                return mac;
+            }
+            return null;
         }
 
         private static bool IsOwnedCaptionCommand(object command, object demand)

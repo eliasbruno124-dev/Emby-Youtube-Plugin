@@ -5,6 +5,7 @@ using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Model.Data;
 using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Library;
 using MediaBrowser.Model.Querying;
 using System.Reflection;
@@ -386,6 +387,63 @@ namespace Emby.YouTubePlugin
             item.ExternalId?.StartsWith(Prefix, StringComparison.Ordinal) == true
             || item.ExternalId?.StartsWith("personalshared_x_", StringComparison.Ordinal) == true
             || item.ParentId == channel && item.ExternalId?.StartsWith("channel_x_", StringComparison.Ordinal) == true;
+
+        // Builds before 2.0.14.2 gave videos of own subscriptions a studio.
+        // Emby made a library-wide Studio item of it (visible to every user in
+        // search and /Studios), and a channel refresh never clears a list that
+        // is already stored. Clear the studios of every video below a
+        // personal folder and delete a Studio item that nothing else uses any
+        // more (a public channel of the same name keeps it). Runs in the
+        // background, never inside a query hook.
+        internal static int RepairPersonalStudios(ILibraryManager library, long channel, CancellationToken cancellation)
+        {
+            if (channel <= 0) return 0;
+            var folders = library.GetItemList(new InternalItemsQuery
+            {
+                AncestorIds = new[] { channel }, IsFolder = true, Recursive = true,
+                GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false, ForceOriginalFolders = true
+            }, cancellation);
+            var guarded = folders.Where(folder => IsGuarded(folder, channel)).Select(folder => folder.InternalId).ToArray();
+            if (guarded.Length == 0) return 0;
+            var videos = library.GetItemList(new InternalItemsQuery
+            {
+                AncestorIds = guarded, IsFolder = false, Recursive = true,
+                GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false
+            }, cancellation);
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            int cleared = 0;
+            foreach (var video in videos)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                if (video.Studios == null || video.Studios.Length == 0) continue;
+                foreach (var name in video.Studios) if (!string.IsNullOrWhiteSpace(name)) names.Add(name);
+                video.Studios = Array.Empty<string>();
+                library.UpdateItem(video, video.GetParent(), ItemUpdateType.MetadataEdit);
+                cleared++;
+            }
+            int removed = 0;
+            foreach (var name in names)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                var studios = library.GetItemList(new InternalItemsQuery
+                    { IncludeItemTypes = new[] { "Studio" }, Name = name, EnableTotalRecordCount = false }, cancellation);
+                foreach (var studio in studios)
+                {
+                    if (!string.Equals(studio.Name, name, StringComparison.OrdinalIgnoreCase)) continue;
+                    var users = library.GetItemList(new InternalItemsQuery
+                    {
+                        StudioIds = new[] { studio.InternalId }, Recursive = true, Limit = 1,
+                        GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false
+                    }, cancellation);
+                    if (users.Length > 0) continue;
+                    library.DeleteItem(studio, new DeleteOptions { DeleteFileLocation = false, DeleteFromExternalProvider = false }, false);
+                    removed++;
+                }
+            }
+            if (cleared > 0 || removed > 0)
+                YouTubeChannel.LogPublic("[YT] Personal studio names removed from " + cleared + " videos; " + removed + " unused studio entries deleted.");
+            return cleared;
+        }
 
         private static readonly MethodInfo ShallowCopy = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic)!;
         private static BaseItem RequestItem(BaseItem item)

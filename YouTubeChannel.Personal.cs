@@ -240,6 +240,31 @@ internal static class YouTubePersonalCatalog
         });
     }
 
+    // Once per start, after the channel is known and no channel refresh
+    // writes: removes studio names that older builds stored for own
+    // subscriptions (YouTubePersonalVisibility.RepairPersonalStudios).
+    private static void RepairStudiosLater(ILibraryManager library, CancellationToken token)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(30), token).ConfigureAwait(false);
+                var started = DateTime.UtcNow;
+                while ((Interlocked.Read(ref _channelId) <= 0 || ChannelRefreshInvoker.IsRefreshInProgress)
+                    && DateTime.UtcNow - started < TimeSpan.FromHours(2))
+                    await Task.Delay(TimeSpan.FromSeconds(15), token).ConfigureAwait(false);
+                if (!YouTubePersonalVisibility.IsReady) return;
+                YouTubePersonalVisibility.RepairPersonalStudios(library, Interlocked.Read(ref _channelId), token);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] Personal studio repair failed (" + error.GetType().Name + ").");
+            }
+        });
+    }
+
     internal static void Start(ILibraryManager library, IUserManager users, IUserViewManager views)
     {
         YouTubeChannelProvenance.Reset();
@@ -268,6 +293,7 @@ internal static class YouTubePersonalCatalog
             YouTubePersonalVisibility.Initialize(library, views, dto, () => Interlocked.Read(ref _channelId), MayView);
             if (!TryResolveChannelId(library))
                 PollChannelId(library, _lifetime.Token);
+            RepairStudiosLater(library, _lifetime.Token);
             var count = YouTubePersonalVisibility.Install(_harmony, methodType);
             YouTubeChannel.LogPublic("[YT] Personal catalog visibility " + (YouTubePersonalVisibility.IsReady
                 ? "ready (" + count + " bindings)." : "unavailable; new personal folders are disabled. Check server compatibility."));
