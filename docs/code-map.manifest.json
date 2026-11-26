@@ -375,7 +375,7 @@
     },
     {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "23f30b970a0cba09bc15829ca41850b153c401a7ff39c047cba331144ad17e4c"
+      "sha256": "a43dee995c7154e08d30ebfa45db01fc023d5e283a1619abce37034cd24f5506"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -501,11 +501,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "8fe97f5b8b64ad14707e807b1b16b486110253d65f09112a09df7776df04248f"
+      "sha256": "6ae570a364b0c55f3952bf64c657e92979fb705da01196f55894f5a150aa3bf2"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "5211cfdfedd4ea7c22bc70e43dc81a0a8e5b2e34fd96cf825aaff608ccb1c77c"
+      "sha256": "8a764a0488a7e47849883e94ad6a8a5be1b041198084fbbdc345e1b26cbb0b69"
     }
   ],
   "parsers": {

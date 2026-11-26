@@ -403,13 +403,22 @@ namespace Emby.YouTubePlugin
                 AncestorIds = new[] { channel }, IsFolder = true, Recursive = true,
                 GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false, ForceOriginalFolders = true
             }, cancellation);
-            var guarded = folders.Where(folder => IsGuarded(folder, channel)).Select(folder => folder.InternalId).ToArray();
-            if (guarded.Length == 0) return 0;
+            // Only folders of own subscriptions (personal_x_<scope>_own_...):
+            // every folder of such a tree carries the wrapped id. Admin channel
+            // roots (channel_x_) and shared personal folders are visible to
+            // everyone and keep their studios. Direct children only, because
+            // AncestorIds also reached videos of public channels (the first
+            // test cleared 150 instead of 50 videos and deleted a public studio).
+            var own = folders.Where(folder => folder.ExternalId?.StartsWith(Prefix, StringComparison.Ordinal) == true
+                    && YouTubePersonalCatalog.TryParse(folder.ExternalId, out _, out var inner)
+                    && inner.StartsWith("own_", StringComparison.Ordinal))
+                .Select(folder => folder.InternalId).ToHashSet();
+            if (own.Count == 0) return 0;
             var videos = library.GetItemList(new InternalItemsQuery
             {
-                AncestorIds = guarded, IsFolder = false, Recursive = true,
+                ParentIds = own.ToArray(), IsFolder = false, Recursive = false,
                 GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false
-            }, cancellation);
+            }, cancellation).Where(video => own.Contains(video.ParentId)).ToArray();
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             int cleared = 0;
             foreach (var video in videos)

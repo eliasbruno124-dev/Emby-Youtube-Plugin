@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 124 files; 10365 syntax declarations/HTML anchors.
+Scope: 124 files; 10368 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -105,7 +105,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubePersonalRequestContext.cs](#file-5a4637d17f32c0fe) | Plugin Compile source (SDK default) | 19 |
 | [YouTubePersonalService.cs](#file-cdd49be2d7ae99e3) | Plugin Compile source (SDK default) | 91 |
 | [YouTubePersonalStartup.cs](#file-e29c28a293aed316) | Plugin Compile source (SDK default) | 12 |
-| [YouTubePersonalVisibility.cs](#file-3c3889e240a93fde) | Plugin Compile source (SDK default) | 243 |
+| [YouTubePersonalVisibility.cs](#file-3c3889e240a93fde) | Plugin Compile source (SDK default) | 246 |
 | [YouTubeRequestBackoff.cs](#file-7a9c7096d206cd40) | Plugin Compile source (SDK default) | 27 |
 | [YouTubeRootMaterialization.cs](#file-d83451aba3d200d0) | Plugin Compile source (SDK default) | 115 |
 | [YouTubeRootMigration.cs](#file-9330046d20e24a92) | Plugin Compile source (SDK default) | 81 |
@@ -9943,10 +9943,10 @@ Plugin Compile source (SDK default); 1209 bytes; 30 lines.
 <a id="file-3c3889e240a93fde"></a>
 ## [YouTubePersonalVisibility.cs](../YouTubePersonalVisibility.cs)
 
-Plugin Compile source (SDK default); 27486 bytes; 483 lines.
+Plugin Compile source (SDK default); 28246 bytes; 492 lines.
 
 <details>
-<summary>All 243 declarations / anchors</summary>
+<summary>All 246 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -10156,43 +10156,46 @@ Plugin Compile source (SDK default); 27486 bytes; 483 lines.
 | parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.channel | [398:76](../YouTubePersonalVisibility.cs#L398) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.cancellation | [398:90](../YouTubePersonalVisibility.cs#L398) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.folders | [401:17](../YouTubePersonalVisibility.cs#L401) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.guarded | [406:17](../YouTubePersonalVisibility.cs#L406) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.guarded.anonymous@23363 | [406:41](../YouTubePersonalVisibility.cs#L406) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.guarded.anonymous@23363.folder | [406:41](../YouTubePersonalVisibility.cs#L406) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.guarded.anonymous@23408 | [406:86](../YouTubePersonalVisibility.cs#L406) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.guarded.anonymous@23408.folder | [406:86](../YouTubePersonalVisibility.cs#L406) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos | [408:17](../YouTubePersonalVisibility.cs#L408) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.names | [413:17](../YouTubePersonalVisibility.cs#L413) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.cleared | [414:17](../YouTubePersonalVisibility.cs#L414) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video | [415:13](../YouTubePersonalVisibility.cs#L415) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video.name | [419:17](../YouTubePersonalVisibility.cs#L419) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.removed | [424:17](../YouTubePersonalVisibility.cs#L424) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name | [425:13](../YouTubePersonalVisibility.cs#L425) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studios | [428:21](../YouTubePersonalVisibility.cs#L428) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio | [430:17](../YouTubePersonalVisibility.cs#L430) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio.users | [433:25](../YouTubePersonalVisibility.cs#L433) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.ShallowCopy | [448:44](../YouTubePersonalVisibility.cs#L448) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem | [449:9](../YouTubePersonalVisibility.cs#L449) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.item | [449:45](../YouTubePersonalVisibility.cs#L449) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.state | [451:17](../YouTubePersonalVisibility.cs#L451) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.channel | [453:17](../YouTubePersonalVisibility.cs#L453) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.cursor | [454:17](../YouTubePersonalVisibility.cs#L454) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.seen | [455:17](../YouTubePersonalVisibility.cs#L455) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.copy | [461:17](../YouTubePersonalVisibility.cs#L461) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed | [468:9](../YouTubePersonalVisibility.cs#L468) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.state | [468:37](../YouTubePersonalVisibility.cs#L468) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.externalId | [468:50](../YouTubePersonalVisibility.cs#L468) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.userId | [468:69](../YouTubePersonalVisibility.cs#L468) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.error | [472:19](../YouTubePersonalVisibility.cs#L472) |
-| type | Emby.YouTubePlugin.YouTubePersonalVisibility.State | [475:9](../YouTubePersonalVisibility.cs#L475) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.LibraryType | [475:37](../YouTubePersonalVisibility.cs#L475) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ViewsType | [475:55](../YouTubePersonalVisibility.cs#L475) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.DtoType | [475:71](../YouTubePersonalVisibility.cs#L475) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Read | [476:13](../YouTubePersonalVisibility.cs#L476) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Lookup | [477:13](../YouTubePersonalVisibility.cs#L477) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ChannelId | [477:43](../YouTubePersonalVisibility.cs#L477) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Authorize | [477:65](../YouTubePersonalVisibility.cs#L477) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Presence | [480:26](../YouTubePersonalVisibility.cs#L480) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own | [412:17](../YouTubePersonalVisibility.cs#L412) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834 | [412:37](../YouTubePersonalVisibility.cs#L412) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834.folder | [412:37](../YouTubePersonalVisibility.cs#L412) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834.inner | [413:90](../YouTubePersonalVisibility.cs#L413) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@24111 | [415:25](../YouTubePersonalVisibility.cs#L415) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@24111.folder | [415:25](../YouTubePersonalVisibility.cs#L415) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos | [417:17](../YouTubePersonalVisibility.cs#L417) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos.anonymous@24477 | [421:36](../YouTubePersonalVisibility.cs#L421) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos.anonymous@24477.video | [421:36](../YouTubePersonalVisibility.cs#L421) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.names | [422:17](../YouTubePersonalVisibility.cs#L422) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.cleared | [423:17](../YouTubePersonalVisibility.cs#L423) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video | [424:13](../YouTubePersonalVisibility.cs#L424) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video.name | [428:17](../YouTubePersonalVisibility.cs#L428) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.removed | [433:17](../YouTubePersonalVisibility.cs#L433) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name | [434:13](../YouTubePersonalVisibility.cs#L434) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studios | [437:21](../YouTubePersonalVisibility.cs#L437) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio | [439:17](../YouTubePersonalVisibility.cs#L439) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio.users | [442:25](../YouTubePersonalVisibility.cs#L442) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.ShallowCopy | [457:44](../YouTubePersonalVisibility.cs#L457) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem | [458:9](../YouTubePersonalVisibility.cs#L458) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.item | [458:45](../YouTubePersonalVisibility.cs#L458) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.state | [460:17](../YouTubePersonalVisibility.cs#L460) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.channel | [462:17](../YouTubePersonalVisibility.cs#L462) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.cursor | [463:17](../YouTubePersonalVisibility.cs#L463) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.seen | [464:17](../YouTubePersonalVisibility.cs#L464) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.copy | [470:17](../YouTubePersonalVisibility.cs#L470) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed | [477:9](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.state | [477:37](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.externalId | [477:50](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.userId | [477:69](../YouTubePersonalVisibility.cs#L477) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.error | [481:19](../YouTubePersonalVisibility.cs#L481) |
+| type | Emby.YouTubePlugin.YouTubePersonalVisibility.State | [484:9](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.LibraryType | [484:37](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ViewsType | [484:55](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.DtoType | [484:71](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Read | [485:13](../YouTubePersonalVisibility.cs#L485) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Lookup | [486:13](../YouTubePersonalVisibility.cs#L486) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ChannelId | [486:43](../YouTubePersonalVisibility.cs#L486) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Authorize | [486:65](../YouTubePersonalVisibility.cs#L486) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Presence | [489:26](../YouTubePersonalVisibility.cs#L489) |
 
 </details>
 
