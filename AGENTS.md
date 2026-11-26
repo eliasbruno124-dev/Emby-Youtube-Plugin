@@ -6,3 +6,8 @@
 - Keep syntax-extracted facts distinct from reviewed architecture and observed runtime behavior. A successful build or command send does not establish support in every Emby/native client.
 - Preserve tool/private-test C# exclusions from the plugin build. Code-map tooling is development-only. Do not install hooks, background watchers or a runtime map dependency.
 - Do not add live configuration, credentials, tokens, logs or environment-specific deployment identifiers to the map or documentation. Do not edit README as an incidental map-maintenance step.
+
+# Commits
+
+- Commits and pull requests carry no AI attribution: no `Co-Authored-By` trailer, no "Generated with" line. `.claude/settings.json` switches Claude Code's default trailer off; agents that ignore it must leave it out themselves.
+- Commit as the maintainer, `eliasbruno124-dev`, with the same e-mail as the existing commits by that name. Check `git config user.name` and `git config user.email` before the first commit in a clone. Never commit as `root` or as a machine user: on the home server the global git identity was `root`, which put 32 commits under that name.
