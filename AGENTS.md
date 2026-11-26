@@ -10,4 +10,4 @@
 # Commits
 
 - Commits and pull requests carry no AI attribution: no `Co-Authored-By` trailer, no "Generated with" line. `.claude/settings.json` switches Claude Code's default trailer off; agents that ignore it must leave it out themselves.
-- Commit as the maintainer, `eliasbruno124-dev`, with the same e-mail as the existing commits by that name. Check `git config user.name` and `git config user.email` before the first commit in a clone. Never commit as `root` or as a machine user: on the home server the global git identity was `root`, which put 32 commits under that name.
+- Commit as the maintainer, `eliasbruno124-dev`, with the GitHub noreply e-mail `230422461+eliasbruno124-dev@users.noreply.github.com`, so the private address stays out of the history (older commits used it). Check `git config user.name` and `git config user.email` before the first commit in a clone. Never commit as `root` or as a machine user: on the home server the global git identity was `root`, which put 32 commits under that name.
