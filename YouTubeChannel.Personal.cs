@@ -48,6 +48,7 @@ public partial class YouTubeChannel
                     // server key. Within a profile, aliases also deduplicate.
                     if (!existing.Add(item.Id)) continue;
                     item.Id = YouTubePersonalCatalog.WrapOwn(profile.ScopeId, YouTubeChannelProvenance.Token(term), item.Id);
+                    item.Studios = new List<string>(); // see GetPersonalItemsAsync
                     YouTubePersonalVisibility.MarkPersonalContent();
                     items.Add(item);
                 }
@@ -108,8 +109,16 @@ public partial class YouTubeChannel
             return Msg(new List<ChannelItemInfo>(), "YouTube is temporarily unavailable. Check My YouTube settings.");
         }
         foreach (var item in result.Items)
+        {
             if (item.Type == ChannelItemType.Folder)
                 item.Id = ownRoot ? YouTubePersonalCatalog.WrapOwn(scope, contribution, item.Id) : YouTubePersonalCatalog.Wrap(scope, item.Id);
+            // Emby turns every studio name into a library-wide Studio item
+            // that no folder guard covers: another user would find the
+            // channel name in search and /Studios. Videos of a user's own
+            // subscriptions therefore carry no studio; the channel name stays
+            // in SeriesName, which creates no item of its own.
+            if (ownRoot) item.Studios = new List<string>();
+        }
         return result;
     }
 

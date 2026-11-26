@@ -50,7 +50,12 @@ namespace Emby.YouTubePlugin
             try
             {
                 _installed = false;
-                if (typeof(StreamBuilder).Assembly.GetName().Version != new Version(4, 10, 2, 0)) return 0;
+                // Bound by shape, not by version: Emby 4.11.0.18+ moved the
+                // demand/codec types into Emby.MediaEncoding.Model and
+                // obfuscates private method names and some builder types.
+                // Every binding must be unique, otherwise native rendering
+                // stays off and external subtitle delivery remains.
+                const BindingFlags all = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
                 var target = typeof(StreamBuilder).GetMethod("GetSubtitleStreams", BindingFlags.NonPublic | BindingFlags.Instance,
                     null, new[] { typeof(MediaSourceInfo), typeof(List<MediaStream>), typeof(int?), typeof(SubtitleProfile[]),
                         typeof(PlayMethod), typeof(EncodingContext), typeof(string), typeof(string), typeof(string), typeof(int) }, null);
@@ -60,22 +65,42 @@ namespace Emby.YouTubePlugin
                         && parameters.Length >= 3 && parameters[0].ParameterType == typeof(MethodBase)
                         && parameters.Any(parameter => parameter.Name == "prefix"));
                 if (patch == null) return 0;
-                Type Find(string name) => AppDomain.CurrentDomain.GetAssemblies().Select(assembly => assembly.GetType(name, false))
-                    .FirstOrDefault(type => type != null) ?? throw new InvalidOperationException();
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(assembly => assembly.GetName().Name is string name && (name.StartsWith("Emby.", StringComparison.Ordinal)
+                        || name.StartsWith("MediaBrowser.", StringComparison.Ordinal))).ToArray();
+                Type[] Exported(Assembly assembly)
+                {
+                    try { return assembly.GetExportedTypes(); }
+                    catch (Exception error) when (error is not OutOfMemoryException) { return Array.Empty<Type>(); }
+                }
+                // Full name first; otherwise the single public type of that
+                // simple name (the namespace moved in 4.11.0.18).
+                Type Find(string name)
+                {
+                    var exact = assemblies.Select(assembly => assembly.GetType(name, false)).FirstOrDefault(type => type != null);
+                    if (exact != null) return exact;
+                    var simple = name.Substring(name.LastIndexOf('.') + 1);
+                    var matches = assemblies.SelectMany(Exported).Where(type => type.Name == simple).Distinct().ToArray();
+                    return matches.Length == 1 ? matches[0] : throw new InvalidOperationException();
+                }
+                MethodInfo Single(IEnumerable<MethodInfo> candidates, string preferred)
+                {
+                    var list = candidates.ToArray();
+                    var named = list.Where(method => method.Name == preferred).ToArray();
+                    if (named.Length == 1) return named[0];
+                    return list.Length == 1 ? list[0] : throw new InvalidOperationException();
+                }
+                bool Shape(MethodInfo method, params Type[] types)
+                    => method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(types);
                 var pipeline = Find("Emby.Server.MediaEncoding.Encoder.Pipelines.Video.PipelineBuilderBase");
-                if (pipeline.Assembly.GetName().Version != new Version(4, 10, 2, 0)) return 0;
-                var nativeSource = pipeline.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                    .Single(method => method.Name == "CreateTextSubtitleStreamSource"
-                        && method.ReturnType.FullName == "Emby.Ffmpeg.Model.Interfaces.ISubtitleStreamSource"
-                        && method.GetParameters().Select(parameter => parameter.ParameterType.FullName).SequenceEqual(new[]
-                        {
-                            "Emby.Server.MediaEncoding.Encoder.Pipelines.FilterBuilder.StateTrackingFilterBuilder",
-                            "Emby.Ffmpeg.Model.FfmpegCommand",
-                            "Emby.Server.MediaEncoding.Encoder.Demands.VideoProcessing.SubtitleBurnInDemand",
-                            "Emby.Server.MediaEncoding.Encoder.Demands.DemandsList"
-                        }));
-                var command = nativeSource.GetParameters()[1].ParameterType;
-                var demand = nativeSource.GetParameters()[2].ParameterType;
+                var tracking = Find("Emby.Server.MediaEncoding.Encoder.Pipelines.FilterBuilder.StateTrackingFilterBuilder");
+                var command = Find("Emby.Ffmpeg.Model.FfmpegCommand");
+                var demand = Find("Emby.Server.MediaEncoding.Encoder.Demands.VideoProcessing.SubtitleBurnInDemand");
+                var demands = Find("Emby.Server.MediaEncoding.Encoder.Demands.DemandsList");
+                var source = Find("Emby.Ffmpeg.Model.Interfaces.ISubtitleStreamSource");
+                var declared = pipeline.GetMethods(all | BindingFlags.DeclaredOnly);
+                var nativeSource = Single(declared.Where(method => method.ReturnType == source
+                    && Shape(method, tracking, command, demand, demands)), "CreateTextSubtitleStreamSource");
                 PropertyInfo Property(Type type, string name, Type? expected = null)
                 {
                     var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
@@ -89,30 +114,36 @@ namespace Emby.YouTubePlugin
                     || !nativeSource.ReturnType.IsAssignableFrom(subtitles.PropertyType)) throw new InvalidOperationException();
                 _input = new InputBinding(inputs, first, Property(first.PropertyType, "Url", typeof(string)), subtitles,
                     Property(demand, "IsExternal", typeof(bool)), Property(demand, "SubtitlePath", typeof(string)));
-                var tracking = nativeSource.GetParameters()[0].ParameterType;
-                var demands = nativeSource.GetParameters()[3].ParameterType;
                 MethodInfo Method(Type type, string name, params Type[] types)
                 {
-                    var method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, types, null);
+                    var method = type.GetMethod(name, all, null, types, null);
                     if (method?.ReturnType != typeof(void)) throw new InvalidOperationException();
                     return method;
                 }
                 var software = Method(pipeline, "AddSoftwareSubtitleBurnInFilter", command, tracking, demand, demands);
+                var legacy = Single(declared.Where(method => method.ReturnType == typeof(void) && !method.IsVirtual
+                    && Shape(method, tracking, demand)), "AddLegacySoftwareSubtitleBurnInFilter");
                 var plan = Find("Emby.Server.MediaEncoding.Encoder.Pipelines.ProcessingSteps.ProcessingPlan");
                 var step = Find("Emby.Server.MediaEncoding.Encoder.Pipelines.ProcessingSteps.ProcessingStep");
                 var hardware = Property(step, "WillDoInHardware", typeof(bool));
                 var steps = Property(plan, "ProcessingSteps");
                 if (!hardware.CanWrite || !typeof(IEnumerable).IsAssignableFrom(steps.PropertyType)) throw new InvalidOperationException();
-                _render = new RenderBinding(Method(pipeline, "EnsureSoftwareContext", tracking),
-                    Method(pipeline, "AddLegacySoftwareSubtitleBurnInFilter", tracking, demand),
+                _render = new RenderBinding(Method(pipeline, "EnsureSoftwareContext", tracking), legacy,
                     steps, Property(step, "Demand"), hardware);
                 var pipelineArguments = new[] { plan, demands, command,
                     Find("Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoDecoder"),
                     Find("Emby.Server.MediaEncoding.Codecs.Common.Types.ConfiguredVideoEncoder"), tracking };
-                var pipelines = new[] { "Software", "Vaapi", "Nvidia", "QuickSync", "MediaCodec" }
-                    .Select(name => Method(Find("Emby.Server.MediaEncoding.Encoder.Pipelines.Video.PipelineBuilder" + name),
-                        "SetupVideoProcessing", pipelineArguments)).ToArray();
-                if (pipelines.Any(method => method.IsAbstract)) throw new InvalidOperationException();
+                // Every concrete video pipeline (Software, VAAPI, NVIDIA,
+                // QuickSync, MediaCodec, ...): their type names are obfuscated
+                // from 4.11.0.18 on, the override of the abstract method is not.
+                Type[] builderTypes;
+                try { builderTypes = pipeline.Assembly.GetTypes(); }
+                catch (ReflectionTypeLoadException error) { builderTypes = error.Types.Where(type => type != null).ToArray()!; }
+                var pipelines = builderTypes.Where(type => type.IsClass && !type.IsAbstract && pipeline.IsAssignableFrom(type))
+                    .Select(type => type.GetMethod("SetupVideoProcessing", all | BindingFlags.DeclaredOnly, null, pipelineArguments, null))
+                    .Where(method => method != null && method.ReturnType == typeof(void)).Select(method => method!).ToArray();
+                if (pipelines.Length == 0 || pipelines.Any(method => method.IsAbstract)
+                    || !pipelines.Any(method => method.DeclaringType!.Name == "PipelineBuilderSoftware")) throw new InvalidOperationException();
                 EmbyPatchSafety.RequirePatchable(new MethodBase[] { nativeSource, software, target }.Concat(pipelines));
                 void Add(MethodInfo original, string? prefix, string? postfix)
                 {
