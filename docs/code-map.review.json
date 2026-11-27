@@ -6,7 +6,7 @@
       "definitionHash": "53929e6a6634d294811b26460b431d9fad83322092766ddcf242625e090f376e",
       "sourceHashes": {
         "EmbeddedDependencyLoader.cs": "894579e40db3d381c41ecf37eeb98fc1f65cd7bf81ae05b0ddbc627b81465c2e",
-        "Emby.YouTubePlugin.csproj": "7e724b5efe1c7c36bc0e6a7d7248fa93de380ec04527f639080d7ae853314017",
+        "Emby.YouTubePlugin.csproj": "ded4f6dc3143038b3438cafe41e9c75e0fab6d5c647d46475d4406c304a791e7",
         "EmbyPatchSafety.cs": "d490c3193f5179de39a3d97dba332b5787186e34db6e2d42cbf079f2c23b3f40",
         "ManagedResolver/License.txt": "0be76f79072fad21b789198003de6d29f04af9f7c96ef9185d407508ad5d167f",
         "ManagedResolver/Upstream.json": "e5b3bdbdf6e64ffe2a7f2df8246f52482c8536014cdf977dfff559f28c86d3fe",
@@ -193,7 +193,7 @@
       "definitionHash": "140e05b9de1939cf5d79aeb6b269fec6d1967827c5cb51cf58960b2f9823d0c2",
       "sourceHashes": {
         "DashboardYouTubePlayerInterceptor.cs": "c1e70c424b9273ec8ff40246e5ee2009110da5c808293500f5cef16960cfe561",
-        "Emby.YouTubePlugin.csproj": "7e724b5efe1c7c36bc0e6a7d7248fa93de380ec04527f639080d7ae853314017",
+        "Emby.YouTubePlugin.csproj": "ded4f6dc3143038b3438cafe41e9c75e0fab6d5c647d46475d4406c304a791e7",
         "PlaybackIntentInterceptor.cs": "c07b11c6a9e3bca02590de1e7c521a79140f21739ca32837321ab263853e10e9",
         "YouTubeCaptionMetadata.cs": "26e5ded81d6d7253991ae31786926dbc7a0104514312f7b3a5fced20f556405b",
         "YouTubeCaptionOffGuard.cs": "0bce63452eb78f021fac66f81c110edfdf16fa5762e582e05a9ac215c3d37eda",
