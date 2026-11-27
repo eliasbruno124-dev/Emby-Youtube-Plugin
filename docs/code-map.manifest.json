@@ -2,6 +2,10 @@
   "schemaVersion": 1,
   "inputs": [
     {
+      "path": ".claude/settings.json",
+      "sha256": "5d2ddf16770542c7d5b6d74c1a3c66e16c84a1765bd6e2f4e357de4fe8eb1bf0"
+    },
+    {
       "path": ".gitattributes",
       "sha256": "1a1dbe176bc233b499d35a57db7513f2941c99ab9759f177830c9149be99005b"
     },
@@ -11,7 +15,7 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "dca318fb6fb051992470f0d4e8a5365576ed5d5ecb99e121dc6b9e1429359ca2"
+      "sha256": "6af2cb9724313e934ec9ec16db07f568917e62187649e140711c4b8b4d66abb8"
     },
     {
       "path": "ChannelContentFlags.cs",
@@ -75,11 +79,11 @@
     },
     {
       "path": "Emby.YouTubePlugin.csproj",
-      "sha256": "7e724b5efe1c7c36bc0e6a7d7248fa93de380ec04527f639080d7ae853314017"
+      "sha256": "ded4f6dc3143038b3438cafe41e9c75e0fab6d5c647d46475d4406c304a791e7"
     },
     {
       "path": "EmbyPatchSafety.cs",
-      "sha256": "ead20bc7fbbac27c309a3ed82c3f4396c6dad5bb2d78b6a1345e6f033982fe44"
+      "sha256": "d490c3193f5179de39a3d97dba332b5787186e34db6e2d42cbf079f2c23b3f40"
     },
     {
       "path": "FolderIcons.cs",
@@ -239,7 +243,7 @@
     },
     {
       "path": "YouTubeChannel.Personal.cs",
-      "sha256": "201de305b38c2bdccf81a79ce4c033e9bca2d7efd44ddf44c11d6b0cfa0821da"
+      "sha256": "ff8202223ab151ebe0ea734a44e20b6b151071980eb6b88b5a9d4b9b3a389d75"
     },
     {
       "path": "YouTubeChannel.Shorts.cs",
@@ -331,7 +335,7 @@
     },
     {
       "path": "YouTubeLazyImage.cs",
-      "sha256": "cc70553dfa639e6f44f02bd7b4da6316c72a1d81fb6088999842fd64735b450e"
+      "sha256": "8d304372bee52d25f8345406e1af7131763efdfb0615b6d4e428289f83105c64"
     },
     {
       "path": "YouTubeManagedHttp.cs",
@@ -371,7 +375,7 @@
     },
     {
       "path": "YouTubePersonalVisibility.cs",
-      "sha256": "0fa6dbfd7b7c6234134709bab1d9e98b9f4d278fae684c69e74e917af11a5167"
+      "sha256": "a43dee995c7154e08d30ebfa45db01fc023d5e283a1619abce37034cd24f5506"
     },
     {
       "path": "YouTubeRequestBackoff.cs",
@@ -383,7 +387,7 @@
     },
     {
       "path": "YouTubeRootMigration.cs",
-      "sha256": "29e122d24b5743d563c73049b0086d938cd9860ea4cceac3600e6816c75379df"
+      "sha256": "518d9647d490242ae294a295159fda341d653114e4fb5194066e73c006657117"
     },
     {
       "path": "YouTubeSessionCommandRouter.cs",
@@ -403,7 +407,7 @@
     },
     {
       "path": "YouTubeSubtitleDelivery.cs",
-      "sha256": "840efa232b00869ed9c9bc6ad84ddae9668c1d255d3d56bc1981190bd9959a5e"
+      "sha256": "b60ea76d1c4dacb591754ea25093371770c67fb4c8ac1b2478a6c69e9d1813c2"
     },
     {
       "path": "YouTubeTrailers.cs",
@@ -415,7 +419,7 @@
     },
     {
       "path": "docs/CODE_GUIDE.md",
-      "sha256": "23d7bb35fe225e404dbe3ea664b8dcc2f52a52925b6e26db58346359e0a12c56"
+      "sha256": "4b20690f05c2c041a27793d87c054cb0f8240c711a96e7aab331755e67a4a403"
     },
     {
       "path": "docs/CODE_MAP_MAINTENANCE.md",
@@ -427,7 +431,7 @@
     },
     {
       "path": "docs/code-map.flows.json",
-      "sha256": "c87826b8470d65e4125c614c77df00deef5e4c41cf795c855032017ded82fc47"
+      "sha256": "f0ff2d1184aeda969e9b1701547eaa5a2130bfd4128a86ae03baf081b895162a"
     },
     {
       "path": "docs/screenshots/.gitkeep",
@@ -497,11 +501,11 @@
   "outputs": [
     {
       "path": "docs/CODE_MAP.md",
-      "sha256": "1b3ca74ddb70c73e071a292c03109f88390f4349f4da57db04f867cbb1f87dd8"
+      "sha256": "6ae570a364b0c55f3952bf64c657e92979fb705da01196f55894f5a150aa3bf2"
     },
     {
       "path": "docs/code-map.json",
-      "sha256": "dee450a6cce8876d0f94c742ea9e8e7b699b29286a9bde229095582718a52cc4"
+      "sha256": "f3f9d4517b15d236fff5a49e9b074069c93f246e580b523357a97797c032de35"
     }
   ],
   "parsers": {
@@ -512,7 +516,7 @@
     },
     "javascript": {
       "engine": "Acorn",
-      "version": "8.17.0"
+      "version": "8.8.1"
     },
     "html": "Quoted-tag/comment/rawtext scanner; not a DOM validator"
   }

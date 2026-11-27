@@ -48,6 +48,7 @@ public partial class YouTubeChannel
                     // server key. Within a profile, aliases also deduplicate.
                     if (!existing.Add(item.Id)) continue;
                     item.Id = YouTubePersonalCatalog.WrapOwn(profile.ScopeId, YouTubeChannelProvenance.Token(term), item.Id);
+                    item.Studios = new List<string>(); // see GetPersonalItemsAsync
                     YouTubePersonalVisibility.MarkPersonalContent();
                     items.Add(item);
                 }
@@ -108,8 +109,16 @@ public partial class YouTubeChannel
             return Msg(new List<ChannelItemInfo>(), "YouTube is temporarily unavailable. Check My YouTube settings.");
         }
         foreach (var item in result.Items)
+        {
             if (item.Type == ChannelItemType.Folder)
                 item.Id = ownRoot ? YouTubePersonalCatalog.WrapOwn(scope, contribution, item.Id) : YouTubePersonalCatalog.Wrap(scope, item.Id);
+            // Emby turns every studio name into a library-wide Studio item
+            // that no folder guard covers: another user would find the
+            // channel name in search and /Studios. Videos of a user's own
+            // subscriptions therefore carry no studio; the channel name stays
+            // in SeriesName, which creates no item of its own.
+            if (ownRoot) item.Studios = new List<string>();
+        }
         return result;
     }
 
@@ -195,9 +204,7 @@ internal static class YouTubePersonalCatalog
         try
         {
             var manager = Plugin.ResolveService<IChannelManager>();
-            var providerMethod = manager?.GetType().GetMethod("GetChannelProvider",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null, new[] { typeof(Channel) }, null);
+            var providerMethod = EmbyChannelBinding.ProviderMethod(manager);
             if (manager == null || providerMethod == null) return false;
             var channels = library.GetItemList(new InternalItemsQuery
                 { IncludeItemTypes = new[] { "Channel" }, Recursive = true }, CancellationToken.None).OfType<Channel>();
@@ -233,6 +240,31 @@ internal static class YouTubePersonalCatalog
         });
     }
 
+    // Once per start, after the channel is known and no channel refresh
+    // writes: removes studio names that older builds stored for own
+    // subscriptions (YouTubePersonalVisibility.RepairPersonalStudios).
+    private static void RepairStudiosLater(ILibraryManager library, CancellationToken token)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(30), token).ConfigureAwait(false);
+                var started = DateTime.UtcNow;
+                while ((Interlocked.Read(ref _channelId) <= 0 || ChannelRefreshInvoker.IsRefreshInProgress)
+                    && DateTime.UtcNow - started < TimeSpan.FromHours(2))
+                    await Task.Delay(TimeSpan.FromSeconds(15), token).ConfigureAwait(false);
+                if (!YouTubePersonalVisibility.IsReady) return;
+                YouTubePersonalVisibility.RepairPersonalStudios(library, Interlocked.Read(ref _channelId), token);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception error) when (error is not OutOfMemoryException)
+            {
+                YouTubeChannel.LogPublic("[YT] Personal studio repair failed (" + error.GetType().Name + ").");
+            }
+        });
+    }
+
     internal static void Start(ILibraryManager library, IUserManager users, IUserViewManager views)
     {
         YouTubeChannelProvenance.Reset();
@@ -261,6 +293,7 @@ internal static class YouTubePersonalCatalog
             YouTubePersonalVisibility.Initialize(library, views, dto, () => Interlocked.Read(ref _channelId), MayView);
             if (!TryResolveChannelId(library))
                 PollChannelId(library, _lifetime.Token);
+            RepairStudiosLater(library, _lifetime.Token);
             var count = YouTubePersonalVisibility.Install(_harmony, methodType);
             YouTubeChannel.LogPublic("[YT] Personal catalog visibility " + (YouTubePersonalVisibility.IsReady
                 ? "ready (" + count + " bindings)." : "unavailable; new personal folders are disabled. Check server compatibility."));

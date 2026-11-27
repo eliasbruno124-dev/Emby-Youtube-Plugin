@@ -4,7 +4,7 @@ Generated syntax inventory. Start with [the reviewed change guide](CODE_GUIDE.md
 
 Run `node tools/code-map.mjs check` before trusting this snapshot. A generated map is not a compiler-bound call graph or a runtime capability test.
 
-Scope: 123 files; 10192 syntax declarations/HTML anchors.
+Scope: 124 files; 10368 syntax declarations/HTML anchors.
 
 C# includes namespace/type/member/local/parameter declarations and anonymous functions. JavaScript includes functions, classes/methods, bindings and parameters. HTML records IDs, script/style blocks and resource references. Compiler-synthesized members and external Emby bundle code are not repository declarations.
 
@@ -12,6 +12,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 
 | File | Role | Entries |
 |---|---|---:|
+| [.claude/settings.json](#file-f27ac6f39d89fe02) | Repository support | 0 |
 | [.gitattributes](#file-618cd5b83d62060b) | Repository support | 0 |
 | [.gitignore](#file-bc37d034bad56458) | Repository support | 0 |
 | [AGENTS.md](#file-a54ff182c7e8acf5) | Documentation/resource | 0 |
@@ -31,7 +32,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [EmbeddedDependencyLoader.cs](#file-07323f6dc3f3a1d5) | Plugin Compile source (SDK default) | 23 |
 | [Emby-Youtube-Plugin.sln](#file-8194c8953ddc1453) | Build definition | 0 |
 | [Emby.YouTubePlugin.csproj](#file-8c9377fd54ef39d4) | Build definition | 0 |
-| [EmbyPatchSafety.cs](#file-851e782cbdb64f12) | Plugin Compile source (SDK default) | 33 |
+| [EmbyPatchSafety.cs](#file-851e782cbdb64f12) | Plugin Compile source (SDK default) | 63 |
 | [FolderIcons.cs](#file-072a7f211747c67e) | Plugin Compile source (SDK default) | 15 |
 | [GuideImageService.cs](#file-24d40baec16f6f30) | Plugin Compile source (SDK default) | 18 |
 | [LICENSE](#file-c693279643b8cd5d) | Repository support | 0 |
@@ -71,7 +72,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeChannel.Live.cs](#file-fd75d22d5169819c) | Plugin Compile source (SDK default) | 30 |
 | [YouTubeChannel.Mapping.cs](#file-b5a9b427d9c6cb61) | Plugin Compile source (SDK default) | 98 |
 | [YouTubeChannel.MediaFolders.cs](#file-11faad7ba4aab64e) | Plugin Compile source (SDK default) | 142 |
-| [YouTubeChannel.Personal.cs](#file-ea131b3b3c2fe81c) | Plugin Compile source (SDK default) | 173 |
+| [YouTubeChannel.Personal.cs](#file-ea131b3b3c2fe81c) | Plugin Compile source (SDK default) | 179 |
 | [YouTubeChannel.Shorts.cs](#file-b6bd071cf0a75be9) | Plugin Compile source (SDK default) | 148 |
 | [YouTubeChannel.State.cs](#file-bd6961656d4c3822) | Plugin Compile source (SDK default) | 53 |
 | [YouTubeChannel.cs](#file-aa77154cbf6e5636) | Plugin Compile source (SDK default) | 55 |
@@ -104,7 +105,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubePersonalRequestContext.cs](#file-5a4637d17f32c0fe) | Plugin Compile source (SDK default) | 19 |
 | [YouTubePersonalService.cs](#file-cdd49be2d7ae99e3) | Plugin Compile source (SDK default) | 91 |
 | [YouTubePersonalStartup.cs](#file-e29c28a293aed316) | Plugin Compile source (SDK default) | 12 |
-| [YouTubePersonalVisibility.cs](#file-3c3889e240a93fde) | Plugin Compile source (SDK default) | 192 |
+| [YouTubePersonalVisibility.cs](#file-3c3889e240a93fde) | Plugin Compile source (SDK default) | 246 |
 | [YouTubeRequestBackoff.cs](#file-7a9c7096d206cd40) | Plugin Compile source (SDK default) | 27 |
 | [YouTubeRootMaterialization.cs](#file-d83451aba3d200d0) | Plugin Compile source (SDK default) | 115 |
 | [YouTubeRootMigration.cs](#file-9330046d20e24a92) | Plugin Compile source (SDK default) | 81 |
@@ -112,7 +113,7 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [YouTubeSortNameRepairer.cs](#file-ff64b0c5af701f8e) | Plugin Compile source (SDK default) | 57 |
 | [YouTubeSourceBudget.cs](#file-28aab84e271eec1a) | Plugin Compile source (SDK default) | 92 |
 | [YouTubeStreamResolver.cs](#file-a5337fff5b60437f) | Plugin Compile source (SDK default) | 146 |
-| [YouTubeSubtitleDelivery.cs](#file-8b85a2815c8e321e) | Plugin Compile source (SDK default) | 143 |
+| [YouTubeSubtitleDelivery.cs](#file-8b85a2815c8e321e) | Plugin Compile source (SDK default) | 229 |
 | [YouTubeTrailers.cs](#file-2c3004d965267f89) | Plugin Compile source (SDK default) | 169 |
 | [YouTubeVideoPresentation.cs](#file-39d5ac61905a017e) | Plugin Compile source (SDK default) | 33 |
 | [docs/CODE_GUIDE.md](#file-8a63fe1dcd96b301) | Documentation/resource | 0 |
@@ -136,6 +137,11 @@ C# constant JavaScript payload coordinates point to the owning constant; decoded
 | [tools/code-map.mjs](#file-f02e27bb31214f09) | Development tooling | 322 |
 | [tools/package.json](#file-fd2585028b28d5cf) | Development tooling | 0 |
 
+<a id="file-f27ac6f39d89fe02"></a>
+## [.claude/settings.json](../.claude/settings.json)
+
+Repository support; 90 bytes; 7 lines.
+
 <a id="file-618cd5b83d62060b"></a>
 ## [.gitattributes](../.gitattributes)
 
@@ -149,7 +155,7 @@ Repository support; 102 bytes.
 <a id="file-a54ff182c7e8acf5"></a>
 ## [AGENTS.md](../AGENTS.md)
 
-Documentation/resource; 1241 bytes; 8 lines.
+Documentation/resource; 1921 bytes; 13 lines.
 
 <a id="file-3fbcb901338e79fb"></a>
 ## [ChannelContentFlags.cs](../ChannelContentFlags.cs)
@@ -1142,46 +1148,76 @@ Build definition; 2340 bytes; 45 lines.
 <a id="file-851e782cbdb64f12"></a>
 ## [EmbyPatchSafety.cs](../EmbyPatchSafety.cs)
 
-Plugin Compile source (SDK default); 4454 bytes; 89 lines.
+Plugin Compile source (SDK default); 9002 bytes; 173 lines.
 
 <details>
-<summary>All 33 declarations / anchors</summary>
+<summary>All 63 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
-| namespace | Emby.YouTubePlugin | [8:1](../EmbyPatchSafety.cs#L8) |
-| type | Emby.YouTubePlugin.EmbyPatchSafety | [19:5](../EmbyPatchSafety.cs#L19) |
-| field | Emby.YouTubePlugin.EmbyPatchSafety.Cache | [21:72](../EmbyPatchSafety.cs#L21) |
-| field | Emby.YouTubePlugin.EmbyPatchSafety.Operands | [22:64](../EmbyPatchSafety.cs#L22) |
-| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1177 | [24:21](../EmbyPatchSafety.cs#L24) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1177.field | [24:21](../EmbyPatchSafety.cs#L24) |
-| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1246 | [25:22](../EmbyPatchSafety.cs#L25) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1246.code | [25:22](../EmbyPatchSafety.cs#L25) |
-| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1279 | [25:55](../EmbyPatchSafety.cs#L25) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1279.group | [25:55](../EmbyPatchSafety.cs#L25) |
-| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1299 | [25:75](../EmbyPatchSafety.cs#L25) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1299.group | [25:75](../EmbyPatchSafety.cs#L25) |
-| method | Emby.YouTubePlugin.EmbyPatchSafety.IsPatchable | [27:9](../EmbyPatchSafety.cs#L27) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.IsPatchable.method | [27:42](../EmbyPatchSafety.cs#L27) |
-| method | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable | [29:9](../EmbyPatchSafety.cs#L29) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable.methods | [29:47](../EmbyPatchSafety.cs#L29) |
-| iteration-variable | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable.method | [31:13](../EmbyPatchSafety.cs#L31) |
-| method | Emby.YouTubePlugin.EmbyPatchSafety.Inspect | [36:9](../EmbyPatchSafety.cs#L36) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.method | [36:37](../EmbyPatchSafety.cs#L36) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.il | [39:21](../EmbyPatchSafety.cs#L39) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.typeArguments | [43:21](../EmbyPatchSafety.cs#L43) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.methodArguments | [44:21](../EmbyPatchSafety.cs#L44) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.i | [45:17](../EmbyPatchSafety.cs#L45) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.value | [48:23](../EmbyPatchSafety.cs#L48) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.size | [49:21](../EmbyPatchSafety.cs#L49) |
-| pattern-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.operand | [51:58](../EmbyPatchSafety.cs#L51) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.token | [57:29](../EmbyPatchSafety.cs#L57) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.target | [60:33](../EmbyPatchSafety.cs#L60) |
-| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.count | [75:29](../EmbyPatchSafety.cs#L75) |
-| method | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName | [86:9](../EmbyPatchSafety.cs#L86) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.name | [86:46](../EmbyPatchSafety.cs#L86) |
-| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.anonymous@4358 | [87:38](../EmbyPatchSafety.cs#L87) |
-| parameter | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.anonymous@4358.c | [87:38](../EmbyPatchSafety.cs#L87) |
+| namespace | Emby.YouTubePlugin | [10:1](../EmbyPatchSafety.cs#L10) |
+| type | Emby.YouTubePlugin.EmbyPatchSafety | [21:5](../EmbyPatchSafety.cs#L21) |
+| field | Emby.YouTubePlugin.EmbyPatchSafety.Cache | [23:72](../EmbyPatchSafety.cs#L23) |
+| field | Emby.YouTubePlugin.EmbyPatchSafety.Operands | [24:64](../EmbyPatchSafety.cs#L24) |
+| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1257 | [26:21](../EmbyPatchSafety.cs#L26) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1257.field | [26:21](../EmbyPatchSafety.cs#L26) |
+| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1326 | [27:22](../EmbyPatchSafety.cs#L27) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1326.code | [27:22](../EmbyPatchSafety.cs#L27) |
+| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1359 | [27:55](../EmbyPatchSafety.cs#L27) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1359.group | [27:55](../EmbyPatchSafety.cs#L27) |
+| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1379 | [27:75](../EmbyPatchSafety.cs#L27) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Operands.anonymous@1379.group | [27:75](../EmbyPatchSafety.cs#L27) |
+| field | Emby.YouTubePlugin.EmbyPatchSafety.Reported | [29:72](../EmbyPatchSafety.cs#L29) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.IsPatchable | [31:9](../EmbyPatchSafety.cs#L31) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.IsPatchable.method | [31:42](../EmbyPatchSafety.cs#L31) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.Describe | [35:9](../EmbyPatchSafety.cs#L35) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Describe.method | [35:41](../EmbyPatchSafety.cs#L35) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Describe.type | [37:20](../EmbyPatchSafety.cs#L37) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Describe.name | [38:20](../EmbyPatchSafety.cs#L38) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable | [45:9](../EmbyPatchSafety.cs#L45) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable.methods | [45:47](../EmbyPatchSafety.cs#L45) |
+| iteration-variable | Emby.YouTubePlugin.EmbyPatchSafety.RequirePatchable.method | [47:13](../EmbyPatchSafety.cs#L47) |
+| field | Emby.YouTubePlugin.EmbyPatchSafety.InlineDepth | [64:27](../EmbyPatchSafety.cs#L64) |
+| field | Emby.YouTubePlugin.EmbyPatchSafety.InlineCandidateBytes | [65:27](../EmbyPatchSafety.cs#L65) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.Inspect | [67:9](../EmbyPatchSafety.cs#L67) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Inspect.method | [67:37](../EmbyPatchSafety.cs#L67) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.Clean | [69:9](../EmbyPatchSafety.cs#L69) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Clean.method | [69:35](../EmbyPatchSafety.cs#L69) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Clean.depth | [69:54](../EmbyPatchSafety.cs#L69) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.Clean.seen | [69:65](../EmbyPatchSafety.cs#L69) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.il | [72:21](../EmbyPatchSafety.cs#L72) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.typeArguments | [79:21](../EmbyPatchSafety.cs#L79) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.methodArguments | [80:21](../EmbyPatchSafety.cs#L80) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.i | [81:17](../EmbyPatchSafety.cs#L81) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.value | [84:23](../EmbyPatchSafety.cs#L84) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.size | [85:21](../EmbyPatchSafety.cs#L85) |
+| pattern-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.operand | [87:58](../EmbyPatchSafety.cs#L87) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.token | [93:29](../EmbyPatchSafety.cs#L93) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.target | [96:33](../EmbyPatchSafety.cs#L96) |
+| local-variable | Emby.YouTubePlugin.EmbyPatchSafety.Clean.count | [114:29](../EmbyPatchSafety.cs#L114) |
+| method | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName | [125:9](../EmbyPatchSafety.cs#L125) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.name | [125:46](../EmbyPatchSafety.cs#L125) |
+| anonymous-function | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.anonymous@6661 | [126:38](../EmbyPatchSafety.cs#L126) |
+| parameter | Emby.YouTubePlugin.EmbyPatchSafety.HasInvisibleName.anonymous@6661.c | [126:38](../EmbyPatchSafety.cs#L126) |
+| type | Emby.YouTubePlugin.EmbyChannelBinding | [134:5](../EmbyPatchSafety.cs#L134) |
+| field | Emby.YouTubePlugin.EmbyChannelBinding.Sync | [136:40](../EmbyPatchSafety.cs#L136) |
+| field | Emby.YouTubePlugin.EmbyChannelBinding._type | [137:30](../EmbyPatchSafety.cs#L137) |
+| field | Emby.YouTubePlugin.EmbyChannelBinding._method | [138:36](../EmbyPatchSafety.cs#L138) |
+| method | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod | [140:9](../EmbyPatchSafety.cs#L140) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.manager | [140:52](../EmbyPatchSafety.cs#L140) |
+| local-variable | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.type | [143:17](../EmbyPatchSafety.cs#L143) |
+| local-variable | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.method | [147:29](../EmbyPatchSafety.cs#L147) |
+| local-variable | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.flags | [150:40](../EmbyPatchSafety.cs#L150) |
+| local-variable | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.shaped | [154:29](../EmbyPatchSafety.cs#L154) |
+| anonymous-function | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.shaped.anonymous@8057 | [155:36](../EmbyPatchSafety.cs#L155) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.shaped.anonymous@8057.candidate | [155:36](../EmbyPatchSafety.cs#L155) |
+| anonymous-function | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.shaped.anonymous@8057.anonymous@8204 | [156:69](../EmbyPatchSafety.cs#L156) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.shaped.anonymous@8057.anonymous@8204.parameter | [156:69](../EmbyPatchSafety.cs#L156) |
+| catch-variable | Emby.YouTubePlugin.EmbyChannelBinding.ProviderMethod.error | [161:23](../EmbyPatchSafety.cs#L161) |
+| method | Emby.YouTubePlugin.EmbyChannelBinding.IsYouTube | [170:9](../EmbyPatchSafety.cs#L170) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.IsYouTube.manager | [170:40](../EmbyPatchSafety.cs#L170) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.IsYouTube.provider | [170:56](../EmbyPatchSafety.cs#L170) |
+| parameter | Emby.YouTubePlugin.EmbyChannelBinding.IsYouTube.channel | [170:77](../EmbyPatchSafety.cs#L170) |
 
 </details>
 
@@ -5720,10 +5756,10 @@ Plugin Compile source (SDK default); 21472 bytes; 507 lines.
 <a id="file-ea131b3b3c2fe81c"></a>
 ## [YouTubeChannel.Personal.cs](../YouTubeChannel.Personal.cs)
 
-Plugin Compile source (SDK default); 23014 bytes; 394 lines.
+Plugin Compile source (SDK default); 24730 bytes; 427 lines.
 
 <details>
-<summary>All 173 declarations / anchors</summary>
+<summary>All 179 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -5748,158 +5784,164 @@ Plugin Compile source (SDK default); 23014 bytes; 394 lines.
 | iteration-variable | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRootsAsync.profile.term | [40:13](../YouTubeChannel.Personal.cs#L40) |
 | local-variable | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRootsAsync.profile.term.own | [42:21](../YouTubeChannel.Personal.cs#L42) |
 | iteration-variable | Emby.YouTubePlugin.YouTubeChannel.AddPersonalRootsAsync.profile.term.item | [45:17](../YouTubeChannel.Personal.cs#L45) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync | [59:5](../YouTubeChannel.Personal.cs#L59) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.id | [59:65](../YouTubeChannel.Personal.cs#L59) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.config | [59:76](../YouTubeChannel.Personal.cs#L59) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ct | [59:104](../YouTubeChannel.Personal.cs#L59) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.scope | [61:58](../YouTubeChannel.Personal.cs#L61) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.inner | [61:73](../YouTubeChannel.Personal.cs#L61) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ownRoot | [65:13](../YouTubeChannel.Personal.cs#L65) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.contribution | [66:13](../YouTubeChannel.Personal.cs#L66) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile | [69:13](../YouTubeChannel.Personal.cs#L69) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@3934 | [69:85](../YouTubeChannel.Personal.cs#L69) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@3934.p | [69:85](../YouTubeChannel.Personal.cs#L69) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.anonymous@4141 | [72:38](../YouTubeChannel.Personal.cs#L72) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.anonymous@4141.term | [72:38](../YouTubeChannel.Personal.cs#L72) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.usePersonalKey | [74:13](../YouTubeChannel.Personal.cs#L74) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.key | [75:13](../YouTubeChannel.Personal.cs#L75) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.configurationHash | [78:13](../YouTubeChannel.Personal.cs#L78) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.catalogRevision | [79:13](../YouTubeChannel.Personal.cs#L79) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context | [80:19](../YouTubeChannel.Personal.cs#L80) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context.anonymous@4906 | [81:13](../YouTubeChannel.Personal.cs#L81) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.saved | [82:13](../YouTubeChannel.Personal.cs#L82) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.local | [86:13](../YouTubeChannel.Personal.cs#L86) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.result | [96:27](../YouTubeChannel.Personal.cs#L96) |
-| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.error | [105:15](../YouTubeChannel.Personal.cs#L105) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.item | [110:9](../YouTubeChannel.Personal.cs#L110) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync | [116:5](../YouTubeChannel.Personal.cs#L116) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.id | [116:63](../YouTubeChannel.Personal.cs#L116) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.config | [116:74](../YouTubeChannel.Personal.cs#L116) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.ct | [116:102](../YouTubeChannel.Personal.cs#L116) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.token | [118:98](../YouTubeChannel.Personal.cs#L118) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.inner | [118:113](../YouTubeChannel.Personal.cs#L118) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.hash | [121:13](../YouTubeChannel.Personal.cs#L121) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.revision | [122:13](../YouTubeChannel.Personal.cs#L122) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.snapshot | [123:13](../YouTubeChannel.Personal.cs#L123) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.result | [129:13](../YouTubeChannel.Personal.cs#L129) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.item | [133:9](../YouTubeChannel.Personal.cs#L133) |
-| method | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync | [138:5](../YouTubeChannel.Personal.cs#L138) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.folderId | [138:73](../YouTubeChannel.Personal.cs#L138) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.apiKey | [139:9](../YouTubeChannel.Personal.cs#L139) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.config | [139:24](../YouTubeChannel.Personal.cs#L139) |
-| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.ct | [139:52](../YouTubeChannel.Personal.cs#L139) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.separator | [141:13](../YouTubeChannel.Personal.cs#L141) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.type | [143:13](../YouTubeChannel.Personal.cs#L143) |
-| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.term | [144:13](../YouTubeChannel.Personal.cs#L144) |
-| type | Emby.YouTubePlugin.YouTubePersonalCatalog | [156:1](../YouTubeChannel.Personal.cs#L156) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Prefix | [158:27](../YouTubeChannel.Personal.cs#L158) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.HarmonyId | [159:26](../YouTubeChannel.Personal.cs#L159) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._users | [160:34](../YouTubeChannel.Personal.cs#L160) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._profiles | [161:55](../YouTubeChannel.Personal.cs#L161) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._harmony | [162:28](../YouTubeChannel.Personal.cs#L162) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._channelId | [163:25](../YouTubeChannel.Personal.cs#L163) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._refreshQueued | [164:24](../YouTubeChannel.Personal.cs#L164) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog._lifetime | [165:45](../YouTubeChannel.Personal.cs#L165) |
-| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Revision | [166:26](../YouTubeChannel.Personal.cs#L166) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap | [168:5](../YouTubeChannel.Personal.cs#L168) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.scope | [168:33](../YouTubeChannel.Personal.cs#L168) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.inner | [168:47](../YouTubeChannel.Personal.cs#L168) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn | [170:5](../YouTubeChannel.Personal.cs#L170) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.scope | [170:36](../YouTubeChannel.Personal.cs#L170) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.token | [170:50](../YouTubeChannel.Personal.cs#L170) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.inner | [170:64](../YouTubeChannel.Personal.cs#L170) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn | [171:5](../YouTubeChannel.Personal.cs#L171) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.value | [171:38](../YouTubeChannel.Personal.cs#L171) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.token | [171:52](../YouTubeChannel.Personal.cs#L171) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.inner | [171:70](../YouTubeChannel.Personal.cs#L171) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10957 | [176:23](../YouTubeChannel.Personal.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@10957.c | [176:23](../YouTubeChannel.Personal.cs#L176) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse | [181:5](../YouTubeChannel.Personal.cs#L181) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.value | [181:35](../YouTubeChannel.Personal.cs#L181) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.scope | [181:50](../YouTubeChannel.Personal.cs#L181) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.inner | [181:68](../YouTubeChannel.Personal.cs#L181) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId | [192:5](../YouTubeChannel.Personal.cs#L192) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.library | [192:45](../YouTubeChannel.Personal.cs#L192) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.manager | [197:17](../YouTubeChannel.Personal.cs#L197) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.providerMethod | [198:17](../YouTubeChannel.Personal.cs#L198) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.channels | [202:17](../YouTubeChannel.Personal.cs#L202) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.channel | [204:13](../YouTubeChannel.Personal.cs#L204) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.error | [213:15](../YouTubeChannel.Personal.cs#L213) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId | [220:5](../YouTubeChannel.Personal.cs#L220) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.library | [220:39](../YouTubeChannel.Personal.cs#L220) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.token | [220:64](../YouTubeChannel.Personal.cs#L220) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@13133 | [222:22](../YouTubeChannel.Personal.cs#L222) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@13133.started | [228:21](../YouTubeChannel.Personal.cs#L228) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Start | [236:5](../YouTubeChannel.Personal.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.library | [236:32](../YouTubeChannel.Personal.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.users | [236:57](../YouTubeChannel.Personal.cs#L236) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.views | [236:77](../YouTubeChannel.Personal.cs#L236) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.dto | [247:17](../YouTubeChannel.Personal.cs#L247) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.assembly | [248:17](../YouTubeChannel.Personal.cs#L248) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.harmonyType | [249:17](../YouTubeChannel.Personal.cs#L249) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.methodType | [250:17](../YouTubeChannel.Personal.cs#L250) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@15176 | [261:71](../YouTubeChannel.Personal.cs#L261) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.count | [264:17](../YouTubeChannel.Personal.cs#L264) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.error | [268:15](../YouTubeChannel.Personal.cs#L268) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles | [274:5](../YouTubeChannel.Personal.cs#L274) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.config | [274:71](../YouTubeChannel.Personal.cs#L274) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.users | [277:13](../YouTubeChannel.Personal.cs#L277) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled | [278:13](../YouTubeChannel.Personal.cs#L278) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16230 | [278:35](../YouTubeChannel.Personal.cs#L278) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16230.user | [278:35](../YouTubeChannel.Personal.cs#L278) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16286 | [278:91](../YouTubeChannel.Personal.cs#L278) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@16286.user | [278:91](../YouTubeChannel.Personal.cs#L278) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16366 | [279:51](../YouTubeChannel.Personal.cs#L279) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@16366.profile | [279:51](../YouTubeChannel.Personal.cs#L279) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels | [284:5](../YouTubeChannel.Personal.cs#L284) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.config | [284:45](../YouTubeChannel.Personal.cs#L284) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16820 | [286:49](../YouTubeChannel.Personal.cs#L286) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@16820.profile | [286:49](../YouTubeChannel.Personal.cs#L286) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor | [289:5](../YouTubeChannel.Personal.cs#L289) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.config | [289:40](../YouTubeChannel.Personal.cs#L289) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.userId | [289:68](../YouTubeChannel.Personal.cs#L289) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@17048 | [290:36](../YouTubeChannel.Personal.cs#L290) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@17048.profile | [290:36](../YouTubeChannel.Personal.cs#L290) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView | [295:5](../YouTubeChannel.Personal.cs#L295) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.externalId | [295:33](../YouTubeChannel.Personal.cs#L295) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.userId | [295:52](../YouTubeChannel.Personal.cs#L295) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.config | [298:13](../YouTubeChannel.Personal.cs#L298) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.user | [299:13](../YouTubeChannel.Personal.cs#L299) |
-| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.sharedToken | [301:67](../YouTubeChannel.Personal.cs#L301) |
-| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.scope | [305:43](../YouTubeChannel.Personal.cs#L305) |
-| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.inner | [305:58](../YouTubeChannel.Personal.cs#L305) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.own | [307:13](../YouTubeChannel.Personal.cs#L307) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.contribution | [308:13](../YouTubeChannel.Personal.cs#L308) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18503 | [310:49](../YouTubeChannel.Personal.cs#L310) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18503.profile | [310:49](../YouTubeChannel.Personal.cs#L310) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18503.anonymous@18661 | [312:46](../YouTubeChannel.Personal.cs#L312) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@18503.anonymous@18661.term | [312:46](../YouTubeChannel.Personal.cs#L312) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent | [315:5](../YouTubeChannel.Personal.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.original | [315:36](../YouTubeChannel.Personal.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.configurationHash | [315:79](../YouTubeChannel.Personal.cs#L315) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.catalogRevision | [315:105](../YouTubeChannel.Personal.cs#L315) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.config | [319:13](../YouTubeChannel.Personal.cs#L319) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user | [321:13](../YouTubeChannel.Personal.cs#L321) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19251 | [321:72](../YouTubeChannel.Personal.cs#L321) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@19251.candidate | [321:72](../YouTubeChannel.Personal.cs#L321) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19428 | [323:49](../YouTubeChannel.Personal.cs#L323) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@19428.profile | [323:49](../YouTubeChannel.Personal.cs#L323) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot | [329:5](../YouTubeChannel.Personal.cs#L329) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.profile | [329:42](../YouTubeChannel.Personal.cs#L329) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.config | [329:84](../YouTubeChannel.Personal.cs#L329) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled | [334:5](../YouTubeChannel.Personal.cs#L334) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.profile | [334:35](../YouTubeChannel.Personal.cs#L334) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.config | [334:77](../YouTubeChannel.Personal.cs#L334) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles | [338:5](../YouTubeChannel.Personal.cs#L338) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles.error | [341:15](../YouTubeChannel.Personal.cs#L341) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged | [349:5](../YouTubeChannel.Personal.cs#L349) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.lifetime | [353:13](../YouTubeChannel.Personal.cs#L353) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.token | [355:27](../YouTubeChannel.Personal.cs#L355) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21345 | [359:22](../YouTubeChannel.Personal.cs#L359) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@21345.error | [371:19](../YouTubeChannel.Personal.cs#L371) |
-| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop | [379:5](../YouTubeChannel.Personal.cs#L379) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.lifetime | [383:13](../YouTubeChannel.Personal.cs#L383) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.error | [387:15](../YouTubeChannel.Personal.cs#L387) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync | [60:5](../YouTubeChannel.Personal.cs#L60) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.id | [60:65](../YouTubeChannel.Personal.cs#L60) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.config | [60:76](../YouTubeChannel.Personal.cs#L60) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ct | [60:104](../YouTubeChannel.Personal.cs#L60) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.scope | [62:58](../YouTubeChannel.Personal.cs#L62) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.inner | [62:73](../YouTubeChannel.Personal.cs#L62) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.ownRoot | [66:13](../YouTubeChannel.Personal.cs#L66) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.contribution | [67:13](../YouTubeChannel.Personal.cs#L67) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile | [70:13](../YouTubeChannel.Personal.cs#L70) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@4018 | [70:85](../YouTubeChannel.Personal.cs#L70) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.profile.anonymous@4018.p | [70:85](../YouTubeChannel.Personal.cs#L70) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.anonymous@4225 | [73:38](../YouTubeChannel.Personal.cs#L73) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.anonymous@4225.term | [73:38](../YouTubeChannel.Personal.cs#L73) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.usePersonalKey | [75:13](../YouTubeChannel.Personal.cs#L75) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.key | [76:13](../YouTubeChannel.Personal.cs#L76) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.configurationHash | [79:13](../YouTubeChannel.Personal.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.catalogRevision | [80:13](../YouTubeChannel.Personal.cs#L80) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context | [81:19](../YouTubeChannel.Personal.cs#L81) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.context.anonymous@4990 | [82:13](../YouTubeChannel.Personal.cs#L82) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.saved | [83:13](../YouTubeChannel.Personal.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.local | [87:13](../YouTubeChannel.Personal.cs#L87) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.result | [97:27](../YouTubeChannel.Personal.cs#L97) |
+| catch-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.error | [106:15](../YouTubeChannel.Personal.cs#L106) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetPersonalItemsAsync.item | [111:9](../YouTubeChannel.Personal.cs#L111) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync | [125:5](../YouTubeChannel.Personal.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.id | [125:63](../YouTubeChannel.Personal.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.config | [125:74](../YouTubeChannel.Personal.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.ct | [125:102](../YouTubeChannel.Personal.cs#L125) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.token | [127:98](../YouTubeChannel.Personal.cs#L127) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.inner | [127:113](../YouTubeChannel.Personal.cs#L127) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.hash | [130:13](../YouTubeChannel.Personal.cs#L130) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.revision | [131:13](../YouTubeChannel.Personal.cs#L131) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.snapshot | [132:13](../YouTubeChannel.Personal.cs#L132) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.result | [138:13](../YouTubeChannel.Personal.cs#L138) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeChannel.GetSharedItemsAsync.item | [142:9](../YouTubeChannel.Personal.cs#L142) |
+| method | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync | [147:5](../YouTubeChannel.Personal.cs#L147) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.folderId | [147:73](../YouTubeChannel.Personal.cs#L147) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.apiKey | [148:9](../YouTubeChannel.Personal.cs#L148) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.config | [148:24](../YouTubeChannel.Personal.cs#L148) |
+| parameter | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.ct | [148:52](../YouTubeChannel.Personal.cs#L148) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.separator | [150:13](../YouTubeChannel.Personal.cs#L150) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.type | [152:13](../YouTubeChannel.Personal.cs#L152) |
+| local-variable | Emby.YouTubePlugin.YouTubeChannel.GetStandardFolderAsync.term | [153:13](../YouTubeChannel.Personal.cs#L153) |
+| type | Emby.YouTubePlugin.YouTubePersonalCatalog | [165:1](../YouTubeChannel.Personal.cs#L165) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Prefix | [167:27](../YouTubeChannel.Personal.cs#L167) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.HarmonyId | [168:26](../YouTubeChannel.Personal.cs#L168) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._users | [169:34](../YouTubeChannel.Personal.cs#L169) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._profiles | [170:55](../YouTubeChannel.Personal.cs#L170) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._harmony | [171:28](../YouTubeChannel.Personal.cs#L171) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._channelId | [172:25](../YouTubeChannel.Personal.cs#L172) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._refreshQueued | [173:24](../YouTubeChannel.Personal.cs#L173) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog._lifetime | [174:45](../YouTubeChannel.Personal.cs#L174) |
+| field | Emby.YouTubePlugin.YouTubePersonalCatalog.Revision | [175:26](../YouTubeChannel.Personal.cs#L175) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap | [177:5](../YouTubeChannel.Personal.cs#L177) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.scope | [177:33](../YouTubeChannel.Personal.cs#L177) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Wrap.inner | [177:47](../YouTubeChannel.Personal.cs#L177) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn | [179:5](../YouTubeChannel.Personal.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.scope | [179:36](../YouTubeChannel.Personal.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.token | [179:50](../YouTubeChannel.Personal.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.WrapOwn.inner | [179:64](../YouTubeChannel.Personal.cs#L179) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn | [180:5](../YouTubeChannel.Personal.cs#L180) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.value | [180:38](../YouTubeChannel.Personal.cs#L180) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.token | [180:52](../YouTubeChannel.Personal.cs#L180) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.inner | [180:70](../YouTubeChannel.Personal.cs#L180) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@11487 | [185:23](../YouTubeChannel.Personal.cs#L185) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParseOwn.anonymous@11487.c | [185:23](../YouTubeChannel.Personal.cs#L185) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse | [190:5](../YouTubeChannel.Personal.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.value | [190:35](../YouTubeChannel.Personal.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.scope | [190:50](../YouTubeChannel.Personal.cs#L190) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryParse.inner | [190:68](../YouTubeChannel.Personal.cs#L190) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId | [201:5](../YouTubeChannel.Personal.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.library | [201:45](../YouTubeChannel.Personal.cs#L201) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.manager | [206:17](../YouTubeChannel.Personal.cs#L206) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.providerMethod | [207:17](../YouTubeChannel.Personal.cs#L207) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.channels | [209:17](../YouTubeChannel.Personal.cs#L209) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.channel | [211:13](../YouTubeChannel.Personal.cs#L211) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.TryResolveChannelId.error | [220:15](../YouTubeChannel.Personal.cs#L220) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId | [227:5](../YouTubeChannel.Personal.cs#L227) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.library | [227:39](../YouTubeChannel.Personal.cs#L227) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.token | [227:64](../YouTubeChannel.Personal.cs#L227) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@13514 | [229:22](../YouTubeChannel.Personal.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.PollChannelId.anonymous@13514.started | [235:21](../YouTubeChannel.Personal.cs#L235) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater | [246:5](../YouTubeChannel.Personal.cs#L246) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater.library | [246:44](../YouTubeChannel.Personal.cs#L246) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater.token | [246:69](../YouTubeChannel.Personal.cs#L246) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater.anonymous@14414 | [248:22](../YouTubeChannel.Personal.cs#L248) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater.anonymous@14414.started | [253:21](../YouTubeChannel.Personal.cs#L253) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.RepairStudiosLater.anonymous@14414.error | [261:19](../YouTubeChannel.Personal.cs#L261) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Start | [268:5](../YouTubeChannel.Personal.cs#L268) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.library | [268:32](../YouTubeChannel.Personal.cs#L268) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.users | [268:57](../YouTubeChannel.Personal.cs#L268) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.views | [268:77](../YouTubeChannel.Personal.cs#L268) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.dto | [279:17](../YouTubeChannel.Personal.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.assembly | [280:17](../YouTubeChannel.Personal.cs#L280) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.harmonyType | [281:17](../YouTubeChannel.Personal.cs#L281) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.methodType | [282:17](../YouTubeChannel.Personal.cs#L282) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.anonymous@16834 | [293:71](../YouTubeChannel.Personal.cs#L293) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.count | [297:17](../YouTubeChannel.Personal.cs#L297) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Start.error | [301:15](../YouTubeChannel.Personal.cs#L301) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles | [307:5](../YouTubeChannel.Personal.cs#L307) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.config | [307:71](../YouTubeChannel.Personal.cs#L307) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.users | [310:13](../YouTubeChannel.Personal.cs#L310) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled | [311:13](../YouTubeChannel.Personal.cs#L311) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@17946 | [311:35](../YouTubeChannel.Personal.cs#L311) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@17946.user | [311:35](../YouTubeChannel.Personal.cs#L311) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@18002 | [311:91](../YouTubeChannel.Personal.cs#L311) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.enabled.anonymous@18002.user | [311:91](../YouTubeChannel.Personal.cs#L311) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@18082 | [312:51](../YouTubeChannel.Personal.cs#L312) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.ActiveProfiles.anonymous@18082.profile | [312:51](../YouTubeChannel.Personal.cs#L312) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels | [317:5](../YouTubeChannel.Personal.cs#L317) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.config | [317:45](../YouTubeChannel.Personal.cs#L317) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@18536 | [319:49](../YouTubeChannel.Personal.cs#L319) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.SharedChannels.anonymous@18536.profile | [319:49](../YouTubeChannel.Personal.cs#L319) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor | [322:5](../YouTubeChannel.Personal.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.config | [322:40](../YouTubeChannel.Personal.cs#L322) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.userId | [322:68](../YouTubeChannel.Personal.cs#L322) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@18764 | [323:36](../YouTubeChannel.Personal.cs#L323) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasContentFor.anonymous@18764.profile | [323:36](../YouTubeChannel.Personal.cs#L323) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView | [328:5](../YouTubeChannel.Personal.cs#L328) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.externalId | [328:33](../YouTubeChannel.Personal.cs#L328) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.userId | [328:52](../YouTubeChannel.Personal.cs#L328) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.config | [331:13](../YouTubeChannel.Personal.cs#L331) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.user | [332:13](../YouTubeChannel.Personal.cs#L332) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.sharedToken | [334:67](../YouTubeChannel.Personal.cs#L334) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.scope | [338:43](../YouTubeChannel.Personal.cs#L338) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.inner | [338:58](../YouTubeChannel.Personal.cs#L338) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.own | [340:13](../YouTubeChannel.Personal.cs#L340) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.contribution | [341:13](../YouTubeChannel.Personal.cs#L341) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@20219 | [343:49](../YouTubeChannel.Personal.cs#L343) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@20219.profile | [343:49](../YouTubeChannel.Personal.cs#L343) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@20219.anonymous@20377 | [345:46](../YouTubeChannel.Personal.cs#L345) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.MayView.anonymous@20219.anonymous@20377.term | [345:46](../YouTubeChannel.Personal.cs#L345) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent | [348:5](../YouTubeChannel.Personal.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.original | [348:36](../YouTubeChannel.Personal.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.configurationHash | [348:79](../YouTubeChannel.Personal.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.catalogRevision | [348:105](../YouTubeChannel.Personal.cs#L348) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.config | [352:13](../YouTubeChannel.Personal.cs#L352) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user | [354:13](../YouTubeChannel.Personal.cs#L354) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@20967 | [354:72](../YouTubeChannel.Personal.cs#L354) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.user.anonymous@20967.candidate | [354:72](../YouTubeChannel.Personal.cs#L354) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@21144 | [356:49](../YouTubeChannel.Personal.cs#L356) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsCurrent.anonymous@21144.profile | [356:49](../YouTubeChannel.Personal.cs#L356) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot | [362:5](../YouTubeChannel.Personal.cs#L362) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.profile | [362:42](../YouTubeChannel.Personal.cs#L362) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.HasPersonalRoot.config | [362:84](../YouTubeChannel.Personal.cs#L362) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled | [367:5](../YouTubeChannel.Personal.cs#L367) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.profile | [367:35](../YouTubeChannel.Personal.cs#L367) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalCatalog.IsEnabled.config | [367:77](../YouTubeChannel.Personal.cs#L367) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles | [371:5](../YouTubeChannel.Personal.cs#L371) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ReloadProfiles.error | [374:15](../YouTubeChannel.Personal.cs#L374) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged | [382:5](../YouTubeChannel.Personal.cs#L382) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.lifetime | [386:13](../YouTubeChannel.Personal.cs#L386) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.token | [388:27](../YouTubeChannel.Personal.cs#L388) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@23061 | [392:22](../YouTubeChannel.Personal.cs#L392) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.ProfilesChanged.anonymous@23061.error | [404:19](../YouTubeChannel.Personal.cs#L404) |
+| method | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop | [412:5](../YouTubeChannel.Personal.cs#L412) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.lifetime | [416:13](../YouTubeChannel.Personal.cs#L416) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalCatalog.Stop.error | [420:15](../YouTubeChannel.Personal.cs#L420) |
 
 </details>
 
@@ -8459,7 +8501,7 @@ Plugin Compile source (SDK default); 13522 bytes; 326 lines.
 <a id="file-902c642e89577cbb"></a>
 ## [YouTubeLazyImage.cs](../YouTubeLazyImage.cs)
 
-Plugin Compile source (SDK default); 20780 bytes; 441 lines.
+Plugin Compile source (SDK default); 20631 bytes; 439 lines.
 
 <details>
 <summary>All 134 declarations / anchors</summary>
@@ -8598,8 +8640,8 @@ Plugin Compile source (SDK default); 20780 bytes; 441 lines.
 | parameter | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.token | [423:75](../YouTubeLazyImage.cs#L423) |
 | local-variable | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.manager | [425:17](../YouTubeLazyImage.cs#L425) |
 | local-variable | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.provider | [426:17](../YouTubeLazyImage.cs#L426) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.anonymous@20653 | [437:24](../YouTubeLazyImage.cs#L437) |
-| parameter | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.anonymous@20653.channel | [437:24](../YouTubeLazyImage.cs#L437) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.anonymous@20504 | [435:24](../YouTubeLazyImage.cs#L435) |
+| parameter | Emby.YouTubePlugin.YouTubeLazyImage.FindOwnChannels.anonymous@20504.channel | [435:24](../YouTubeLazyImage.cs#L435) |
 
 </details>
 
@@ -9901,205 +9943,259 @@ Plugin Compile source (SDK default); 1209 bytes; 30 lines.
 <a id="file-3c3889e240a93fde"></a>
 ## [YouTubePersonalVisibility.cs](../YouTubePersonalVisibility.cs)
 
-Plugin Compile source (SDK default); 20540 bytes; 372 lines.
+Plugin Compile source (SDK default); 28246 bytes; 492 lines.
 
 <details>
-<summary>All 192 declarations / anchors</summary>
+<summary>All 246 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
-| namespace | Emby.YouTubePlugin | [12:1](../YouTubePersonalVisibility.cs#L12) |
-| type | Emby.YouTubePlugin.YouTubePersonalVisibility | [17:5](../YouTubePersonalVisibility.cs#L17) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.Prefix | [19:30](../YouTubePersonalVisibility.cs#L19) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.Sync | [20:40](../YouTubePersonalVisibility.cs#L20) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility._state | [21:40](../YouTubePersonalVisibility.cs#L21) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility._ready | [22:38](../YouTubePersonalVisibility.cs#L22) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility._installed | [23:29](../YouTubePersonalVisibility.cs#L23) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.InstalledTargets | [24:53](../YouTubePersonalVisibility.cs#L24) |
-| property | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReady | [26:9](../YouTubePersonalVisibility.cs#L26) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.MarkPersonalContent | [31:9](../YouTubePersonalVisibility.cs#L31) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.MarkPersonalContent.state | [33:17](../YouTubePersonalVisibility.cs#L33) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Shutdown | [39:9](../YouTubePersonalVisibility.cs#L39) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize | [50:9](../YouTubePersonalVisibility.cs#L50) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.library | [50:41](../YouTubePersonalVisibility.cs#L50) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.views | [50:66](../YouTubePersonalVisibility.cs#L50) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.dto | [51:13](../YouTubePersonalVisibility.cs#L51) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.channelId | [51:30](../YouTubePersonalVisibility.cs#L51) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.authorize | [51:52](../YouTubePersonalVisibility.cs#L51) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2305 | [57:17](../YouTubePersonalVisibility.cs#L57) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2305.query | [57:18](../YouTubePersonalVisibility.cs#L57) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2305.context | [57:25](../YouTubePersonalVisibility.cs#L57) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2305.cancellation | [57:34](../YouTubePersonalVisibility.cs#L57) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2407 | [58:17](../YouTubePersonalVisibility.cs#L58) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2407.id | [58:17](../YouTubePersonalVisibility.cs#L58) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure | [64:9](../YouTubePersonalVisibility.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.libraryType | [64:40](../YouTubePersonalVisibility.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.viewsType | [64:58](../YouTubePersonalVisibility.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.dtoType | [64:74](../YouTubePersonalVisibility.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.read | [65:13](../YouTubePersonalVisibility.cs#L65) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.lookup | [66:13](../YouTubePersonalVisibility.cs#L66) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.channelId | [66:43](../YouTubePersonalVisibility.cs#L66) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.authorize | [66:65](../YouTubePersonalVisibility.cs#L66) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Install | [79:9](../YouTubePersonalVisibility.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.harmony | [79:37](../YouTubePersonalVisibility.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.harmonyMethodType | [79:53](../YouTubePersonalVisibility.cs#L79) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.state | [85:21](../YouTubePersonalVisibility.cs#L85) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.targets | [89:25](../YouTubePersonalVisibility.cs#L89) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.complete | [90:26](../YouTubePersonalVisibility.cs#L90) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch | [91:25](../YouTubePersonalVisibility.cs#L91) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124 | [92:42](../YouTubePersonalVisibility.cs#L92) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124.method | [92:42](../YouTubePersonalVisibility.cs#L92) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124.anonymous@4374 | [95:59](../YouTubePersonalVisibility.cs#L95) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124.anonymous@4374.parameter | [95:59](../YouTubePersonalVisibility.cs#L95) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124.anonymous@4473 | [96:59](../YouTubePersonalVisibility.cs#L96) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4124.anonymous@4473.parameter | [96:59](../YouTubePersonalVisibility.cs#L96) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.anonymous@4602 | [98:37](../YouTubePersonalVisibility.cs#L98) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.anonymous@4602.t | [98:37](../YouTubePersonalVisibility.cs#L98) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.handlers | [99:30](../YouTubePersonalVisibility.cs#L99) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.i | [100:30](../YouTubePersonalVisibility.cs#L100) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.handler | [104:29](../YouTubePersonalVisibility.cs#L104) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.descriptor | [105:29](../YouTubePersonalVisibility.cs#L105) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.parameters | [107:29](../YouTubePersonalVisibility.cs#L107) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.arguments | [108:29](../YouTubePersonalVisibility.cs#L108) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.j | [110:34](../YouTubePersonalVisibility.cs#L110) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.error | [119:23](../YouTubePersonalVisibility.cs#L119) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets | [129:9](../YouTubePersonalVisibility.cs#L129) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.library | [129:50](../YouTubePersonalVisibility.cs#L129) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.views | [129:64](../YouTubePersonalVisibility.cs#L129) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.dto | [129:76](../YouTubePersonalVisibility.cs#L129) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.candidates | [131:17](../YouTubePersonalVisibility.cs#L131) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@6606 | [132:32](../YouTubePersonalVisibility.cs#L132) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@6606.method | [132:32](../YouTubePersonalVisibility.cs#L132) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.parameters | [136:21](../YouTubePersonalVisibility.cs#L136) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.list | [137:21](../YouTubePersonalVisibility.cs#L137) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.result | [138:21](../YouTubePersonalVisibility.cs#L138) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.repository | [139:21](../YouTubePersonalVisibility.cs#L139) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.where | [140:21](../YouTubePersonalVisibility.cs#L140) |
+| namespace | Emby.YouTubePlugin | [14:1](../YouTubePersonalVisibility.cs#L14) |
+| type | Emby.YouTubePlugin.YouTubePersonalVisibility | [19:5](../YouTubePersonalVisibility.cs#L19) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.Prefix | [21:30](../YouTubePersonalVisibility.cs#L21) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.Sync | [22:40](../YouTubePersonalVisibility.cs#L22) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility._state | [23:40](../YouTubePersonalVisibility.cs#L23) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility._ready | [24:38](../YouTubePersonalVisibility.cs#L24) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility._installed | [25:29](../YouTubePersonalVisibility.cs#L25) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.InstalledTargets | [26:53](../YouTubePersonalVisibility.cs#L26) |
+| property | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReady | [28:9](../YouTubePersonalVisibility.cs#L28) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.MarkPersonalContent | [33:9](../YouTubePersonalVisibility.cs#L33) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.MarkPersonalContent.state | [35:17](../YouTubePersonalVisibility.cs#L35) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Shutdown | [41:9](../YouTubePersonalVisibility.cs#L41) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize | [52:9](../YouTubePersonalVisibility.cs#L52) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.library | [52:41](../YouTubePersonalVisibility.cs#L52) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.views | [52:66](../YouTubePersonalVisibility.cs#L52) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.dto | [53:13](../YouTubePersonalVisibility.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.channelId | [53:30](../YouTubePersonalVisibility.cs#L53) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.authorize | [53:52](../YouTubePersonalVisibility.cs#L53) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2383 | [59:17](../YouTubePersonalVisibility.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2383.query | [59:18](../YouTubePersonalVisibility.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2383.context | [59:25](../YouTubePersonalVisibility.cs#L59) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2383.cancellation | [59:34](../YouTubePersonalVisibility.cs#L59) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2485 | [60:17](../YouTubePersonalVisibility.cs#L60) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Initialize.anonymous@2485.id | [60:17](../YouTubePersonalVisibility.cs#L60) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure | [66:9](../YouTubePersonalVisibility.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.libraryType | [66:40](../YouTubePersonalVisibility.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.viewsType | [66:58](../YouTubePersonalVisibility.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.dtoType | [66:74](../YouTubePersonalVisibility.cs#L66) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.read | [67:13](../YouTubePersonalVisibility.cs#L67) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.lookup | [68:13](../YouTubePersonalVisibility.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.channelId | [68:43](../YouTubePersonalVisibility.cs#L68) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Configure.authorize | [68:65](../YouTubePersonalVisibility.cs#L68) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Install | [81:9](../YouTubePersonalVisibility.cs#L81) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.harmony | [81:37](../YouTubePersonalVisibility.cs#L81) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.harmonyMethodType | [81:53](../YouTubePersonalVisibility.cs#L81) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.state | [87:21](../YouTubePersonalVisibility.cs#L87) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.targets | [91:25](../YouTubePersonalVisibility.cs#L91) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.complete | [92:26](../YouTubePersonalVisibility.cs#L92) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch | [93:25](../YouTubePersonalVisibility.cs#L93) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202 | [94:42](../YouTubePersonalVisibility.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202.method | [94:42](../YouTubePersonalVisibility.cs#L94) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202.anonymous@4452 | [97:59](../YouTubePersonalVisibility.cs#L97) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202.anonymous@4452.parameter | [97:59](../YouTubePersonalVisibility.cs#L97) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202.anonymous@4551 | [98:59](../YouTubePersonalVisibility.cs#L98) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.patch.anonymous@4202.anonymous@4551.parameter | [98:59](../YouTubePersonalVisibility.cs#L98) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.handlers | [101:30](../YouTubePersonalVisibility.cs#L101) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.i | [102:30](../YouTubePersonalVisibility.cs#L102) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.handler | [106:29](../YouTubePersonalVisibility.cs#L106) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.descriptor | [107:29](../YouTubePersonalVisibility.cs#L107) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.parameters | [109:29](../YouTubePersonalVisibility.cs#L109) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.arguments | [110:29](../YouTubePersonalVisibility.cs#L110) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.j | [112:34](../YouTubePersonalVisibility.cs#L112) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Install.error | [121:23](../YouTubePersonalVisibility.cs#L121) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets | [131:9](../YouTubePersonalVisibility.cs#L131) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.library | [131:50](../YouTubePersonalVisibility.cs#L131) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.views | [131:64](../YouTubePersonalVisibility.cs#L131) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.dto | [131:76](../YouTubePersonalVisibility.cs#L131) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.candidates | [133:17](../YouTubePersonalVisibility.cs#L133) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@6705 | [134:32](../YouTubePersonalVisibility.cs#L134) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@6705.method | [134:32](../YouTubePersonalVisibility.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.parameters | [138:21](../YouTubePersonalVisibility.cs#L138) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.list | [139:21](../YouTubePersonalVisibility.cs#L139) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.result | [140:21](../YouTubePersonalVisibility.cs#L140) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.where | [141:21](../YouTubePersonalVisibility.cs#L141) |
 | local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.calls | [147:21](../YouTubePersonalVisibility.cs#L147) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7943 | [148:32](../YouTubePersonalVisibility.cs#L148) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7943.method | [148:32](../YouTubePersonalVisibility.cs#L148) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8078 | [149:35](../YouTubePersonalVisibility.cs#L149) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8078.method | [149:35](../YouTubePersonalVisibility.cs#L149) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8215 | [150:35](../YouTubePersonalVisibility.cs#L150) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8215.method | [150:35](../YouTubePersonalVisibility.cs#L150) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8441 | [152:42](../YouTubePersonalVisibility.cs#L152) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8441.method | [152:42](../YouTubePersonalVisibility.cs#L152) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7748 | [148:32](../YouTubePersonalVisibility.cs#L148) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7748.method | [148:32](../YouTubePersonalVisibility.cs#L148) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7883 | [149:35](../YouTubePersonalVisibility.cs#L149) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@7883.method | [149:35](../YouTubePersonalVisibility.cs#L149) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8020 | [150:35](../YouTubePersonalVisibility.cs#L150) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8020.method | [150:35](../YouTubePersonalVisibility.cs#L150) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8246 | [152:42](../YouTubePersonalVisibility.cs#L152) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.anonymous@8246.method | [152:42](../YouTubePersonalVisibility.cs#L152) |
 | catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.FindTargets.error | [154:19](../YouTubePersonalVisibility.cs#L154) |
 | method | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets | [157:9](../YouTubePersonalVisibility.cs#L157) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.library | [157:55](../YouTubePersonalVisibility.cs#L157) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.views | [157:69](../YouTubePersonalVisibility.cs#L157) |
 | parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.dto | [157:81](../YouTubePersonalVisibility.cs#L157) |
-| local-function | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native | [159:13](../YouTubePersonalVisibility.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.type | [159:25](../YouTubePersonalVisibility.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.name | [159:36](../YouTubePersonalVisibility.cs#L159) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.contract | [159:49](../YouTubePersonalVisibility.cs#L159) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.lib | [161:18](../YouTubePersonalVisibility.cs#L161) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.view | [162:18](../YouTubePersonalVisibility.cs#L162) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.dtos | [163:18](../YouTubePersonalVisibility.cs#L163) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead | [173:9](../YouTubePersonalVisibility.cs#L173) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.method | [173:50](../YouTubePersonalVisibility.cs#L173) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.normalize | [173:69](../YouTubePersonalVisibility.cs#L173) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.normalized | [175:18](../YouTubePersonalVisibility.cs#L175) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.read | [175:38](../YouTubePersonalVisibility.cs#L175) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.call | [176:13](../YouTubePersonalVisibility.cs#L176) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue | [188:59](../YouTubePersonalVisibility.cs#L188) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10716 | [189:20](../YouTubePersonalVisibility.cs#L189) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10716.field | [189:20](../YouTubePersonalVisibility.cs#L189) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10767 | [189:71](../YouTubePersonalVisibility.cs#L189) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10767.field | [189:71](../YouTubePersonalVisibility.cs#L189) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10833 | [190:27](../YouTubePersonalVisibility.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@10833.code | [190:27](../YouTubePersonalVisibility.cs#L190) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls | [192:9](../YouTubePersonalVisibility.cs#L192) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.method | [192:54](../YouTubePersonalVisibility.cs#L192) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.il | [194:17](../YouTubePersonalVisibility.cs#L194) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.offset | [195:22](../YouTubePersonalVisibility.cs#L195) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.value | [197:23](../YouTubePersonalVisibility.cs#L197) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.code | [199:21](../YouTubePersonalVisibility.cs#L199) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.size | [200:21](../YouTubePersonalVisibility.cs#L200) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact | [215:9](../YouTubePersonalVisibility.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.type | [215:42](../YouTubePersonalVisibility.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.name | [215:53](../YouTubePersonalVisibility.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.result | [215:66](../YouTubePersonalVisibility.cs#L215) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.parameters | [215:79](../YouTubePersonalVisibility.cs#L215) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.method | [217:17](../YouTubePersonalVisibility.cs#L217) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix | [222:9](../YouTubePersonalVisibility.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__0 | [222:42](../YouTubePersonalVisibility.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__1 | [222:66](../YouTubePersonalVisibility.cs#L222) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__2 | [222:85](../YouTubePersonalVisibility.cs#L222) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery | [225:9](../YouTubePersonalVisibility.cs#L225) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.query | [225:41](../YouTubePersonalVisibility.cs#L225) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.context | [225:67](../YouTubePersonalVisibility.cs#L225) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.cancellation | [225:97](../YouTubePersonalVisibility.cs#L225) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.state | [227:17](../YouTubePersonalVisibility.cs#L227) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.userId | [230:18](../YouTubePersonalVisibility.cs#L230) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.channel | [232:18](../YouTubePersonalVisibility.cs#L232) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folders | [234:17](../YouTubePersonalVisibility.cs#L234) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId | [240:17](../YouTubePersonalVisibility.cs#L240) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13523 | [240:38](../YouTubePersonalVisibility.cs#L240) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13523.item | [240:38](../YouTubePersonalVisibility.cs#L240) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13577 | [241:26](../YouTubePersonalVisibility.cs#L241) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13577.item | [241:26](../YouTubePersonalVisibility.cs#L241) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13615 | [241:64](../YouTubePersonalVisibility.cs#L241) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13615.group | [241:64](../YouTubePersonalVisibility.cs#L241) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13635 | [241:84](../YouTubePersonalVisibility.cs#L241) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@13635.group | [241:84](../YouTubePersonalVisibility.cs#L241) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.denied | [242:17](../YouTubePersonalVisibility.cs#L242) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.containsPersonal | [243:18](../YouTubePersonalVisibility.cs#L243) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder | [244:13](../YouTubePersonalVisibility.cs#L244) |
-| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder | [255:13](../YouTubePersonalVisibility.cs#L255) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder.cursor | [257:21](../YouTubePersonalVisibility.cs#L257) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder.seen | [258:21](../YouTubePersonalVisibility.cs#L258) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix | [272:9](../YouTubePersonalVisibility.cs#L272) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.__1 | [272:42](../YouTubePersonalVisibility.cs#L272) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.__result | [272:52](../YouTubePersonalVisibility.cs#L272) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.anonymous@15481 | [275:43](../YouTubePersonalVisibility.cs#L275) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.anonymous@15481.item | [275:43](../YouTubePersonalVisibility.cs#L275) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix | [278:9](../YouTubePersonalVisibility.cs#L278) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix.__0 | [278:42](../YouTubePersonalVisibility.cs#L278) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix.__2 | [278:60](../YouTubePersonalVisibility.cs#L278) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix | [288:9](../YouTubePersonalVisibility.cs#L288) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.__0 | [288:43](../YouTubePersonalVisibility.cs#L288) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.__2 | [288:63](../YouTubePersonalVisibility.cs#L288) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.anonymous@16058 | [291:33](../YouTubePersonalVisibility.cs#L291) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.anonymous@16058.item | [291:33](../YouTubePersonalVisibility.cs#L291) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee | [294:9](../YouTubePersonalVisibility.cs#L294) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.item | [294:37](../YouTubePersonalVisibility.cs#L294) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.userId | [294:53](../YouTubePersonalVisibility.cs#L294) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.state | [296:17](../YouTubePersonalVisibility.cs#L296) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.channel | [299:18](../YouTubePersonalVisibility.cs#L299) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.guarded | [300:17](../YouTubePersonalVisibility.cs#L300) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.providerHint | [301:18](../YouTubePersonalVisibility.cs#L301) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.seen | [302:17](../YouTubePersonalVisibility.cs#L302) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.cursor | [303:17](../YouTubePersonalVisibility.cs#L303) |
-| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.anonymous@17852 | [322:36](../YouTubePersonalVisibility.cs#L322) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.anonymous@17852.externalId | [322:36](../YouTubePersonalVisibility.cs#L322) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.LooksGuarded | [328:9](../YouTubePersonalVisibility.cs#L328) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.LooksGuarded.id | [328:42](../YouTubePersonalVisibility.cs#L328) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded | [332:9](../YouTubePersonalVisibility.cs#L332) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded.item | [332:39](../YouTubePersonalVisibility.cs#L332) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded.channel | [332:54](../YouTubePersonalVisibility.cs#L332) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.ShallowCopy | [337:44](../YouTubePersonalVisibility.cs#L337) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem | [338:9](../YouTubePersonalVisibility.cs#L338) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.item | [338:45](../YouTubePersonalVisibility.cs#L338) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.state | [340:17](../YouTubePersonalVisibility.cs#L340) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.channel | [342:17](../YouTubePersonalVisibility.cs#L342) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.cursor | [343:17](../YouTubePersonalVisibility.cs#L343) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.seen | [344:17](../YouTubePersonalVisibility.cs#L344) |
-| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.copy | [350:17](../YouTubePersonalVisibility.cs#L350) |
-| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed | [357:9](../YouTubePersonalVisibility.cs#L357) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.state | [357:37](../YouTubePersonalVisibility.cs#L357) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.externalId | [357:50](../YouTubePersonalVisibility.cs#L357) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.userId | [357:69](../YouTubePersonalVisibility.cs#L357) |
-| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.error | [361:19](../YouTubePersonalVisibility.cs#L361) |
-| type | Emby.YouTubePlugin.YouTubePersonalVisibility.State | [364:9](../YouTubePersonalVisibility.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.LibraryType | [364:37](../YouTubePersonalVisibility.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ViewsType | [364:55](../YouTubePersonalVisibility.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.DtoType | [364:71](../YouTubePersonalVisibility.cs#L364) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Read | [365:13](../YouTubePersonalVisibility.cs#L365) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Lookup | [366:13](../YouTubePersonalVisibility.cs#L366) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ChannelId | [366:43](../YouTubePersonalVisibility.cs#L366) |
-| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Authorize | [366:65](../YouTubePersonalVisibility.cs#L366) |
-| field | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Presence | [369:26](../YouTubePersonalVisibility.cs#L369) |
+| local-function | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native | [163:13](../YouTubePersonalVisibility.cs#L163) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.type | [163:25](../YouTubePersonalVisibility.cs#L163) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.name | [163:36](../YouTubePersonalVisibility.cs#L163) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.Native.contract | [163:49](../YouTubePersonalVisibility.cs#L163) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.lib | [165:18](../YouTubePersonalVisibility.cs#L165) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.view | [166:18](../YouTubePersonalVisibility.cs#L166) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CandidateTargets.dtos | [167:18](../YouTubePersonalVisibility.cs#L167) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReadable | [179:9](../YouTubePersonalVisibility.cs#L179) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReadable.name | [179:40](../YouTubePersonalVisibility.cs#L179) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReadable.anonymous@10284 | [180:25](../YouTubePersonalVisibility.cs#L180) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsReadable.anonymous@10284.c | [180:25](../YouTubePersonalVisibility.cs#L180) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryShape | [182:40](../YouTubePersonalVisibility.cs#L182) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents | [188:9](../YouTubePersonalVisibility.cs#L188) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.library | [188:51](../YouTubePersonalVisibility.cs#L188) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.named | [190:17](../YouTubePersonalVisibility.cs#L190) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.list | [192:17](../YouTubePersonalVisibility.cs#L192) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.result | [193:17](../YouTubePersonalVisibility.cs#L193) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.shaped | [197:21](../YouTubePersonalVisibility.cs#L197) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.shaped.anonymous@11457 | [198:28](../YouTubePersonalVisibility.cs#L198) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.shaped.anonymous@11457.method | [198:28](../YouTubePersonalVisibility.cs#L198) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.shaped.anonymous@11457.anonymous@11586 | [199:58](../YouTubePersonalVisibility.cs#L199) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.shaped.anonymous@11457.anonymous@11586.parameter | [199:58](../YouTubePersonalVisibility.cs#L199) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.both | [201:21](../YouTubePersonalVisibility.cs#L201) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.UserAndParents.error | [205:19](../YouTubePersonalVisibility.cs#L205) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses | [211:9](../YouTubePersonalVisibility.cs#L211) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.server | [211:49](../YouTubePersonalVisibility.cs#L211) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.shape | [213:17](../YouTubePersonalVisibility.cs#L213) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.named | [214:17](../YouTubePersonalVisibility.cs#L214) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.types | [216:20](../YouTubePersonalVisibility.cs#L216) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.error | [218:19](../YouTubePersonalVisibility.cs#L218) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.anonymous@12895 | [218:83](../YouTubePersonalVisibility.cs#L218) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.anonymous@12895.type | [218:83](../YouTubePersonalVisibility.cs#L218) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches | [219:17](../YouTubePersonalVisibility.cs#L219) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@12969 | [219:39](../YouTubePersonalVisibility.cs#L219) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@12969.type | [219:39](../YouTubePersonalVisibility.cs#L219) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13089 | [220:29](../YouTubePersonalVisibility.cs#L220) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13089.type | [220:29](../YouTubePersonalVisibility.cs#L220) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13235 | [221:24](../YouTubePersonalVisibility.cs#L221) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13235.method | [221:24](../YouTubePersonalVisibility.cs#L221) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13235.anonymous@13340 | [222:54](../YouTubePersonalVisibility.cs#L222) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.WhereClauses.matches.anonymous@13235.anonymous@13340.parameter | [222:54](../YouTubePersonalVisibility.cs#L222) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead | [227:9](../YouTubePersonalVisibility.cs#L227) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.method | [227:50](../YouTubePersonalVisibility.cs#L227) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.normalize | [227:69](../YouTubePersonalVisibility.cs#L227) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.normalized | [229:18](../YouTubePersonalVisibility.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.read | [229:38](../YouTubePersonalVisibility.cs#L229) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.NormalizesBeforeRead.call | [230:13](../YouTubePersonalVisibility.cs#L230) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue | [242:59](../YouTubePersonalVisibility.cs#L242) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14296 | [243:20](../YouTubePersonalVisibility.cs#L243) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14296.field | [243:20](../YouTubePersonalVisibility.cs#L243) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14347 | [243:71](../YouTubePersonalVisibility.cs#L243) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14347.field | [243:71](../YouTubePersonalVisibility.cs#L243) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14413 | [244:27](../YouTubePersonalVisibility.cs#L244) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OpCodesByValue.anonymous@14413.code | [244:27](../YouTubePersonalVisibility.cs#L244) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls | [246:9](../YouTubePersonalVisibility.cs#L246) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.method | [246:54](../YouTubePersonalVisibility.cs#L246) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.il | [248:17](../YouTubePersonalVisibility.cs#L248) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.offset | [249:22](../YouTubePersonalVisibility.cs#L249) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.value | [251:23](../YouTubePersonalVisibility.cs#L251) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.code | [253:21](../YouTubePersonalVisibility.cs#L253) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Calls.size | [254:21](../YouTubePersonalVisibility.cs#L254) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact | [269:9](../YouTubePersonalVisibility.cs#L269) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.type | [269:42](../YouTubePersonalVisibility.cs#L269) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.name | [269:53](../YouTubePersonalVisibility.cs#L269) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.result | [269:66](../YouTubePersonalVisibility.cs#L269) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.parameters | [269:79](../YouTubePersonalVisibility.cs#L269) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Exact.method | [271:17](../YouTubePersonalVisibility.cs#L271) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix | [276:9](../YouTubePersonalVisibility.cs#L276) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__0 | [276:42](../YouTubePersonalVisibility.cs#L276) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__1 | [276:66](../YouTubePersonalVisibility.cs#L276) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.QueryPostfix.__2 | [276:85](../YouTubePersonalVisibility.cs#L276) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery | [279:9](../YouTubePersonalVisibility.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.query | [279:41](../YouTubePersonalVisibility.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.context | [279:67](../YouTubePersonalVisibility.cs#L279) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.cancellation | [279:97](../YouTubePersonalVisibility.cs#L279) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.state | [281:17](../YouTubePersonalVisibility.cs#L281) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.userId | [284:18](../YouTubePersonalVisibility.cs#L284) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.channel | [286:18](../YouTubePersonalVisibility.cs#L286) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folders | [288:17](../YouTubePersonalVisibility.cs#L288) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId | [294:17](../YouTubePersonalVisibility.cs#L294) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17103 | [294:38](../YouTubePersonalVisibility.cs#L294) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17103.item | [294:38](../YouTubePersonalVisibility.cs#L294) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17157 | [295:26](../YouTubePersonalVisibility.cs#L295) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17157.item | [295:26](../YouTubePersonalVisibility.cs#L295) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17195 | [295:64](../YouTubePersonalVisibility.cs#L295) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17195.group | [295:64](../YouTubePersonalVisibility.cs#L295) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17215 | [295:84](../YouTubePersonalVisibility.cs#L295) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.byId.anonymous@17215.group | [295:84](../YouTubePersonalVisibility.cs#L295) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.denied | [296:17](../YouTubePersonalVisibility.cs#L296) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.containsPersonal | [297:18](../YouTubePersonalVisibility.cs#L297) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder | [298:13](../YouTubePersonalVisibility.cs#L298) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder | [309:13](../YouTubePersonalVisibility.cs#L309) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder.cursor | [311:21](../YouTubePersonalVisibility.cs#L311) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.GuardQuery.folder.seen | [312:21](../YouTubePersonalVisibility.cs#L312) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix | [326:9](../YouTubePersonalVisibility.cs#L326) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.__1 | [326:42](../YouTubePersonalVisibility.cs#L326) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.__result | [326:52](../YouTubePersonalVisibility.cs#L326) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.anonymous@19061 | [329:43](../YouTubePersonalVisibility.cs#L329) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ViewsPostfix.anonymous@19061.item | [329:43](../YouTubePersonalVisibility.cs#L329) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix | [332:9](../YouTubePersonalVisibility.cs#L332) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix.__0 | [332:42](../YouTubePersonalVisibility.cs#L332) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.OneDtoPrefix.__2 | [332:60](../YouTubePersonalVisibility.cs#L332) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix | [342:9](../YouTubePersonalVisibility.cs#L342) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.__0 | [342:43](../YouTubePersonalVisibility.cs#L342) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.__2 | [342:63](../YouTubePersonalVisibility.cs#L342) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.anonymous@19638 | [345:33](../YouTubePersonalVisibility.cs#L345) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.ManyDtoPrefix.anonymous@19638.item | [345:33](../YouTubePersonalVisibility.cs#L345) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee | [348:9](../YouTubePersonalVisibility.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.item | [348:37](../YouTubePersonalVisibility.cs#L348) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.userId | [348:53](../YouTubePersonalVisibility.cs#L348) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.state | [350:17](../YouTubePersonalVisibility.cs#L350) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.channel | [353:18](../YouTubePersonalVisibility.cs#L353) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.guarded | [354:17](../YouTubePersonalVisibility.cs#L354) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.providerHint | [355:18](../YouTubePersonalVisibility.cs#L355) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.seen | [356:17](../YouTubePersonalVisibility.cs#L356) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.cursor | [357:17](../YouTubePersonalVisibility.cs#L357) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.anonymous@21432 | [376:36](../YouTubePersonalVisibility.cs#L376) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.CanSee.anonymous@21432.externalId | [376:36](../YouTubePersonalVisibility.cs#L376) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.LooksGuarded | [382:9](../YouTubePersonalVisibility.cs#L382) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.LooksGuarded.id | [382:42](../YouTubePersonalVisibility.cs#L382) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded | [386:9](../YouTubePersonalVisibility.cs#L386) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded.item | [386:39](../YouTubePersonalVisibility.cs#L386) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.IsGuarded.channel | [386:54](../YouTubePersonalVisibility.cs#L386) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios | [398:9](../YouTubePersonalVisibility.cs#L398) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.library | [398:51](../YouTubePersonalVisibility.cs#L398) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.channel | [398:76](../YouTubePersonalVisibility.cs#L398) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.cancellation | [398:90](../YouTubePersonalVisibility.cs#L398) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.folders | [401:17](../YouTubePersonalVisibility.cs#L401) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own | [412:17](../YouTubePersonalVisibility.cs#L412) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834 | [412:37](../YouTubePersonalVisibility.cs#L412) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834.folder | [412:37](../YouTubePersonalVisibility.cs#L412) |
+| pattern-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@23834.inner | [413:90](../YouTubePersonalVisibility.cs#L413) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@24111 | [415:25](../YouTubePersonalVisibility.cs#L415) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.own.anonymous@24111.folder | [415:25](../YouTubePersonalVisibility.cs#L415) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos | [417:17](../YouTubePersonalVisibility.cs#L417) |
+| anonymous-function | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos.anonymous@24477 | [421:36](../YouTubePersonalVisibility.cs#L421) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.videos.anonymous@24477.video | [421:36](../YouTubePersonalVisibility.cs#L421) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.names | [422:17](../YouTubePersonalVisibility.cs#L422) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.cleared | [423:17](../YouTubePersonalVisibility.cs#L423) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video | [424:13](../YouTubePersonalVisibility.cs#L424) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.video.name | [428:17](../YouTubePersonalVisibility.cs#L428) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.removed | [433:17](../YouTubePersonalVisibility.cs#L433) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name | [434:13](../YouTubePersonalVisibility.cs#L434) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studios | [437:21](../YouTubePersonalVisibility.cs#L437) |
+| iteration-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio | [439:17](../YouTubePersonalVisibility.cs#L439) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RepairPersonalStudios.name.studio.users | [442:25](../YouTubePersonalVisibility.cs#L442) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.ShallowCopy | [457:44](../YouTubePersonalVisibility.cs#L457) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem | [458:9](../YouTubePersonalVisibility.cs#L458) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.item | [458:45](../YouTubePersonalVisibility.cs#L458) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.state | [460:17](../YouTubePersonalVisibility.cs#L460) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.channel | [462:17](../YouTubePersonalVisibility.cs#L462) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.cursor | [463:17](../YouTubePersonalVisibility.cs#L463) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.seen | [464:17](../YouTubePersonalVisibility.cs#L464) |
+| local-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.RequestItem.copy | [470:17](../YouTubePersonalVisibility.cs#L470) |
+| method | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed | [477:9](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.state | [477:37](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.externalId | [477:50](../YouTubePersonalVisibility.cs#L477) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.userId | [477:69](../YouTubePersonalVisibility.cs#L477) |
+| catch-variable | Emby.YouTubePlugin.YouTubePersonalVisibility.Allowed.error | [481:19](../YouTubePersonalVisibility.cs#L481) |
+| type | Emby.YouTubePlugin.YouTubePersonalVisibility.State | [484:9](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.LibraryType | [484:37](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ViewsType | [484:55](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.DtoType | [484:71](../YouTubePersonalVisibility.cs#L484) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Read | [485:13](../YouTubePersonalVisibility.cs#L485) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Lookup | [486:13](../YouTubePersonalVisibility.cs#L486) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.ChannelId | [486:43](../YouTubePersonalVisibility.cs#L486) |
+| parameter | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Authorize | [486:65](../YouTubePersonalVisibility.cs#L486) |
+| field | Emby.YouTubePlugin.YouTubePersonalVisibility.State.Presence | [489:26](../YouTubePersonalVisibility.cs#L489) |
 
 </details>
 
@@ -10274,7 +10370,7 @@ Plugin Compile source (SDK default); 12139 bytes; 275 lines.
 <a id="file-9330046d20e24a92"></a>
 ## [YouTubeRootMigration.cs](../YouTubeRootMigration.cs)
 
-Plugin Compile source (SDK default); 10641 bytes; 180 lines.
+Plugin Compile source (SDK default); 10513 bytes; 179 lines.
 
 <details>
 <summary>All 81 declarations / anchors</summary>
@@ -10353,15 +10449,15 @@ Plugin Compile source (SDK default); 10641 bytes; 180 lines.
 | parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.token | [158:64](../YouTubeRootMigration.cs#L158) |
 | local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.manager | [161:13](../YouTubeRootMigration.cs#L161) |
 | local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.provider | [162:13](../YouTubeRootMigration.cs#L162) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.channels | [164:13](../YouTubeRootMigration.cs#L164) |
-| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches | [166:13](../YouTubeRootMigration.cs#L166) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9595 | [166:38](../YouTubeRootMigration.cs#L166) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9595.channel | [166:38](../YouTubeRootMigration.cs#L166) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10453 | [176:25](../YouTubeRootMigration.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10453.item | [176:25](../YouTubeRootMigration.cs#L176) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10508 | [176:80](../YouTubeRootMigration.cs#L176) |
-| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10508.item | [176:80](../YouTubeRootMigration.cs#L176) |
-| method | Emby.YouTubePlugin.YouTubeRootMigration.Stop | [179:5](../YouTubeRootMigration.cs#L179) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.channels | [163:13](../YouTubeRootMigration.cs#L163) |
+| local-variable | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches | [165:13](../YouTubeRootMigration.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9467 | [165:38](../YouTubeRootMigration.cs#L165) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.matches.anonymous@9467.channel | [165:38](../YouTubeRootMigration.cs#L165) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10325 | [175:25](../YouTubeRootMigration.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10325.item | [175:25](../YouTubeRootMigration.cs#L175) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10380 | [175:80](../YouTubeRootMigration.cs#L175) |
+| parameter | Emby.YouTubePlugin.YouTubeRootMigration.ReadRoots.anonymous@10380.item | [175:80](../YouTubeRootMigration.cs#L175) |
+| method | Emby.YouTubePlugin.YouTubeRootMigration.Stop | [178:5](../YouTubeRootMigration.cs#L178) |
 
 </details>
 
@@ -10751,10 +10847,10 @@ Plugin Compile source (SDK default); 16101 bytes; 301 lines.
 <a id="file-8b85a2815c8e321e"></a>
 ## [YouTubeSubtitleDelivery.cs](../YouTubeSubtitleDelivery.cs)
 
-Plugin Compile source (SDK default); 16359 bytes; 259 lines.
+Plugin Compile source (SDK default); 23203 bytes; 372 lines.
 
 <details>
-<summary>All 143 declarations / anchors</summary>
+<summary>All 229 declarations / anchors</summary>
 
 | Kind | Owner / name | Source |
 |---|---|---|
@@ -10778,129 +10874,215 @@ Plugin Compile source (SDK default); 16359 bytes; 259 lines.
 | parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.Steps | [22:13](../YouTubeSubtitleDelivery.cs#L22) |
 | parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.Demand | [22:33](../YouTubeSubtitleDelivery.cs#L22) |
 | parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.InHardware | [22:54](../YouTubeSubtitleDelivery.cs#L22) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering | [28:9](../YouTubeSubtitleDelivery.cs#L28) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.requestDto | [28:52](../YouTubeSubtitleDelivery.cs#L28) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.property | [31:17](../YouTubeSubtitleDelivery.cs#L31) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.profile | [33:71](../YouTubeSubtitleDelivery.cs#L33) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.local | [40:17](../YouTubeSubtitleDelivery.cs#L40) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install | [48:9](../YouTubeSubtitleDelivery.cs#L48) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmony | [48:37](../YouTubeSubtitleDelivery.cs#L48) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmonyMethodType | [48:53](../YouTubeSubtitleDelivery.cs#L48) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.target | [54:21](../YouTubeSubtitleDelivery.cs#L54) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch | [58:21](../YouTubeSubtitleDelivery.cs#L58) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442 | [59:38](../YouTubeSubtitleDelivery.cs#L59) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.method | [59:38](../YouTubeSubtitleDelivery.cs#L59) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.parameters | [59:104](../YouTubeSubtitleDelivery.cs#L59) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.anonymous@3664 | [61:43](../YouTubeSubtitleDelivery.cs#L61) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3442.anonymous@3664.parameter | [61:43](../YouTubeSubtitleDelivery.cs#L61) |
-| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find | [63:17](../YouTubeSubtitleDelivery.cs#L63) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.name | [63:27](../YouTubeSubtitleDelivery.cs#L63) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3841 | [63:90](../YouTubeSubtitleDelivery.cs#L63) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3841.assembly | [63:90](../YouTubeSubtitleDelivery.cs#L63) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3920 | [64:37](../YouTubeSubtitleDelivery.cs#L64) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.anonymous@3920.type | [64:37](../YouTubeSubtitleDelivery.cs#L64) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipeline | [65:21](../YouTubeSubtitleDelivery.cs#L65) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource | [67:21](../YouTubeSubtitleDelivery.cs#L67) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320 | [68:29](../YouTubeSubtitleDelivery.cs#L68) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.method | [68:29](../YouTubeSubtitleDelivery.cs#L68) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.anonymous@4545 | [70:58](../YouTubeSubtitleDelivery.cs#L70) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@4320.anonymous@4545.parameter | [70:58](../YouTubeSubtitleDelivery.cs#L70) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.command | [77:21](../YouTubeSubtitleDelivery.cs#L77) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demand | [78:21](../YouTubeSubtitleDelivery.cs#L78) |
-| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property | [79:17](../YouTubeSubtitleDelivery.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.type | [79:39](../YouTubeSubtitleDelivery.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.name | [79:50](../YouTubeSubtitleDelivery.cs#L79) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.expected | [79:63](../YouTubeSubtitleDelivery.cs#L79) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.property | [81:25](../YouTubeSubtitleDelivery.cs#L81) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.first | [85:21](../YouTubeSubtitleDelivery.cs#L85) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.inputs | [86:21](../YouTubeSubtitleDelivery.cs#L86) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.subtitles | [87:21](../YouTubeSubtitleDelivery.cs#L87) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.tracking | [92:21](../YouTubeSubtitleDelivery.cs#L92) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demands | [93:21](../YouTubeSubtitleDelivery.cs#L93) |
-| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method | [94:17](../YouTubeSubtitleDelivery.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.type | [94:35](../YouTubeSubtitleDelivery.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.name | [94:46](../YouTubeSubtitleDelivery.cs#L94) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.types | [94:59](../YouTubeSubtitleDelivery.cs#L94) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.method | [96:25](../YouTubeSubtitleDelivery.cs#L96) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.software | [100:21](../YouTubeSubtitleDelivery.cs#L100) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.plan | [101:21](../YouTubeSubtitleDelivery.cs#L101) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.step | [102:21](../YouTubeSubtitleDelivery.cs#L102) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.hardware | [103:21](../YouTubeSubtitleDelivery.cs#L103) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.steps | [104:21](../YouTubeSubtitleDelivery.cs#L104) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelineArguments | [109:21](../YouTubeSubtitleDelivery.cs#L109) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines | [112:21](../YouTubeSubtitleDelivery.cs#L112) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@8078 | [113:29](../YouTubeSubtitleDelivery.cs#L113) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@8078.name | [113:29](../YouTubeSubtitleDelivery.cs#L113) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@8288 | [115:35](../YouTubeSubtitleDelivery.cs#L115) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@8288.method | [115:35](../YouTubeSubtitleDelivery.cs#L115) |
-| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add | [117:17](../YouTubeSubtitleDelivery.cs#L117) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.original | [117:26](../YouTubeSubtitleDelivery.cs#L117) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.prefix | [117:47](../YouTubeSubtitleDelivery.cs#L117) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.postfix | [117:63](../YouTubeSubtitleDelivery.cs#L117) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.parameters | [119:25](../YouTubeSubtitleDelivery.cs#L119) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.arguments | [120:25](../YouTubeSubtitleDelivery.cs#L120) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.i | [122:30](../YouTubeSubtitleDelivery.cs#L122) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.callbackName | [124:29](../YouTubeSubtitleDelivery.cs#L124) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.method | [132:17](../YouTubeSubtitleDelivery.cs#L132) |
-| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.error | [137:19](../YouTubeSubtitleDelivery.cs#L137) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix | [144:9](../YouTubeSubtitleDelivery.cs#L144) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__0 | [144:50](../YouTubeSubtitleDelivery.cs#L144) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__3 | [144:71](../YouTubeSubtitleDelivery.cs#L144) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__4 | [144:98](../YouTubeSubtitleDelivery.cs#L144) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__5 | [144:114](../YouTubeSubtitleDelivery.cs#L144) |
-| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.error | [158:19](../YouTubeSubtitleDelivery.cs#L158) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix | [162:9](../YouTubeSubtitleDelivery.cs#L162) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__1 | [162:48](../YouTubeSubtitleDelivery.cs#L162) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__2 | [162:60](../YouTubeSubtitleDelivery.cs#L162) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__state | [162:72](../YouTubeSubtitleDelivery.cs#L162) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.binding | [165:17](../YouTubeSubtitleDelivery.cs#L165) |
-| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.error | [172:19](../YouTubeSubtitleDelivery.cs#L172) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix | [175:9](../YouTubeSubtitleDelivery.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__1 | [175:49](../YouTubeSubtitleDelivery.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__2 | [175:61](../YouTubeSubtitleDelivery.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__state | [175:73](../YouTubeSubtitleDelivery.cs#L175) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__result | [175:86](../YouTubeSubtitleDelivery.cs#L175) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.binding | [177:17](../YouTubeSubtitleDelivery.cs#L177) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.path | [183:17](../YouTubeSubtitleDelivery.cs#L183) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches | [184:17](../YouTubeSubtitleDelivery.cs#L184) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12279 | [185:24](../YouTubeSubtitleDelivery.cs#L185) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12279.input | [185:24](../YouTubeSubtitleDelivery.cs#L185) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12398 | [186:25](../YouTubeSubtitleDelivery.cs#L186) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12398.input | [186:25](../YouTubeSubtitleDelivery.cs#L186) |
-| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12449 | [186:76](../YouTubeSubtitleDelivery.cs#L186) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@12449.stream | [186:76](../YouTubeSubtitleDelivery.cs#L186) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix | [190:9](../YouTubeSubtitleDelivery.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__0 | [190:46](../YouTubeSubtitleDelivery.cs#L190) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__2 | [190:58](../YouTubeSubtitleDelivery.cs#L190) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.binding | [192:17](../YouTubeSubtitleDelivery.cs#L192) |
-| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step | [194:13](../YouTubeSubtitleDelivery.cs#L194) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step.demand | [196:21](../YouTubeSubtitleDelivery.cs#L196) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix | [202:9](../YouTubeSubtitleDelivery.cs#L202) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__instance | [202:48](../YouTubeSubtitleDelivery.cs#L202) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__0 | [202:67](../YouTubeSubtitleDelivery.cs#L202) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__1 | [202:79](../YouTubeSubtitleDelivery.cs#L202) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__2 | [202:91](../YouTubeSubtitleDelivery.cs#L202) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.binding | [204:17](../YouTubeSubtitleDelivery.cs#L204) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand | [214:9](../YouTubeSubtitleDelivery.cs#L214) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.command | [214:51](../YouTubeSubtitleDelivery.cs#L214) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.demand | [214:67](../YouTubeSubtitleDelivery.cs#L214) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.binding | [216:17](../YouTubeSubtitleDelivery.cs#L216) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.first | [221:71](../YouTubeSubtitleDelivery.cs#L221) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.primary | [222:66](../YouTubeSubtitleDelivery.cs#L222) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.caption | [223:76](../YouTubeSubtitleDelivery.cs#L223) |
-| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.uri | [225:70](../YouTubeSubtitleDelivery.cs#L225) |
-| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.error | [230:19](../YouTubeSubtitleDelivery.cs#L230) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath | [233:9](../YouTubeSubtitleDelivery.cs#L233) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.path | [233:48](../YouTubeSubtitleDelivery.cs#L233) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.root | [236:17](../YouTubeSubtitleDelivery.cs#L236) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.full | [237:17](../YouTubeSubtitleDelivery.cs#L237) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.comparison | [238:17](../YouTubeSubtitleDelivery.cs#L238) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.name | [240:17](../YouTubeSubtitleDelivery.cs#L240) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.directory | [245:17](../YouTubeSubtitleDelivery.cs#L245) |
-| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.file | [246:17](../YouTubeSubtitleDelivery.cs#L246) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex | [251:9](../YouTubeSubtitleDelivery.cs#L251) |
-| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex.value | [251:35](../YouTubeSubtitleDelivery.cs#L251) |
-| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeProfiles | [253:9](../YouTubeSubtitleDelivery.cs#L253) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.ForceStyle | [23:13](../YouTubeSubtitleDelivery.cs#L23) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.RenderBinding.FontFolder | [23:39](../YouTubeSubtitleDelivery.cs#L23) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering | [29:9](../YouTubeSubtitleDelivery.cs#L29) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.requestDto | [29:52](../YouTubeSubtitleDelivery.cs#L29) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.property | [32:17](../YouTubeSubtitleDelivery.cs#L32) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.profile | [34:71](../YouTubeSubtitleDelivery.cs#L34) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.PreferNativeRendering.local | [41:17](../YouTubeSubtitleDelivery.cs#L41) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install | [49:9](../YouTubeSubtitleDelivery.cs#L49) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmony | [49:37](../YouTubeSubtitleDelivery.cs#L49) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.harmonyMethodType | [49:53](../YouTubeSubtitleDelivery.cs#L49) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.all | [59:36](../YouTubeSubtitleDelivery.cs#L59) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.target | [60:21](../YouTubeSubtitleDelivery.cs#L60) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch | [64:21](../YouTubeSubtitleDelivery.cs#L64) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3878 | [65:38](../YouTubeSubtitleDelivery.cs#L65) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3878.method | [65:38](../YouTubeSubtitleDelivery.cs#L65) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3878.parameters | [65:104](../YouTubeSubtitleDelivery.cs#L65) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3878.anonymous@4100 | [67:43](../YouTubeSubtitleDelivery.cs#L67) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.patch.anonymous@3878.anonymous@4100.parameter | [67:43](../YouTubeSubtitleDelivery.cs#L67) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.assemblies | [69:21](../YouTubeSubtitleDelivery.cs#L69) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.assemblies.anonymous@4288 | [70:28](../YouTubeSubtitleDelivery.cs#L70) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.assemblies.anonymous@4288.assembly | [70:28](../YouTubeSubtitleDelivery.cs#L70) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.assemblies.anonymous@4288.name | [70:74](../YouTubeSubtitleDelivery.cs#L70) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Exported | [72:17](../YouTubeSubtitleDelivery.cs#L72) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Exported.assembly | [72:33](../YouTubeSubtitleDelivery.cs#L72) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Exported.error | [75:27](../YouTubeSubtitleDelivery.cs#L75) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find | [79:17](../YouTubeSubtitleDelivery.cs#L79) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.name | [79:27](../YouTubeSubtitleDelivery.cs#L79) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.exact | [81:25](../YouTubeSubtitleDelivery.cs#L81) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.exact.anonymous@5012 | [81:51](../YouTubeSubtitleDelivery.cs#L81) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.exact.anonymous@5012.assembly | [81:51](../YouTubeSubtitleDelivery.cs#L81) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.exact.anonymous@5070 | [81:109](../YouTubeSubtitleDelivery.cs#L81) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.exact.anonymous@5070.type | [81:109](../YouTubeSubtitleDelivery.cs#L81) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.simple | [83:25](../YouTubeSubtitleDelivery.cs#L83) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.matches | [84:25](../YouTubeSubtitleDelivery.cs#L84) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.matches.anonymous@5294 | [84:73](../YouTubeSubtitleDelivery.cs#L84) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Find.matches.anonymous@5294.type | [84:73](../YouTubeSubtitleDelivery.cs#L84) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single | [87:17](../YouTubeSubtitleDelivery.cs#L87) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.candidates | [87:35](../YouTubeSubtitleDelivery.cs#L87) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.preferred | [87:71](../YouTubeSubtitleDelivery.cs#L87) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.list | [89:25](../YouTubeSubtitleDelivery.cs#L89) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.named | [90:25](../YouTubeSubtitleDelivery.cs#L90) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.named.anonymous@5666 | [90:44](../YouTubeSubtitleDelivery.cs#L90) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Single.named.anonymous@5666.method | [90:44](../YouTubeSubtitleDelivery.cs#L90) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Shape | [94:17](../YouTubeSubtitleDelivery.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Shape.method | [94:28](../YouTubeSubtitleDelivery.cs#L94) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Shape.types | [94:47](../YouTubeSubtitleDelivery.cs#L94) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Shape.anonymous@6006 | [95:54](../YouTubeSubtitleDelivery.cs#L95) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Shape.anonymous@6006.parameter | [95:54](../YouTubeSubtitleDelivery.cs#L95) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipeline | [96:21](../YouTubeSubtitleDelivery.cs#L96) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.tracking | [97:21](../YouTubeSubtitleDelivery.cs#L97) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.command | [98:21](../YouTubeSubtitleDelivery.cs#L98) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demand | [99:21](../YouTubeSubtitleDelivery.cs#L99) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.demands | [100:21](../YouTubeSubtitleDelivery.cs#L100) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.source | [101:21](../YouTubeSubtitleDelivery.cs#L101) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.declared | [102:21](../YouTubeSubtitleDelivery.cs#L102) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource | [103:21](../YouTubeSubtitleDelivery.cs#L103) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@6813 | [103:58](../YouTubeSubtitleDelivery.cs#L103) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.nativeSource.anonymous@6813.method | [103:58](../YouTubeSubtitleDelivery.cs#L103) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property | [105:17](../YouTubeSubtitleDelivery.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.type | [105:39](../YouTubeSubtitleDelivery.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.name | [105:50](../YouTubeSubtitleDelivery.cs#L105) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.expected | [105:63](../YouTubeSubtitleDelivery.cs#L105) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Property.property | [107:25](../YouTubeSubtitleDelivery.cs#L107) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.first | [111:21](../YouTubeSubtitleDelivery.cs#L111) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.inputs | [112:21](../YouTubeSubtitleDelivery.cs#L112) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.subtitles | [113:21](../YouTubeSubtitleDelivery.cs#L113) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method | [118:17](../YouTubeSubtitleDelivery.cs#L118) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.type | [118:35](../YouTubeSubtitleDelivery.cs#L118) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.name | [118:46](../YouTubeSubtitleDelivery.cs#L118) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.types | [118:59](../YouTubeSubtitleDelivery.cs#L118) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Method.method | [120:25](../YouTubeSubtitleDelivery.cs#L120) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.software | [124:21](../YouTubeSubtitleDelivery.cs#L124) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.legacy | [125:21](../YouTubeSubtitleDelivery.cs#L125) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.legacy.anonymous@8506 | [125:52](../YouTubeSubtitleDelivery.cs#L125) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.legacy.anonymous@8506.method | [125:52](../YouTubeSubtitleDelivery.cs#L125) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.plan | [127:21](../YouTubeSubtitleDelivery.cs#L127) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.step | [128:21](../YouTubeSubtitleDelivery.cs#L128) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.hardware | [129:21](../YouTubeSubtitleDelivery.cs#L129) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.steps | [130:21](../YouTubeSubtitleDelivery.cs#L130) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Optional | [132:17](../YouTubeSubtitleDelivery.cs#L132) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Optional.name | [132:40](../YouTubeSubtitleDelivery.cs#L132) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Optional.property | [134:25](../YouTubeSubtitleDelivery.cs#L134) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.forceStyle | [137:21](../YouTubeSubtitleDelivery.cs#L137) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelineArguments | [141:21](../YouTubeSubtitleDelivery.cs#L141) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.builderTypes | [147:24](../YouTubeSubtitleDelivery.cs#L147) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.error | [149:23](../YouTubeSubtitleDelivery.cs#L149) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@10520 | [149:94](../YouTubeSubtitleDelivery.cs#L149) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@10520.type | [149:94](../YouTubeSubtitleDelivery.cs#L149) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines | [150:21](../YouTubeSubtitleDelivery.cs#L150) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10607 | [150:52](../YouTubeSubtitleDelivery.cs#L150) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10607.type | [150:52](../YouTubeSubtitleDelivery.cs#L150) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10712 | [151:29](../YouTubeSubtitleDelivery.cs#L151) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10712.type | [151:29](../YouTubeSubtitleDelivery.cs#L151) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10851 | [152:28](../YouTubeSubtitleDelivery.cs#L152) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10851.method | [152:28](../YouTubeSubtitleDelivery.cs#L152) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10921 | [152:98](../YouTubeSubtitleDelivery.cs#L152) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.pipelines.anonymous@10921.method | [152:98](../YouTubeSubtitleDelivery.cs#L152) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@11010 | [153:60](../YouTubeSubtitleDelivery.cs#L153) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@11010.method | [153:60](../YouTubeSubtitleDelivery.cs#L153) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@11077 | [154:39](../YouTubeSubtitleDelivery.cs#L154) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.anonymous@11077.method | [154:39](../YouTubeSubtitleDelivery.cs#L154) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add | [156:17](../YouTubeSubtitleDelivery.cs#L156) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.original | [156:26](../YouTubeSubtitleDelivery.cs#L156) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.prefix | [156:47](../YouTubeSubtitleDelivery.cs#L156) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.postfix | [156:63](../YouTubeSubtitleDelivery.cs#L156) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.parameters | [158:25](../YouTubeSubtitleDelivery.cs#L158) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.arguments | [159:25](../YouTubeSubtitleDelivery.cs#L159) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.i | [161:30](../YouTubeSubtitleDelivery.cs#L161) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.Add.callbackName | [163:29](../YouTubeSubtitleDelivery.cs#L163) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.method | [171:17](../YouTubeSubtitleDelivery.cs#L171) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Install.error | [176:19](../YouTubeSubtitleDelivery.cs#L176) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix | [183:9](../YouTubeSubtitleDelivery.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__0 | [183:50](../YouTubeSubtitleDelivery.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__3 | [183:71](../YouTubeSubtitleDelivery.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__4 | [183:98](../YouTubeSubtitleDelivery.cs#L183) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.__5 | [183:114](../YouTubeSubtitleDelivery.cs#L183) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSubtitlePrefix.error | [197:19](../YouTubeSubtitleDelivery.cs#L197) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix | [201:9](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__1 | [201:48](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__2 | [201:60](../YouTubeSubtitleDelivery.cs#L201) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.__state | [201:72](../YouTubeSubtitleDelivery.cs#L201) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.binding | [204:17](../YouTubeSubtitleDelivery.cs#L204) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePrefix.error | [211:19](../YouTubeSubtitleDelivery.cs#L211) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix | [214:9](../YouTubeSubtitleDelivery.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__1 | [214:49](../YouTubeSubtitleDelivery.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__2 | [214:61](../YouTubeSubtitleDelivery.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__state | [214:73](../YouTubeSubtitleDelivery.cs#L214) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.__result | [214:86](../YouTubeSubtitleDelivery.cs#L214) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.binding | [216:17](../YouTubeSubtitleDelivery.cs#L216) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.path | [222:17](../YouTubeSubtitleDelivery.cs#L222) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches | [223:17](../YouTubeSubtitleDelivery.cs#L223) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15106 | [224:24](../YouTubeSubtitleDelivery.cs#L224) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15106.input | [224:24](../YouTubeSubtitleDelivery.cs#L224) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15225 | [225:25](../YouTubeSubtitleDelivery.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15225.input | [225:25](../YouTubeSubtitleDelivery.cs#L225) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15276 | [225:76](../YouTubeSubtitleDelivery.cs#L225) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeSourcePostfix.matches.anonymous@15276.stream | [225:76](../YouTubeSubtitleDelivery.cs#L225) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix | [229:9](../YouTubeSubtitleDelivery.cs#L229) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__0 | [229:46](../YouTubeSubtitleDelivery.cs#L229) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.__2 | [229:58](../YouTubeSubtitleDelivery.cs#L229) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.binding | [231:17](../YouTubeSubtitleDelivery.cs#L231) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step | [233:13](../YouTubeSubtitleDelivery.cs#L233) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativePlanPrefix.step.demand | [235:21](../YouTubeSubtitleDelivery.cs#L235) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix | [241:9](../YouTubeSubtitleDelivery.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__instance | [241:48](../YouTubeSubtitleDelivery.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__0 | [241:67](../YouTubeSubtitleDelivery.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__1 | [241:79](../YouTubeSubtitleDelivery.cs#L241) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.__2 | [241:91](../YouTubeSubtitleDelivery.cs#L241) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeRenderPrefix.binding | [243:17](../YouTubeSubtitleDelivery.cs#L243) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont | [259:9](../YouTubeSubtitleDelivery.cs#L259) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont.binding | [259:39](../YouTubeSubtitleDelivery.cs#L259) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont.demand | [259:62](../YouTubeSubtitleDelivery.cs#L259) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont.family | [264:21](../YouTubeSubtitleDelivery.cs#L264) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont.style | [266:21](../YouTubeSubtitleDelivery.cs#L266) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ApplyFont.error | [270:19](../YouTubeSubtitleDelivery.cs#L270) |
+| field | Emby.YouTubePlugin.YouTubeSubtitleDelivery.Families | [273:101](../YouTubeSubtitleDelivery.cs#L273) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily | [275:9](../YouTubeSubtitleDelivery.cs#L275) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.folder | [275:43](../YouTubeSubtitleDelivery.cs#L275) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981 | [278:46](../YouTubeSubtitleDelivery.cs#L278) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.path | [278:46](../YouTubeSubtitleDelivery.cs#L278) |
+| iteration-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file | [283:21](../YouTubeSubtitleDelivery.cs#L283) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.anonymous@18183 | [283:81](../YouTubeSubtitleDelivery.cs#L283) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.anonymous@18183.name | [283:81](../YouTubeSubtitleDelivery.cs#L283) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.extension | [285:29](../YouTubeSubtitleDelivery.cs#L285) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.name | [288:29](../YouTubeSubtitleDelivery.cs#L288) |
+| anonymous-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.anonymous@18629 | [289:74](../YouTubeSubtitleDelivery.cs#L289) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.file.anonymous@18629.c | [289:74](../YouTubeSubtitleDelivery.cs#L289) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.FontFamily.anonymous@17981.error | [293:23](../YouTubeSubtitleDelivery.cs#L293) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily | [299:9](../YouTubeSubtitleDelivery.cs#L299) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.file | [299:43](../YouTubeSubtitleDelivery.cs#L299) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.info | [301:17](../YouTubeSubtitleDelivery.cs#L301) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.data | [303:17](../YouTubeSubtitleDelivery.cs#L303) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.U16 | [304:13](../YouTubeSubtitleDelivery.cs#L304) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.U16.at | [304:21](../YouTubeSubtitleDelivery.cs#L304) |
+| local-function | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.U32 | [305:13](../YouTubeSubtitleDelivery.cs#L305) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.U32.at | [305:22](../YouTubeSubtitleDelivery.cs#L305) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.tables | [306:17](../YouTubeSubtitleDelivery.cs#L306) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.i | [307:22](../YouTubeSubtitleDelivery.cs#L307) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.record | [309:21](../YouTubeSubtitleDelivery.cs#L309) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.table | [311:21](../YouTubeSubtitleDelivery.cs#L311) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.count | [312:21](../YouTubeSubtitleDelivery.cs#L312) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.strings | [312:45](../YouTubeSubtitleDelivery.cs#L312) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.mac | [313:25](../YouTubeSubtitleDelivery.cs#L313) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.j | [314:26](../YouTubeSubtitleDelivery.cs#L314) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.entry | [316:25](../YouTubeSubtitleDelivery.cs#L316) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.platform | [317:25](../YouTubeSubtitleDelivery.cs#L317) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.id | [317:48](../YouTubeSubtitleDelivery.cs#L317) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.length | [317:69](../YouTubeSubtitleDelivery.cs#L317) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.ReadFamily.offset | [317:94](../YouTubeSubtitleDelivery.cs#L317) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand | [327:9](../YouTubeSubtitleDelivery.cs#L327) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.command | [327:51](../YouTubeSubtitleDelivery.cs#L327) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.demand | [327:67](../YouTubeSubtitleDelivery.cs#L327) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.binding | [329:17](../YouTubeSubtitleDelivery.cs#L329) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.first | [334:71](../YouTubeSubtitleDelivery.cs#L334) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.primary | [335:66](../YouTubeSubtitleDelivery.cs#L335) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.caption | [336:76](../YouTubeSubtitleDelivery.cs#L336) |
+| pattern-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.uri | [338:70](../YouTubeSubtitleDelivery.cs#L338) |
+| catch-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionCommand.error | [343:19](../YouTubeSubtitleDelivery.cs#L343) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath | [346:9](../YouTubeSubtitleDelivery.cs#L346) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.path | [346:48](../YouTubeSubtitleDelivery.cs#L346) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.root | [349:17](../YouTubeSubtitleDelivery.cs#L349) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.full | [350:17](../YouTubeSubtitleDelivery.cs#L350) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.comparison | [351:17](../YouTubeSubtitleDelivery.cs#L351) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.name | [353:17](../YouTubeSubtitleDelivery.cs#L353) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.directory | [358:17](../YouTubeSubtitleDelivery.cs#L358) |
+| local-variable | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsOwnedCaptionPath.file | [359:17](../YouTubeSubtitleDelivery.cs#L359) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex | [364:9](../YouTubeSubtitleDelivery.cs#L364) |
+| parameter | Emby.YouTubePlugin.YouTubeSubtitleDelivery.IsHex.value | [364:35](../YouTubeSubtitleDelivery.cs#L364) |
+| method | Emby.YouTubePlugin.YouTubeSubtitleDelivery.NativeProfiles | [366:9](../YouTubeSubtitleDelivery.cs#L366) |
 
 </details>
 
@@ -11135,7 +11317,7 @@ Plugin Compile source (SDK default); 4535 bytes; 92 lines.
 <a id="file-8a63fe1dcd96b301"></a>
 ## [docs/CODE_GUIDE.md](../docs/CODE_GUIDE.md)
 
-Documentation/resource; 66449 bytes; 374 lines.
+Documentation/resource; 68460 bytes; 374 lines.
 
 <a id="file-24c05485c45ad84d"></a>
 ## [docs/CODE_MAP_MAINTENANCE.md](../docs/CODE_MAP_MAINTENANCE.md)
@@ -11150,7 +11332,7 @@ Documentation/resource; 3896 bytes; 60 lines.
 <a id="file-31e2cff7937d621c"></a>
 ## [docs/code-map.flows.json](../docs/code-map.flows.json)
 
-Documentation/resource; 17748 bytes; 243 lines.
+Documentation/resource; 17882 bytes; 243 lines.
 
 <a id="file-51ccab4fa46b4e7f"></a>
 ## [docs/screenshots/.gitkeep](../docs/screenshots/.gitkeep)

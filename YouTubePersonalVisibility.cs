@@ -2,8 +2,10 @@ using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Dto;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Model.Data;
 using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Library;
 using MediaBrowser.Model.Querying;
 using System.Reflection;
@@ -95,7 +97,7 @@ namespace Emby.YouTubePlugin
                             && method.GetParameters().Any(parameter => parameter.Name == "prefix")
                             && method.GetParameters().Any(parameter => parameter.Name == "postfix"));
                     if (patch == null) return 0;
-                    if (targets.Any(t => t != null && !EmbyPatchSafety.IsPatchable(t))) return 0;
+                    try { EmbyPatchSafety.RequirePatchable(targets); } catch (InvalidOperationException) { return 0; }
                     string[] handlers = { nameof(QueryPostfix), nameof(ViewsPostfix), nameof(OneDtoPrefix), nameof(ManyDtoPrefix) };
                     for (int i = 0; i < targets.Length; i++)
                     {
@@ -136,9 +138,7 @@ namespace Emby.YouTubePlugin
                 var parameters = new[] { typeof(InternalItemsQuery), typeof(IDataContext), typeof(CancellationToken) };
                 var list = Exact(library, "GetItemList", typeof(BaseItem[]), parameters);
                 var result = Exact(library, "GetItemsResult", typeof(QueryResult<BaseItem>), parameters);
-                var repository = library.Assembly.GetType("Emby.Server.Implementations.Data.SqliteItemRepository");
-                var where = repository == null ? null : Exact(repository, "GetWhereClauses", typeof(List<string>),
-                    typeof(InternalItemsQuery), typeof(List<KeyValuePair<string, string>>), typeof(string), typeof(bool));
+                var where = WhereClauses(library.Assembly);
                 // Structural checks work across operating systems and compatible
                 // Emby builds. A matching name alone is not a supported binding.
                 if (list == null || result == null || where == null
@@ -156,18 +156,72 @@ namespace Emby.YouTubePlugin
 
         private static MethodInfo?[] CandidateTargets(Type library, Type views, Type dto)
         {
-            bool Native(Type type, string name, Type contract) => type.FullName == name
+            // Emby 4.11.0.18+ obfuscates the implementation names, so the
+            // types are the server's own implementations of the contracts
+            // (the instances Emby injected) and private methods are found by
+            // shape; the structural checks in FindTargets stay the proof.
+            bool Native(Type type, string name, Type contract) => (type.FullName == name || !IsReadable(type.FullName))
                 && type.Assembly.GetName().Name == "Emby.Server.Implementations" && contract.IsAssignableFrom(type);
             bool lib = Native(library, "Emby.Server.Implementations.Library.LibraryManager", typeof(ILibraryManager));
             bool view = Native(views, "Emby.Server.Implementations.Library.UserViewManager", typeof(IUserViewManager));
             bool dtos = Native(dto, "Emby.Server.Implementations.Dto.DtoService", typeof(IDtoService));
             return new[]
             {
-                lib ? Exact(library, "SetUserAndParents", typeof(void), typeof(InternalItemsQuery), typeof(IDataContext), typeof(CancellationToken)) : null,
+                lib ? UserAndParents(library) : null,
                 view ? Exact(views, "GetUserViews", typeof(Folder[]), typeof(UserViewQuery), typeof(User), typeof(Folder[]), typeof(IDataContext), typeof(CancellationToken)) : null,
                 dtos ? Exact(dto, "GetBaseItemDto", typeof(BaseItemDto), typeof(BaseItem), typeof(DtoOptions), typeof(User), typeof(CancellationToken)) : null,
                 dtos ? Exact(dto, "GetBaseItemDtos", typeof(BaseItemDto[]), typeof(BaseItem[]), typeof(DtoOptions), typeof(User), typeof(CancellationToken)) : null
             };
+        }
+
+        // Names made of letters, digits, dots, '+', '_' and '`' are real C#
+        // names; obfuscated ones use invisible or punctuation characters.
+        private static bool IsReadable(string? name) => !string.IsNullOrEmpty(name)
+            && name.All(c => c < 128 && (char.IsLetterOrDigit(c) || c is '.' or '+' or '_' or '`'));
+
+        private static readonly Type[] QueryShape = { typeof(InternalItemsQuery), typeof(IDataContext), typeof(CancellationToken) };
+
+        // LibraryManager.SetUserAndParents(query, context, cancellation): by
+        // name where readable, otherwise the one private void method of that
+        // shape which both GetItemList and GetItemsResult call before they
+        // read from the repository (FindTargets verifies that order).
+        private static MethodInfo? UserAndParents(Type library)
+        {
+            var named = Exact(library, "SetUserAndParents", typeof(void), QueryShape);
+            if (named != null) return named;
+            var list = Exact(library, "GetItemList", typeof(BaseItem[]), QueryShape);
+            var result = Exact(library, "GetItemsResult", typeof(QueryResult<BaseItem>), QueryShape);
+            if (list == null || result == null) return null;
+            try
+            {
+                var shaped = library.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(method => !IsReadable(method.Name) && method.ReturnType == typeof(void)
+                        && method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(QueryShape))
+                    .ToHashSet();
+                var both = Calls(list).OfType<MethodInfo>().Where(shaped.Contains)
+                    .Intersect(Calls(result).OfType<MethodInfo>().Where(shaped.Contains)).Distinct().ToArray();
+                return both.Length == 1 ? Exact(library, both[0].Name, typeof(void), QueryShape) : null;
+            }
+            catch (Exception error) when (error is not OutOfMemoryException) { return null; }
+        }
+
+        // SqliteItemRepository.GetWhereClauses(query, parameters, prefix, flag):
+        // by name where readable, otherwise the single method of that exact
+        // signature on the server's IItemRepository implementation.
+        private static MethodInfo? WhereClauses(Assembly server)
+        {
+            var shape = new[] { typeof(InternalItemsQuery), typeof(List<KeyValuePair<string, string>>), typeof(string), typeof(bool) };
+            var named = server.GetType("Emby.Server.Implementations.Data.SqliteItemRepository");
+            if (named != null) return Exact(named, "GetWhereClauses", typeof(List<string>), shape);
+            Type[] types;
+            try { types = server.GetTypes(); }
+            catch (ReflectionTypeLoadException error) { types = error.Types.Where(type => type != null).ToArray()!; }
+            var matches = types.Where(type => type.IsClass && !type.IsAbstract && typeof(IItemRepository).IsAssignableFrom(type))
+                .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
+                .Where(method => method.ReturnType == typeof(List<string>)
+                    && method.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(shape))
+                .ToArray();
+            return matches.Length == 1 ? Exact(matches[0].DeclaringType!, matches[0].Name, typeof(List<string>), shape) : null;
         }
 
         private static bool NormalizesBeforeRead(MethodInfo method, MethodInfo normalize)
@@ -333,6 +387,72 @@ namespace Emby.YouTubePlugin
             item.ExternalId?.StartsWith(Prefix, StringComparison.Ordinal) == true
             || item.ExternalId?.StartsWith("personalshared_x_", StringComparison.Ordinal) == true
             || item.ParentId == channel && item.ExternalId?.StartsWith("channel_x_", StringComparison.Ordinal) == true;
+
+        // Builds before 2.0.14.2 gave videos of own subscriptions a studio.
+        // Emby made a library-wide Studio item of it (visible to every user in
+        // search and /Studios), and a channel refresh never clears a list that
+        // is already stored. Clear the studios of every video below a
+        // personal folder and delete a Studio item that nothing else uses any
+        // more (a public channel of the same name keeps it). Runs in the
+        // background, never inside a query hook.
+        internal static int RepairPersonalStudios(ILibraryManager library, long channel, CancellationToken cancellation)
+        {
+            if (channel <= 0) return 0;
+            var folders = library.GetItemList(new InternalItemsQuery
+            {
+                AncestorIds = new[] { channel }, IsFolder = true, Recursive = true,
+                GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false, ForceOriginalFolders = true
+            }, cancellation);
+            // Only folders of own subscriptions (personal_x_<scope>_own_...):
+            // every folder of such a tree carries the wrapped id. Admin channel
+            // roots (channel_x_) and shared personal folders are visible to
+            // everyone and keep their studios. Direct children only, because
+            // AncestorIds also reached videos of public channels (the first
+            // test cleared 150 instead of 50 videos and deleted a public studio).
+            var own = folders.Where(folder => folder.ExternalId?.StartsWith(Prefix, StringComparison.Ordinal) == true
+                    && YouTubePersonalCatalog.TryParse(folder.ExternalId, out _, out var inner)
+                    && inner.StartsWith("own_", StringComparison.Ordinal))
+                .Select(folder => folder.InternalId).ToHashSet();
+            if (own.Count == 0) return 0;
+            var videos = library.GetItemList(new InternalItemsQuery
+            {
+                ParentIds = own.ToArray(), IsFolder = false, Recursive = false,
+                GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false
+            }, cancellation).Where(video => own.Contains(video.ParentId)).ToArray();
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            int cleared = 0;
+            foreach (var video in videos)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                if (video.Studios == null || video.Studios.Length == 0) continue;
+                foreach (var name in video.Studios) if (!string.IsNullOrWhiteSpace(name)) names.Add(name);
+                video.Studios = Array.Empty<string>();
+                library.UpdateItem(video, video.GetParent(), ItemUpdateType.MetadataEdit);
+                cleared++;
+            }
+            int removed = 0;
+            foreach (var name in names)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                var studios = library.GetItemList(new InternalItemsQuery
+                    { IncludeItemTypes = new[] { "Studio" }, Name = name, EnableTotalRecordCount = false }, cancellation);
+                foreach (var studio in studios)
+                {
+                    if (!string.Equals(studio.Name, name, StringComparison.OrdinalIgnoreCase)) continue;
+                    var users = library.GetItemList(new InternalItemsQuery
+                    {
+                        StudioIds = new[] { studio.InternalId }, Recursive = true, Limit = 1,
+                        GroupByPresentationUniqueKey = false, EnableTotalRecordCount = false
+                    }, cancellation);
+                    if (users.Length > 0) continue;
+                    library.DeleteItem(studio, new DeleteOptions { DeleteFileLocation = false, DeleteFromExternalProvider = false }, false);
+                    removed++;
+                }
+            }
+            if (cleared > 0 || removed > 0)
+                YouTubeChannel.LogPublic("[YT] Personal studio names removed from " + cleared + " videos; " + removed + " unused studio entries deleted.");
+            return cleared;
+        }
 
         private static readonly MethodInfo ShallowCopy = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic)!;
         private static BaseItem RequestItem(BaseItem item)

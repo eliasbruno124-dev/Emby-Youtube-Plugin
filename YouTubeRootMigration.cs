@@ -159,8 +159,7 @@ internal static class YouTubeRootMigration
     {
         token.ThrowIfCancellationRequested();
         var manager = Plugin.ResolveService<IChannelManager>() ?? throw new InvalidOperationException("Channel manager unavailable.");
-        var provider = manager.GetType().GetMethod("GetChannelProvider", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-            null, new[] { typeof(Channel) }, null) ?? throw new InvalidOperationException("Channel identity binding unavailable.");
+        var provider = EmbyChannelBinding.ProviderMethod(manager) ?? throw new InvalidOperationException("Channel identity binding unavailable.");
         var channels = library.GetItemList(new InternalItemsQuery
         { IncludeItemTypes = new[] { "Channel" }, Recursive = true, EnableTotalRecordCount = false }, token).OfType<Channel>();
         var matches = channels.Where(channel => provider.Invoke(manager, new object[] { channel }) is YouTubeChannel).ToArray();
